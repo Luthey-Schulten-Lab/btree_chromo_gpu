@@ -7,13 +7,14 @@ int main()
   btree btree_test;
   fork_rho fork_rho_test;
   btree_state btree_state_test;
+  btree_transforms btree_transforms_test;
 
-  btree_state_test.size = 100;
+  btree_state_test.size = 1000;
   fork_rho_test.fork = "m";
   fork_rho_test.rho = 100;
   btree_state_test.fork_rhos.push_back(fork_rho_test);
   fork_rho_test.fork = "ml";
-  fork_rho_test.rho = 100;
+  fork_rho_test.rho = 150;
   btree_state_test.fork_rhos.push_back(fork_rho_test);
   fork_rho_test.fork = "mlr";
   fork_rho_test.rho = 25;
@@ -23,25 +24,24 @@ int main()
   btree_state_test.fork_rhos.push_back(fork_rho_test);
 
   btree_test.prepare_state(btree_state_test);
+  btree_test.print_tree();
 
-  // btree_test.initialize_tree(100);
+  fork_rho_test.fork = "mlr";
+  fork_rho_test.rho = 25;
+  btree_transforms_test.fork_rhos.push_back(fork_rho_test);
+  fork_rho_test.fork = "mrrr";
+  fork_rho_test.rho = 15;
+  btree_transforms_test.fork_rhos.push_back(fork_rho_test);
 
-  // btree_test.foo();
+  btree_test.apply_transforms(btree_transforms_test);
+  btree_test.print_tree();
 
-  // btree_test.print_tree();
+  btree_state_test = btree_test.dump_state();
 
-  // btree_test.branch("ml");
-  // btree_test.branch("m");
-  // btree_test.grow_at_branch("m",10);
-  // btree_test.branch("ml");
-  // btree_test.grow_at_branch("ml",15);
+  btree_test.destroy_tree();
 
-  // btree_test.print_tree();
-  // btree_test.grow_at_branch("m",150);
-  // btree_test.branch("mlr");
-  // btree_test.grow_at_branch("ml",150);
-  // btree_test.branch("mr");
-
+  cout << "remaking btree" << endl;
+  btree_test.prepare_state(btree_state_test);
   btree_test.print_tree();
 
   btree_test.destroy_tree();
