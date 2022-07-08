@@ -16,7 +16,7 @@ btree::~btree()
 }
 
 
-// function to initialize tree
+// function to initialize binary tree
 void btree::initialize_tree(int s)
 {
   if (root == NULL)
@@ -26,14 +26,95 @@ void btree::initialize_tree(int s)
     }
 }
 
-// function to prepare a state
+
+// function to prepare a state of the binary tree
 void btree::prepare_state(btree_state st)
 {
+
+  int error_code;
+  
   initialize_tree(st.size);
   for (fork_rho f_r: st.fork_rhos)
     {
-      branch(f_r.fork);
-      grow_at_branch(f_r.fork,f_r.rho);
+      
+      error_code = grow_at_branch(f_r.fork,f_r.rho);
+
+      if (error_code == -1)
+	{
+	  cout << "ERROR: impossible state, destroying tree" << endl;
+	  destroy_tree();
+	  return;
+	}
+      
+    }
+}
+
+
+// function to prepare a state of the binary tree
+btree_state btree::dump_state()
+{
+
+  btree_state st;
+  fork_rho f_r;
+  
+  if (root != NULL)
+    {
+      st.size = root->size;
+
+      // add completed forks to state
+      for (string s: get_completed_forks())
+	{
+	  
+	  f_r.fork = s;
+	  f_r.rho = get_branch(s)->rho;
+
+	  st.fork_rhos.push_back(f_r);
+	  
+	}
+
+      // add active forks to state
+      for (string s: get_active_forks())
+	{
+	  
+	  f_r.fork = s;
+	  f_r.rho = get_branch(s)->rho;
+
+	  st.fork_rhos.push_back(f_r);
+	  
+	}
+      
+    }
+  else
+    {
+      st.size = -1;
+    }
+  
+  return st;
+}
+
+
+// function to apply transforms to the binary tree
+void btree::apply_transforms(btree_transforms tr)
+{
+
+  int error_code;
+  btree_state st = dump_state();
+  
+  for (fork_rho f_r: tr.fork_rhos)
+    {
+      
+      error_code = grow_at_branch(f_r.fork,f_r.rho);
+
+      if (error_code == -1)
+	{
+	  cout << "ERROR: impossible state, destroying tree and returning to initial state" << endl;
+
+	  // destroy the impossible tree and return to the initial state
+	  destroy_tree();
+	  prepare_state(st);
+	  return;
+	}
+      
     }
 }
 
@@ -51,8 +132,8 @@ void btree::initialize_branch(node *branch, int g, int s)
 }
 
 
-// function to begin a branching procedure if it is valud
-void btree::branch(string loc)
+// function to begin a branching procedure if it is valid
+int btree::branch(string loc)
 {
   node *branch;
 
@@ -60,12 +141,24 @@ void btree::branch(string loc)
 
   if (branch == NULL)
     {
-      cout << "invalid branch" << endl;
+      cout << "invalid branch ("
+	   << loc
+	   << ")"
+	   << endl;
+      
+      return -1;
     }
   else
     {
-      cout << "branching at (" << loc << ")"  << endl;
+      
+      cout << "branching at ("
+	   << loc
+	   << ")"
+	   << endl;
+      
       split_branch(branch);
+      
+      return 0;
     }
 }
 
@@ -89,20 +182,41 @@ void btree::split_branch(node *branch)
 
 
 // function to increase rho in a manner dependent on the possible growth
-void btree::grow_at_branch(string loc, int r)
+int btree::grow_at_branch(string loc, int r)
 {
-  int max_growth;
-  node *branch = get_branch(loc);
+  int max_growth, growth, rem, error_code;
+  node *g_branch;
 
-  if (branch->parent == NULL)
+  error_code = branch(loc);
+  if (error_code < 0)
     {
-      max_growth = branch->size;
+      return error_code;
     }
-  else
+
+  // grow the branch if r > 0
+  if (r > 0)
     {
-      max_growth = branch->parent->rho;
+      g_branch = get_branch(loc);
+
+      if (g_branch->parent == NULL)
+	{
+	  max_growth = g_branch->size;
+	}
+      else
+	{
+	  max_growth = g_branch->parent->rho;
+	}
+  
+      growth = min(max_growth-g_branch->rho,r);
+      g_branch->rho += growth;
+      rem = r - growth;
     }
-  branch->rho = min(max_growth,branch->rho+r);
+  else // do nothing if r == 0
+    {
+      rem = 0;
+    }
+  
+  return rem; // return the remainder of the growth
 }
 
 
@@ -355,8 +469,11 @@ void btree::destroy_tree(node *branch)
 
 void btree::destroy_tree()
 {
-  destroy_tree(root);
-  root = NULL;
+  if (root != NULL)
+    {
+      destroy_tree(root);
+      root = NULL;
+    }
 }
 
 

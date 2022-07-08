@@ -32,6 +32,11 @@ struct btree_state
   vector<fork_rho> fork_rhos;
 };
 
+struct btree_transforms
+{
+  vector<fork_rho> fork_rhos;
+};
+
 class btree
 {
 public:
@@ -48,9 +53,15 @@ public:
 
   // initialize, branch, and grow at branches
   void initialize_tree(int s);
-  void branch(string loc);
-  void grow_at_branch(string loc, int r);
+  int branch(string loc);
+  int grow_at_branch(string loc, int r);
+
+  // prepare and dump state
   void prepare_state(btree_state st);
+  btree_state dump_state();
+
+  // apply transformations to btree
+  void apply_transforms(btree_transforms tr);
 
   // queries about tree state
   int count_total_leaves();
