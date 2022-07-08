@@ -1,18 +1,22 @@
-#include <iostream>
-
 #include <btree/btree.hpp>
 
 // constructor
 btree::btree()
 {
-  root = NULL;
+  reset_root();
 }
 
+void btree::reset_root()
+{
+  root = NULL;
+}
 
 // destructor
 btree::~btree()
 {
-  destroy_tree(root);
+  // cout << "btree destructor before destroy" << endl;
+  destroy_tree();
+  // cout << "btree destructor after destroy" << endl;
 }
 
 
@@ -50,7 +54,7 @@ void btree::prepare_state(btree_state st)
 }
 
 
-// function to prepare a state of the binary tree
+// function to dump a state of the binary tree
 btree_state btree::dump_state()
 {
 
@@ -116,6 +120,145 @@ void btree::apply_transforms(btree_transforms tr)
 	}
       
     }
+}
+
+
+// function to write a binary tree state to a file
+void btree::write_state(string st_filename, btree_state st)
+{
+  fstream st_file;
+
+  st_file.open(st_filename, ios::out);
+
+  st_file << "size=" << st.size << endl;
+
+  for (fork_rho f_r: st.fork_rhos)
+    {
+      
+      st_file << f_r.fork << "_" << f_r.rho << endl;
+      
+    }
+
+  st_file.close();
+}
+
+
+// function to read a binary tree state from a file
+btree_state btree::read_state(string st_filename)
+{
+  fstream st_file;
+
+  btree_state st;
+  fork_rho f_r;
+  
+  string line;
+
+  int delim;
+  bool size_found = false;
+
+  st_file.open(st_filename, ios::in);
+
+  // cout << st_filename << endl;
+
+  if (!st_file)
+    {
+      st.size = -1;
+      cout << "ERROR: file not opened in read_state" << endl;
+    }
+  else
+    {
+      while (1)
+	{
+	  st_file >> line;
+	  if (st_file.eof()) break;
+	  
+	  // cout << line << endl;
+
+	  if (size_found == false)
+	    {
+	      
+	      delim = line.find("=");
+	      // cout << line.substr(0,delim) << endl;
+	      // cout << line.substr(delim+1,line.length()) << endl;
+	      
+	      if (line.substr(0,delim) == "size")
+		{
+		  st.size = stoi(line.substr(delim+1,line.length()));
+		  size_found = true;
+		}
+	      
+	    }
+	  else
+	    {
+	      
+	      delim = line.find("_");
+	      if (delim != -1)
+		{
+		  f_r.fork = line.substr(0,delim);
+		  // cout << f_r.fork << endl;
+		  f_r.rho = stoi(line.substr(delim+1,line.length()));
+		  // cout << f_r.rho << endl;
+		  st.fork_rhos.push_back(f_r);
+		}
+	      
+	    }
+      
+	}
+  
+    }
+  
+  st_file.close();
+
+  return st;
+}
+
+
+// function to read a binary tree state from a file
+btree_transforms btree::read_transforms(string tr_filename)
+{
+  fstream tr_file;
+
+  btree_transforms tr;
+  fork_rho f_r;
+  
+  string line;
+
+  int delim;
+
+  tr_file.open(tr_filename, ios::in);
+
+  // cout << tr_filename << endl;
+
+  if (!tr_file)
+    {
+      cout << "ERROR: file not opened in read_transforms" << endl;
+    }
+  else
+    {
+      while (1)
+	{
+	  tr_file >> line;
+	  if (tr_file.eof()) break;
+	  
+	  // cout << line << endl;
+	      
+	  delim = line.find("_");
+	  if (delim != -1)
+	    {
+	      f_r.fork = line.substr(0,delim);
+	      // cout << f_r.fork << endl;
+	      f_r.rho = stoi(line.substr(delim+1,line.length()));
+	      // cout << f_r.rho << endl;
+	      tr.fork_rhos.push_back(f_r);
+	    }
+
+     	}
+  
+    }
+  
+  tr_file.close();
+
+  return tr;
 }
 
 
@@ -472,7 +615,7 @@ void btree::destroy_tree()
   if (root != NULL)
     {
       destroy_tree(root);
-      root = NULL;
+      reset_root();
     }
 }
 
@@ -540,7 +683,7 @@ void btree::print_tree()
       int N_completed_forks = count_completed_forks();
       int N_active_forks = count_active_forks();
       
-      cout << "printing tree with "
+      cout << "\n\nprinting tree with "
 	   << N_leaves
 	   << " leaves and "
 	   << N_forks
@@ -591,8 +734,9 @@ void btree::print_tree()
     }
   else
     {
-      cout << "tree does not exist" << endl;
+      cout << "\n\ntree does not exist" << endl;
     }
+  cout << "\n\n" << endl;
 }
 
 void btree::foo()

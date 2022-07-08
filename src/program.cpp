@@ -1,56 +1,52 @@
 #include <btree/btree.hpp>
+#include <btree/btree_driver.hpp>
 #include <program.hpp>
 
 int main()
 {
 
-  btree btree_test;
-  fork_rho fork_rho_test;
-  btree_state btree_state_test;
-  btree_transforms btree_transforms_test;
+  int error_code = 0;
+  btree_driver driver;
 
-  btree_state_test.size = 1000;
-  fork_rho_test.fork = "m";
-  fork_rho_test.rho = 100;
-  btree_state_test.fork_rhos.push_back(fork_rho_test);
-  fork_rho_test.fork = "ml";
-  fork_rho_test.rho = 150;
-  btree_state_test.fork_rhos.push_back(fork_rho_test);
-  fork_rho_test.fork = "mlr";
-  fork_rho_test.rho = 25;
-  btree_state_test.fork_rhos.push_back(fork_rho_test);
-  fork_rho_test.fork = "mr";
-  fork_rho_test.rho = 15;
-  btree_state_test.fork_rhos.push_back(fork_rho_test);
+  driver.read_directives("/home/ben/Workspace/btree_chromo/test_case/directives.inp");
+  driver.print_directives();
 
-  btree_test.prepare_state(btree_state_test);
-  btree_test.print_tree();
+  error_code = driver.execute_directives();
 
-  fork_rho_test.fork = "mlr";
-  fork_rho_test.rho = 25;
-  btree_transforms_test.fork_rhos.push_back(fork_rho_test);
-  fork_rho_test.fork = "mrrr";
-  fork_rho_test.rho = 15;
-  btree_transforms_test.fork_rhos.push_back(fork_rho_test);
+  if (error_code != 0)
+    {
+      cout << "error during directive execution" << endl;
+    }
+  
+  // driver.~btree_driver();
+  
+  // btree btree_test;
+  // fork_rho fork_rho_test;
+  // btree_state btree_state_test;
+  // btree_transforms btree_transforms_test;
 
-  btree_test.apply_transforms(btree_transforms_test);
-  btree_test.print_tree();
 
-  btree_state_test = btree_test.dump_state();
+  // btree_state_test = btree_test.read_state("/home/ben/Workspace/btree_chromo/test_case/in_state_test.txt");
+  // btree_test.prepare_state(btree_state_test);
+  // btree_test.print_tree();
 
-  btree_test.destroy_tree();
+  // btree_transforms_test = btree_test.read_transforms("/home/ben/Workspace/btree_chromo/test_case/state_trans_test.txt");
 
-  cout << "remaking btree" << endl;
-  btree_test.prepare_state(btree_state_test);
-  btree_test.print_tree();
+  // btree_test.apply_transforms(btree_transforms_test);
+  // btree_test.print_tree();
 
-  btree_test.destroy_tree();
+  // btree_state_test = btree_test.dump_state();
 
-  btree_test.print_tree();
+  // btree_test.write_state("/home/ben/Workspace/btree_chromo/test_case/out_state_test.txt"
+  // 			 ,btree_state_test);
+  
+  // btree_test.destroy_tree();
 
-  btree_test.initialize_tree(10);
+  // btree_test.print_tree();
 
-  btree_test.print_tree();
+  // btree_test.initialize_tree(10);
+
+  // btree_test.print_tree();
   
   program::foo();
 

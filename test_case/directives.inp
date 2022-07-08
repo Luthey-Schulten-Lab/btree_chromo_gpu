@@ -1,0 +1,7 @@
+input_state:/home/ben/Workspace/btree_chromo/test_case/in_state_test.txt
+print
+transforms_file:/home/ben/Workspace/btree_chromo/test_case/state_trans_test.txt
+print
+output_state:/home/ben/Workspace/btree_chromo/test_case/out_state_test.txt
+transforms_file:/home/ben/Workspace/btree_chromo/test_case/state_trans_test.txt
+output_state:/home/ben/Workspace/btree_chromo/test_case/out_state_test2.txt

@@ -2,6 +2,7 @@
 #define INCLUDE_BTREE_HPP
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <cstring>
 #include <algorithm>
@@ -45,6 +46,9 @@ public:
   btree();
   ~btree();
 
+  // reset root
+  void reset_root();
+
   // recursively destroys tree
   void destroy_tree();
 
@@ -59,6 +63,11 @@ public:
   // prepare and dump state
   void prepare_state(btree_state st);
   btree_state dump_state();
+
+  // read and write the state
+  void write_state(string st_filename, btree_state st);
+  btree_state read_state(string st_filename);
+  btree_transforms read_transforms(string tr_filename);
 
   // apply transformations to btree
   void apply_transforms(btree_transforms tr);
