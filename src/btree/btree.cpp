@@ -272,6 +272,10 @@ void btree::initialize_branch(node *branch, int g, int s)
   branch->parent = NULL;
   branch->left = NULL;
   branch->right = NULL;
+  branch->topo.start = -1;
+  branch->topo.end = -1;
+  branch->topo.start_link = -1;
+  branch->topo.end_link = -1;
 }
 
 
@@ -599,6 +603,131 @@ vector<string> btree::traverse_active_forks(vector<string> forks, string f, node
 }
 
 
+// calculate the total size of the system
+int btree::total_size()
+{
+  return branch_size(get_branch("m"));
+}
+
+// calculate size of branch
+int btree::branch_size(node *branch)
+{
+  int s = 0;
+
+  if (branch->parent == NULL)
+    {
+      s += branch->size;
+    }
+  
+  if (branch->leaf == false)
+    {
+      s += branch->rho;
+      s += branch_size(branch->left);
+      s += branch_size(branch->right);
+    }
+  
+  return s;
+}
+
+
+// function to partition units among branches
+void btree::solve_topology()
+{
+  int temp_start, target_size;
+  string free_leaf;
+  string query_leaf;
+  node *free_branch;
+  node *query_branch;
+
+  int N_leaves = count_total_leaves();
+  vector<string> leaves = get_leaves();
+
+  bool match;
+  int j_q, j_f;
+
+  int mid, d_start, d_end;
+
+  temp_start = 0;
+
+  for (int i=0; i<N_leaves; i++)
+    {
+
+      free_leaf = leaves[i];
+      free_branch = get_branch(free_leaf);
+      
+      if (i == 0)
+	{
+	  
+	  target_size = free_branch->size;
+	  
+	}
+      else
+	{
+
+	  match = false;
+	  query_leaf = leaves[i-1];
+
+	  j_f = free_leaf.length() - 1;
+	  while ((match == false) && (j_f >= 0))
+	    {
+
+	      j_q = query_leaf.length() - 1;
+	      while ((match == false) && (j_q >= 0))
+		{
+
+		  if (free_leaf.substr(0,j_f) == query_leaf.substr(0,j_q))
+		    {
+		      query_branch = get_branch(query_leaf.substr(0,j_q));
+		      match = true;
+		    }
+
+		  j_q -= 1;
+	      
+		}
+
+	      j_f -= 1;
+	      
+	    }
+
+	  // set the target size
+	  target_size = query_branch->rho;
+
+	  // descend to leftmost leaf of query branch
+	  while (query_branch->leaf == false)
+	    {
+	      query_branch = query_branch->left;
+	    }
+	  
+	}
+
+      // set the start and end
+      free_branch->topo.start = temp_start;
+      free_branch->topo.end = temp_start + target_size - 1;
+      temp_start += target_size;
+
+      if (target_size == free_branch->size)
+	{
+	  free_branch->topo.start_link = free_branch->topo.end;
+	  free_branch->topo.end_link = free_branch->topo.start;
+	}
+      else
+	{
+
+	  d_start = target_size/2;
+	  d_end = target_size - d_start;
+
+	  mid = (query_branch->topo.start + query_branch->topo.end)/2;
+
+	  free_branch->topo.start_link = mid - d_start;
+	  free_branch->topo.end_link = mid + d_end + 1;
+	  
+	}
+      
+    }
+  
+}
+
+
 // function used by destructor
 void btree::destroy_tree(node *branch)
 {
@@ -650,11 +779,25 @@ void btree::print_branch(node *branch)
 	  max_size = branch->size;
 	}
       cout << gen_offset
-		<< "rho = "
-		<< branch->rho
-		<< "/" << max_size
-		<< endl;
+	   << "rho = "
+	   << branch->rho
+	   << "/" << max_size
+	   << endl;
     }
+
+
+  cout << gen_offset
+       << "start = "
+       << branch->topo.start
+       << ", end = "
+       << branch->topo.end
+       << endl;
+  cout << gen_offset
+       << "start_link = "
+       << branch->topo.start_link
+       << ", end_link = "
+       << branch->topo.end_link
+       << endl;
 
   if (branch->leaf == false)
     {
@@ -729,6 +872,10 @@ void btree::print_tree()
 	    }
 	  cout << endl;
 	}
+
+      cout << "total_size = "
+	   << total_size()
+	   << endl;
       
       print_branch(root);
     }

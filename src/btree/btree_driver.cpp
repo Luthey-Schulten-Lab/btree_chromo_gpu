@@ -101,6 +101,14 @@ int btree_driver::execute_directives()
 	{
 	  write_state(params,dump_state());
 	}
+      else if (command == "dump_topology")
+	{
+	  print_tree();
+	}
+      else if (command == "solve_topology")
+	{
+	  solve_topology();
+	}
       else if (command == "print")
 	{
 	  print_tree();

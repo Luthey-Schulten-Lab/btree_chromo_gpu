@@ -10,12 +10,18 @@
 
 using namespace std;
 
+struct theta_topo
+{
+  int start, end, start_link, end_link;
+};
+
 struct node
 {
   int gen;
   int size;
   int rho;
   bool leaf;
+  theta_topo topo;
   node *parent;
   node *left;
   node *right;
@@ -81,6 +87,10 @@ public:
   int count_total_forks(string loc);
   int count_completed_forks(string loc);
   int count_active_forks(string loc);
+  int total_size();
+
+  // solve the theta structure topology
+  void solve_topology();
 
   // get details of tree
   vector<string> get_completed_forks();
@@ -102,6 +112,10 @@ private:
   int total_fork_counter(node *branch);
   int completed_fork_counter(node *branch);
   int active_fork_counter(node *branch);
+  int branch_size(node *branch);
+
+  // used for solving the topology
+  void partition_units();
 
   // traverse leaves and forks to determine identities
   vector<string> traverse_leaves(vector<string> leaves, node *branch);
