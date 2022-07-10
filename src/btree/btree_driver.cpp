@@ -25,8 +25,8 @@ void btree_driver::read_directives(string drctvs_filename)
 
   drctvs_file.open(drctvs_filename, ios::in);
 
-  cout << "Reading Directives:" << endl;
-  cout << drctvs_filename << endl;
+  cout << "\nREADING DIRECTIVES:\n" << endl;
+  cout << "\t" << drctvs_filename << endl;
 
   if (!drctvs_file)
     {
@@ -74,6 +74,9 @@ int btree_driver::execute_directives()
   string param_delim = ",";
   int delim;
 
+  bool require_topo_update = true;
+  bool regions_present = false;
+
   cout << "\n---BEGIN EXECUTING DIRECTIVES---\n" << endl;
 
   for (string drctv: drctvs)
@@ -81,6 +84,7 @@ int btree_driver::execute_directives()
 
       delim = drctv.find(cmd_delim);
 
+      // get command and parameters
       if (delim != -1)
 	{
 	  
@@ -111,6 +115,7 @@ int btree_driver::execute_directives()
 	  cout << "\n" << endl;
 	  
 	}
+      // get a command without parameters
       else
 	{
 	  command = drctv;
@@ -119,35 +124,97 @@ int btree_driver::execute_directives()
 	  cout << "\n" << endl;
 	}
 
+      // COMMAND LIST
+
+      // read input state from a file
       if (command == "input_state")
 	{
 	  driver_st = read_state(params[0]);
 	  prepare_state(driver_st);
+	  // require a topology update
+	  require_topo_update = true;
 	}
+
+      // apply state transformations from a file
       else if (command == "transforms_file")
 	{
 	  driver_tr = read_transforms(params[0]);
 	  apply_transforms(driver_tr);
+	  // require a topology update
+	  require_topo_update = true;
 	}
+
+      // write the state to an output file
       else if (command == "output_state")
 	{
 	  write_state(params[0],dump_state());
 	}
+
+      // apply state transformations from a file
+      else if (command == "regions_file")
+	{
+	  driver_rg.clear();
+	  driver_rg = read_regions(params[0],stoi(params[1]));
+	  // flag for regions being present
+	  regions_present = true;
+	}
+
+      // apply state transformations from a file
+      else if (command == "dump_regions")
+	{
+	  if (regions_present == true)
+	    {
+	      
+	      // update topology before updating regions
+	      if (require_topo_update == true)
+		{
+		  solve_topology();
+		  require_topo_update = false;
+		}
+ 
+	      update_region_counts(driver_rg);
+	      dump_regions(params[0],driver_rg);
+	    }
+	  else
+	    {
+	      cout << "  missing (read_regions), no regions to dump" << endl;
+	    }
+	}
+
+      // write the topology to an output file
       else if (command == "dump_topology")
 	{
+	  // update topology before dumping
+	  if (require_topo_update == true)
+	    {
+	      solve_topology();
+	      require_topo_update = false;
+	    }
 	  dump_topology(params[0],stoi(params[1]));
 	}
+
+      // solve the topology of the current state
       else if (command == "solve_topology")
 	{
 	  solve_topology();
+	  // disable flag for topology updating after an update
+	  require_topo_update = false;
 	}
+
+      // print the current state
       else if (command == "print")
 	{
+	  // update topology before printing
+	  if (require_topo_update == true)
+	    {
+	      solve_topology();
+	      require_topo_update = false;
+	    }
 	  print_tree();
 	}
 
     }
-  cout << "\n---END EXECUTING DIRECTIVES---\n" << endl;
+  cout << "---END EXECUTING DIRECTIVES---\n" << endl;
   
   return 0;
 }

@@ -44,6 +44,12 @@ struct btree_transforms
   vector<fork_rho> fork_rhos;
 };
 
+struct chromo_region
+{
+  string name;
+  int start, end, count;
+};
+
 class btree
 {
 public:
@@ -92,6 +98,11 @@ public:
   // solve the theta structure topology
   void solve_topology();
   void dump_topology(string topo_filename, int idx);
+
+  // read, update, and dump chromo_regions
+  vector<chromo_region> read_regions(string rg_filename, int idx);
+  void update_region_counts(vector<chromo_region> &c_rs);
+  void dump_regions(string rg_filename, vector<chromo_region> c_rs);
 
   // get details of tree
   vector<string> get_completed_forks();

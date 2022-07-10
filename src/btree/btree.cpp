@@ -784,6 +784,146 @@ void btree::dump_topology(string topo_filename, int idx)
 }
 
 
+// function to read chromosome regions from file
+vector<chromo_region> btree::read_regions(string rg_filename, int idx)
+{
+  fstream rg_file;
+
+  chromo_region c_r;
+  vector<chromo_region> c_rs;
+
+  string line;
+  
+  string rg_delim = ",";
+  int delim;
+  
+  rg_file.open(rg_filename, ios::in);
+
+  if (!rg_file)
+    {
+      cout << "ERROR: file not opened in read_regions" << endl;
+    }
+  else
+    {
+      while (1)
+	{
+	  rg_file >> line;
+	  if (rg_file.eof()) break;
+
+	  // region name
+	  delim = line.find(rg_delim);
+	  c_r.name = line.substr(0,delim);
+	  line.erase(0,delim+1);
+
+	  // start of region (inclusive)
+	  delim = line.find(rg_delim);
+	  c_r.start = stoi(line.substr(0,delim)) - idx;
+	  line.erase(0,delim+1);
+
+	  // end of region (inclusive)
+	  c_r.end = stoi(line) - idx;
+
+	  // initialize count to zero
+	  c_r.count = 0;
+
+	  c_rs.push_back(c_r);
+	  
+	}
+  
+    }
+  
+  rg_file.close();
+
+  return c_rs;
+  
+}
+
+
+// function to update region counts
+void btree::update_region_counts(vector<chromo_region> &c_rs)
+{
+
+  int offset;
+  int circ_size, exists_size;
+  int start_circ, end_circ;
+  node *count_branch;
+
+  // zero counts before summation over leaves
+  for (chromo_region &c_r: c_rs)
+    {
+      c_r.count = 0;
+    }
+
+  // iterate over leaves
+  for (string leaf: get_leaves())
+    {
+	  
+      count_branch = get_branch(leaf);
+
+      // calculate appropriate offset from topology
+      circ_size = count_branch->size;
+      exists_size = count_branch->topo.end - count_branch->topo.start;
+      offset = count_branch->topo.mid - count_branch->topo.start;
+
+      // cout << exists_size << endl;
+
+      // iterate over regions
+      for (chromo_region &c_r: c_rs)
+	{
+
+	  start_circ = (c_r.start + offset)%circ_size;
+	  end_circ = (c_r.end + offset)%circ_size;
+
+	  // cout << c_r.name << " " << start_circ << " " << end_circ << endl;
+
+	  if ((start_circ >= 0) &&
+	      (end_circ >= 0) &&
+	      (start_circ <= exists_size) &&
+	      (end_circ <= exists_size))
+	    {
+
+	      c_r.count += 1;
+
+	    }
+
+	}
+
+    }
+  
+}
+
+
+// function used to dump the regions and counts to a file
+void btree::dump_regions(string rg_filename, vector<chromo_region> c_rs)
+{
+  fstream rg_file;
+
+  rg_file.open(rg_filename, ios::out);
+
+  if (!rg_file)
+    {
+      cout << "ERROR: file not opened in dump_regions" << endl;
+    }
+  else
+    {
+  
+      for (chromo_region c_r: c_rs)
+	{
+
+	  rg_file << c_r.name
+		  << "," << c_r.start
+		  << "," << c_r.end
+		  << ":" << c_r.count
+		  << endl;
+      
+	}
+
+    }
+
+  rg_file.close();
+}
+
+
 // function used by destructor
 void btree::destroy_tree(node *branch)
 {

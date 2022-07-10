@@ -1,5 +1,7 @@
 input_state:/home/ben/Workspace/btree_chromo/test_case/in_state_test.txt
 
+regions_file:/home/ben/Workspace/btree_chromo/test_case/region_test.txt,0
+
 solve_topology
 
 #print
@@ -9,6 +11,8 @@ transforms_file:/home/ben/Workspace/btree_chromo/test_case/state_trans_test.txt
 solve_topology
 
 dump_topology:/home/ben/Workspace/btree_chromo/test_case/topo_test.txt,0
+
+dump_regions:/home/ben/Workspace/btree_chromo/test_case/out_region_test.txt
 
 #print
 

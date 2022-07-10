@@ -27,6 +27,7 @@ private:
 
   btree_state driver_st; // state structure
   btree_transforms driver_tr; // transform structure
+  vector<chromo_region> driver_rg; // vector of chromo_regions
   vector<string> drctvs; // set of directives
 
 };
