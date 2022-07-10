@@ -23,11 +23,9 @@ btree::~btree()
 // function to initialize binary tree
 void btree::initialize_tree(int s)
 {
-  if (root == NULL)
-    {
-      root = new node;
-      initialize_branch(root,0,s);
-    }
+  if (root != NULL) destroy_tree();
+  root = new node;
+  initialize_branch(root,0,s);
 }
 
 
@@ -130,13 +128,21 @@ void btree::write_state(string st_filename, btree_state st)
 
   st_file.open(st_filename, ios::out);
 
-  st_file << "size=" << st.size << endl;
-
-  for (fork_rho f_r: st.fork_rhos)
+  if (!st_file)
     {
+      cout << "ERROR: file not opened in write_state" << endl;
+    }
+  else
+    {
+
+      st_file << "size=" << st.size << endl;
+
+      for (fork_rho f_r: st.fork_rhos)
+	{
       
-      st_file << f_r.fork << "_" << f_r.rho << endl;
+	  st_file << f_r.fork << "_" << f_r.rho << endl;
       
+	}
     }
 
   st_file.close();
@@ -274,6 +280,7 @@ void btree::initialize_branch(node *branch, int g, int s)
   branch->right = NULL;
   branch->topo.start = -1;
   branch->topo.end = -1;
+  branch->topo.mid = -1;
   branch->topo.start_link = -1;
   branch->topo.end_link = -1;
 }
@@ -298,10 +305,10 @@ int btree::branch(string loc)
   else
     {
       
-      cout << "branching at ("
-	   << loc
-	   << ")"
-	   << endl;
+      // cout << "branching at ("
+      // 	   << loc
+      // 	   << ")"
+      // 	   << endl;
       
       split_branch(branch);
       
@@ -654,13 +661,15 @@ void btree::solve_topology()
 
       free_leaf = leaves[i];
       free_branch = get_branch(free_leaf);
-      
+
+      // first free branch is always circular
       if (i == 0)
 	{
 	  
 	  target_size = free_branch->size;
 	  
 	}
+      // find query branch supporting free branch
       else
 	{
 
@@ -700,23 +709,28 @@ void btree::solve_topology()
 	  
 	}
 
-      // set the start and end
+      // set the start, end, and mid
       free_branch->topo.start = temp_start;
       free_branch->topo.end = temp_start + target_size - 1;
+      free_branch->topo.mid = (free_branch->topo.start + free_branch->topo.end)/2;
+
+      // increase the starting location by the added size
       temp_start += target_size;
 
+      // create circular configuration if replication is complete
       if (target_size == free_branch->size)
 	{
 	  free_branch->topo.start_link = free_branch->topo.end;
 	  free_branch->topo.end_link = free_branch->topo.start;
 	}
+      // create a theta configuration
       else
 	{
 
 	  d_start = target_size/2;
 	  d_end = target_size - d_start;
 
-	  mid = (query_branch->topo.start + query_branch->topo.end)/2;
+	  mid = query_branch->topo.mid;
 
 	  free_branch->topo.start_link = mid - d_start;
 	  free_branch->topo.end_link = mid + d_end + 1;
@@ -725,6 +739,48 @@ void btree::solve_topology()
       
     }
   
+}
+
+
+// function used to dump the topology to a file
+void btree::dump_topology(string topo_filename, int idx)
+{
+  fstream topo_file;
+  
+  node *topo_branch;
+
+  topo_file.open(topo_filename, ios::out);
+
+  if (!topo_file)
+    {
+      cout << "ERROR: file not opened in dump_topology" << endl;
+    }
+  else
+    {
+
+      topo_file << "size=" << total_size() <<  endl;      
+  
+      for (string leaf: get_leaves())
+	{
+	  
+	  topo_branch = get_branch(leaf);
+
+	  topo_file << leaf
+		    << "("
+		    << (topo_branch->topo.end-topo_branch->topo.start+1)
+		    << ")"
+		    << "," << (topo_branch->topo.start_link + idx)
+		    << "," << (topo_branch->topo.start + idx)
+		    << "," << (topo_branch->topo.mid + idx)
+		    << "," << (topo_branch->topo.end + idx)
+		    << "," << (topo_branch->topo.end_link + idx)
+		    << endl;
+      
+	}
+
+    }
+
+  topo_file.close();
 }
 
 
@@ -789,6 +845,8 @@ void btree::print_branch(node *branch)
   cout << gen_offset
        << "start = "
        << branch->topo.start
+       << ", mid = "
+       << branch->topo.mid
        << ", end = "
        << branch->topo.end
        << endl;
@@ -826,7 +884,7 @@ void btree::print_tree()
       int N_completed_forks = count_completed_forks();
       int N_active_forks = count_active_forks();
       
-      cout << "\n\nprinting tree with "
+      cout << "\nprinting tree with "
 	   << N_leaves
 	   << " leaves and "
 	   << N_forks

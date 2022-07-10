@@ -41,7 +41,7 @@ void btree_driver::read_directives(string drctvs_filename)
 	  
 
 	  if ((line.length() > 0) &&
-	      (line.find("#") != 1))
+	      (line.find("#") != 0))
 	    {
 	      drctvs.push_back(line);
 	    }
@@ -68,9 +68,13 @@ void btree_driver::print_directives()
 int btree_driver::execute_directives()
 {
 
-  string command, params;
+  string command, param, temp_params;
+  vector<string> params;
   string cmd_delim = ":";
+  string param_delim = ",";
   int delim;
+
+  cout << "\n---BEGIN EXECUTING DIRECTIVES---\n" << endl;
 
   for (string drctv: drctvs)
     {
@@ -79,31 +83,59 @@ int btree_driver::execute_directives()
 
       if (delim != -1)
 	{
+	  
 	  command = drctv.substr(0,delim);
-	  params = drctv.substr(delim+1,drctv.length());
+	  temp_params = drctv.substr(delim+1,drctv.length());
+
+	  params.clear();
+
+	  delim = temp_params.find(param_delim);
+
+	  while (delim != -1)
+	    {
+	      param = temp_params.substr(0,delim);
+	      params.push_back(param);
+	      temp_params.erase(0,delim+1);
+	      delim = temp_params.find(param_delim);
+	    }
+	  params.push_back(temp_params);
+
+	  cout << "COMMAND: " << command << endl;
+	  for (long unsigned int i=0; i<params.size(); i++)
+	    {
+	      cout << "\tparam_" << i
+		   << ": " << params[i]
+		   << endl;
+	    }
+
+	  cout << "\n" << endl;
+	  
 	}
       else
 	{
 	  command = drctv;
+
+	  cout << "COMMAND: " << command << endl;
+	  cout << "\n" << endl;
 	}
 
       if (command == "input_state")
 	{
-	  driver_st = read_state(params);
+	  driver_st = read_state(params[0]);
 	  prepare_state(driver_st);
 	}
       else if (command == "transforms_file")
 	{
-	  driver_tr = read_transforms(params);
+	  driver_tr = read_transforms(params[0]);
 	  apply_transforms(driver_tr);
 	}
       else if (command == "output_state")
 	{
-	  write_state(params,dump_state());
+	  write_state(params[0],dump_state());
 	}
       else if (command == "dump_topology")
 	{
-	  print_tree();
+	  dump_topology(params[0],stoi(params[1]));
 	}
       else if (command == "solve_topology")
 	{
@@ -113,7 +145,9 @@ int btree_driver::execute_directives()
 	{
 	  print_tree();
 	}
-      
+
     }
+  cout << "\n---END EXECUTING DIRECTIVES---\n" << endl;
+  
   return 0;
 }

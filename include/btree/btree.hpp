@@ -12,7 +12,7 @@ using namespace std;
 
 struct theta_topo
 {
-  int start, end, start_link, end_link;
+  int start, end, start_link, end_link, mid;
 };
 
 struct node
@@ -91,6 +91,7 @@ public:
 
   // solve the theta structure topology
   void solve_topology();
+  void dump_topology(string topo_filename, int idx);
 
   // get details of tree
   vector<string> get_completed_forks();
@@ -113,9 +114,6 @@ private:
   int completed_fork_counter(node *branch);
   int active_fork_counter(node *branch);
   int branch_size(node *branch);
-
-  // used for solving the topology
-  void partition_units();
 
   // traverse leaves and forks to determine identities
   vector<string> traverse_leaves(vector<string> leaves, node *branch);
