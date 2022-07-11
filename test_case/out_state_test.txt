@@ -1,6 +1,6 @@
-size=1000
-m_600
-ml_170
-mll_170
-mr_350
-mrr_200
+size=100
+m_80
+ml_70
+mll_25
+mr_40
+mrr_20

@@ -14,6 +14,6 @@ dump_topology:/home/ben/Workspace/btree_chromo/test_case/topo_test.txt,0
 
 dump_regions:/home/ben/Workspace/btree_chromo/test_case/out_region_test.txt
 
-#print
+print
 
 output_state:/home/ben/Workspace/btree_chromo/test_case/out_state_test.txt

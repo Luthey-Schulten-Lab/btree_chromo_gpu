@@ -1,3 +1,5 @@
-region1,0,30
-region2,200,300
-region3,700,800
+region1,96,4
+region2,87,13
+region3,14,29
+region4,44,54
+region5,71,85
