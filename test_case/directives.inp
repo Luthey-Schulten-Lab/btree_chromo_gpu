@@ -4,7 +4,7 @@ regions_file:/home/ben/Workspace/btree_chromo/test_case/region_test.txt,0
 
 solve_topology
 
-#print
+print
 
 transforms_file:/home/ben/Workspace/btree_chromo/test_case/state_trans_test.txt
 
@@ -14,6 +14,9 @@ dump_topology:/home/ben/Workspace/btree_chromo/test_case/topo_test.txt,0
 
 dump_regions:/home/ben/Workspace/btree_chromo/test_case/out_region_test.txt
 
-#print
+print
+
+update_CG_map:20
+dump_CG_map:/home/ben/Workspace/btree_chromo/test_case/out_CG_test.txt,10,0
 
 output_state:/home/ben/Workspace/btree_chromo/test_case/out_state_test.txt

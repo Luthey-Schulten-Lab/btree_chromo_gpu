@@ -29,6 +29,7 @@ private:
   btree_transforms driver_tr; // transform structure
   vector<chromo_region> driver_rg; // vector of chromo_regions
   vector<string> drctvs; // set of directives
+  CG_map driver_CG; // coarse-graining map
 
 };
 

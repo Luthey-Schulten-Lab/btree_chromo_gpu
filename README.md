@@ -84,9 +84,9 @@ Use the testcase for an example: **./program /home/ben/Workspace/btree_chromo/te
  - transforms_file:transforms_file - *applies transforms stored in transforms_file*
  - output_state:output_file - *writes state to output_file*
  - solve_topology - *solves bond topology of system*
- - dump_topology:topology_file - *dumps topology to topology_file*
- - regions_file:regions_file - *reads chromosome regions from regions_file*
- - dump_regions:regions_count_file - *updates regions counts given state and dumps counts to regions_count_file*
+ - dump_topology:topology_file,idx - *dumps topology to topology_file with selected indexing convention (idx)*
+ - regions_file:regions_file,idx - *reads chromosome regions from regions_file with selected indexing convention (idx)*
+ - dump_regions:regions_count_file - *updates regions counts given current state and dumps counts to regions_count_file*
  - print - *prints binary tree state in terminal*
 
 ## Support

@@ -8,7 +8,7 @@ btree::btree()
 
 void btree::reset_root()
 {
-  root = NULL;
+  root = nullptr;
 }
 
 // destructor
@@ -23,7 +23,7 @@ btree::~btree()
 // function to initialize binary tree
 void btree::initialize_tree(int s)
 {
-  if (root != NULL) destroy_tree();
+  if (root != nullptr) destroy_tree();
   root = new node;
   initialize_branch(root,0,s);
 }
@@ -59,7 +59,7 @@ btree_state btree::dump_state()
   btree_state st;
   fork_rho f_r;
   
-  if (root != NULL)
+  if (root != nullptr)
     {
       st.size = root->size;
 
@@ -275,9 +275,9 @@ void btree::initialize_branch(node *branch, int g, int s)
   branch->size = s;
   branch->rho = 0;
   branch->leaf = true;
-  branch->parent = NULL;
-  branch->left = NULL;
-  branch->right = NULL;
+  branch->parent = nullptr;
+  branch->left = nullptr;
+  branch->right = nullptr;
   branch->topo.start = -1;
   branch->topo.end = -1;
   branch->topo.mid = -1;
@@ -293,7 +293,7 @@ int btree::branch(string loc)
 
   branch = get_branch(loc);
 
-  if (branch == NULL)
+  if (branch == nullptr)
     {
       cout << "invalid branch ("
 	   << loc
@@ -352,7 +352,7 @@ int btree::grow_at_branch(string loc, int r)
     {
       g_branch = get_branch(loc);
 
-      if (g_branch->parent == NULL)
+      if (g_branch->parent == nullptr)
 	{
 	  max_growth = g_branch->size;
 	}
@@ -391,7 +391,7 @@ node *btree::get_branch(string loc)
     }
   
   i = 1;
-  while ((i < n) && (tar != NULL))
+  while ((i < n) && (tar != nullptr))
     {
       tar = parse_dir(tar,loc[i]);
       i += 1;
@@ -413,7 +413,7 @@ node *btree::parse_dir(node *branch, char d)
 	  return branch->right;
 	}
     }
-  return NULL;
+  return nullptr;
 }
 
 
@@ -621,7 +621,7 @@ int btree::branch_size(node *branch)
 {
   int s = 0;
 
-  if (branch->parent == NULL)
+  if (branch->parent == nullptr)
     {
       s += branch->size;
     }
@@ -862,10 +862,13 @@ void btree::update_region_counts(vector<chromo_region> &c_rs)
 
       // calculate appropriate offset from topology
       circ_size = count_branch->size;
-      exists_size = count_branch->topo.end - count_branch->topo.start;
-      offset = count_branch->topo.mid - count_branch->topo.start;
+      // exists_size = count_branch->topo.end - count_branch->topo.start;
+      // offset = count_branch->topo.mid - count_branch->topo.start;
+      exists_size = count_branch->parent->rho;
+      offset = exists_size/2;	
 
       // cout << exists_size << endl;
+      // cout << offset << endl;
 
       // iterate over regions
       for (chromo_region &c_r: c_rs)
@@ -878,8 +881,8 @@ void btree::update_region_counts(vector<chromo_region> &c_rs)
 
 	  if ((start_circ >= 0) &&
 	      (end_circ >= 0) &&
-	      (start_circ <= exists_size) &&
-	      (end_circ <= exists_size))
+	      (start_circ < exists_size) &&
+	      (end_circ < exists_size))
 	    {
 
 	      c_r.count += 1;
@@ -923,6 +926,211 @@ void btree::dump_regions(string rg_filename, vector<chromo_region> c_rs)
   rg_file.close();
 }
 
+void btree::dump_CG_map(string CG_filename, int idx, CG_map &m)
+{
+  fstream CG_file;
+
+  CG_file.open(CG_filename, ios::out);
+
+  if (!CG_file)
+    {
+      cout << "ERROR: file not opened in dump_CG_map" << endl;
+    }
+  else
+    {
+
+      CG_file << "N_base = "
+	      << m.N_base
+	      << "\nN = "
+	      << m.N
+	      << "\nf_CG = "
+	      << m.f_CG
+	      << "\nN_base_CG = "
+	      << m.N_base_CG
+	      << "\nN_CG = "
+	      << m.N_CG
+	      << endl;
+
+      CG_file << "\nN_leaves = "
+	      << m.CG_leaves.size()
+	      << endl;
+
+      for (CG_leaf leaf: m.CG_leaves)
+	{
+
+	  CG_file << leaf.leaf
+		  << ","
+		  << leaf.start + idx
+		  << ","
+		  << leaf.end + idx
+		  << endl;
+      
+	}
+
+      CG_file << "\nID, base-ID, min, max" << endl;
+      
+  
+      for (CG_locus l: m.loci)
+	{
+
+	  CG_file << l.CG + idx
+		  << ","
+		  << l.bCG + idx
+		  << ","
+		  << l.start + idx
+		  << ","
+		  << l.end + idx
+		  << endl;
+      
+	}
+
+    }
+
+  CG_file.close();
+}
+
+
+// function to create a coarse-graining for the entire system
+CG_map btree::update_CG_map(int f_CG)
+{
+
+  CG_map m;
+  CG_leaf temp_CG_leaf;
+
+  int N_leaves = count_total_leaves();
+  int init_size;//, N_CG_leaf;
+  vector<string> leaves = get_leaves();
+
+  m.f_CG = f_CG;
+  m.N_base = root->size;
+  m.N = total_size();
+
+  for (int i=0; i<N_leaves; i++)
+    {
+
+      init_size = m.loci.size();
+
+      centered_CG_map(m.loci,get_branch(leaves[i]),f_CG);
+
+      temp_CG_leaf.leaf = leaves[i];
+      temp_CG_leaf.start = init_size;
+      temp_CG_leaf.end = m.loci.size() - 1;
+      // N_CG_leaf = temp_CG_leaf.end - temp_CG_leaf.start + 1;
+
+      if (i == 0)
+	{
+	  m.N_base_CG = m.loci.size();
+	}
+      else
+	{
+
+	  for (int j=temp_CG_leaf.start; j<temp_CG_leaf.end+1; j++)
+	    {
+	      m.loci[j].CG += (m.loci[temp_CG_leaf.start-1].CG + 1);
+	      m.loci[j].start += (m.loci[temp_CG_leaf.start-1].end + 1);
+	      m.loci[j].end += (m.loci[temp_CG_leaf.start-1].end + 1);
+	    }
+	  
+	}
+      
+      m.CG_leaves.push_back(temp_CG_leaf);
+      
+    }
+
+  m.N_CG = m.loci.size();
+
+  return m;
+}
+
+
+// function to create a centered coarse-graining for a single branch
+void btree::centered_CG_map(vector<CG_locus> &loci, node *branch, int f_CG)
+{
+
+  CG_locus l;
+  int N = branch->topo.end - branch->topo.start + 1;
+  int ori_idx_m = branch->topo.mid - branch->topo.start;
+  int ori_idx_p = ori_idx_m + 1;
+
+  int N_cum, N_CG_cum;
+
+  int CG_rem_m, CG_rem_p, N_CG_m, N_CG_p, N_CG;
+
+  CG_rem_m = (ori_idx_m+1)%f_CG;
+  CG_rem_p = (N - ori_idx_p)%f_CG;
+
+  N_CG_m = (ori_idx_m+1)/f_CG;
+  if (CG_rem_m > 0) N_CG_m++;
+  N_CG_p = (N - ori_idx_p)/f_CG;
+  if (CG_rem_p > 0) N_CG_p++;
+
+  N_CG = N_CG_m + N_CG_p;
+
+  N_cum = 0;
+  N_CG_cum = 0;
+
+  // cout << "N=" << N << endl;
+  // cout << "ori_idx_m=" <<  ori_idx_m << endl;
+  // cout << "CG_rem_m=" <<  CG_rem_m << endl;
+  // cout << "ori_idx_p=" <<  ori_idx_p << endl;
+  // cout << "CG_rem_p=" <<  CG_rem_p << endl;
+
+  while (N_CG_cum < N_CG)
+    {
+
+      // conditional for remainder beads at start
+      if ((N_CG_cum == 0) &&
+	  (CG_rem_m > 0))
+	{
+
+	  l.CG = N_CG_cum;
+	  l.bCG = N_CG_cum;
+	  l.start = N_cum;
+	  l.end = N_cum + CG_rem_m - 1;
+
+	  N_CG_cum += 1;
+	  N_cum += CG_rem_m;
+
+	  loci.push_back(l);
+
+	  continue;
+	  
+	}
+
+      // conditional for remainder beads at end
+      if ((N_CG_cum == N_CG - 1) &&
+	  (CG_rem_p > 0))
+	{
+
+	  l.CG = N_CG_cum;
+	  l.bCG = N_CG_cum;
+	  l.start = N_cum;
+	  l.end = N_cum + CG_rem_p - 1;
+
+	  N_CG_cum += 1;
+	  N_cum += CG_rem_p;
+
+	  loci.push_back(l);
+
+	  continue;
+	  
+	}
+
+      l.CG = N_CG_cum;
+      l.bCG = N_CG_cum;
+      l.start = N_cum;
+      l.end = N_cum + f_CG - 1;
+
+      N_CG_cum += 1;
+      N_cum += f_CG;
+
+      loci.push_back(l);
+      
+
+    }
+  
+}
+
 
 // function used by destructor
 void btree::destroy_tree(node *branch)
@@ -931,13 +1139,13 @@ void btree::destroy_tree(node *branch)
     {
       destroy_tree(branch->left);
       destroy_tree(branch->right);
-      delete branch;
     }
+  delete branch;
 }
 
 void btree::destroy_tree()
 {
-  if (root != NULL)
+  if (root != nullptr)
     {
       destroy_tree(root);
       reset_root();
@@ -966,7 +1174,7 @@ void btree::print_branch(node *branch)
   if (branch->leaf == false)
     {
       int max_size;
-      if (branch->parent != NULL)
+      if (branch->parent != nullptr)
 	{
 	  max_size = branch->parent->rho;
 	}
@@ -1016,7 +1224,7 @@ void btree::print_branch(node *branch)
 void btree::print_tree()
 {
   
-  if (root != NULL)
+  if (root != nullptr)
     {
 
       int N_leaves = count_total_leaves();
