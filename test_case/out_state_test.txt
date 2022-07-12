@@ -1,6 +1,4 @@
 size=100
 m_80
 ml_70
-mll_25
 mr_40
-mrr_20

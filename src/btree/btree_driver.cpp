@@ -75,6 +75,7 @@ int btree_driver::execute_directives()
   int delim;
 
   bool require_topo_update = true;
+  bool require_CG_update = true;
   bool regions_present = false;
 
   cout << "\n---BEGIN EXECUTING DIRECTIVES---\n" << endl;
@@ -124,35 +125,61 @@ int btree_driver::execute_directives()
 	  cout << "\n" << endl;
 	}
 
-      // COMMAND LIST
+      //////////////////
+      // COMMAND LIST //
+      //////////////////
 
       // read input state from a file
       if (command == "input_state")
 	{
+	  if (params.size() != 1)
+	    {
+	      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+	      return 0;
+	    }
 	  driver_st = read_state(params[0]);
 	  prepare_state(driver_st);
 	  // require a topology update
 	  require_topo_update = true;
+	  // require a coarse-graining update
+	  require_CG_update = true;
 	}
 
       // apply state transformations from a file
       else if (command == "transforms_file")
 	{
+	  if (params.size() != 1)
+	    {
+	      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+	      return 0;
+	    }
 	  driver_tr = read_transforms(params[0]);
 	  apply_transforms(driver_tr);
 	  // require a topology update
 	  require_topo_update = true;
+	  // require a coarse-graining update
+	  require_CG_update = true;
 	}
 
       // write the state to an output file
       else if (command == "output_state")
 	{
+	  if (params.size() != 1)
+	    {
+	      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+	      return 0;
+	    }
 	  write_state(params[0],dump_state());
 	}
 
       // apply state transformations from a file
       else if (command == "regions_file")
 	{
+	  if (params.size() != 2)
+	    {
+	      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+	      return 0;
+	    }
 	  driver_rg.clear();
 	  driver_rg = read_regions(params[0],stoi(params[1]));
 	  // flag for regions being present
@@ -162,6 +189,11 @@ int btree_driver::execute_directives()
       // apply state transformations from a file
       else if (command == "dump_regions")
 	{
+	  if (params.size() != 1)
+	    {
+	      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+	      return 0;
+	    }
 	  if (regions_present == true)
 	    {
 	      
@@ -184,6 +216,11 @@ int btree_driver::execute_directives()
       // write the topology to an output file
       else if (command == "dump_topology")
 	{
+	  if (params.size() != 2)
+	    {
+	      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+	      return 0;
+	    }
 	  // update topology before dumping
 	  if (require_topo_update == true)
 	    {
@@ -199,6 +236,46 @@ int btree_driver::execute_directives()
 	  solve_topology();
 	  // disable flag for topology updating after an update
 	  require_topo_update = false;
+	}
+
+      // update the CG map
+      else if (command == "update_CG_map")
+	{
+	  if (params.size() != 1)
+	    {
+	      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+	      return 0;
+	    }
+	  // update topology before dumping
+	  if (require_topo_update == true)
+	    {
+	      solve_topology();
+	      require_topo_update = false;
+	    }
+	  driver_CG = update_CG_map(stoi(params[0]));
+	}
+
+      // update the CG map
+      else if (command == "dump_CG_map")
+	{
+	  if (params.size() != 3)
+	    {
+	      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+	      return 0;
+	    }
+	  // update topology before updating CG_map
+	  if (require_topo_update == true)
+	    {
+	      solve_topology();
+	      require_topo_update = false;
+	    }
+	  // update CG_map before dumping
+	  if (require_CG_update == true)
+	    {
+	      driver_CG = update_CG_map(stoi(params[1]));
+	      require_CG_update = false;
+	    }
+	  dump_CG_map(params[0],stoi(params[2]),driver_CG);
 	}
 
       // print the current state

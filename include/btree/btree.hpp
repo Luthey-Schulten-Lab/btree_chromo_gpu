@@ -7,6 +7,7 @@
 #include <cstring>
 #include <algorithm>
 #include <vector>
+#include <memory>
 
 using namespace std;
 
@@ -48,6 +49,27 @@ struct chromo_region
 {
   string name;
   int start, end, count;
+};
+
+struct CG_locus
+{
+  int CG, bCG, start, end;
+};
+
+struct CG_leaf
+{
+  string leaf;
+  int start, end;
+};
+
+struct CG_map
+{
+  int N_base, N;
+  int N_base_CG, N_CG;
+  int f_CG;
+
+  vector<CG_locus> loci;
+  vector<CG_leaf> CG_leaves;
 };
 
 class btree
@@ -99,6 +121,10 @@ public:
   void solve_topology();
   void dump_topology(string topo_filename, int idx);
 
+  // update the coarse-graining map based on the current state
+  CG_map update_CG_map(int f_CG);
+  void dump_CG_map(string CG_filename, int idx, CG_map &m);
+
   // read, update, and dump chromo_regions
   vector<chromo_region> read_regions(string rg_filename, int idx);
   void update_region_counts(vector<chromo_region> &c_rs);
@@ -125,6 +151,9 @@ private:
   int completed_fork_counter(node *branch);
   int active_fork_counter(node *branch);
   int branch_size(node *branch);
+
+  // create centered CG maps per branch
+  void centered_CG_map(vector<CG_locus> &loci, node *branch, int f_CG);
 
   // traverse leaves and forks to determine identities
   vector<string> traverse_leaves(vector<string> leaves, node *branch);
