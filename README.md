@@ -85,6 +85,8 @@ Use the testcase for an example: **./program /home/ben/Workspace/btree_chromo/te
  - output_state:output_file - *writes state to output_file*
  - solve_topology - *solves bond topology of system*
  - dump_topology:topology_file,idx - *dumps topology to topology_file with selected indexing convention (idx)*
+ - update_CG_map:f_CG - *update coarse-graining with selected factor (f_CG)*
+ - dump_CG_map:CG_map_file,f_CG,idx - *dumps CG_map to CG_map_file with selected factor (f_CG) and indexing convention (idx)*
  - regions_file:regions_file,idx - *reads chromosome regions from regions_file with selected indexing convention (idx)*
  - dump_regions:regions_count_file - *updates regions counts given current state and dumps counts to regions_count_file*
  - print - *prints binary tree state in terminal*
