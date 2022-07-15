@@ -278,6 +278,19 @@ int btree_driver::execute_directives()
 	  dump_CG_map(params[0],stoi(params[2]),driver_CG);
 	}
 
+      // seed the PRNG
+      else if (command == "prng_seed")
+	{
+	  if (params.size() != 1)
+	    {
+	      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+	      return 0;
+	    }
+	  // seed the PRNG
+	  prng_seed(stoi(params[0]));
+	  
+	}
+
       // print the current state
       else if (command == "print")
 	{

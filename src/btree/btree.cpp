@@ -3,6 +3,7 @@
 // constructor
 btree::btree()
 {
+  rand_eng.seed(0);
   reset_root();
 }
 
@@ -17,6 +18,12 @@ btree::~btree()
   // cout << "btree destructor before destroy" << endl;
   destroy_tree();
   // cout << "btree destructor after destroy" << endl;
+}
+
+
+void btree::prng_seed(int s)
+{
+  rand_eng.seed(s);
 }
 
 
@@ -39,7 +46,7 @@ void btree::prepare_state(btree_state st)
   for (fork_rho f_r: st.fork_rhos)
     {
       
-      error_code = grow_at_branch(f_r.fork,f_r.rho);
+      error_code = grow_at_branch_asym(f_r.fork,f_r.rho_cw,f_r.rho_ccw);
 
       if (error_code == -1)
 	{
@@ -58,6 +65,7 @@ btree_state btree::dump_state()
 
   btree_state st;
   fork_rho f_r;
+  node *temp_branch;
   
   if (root != nullptr)
     {
@@ -68,7 +76,9 @@ btree_state btree::dump_state()
 	{
 	  
 	  f_r.fork = s;
-	  f_r.rho = get_branch(s)->rho;
+	  temp_branch = get_branch(s);
+	  f_r.rho_cw = temp_branch->rho_cw;
+	  f_r.rho_ccw = temp_branch->rho_ccw;
 
 	  st.fork_rhos.push_back(f_r);
 	  
@@ -79,7 +89,9 @@ btree_state btree::dump_state()
 	{
 	  
 	  f_r.fork = s;
-	  f_r.rho = get_branch(s)->rho;
+	  temp_branch = get_branch(s);
+	  f_r.rho_cw = temp_branch->rho_cw;
+	  f_r.rho_ccw = temp_branch->rho_ccw;
 
 	  st.fork_rhos.push_back(f_r);
 	  
@@ -105,7 +117,7 @@ void btree::apply_transforms(btree_transforms tr)
   for (fork_rho f_r: tr.fork_rhos)
     {
       
-      error_code = grow_at_branch(f_r.fork,f_r.rho);
+      error_code = grow_at_branch_asym(f_r.fork,f_r.rho_cw,f_r.rho_ccw);
 
       if (error_code == -1)
 	{
@@ -140,7 +152,10 @@ void btree::write_state(string st_filename, btree_state st)
       for (fork_rho f_r: st.fork_rhos)
 	{
       
-	  st_file << f_r.fork << "_" << f_r.rho << endl;
+	  st_file << f_r.fork <<
+	    "_cw" << f_r.rho_cw <<
+	    "_ccw" << f_r.rho_ccw <<
+	    endl;
       
 	}
     }
@@ -160,6 +175,7 @@ btree_state btree::read_state(string st_filename)
   string line;
 
   int delim;
+  
   bool size_found = false;
 
   st_file.open(st_filename, ios::in);
@@ -197,15 +213,8 @@ btree_state btree::read_state(string st_filename)
 	  else
 	    {
 	      
-	      delim = line.find("_");
-	      if (delim != -1)
-		{
-		  f_r.fork = line.substr(0,delim);
-		  // cout << f_r.fork << endl;
-		  f_r.rho = stoi(line.substr(delim+1,line.length()));
-		  // cout << f_r.rho << endl;
-		  st.fork_rhos.push_back(f_r);
-		}
+	      f_r = parse_transform(line);
+	      st.fork_rhos.push_back(f_r);
 	      
 	    }
       
@@ -229,8 +238,6 @@ btree_transforms btree::read_transforms(string tr_filename)
   
   string line;
 
-  int delim;
-
   tr_file.open(tr_filename, ios::in);
 
   // cout << tr_filename << endl;
@@ -247,16 +254,8 @@ btree_transforms btree::read_transforms(string tr_filename)
 	  if (tr_file.eof()) break;
 	  
 	  // cout << line << endl;
-	      
-	  delim = line.find("_");
-	  if (delim != -1)
-	    {
-	      f_r.fork = line.substr(0,delim);
-	      // cout << f_r.fork << endl;
-	      f_r.rho = stoi(line.substr(delim+1,line.length()));
-	      // cout << f_r.rho << endl;
-	      tr.fork_rhos.push_back(f_r);
-	    }
+	  f_r = parse_transform(line);
+	  tr.fork_rhos.push_back(f_r);
 
      	}
   
@@ -268,13 +267,43 @@ btree_transforms btree::read_transforms(string tr_filename)
 }
 
 
+
+// function to parse string into the transform
+fork_rho btree::parse_transform(string s)
+{
+  fork_rho f_r;
+  int delim;
+
+  delim = s.find("_");
+  if (delim != -1)
+    {
+      f_r.fork = s.substr(0,delim);
+      s.erase(0,delim+1);
+    }
+  delim = s.find("_");
+  if (delim != -1)
+    {
+      f_r.rho_cw = stoi(s.substr(2,delim));
+      s.erase(0,delim+1);
+    }
+  
+  f_r.rho_ccw = stoi(s.substr(3,s.length()));
+
+  return f_r;
+  
+}
+
+
 // function to initialize a branch
 void btree::initialize_branch(node *branch, int g, int s)
 {
   branch->gen = g;
   branch->size = s;
-  branch->rho = 0;
+  branch->rho_t = 0;
+  branch->rho_cw = 0;
+  branch->rho_ccw = 0;
   branch->leaf = true;
+  branch->complete = false;
   branch->parent = nullptr;
   branch->left = nullptr;
   branch->right = nullptr;
@@ -336,10 +365,10 @@ void btree::split_branch(node *branch)
 
 
 // function to increase rho in a manner dependent on the possible growth
-int btree::grow_at_branch(string loc, int r)
+int btree::grow_at_branch_sym(string loc, int r_sym)
 {
-  int max_growth, growth, rem, error_code;
-  node *g_branch;
+  int rem, error_code;
+  int r_cw, r_ccw;
 
   error_code = branch(loc);
   if (error_code < 0)
@@ -348,22 +377,22 @@ int btree::grow_at_branch(string loc, int r)
     }
 
   // grow the branch if r > 0
-  if (r > 0)
+  if (r_sym > 0)
     {
-      g_branch = get_branch(loc);
 
-      if (g_branch->parent == nullptr)
+      r_cw = r_sym/2;
+      r_ccw = r_sym - r_cw;
+
+      uniform_real_distribution<double> u_dist(0.0,1.0);
+      double ur = u_dist(rand_eng);
+      if (ur < 0.5)
 	{
-	  max_growth = g_branch->size;
+	  r_ccw = r_cw;
+	  r_cw = r_sym - r_ccw;
 	}
-      else
-	{
-	  max_growth = g_branch->parent->rho;
-	}
-  
-      growth = min(max_growth-g_branch->rho,r);
-      g_branch->rho += growth;
-      rem = r - growth;
+
+      rem = grow_at_branch_asym(loc,r_cw,r_ccw);
+      
     }
   else // do nothing if r == 0
     {
@@ -371,6 +400,140 @@ int btree::grow_at_branch(string loc, int r)
     }
   
   return rem; // return the remainder of the growth
+}
+
+
+
+// function to increase rho in a manner dependent on the possible growth
+int btree::grow_at_branch_asym(string loc, int r_cw, int r_ccw)
+{
+  int error_code;
+  node *g_branch;
+  array<int,2> part_growths;
+
+  error_code = branch(loc);
+  if (error_code < 0)
+    {
+      return error_code;
+    }
+
+  // grow the branch if r_cw > 0 or r_ccw > 0
+  if ((r_cw > 0) || (r_ccw > 0))
+    {
+      g_branch = get_branch(loc);
+
+      part_growths = partition_growths_sym(g_branch,r_cw,r_ccw);
+
+      g_branch->rho_cw += part_growths[0];
+      g_branch->rho_ccw += part_growths[1];
+      g_branch->rho_t = g_branch->rho_cw + g_branch->rho_ccw;
+
+      if (g_branch->rho_t == g_branch->size) g_branch->complete = true;
+    
+    }
+  
+  return r_cw + r_ccw - part_growths[0] - part_growths[1]; // return the remainder of the growth
+}
+
+
+// function to calculate maximum growth in clockwise direction
+int btree::get_max_growth_cw(node *branch)
+{
+  int max_size_cw;
+  
+  if (branch->parent != nullptr)
+    {
+      if (branch->parent->complete == false)
+	{
+	  max_size_cw = branch->parent->rho_cw - 1;
+	}
+      else
+	{
+	  max_size_cw = branch->size;
+	}
+    }
+  else
+    {
+      max_size_cw = branch->size - branch->rho_ccw;
+    }
+
+  return max_size_cw - branch->rho_cw;
+}
+
+// function to calculate maximum growth in counter-clockwise direction
+int btree::get_max_growth_ccw(node *branch)
+{
+  int max_size_ccw;
+  
+  if (branch->parent != nullptr)
+    {
+      if (branch->parent->complete == false)
+	{
+	  max_size_ccw = branch->parent->rho_ccw - 1;
+	}
+      else
+	{
+	  max_size_ccw = branch->size;
+	}
+    }
+  else
+    {
+      max_size_ccw = branch->size - branch->rho_cw;
+    }
+
+  return max_size_ccw - branch->rho_ccw;
+}
+
+// function to partition maximum growths assuming symmetric rates along cw and ccw
+array<int,2> btree::partition_growths_sym(node *branch, int proposed_r_cw, int proposed_r_ccw)
+{
+  array<int,2> growths;
+  int max_growth_cw, max_growth_ccw;
+  
+  bool cw_first = true;
+
+  growths[0] = 0;
+  growths[1] = 0;
+
+  max_growth_cw = get_max_growth_cw(branch);
+  max_growth_ccw = get_max_growth_ccw(branch);
+
+  uniform_real_distribution<double> u_dist(0.0,1.0);
+  double ur = u_dist(rand_eng);
+  if (ur < 0.5) cw_first = false;
+
+  if (cw_first == true)
+    {
+      while ((((growths[0] < max_growth_cw) && (growths[0] < proposed_r_cw)) ||
+	      ((growths[1] < max_growth_ccw) && (growths[1] < proposed_r_ccw))) &&
+	     (growths[0] + growths[1] + branch->rho_t < branch->size))
+	{
+	  if ((growths[0] < max_growth_cw) &&
+	      (growths[0] < proposed_r_cw) &&
+	      (growths[0] + growths[1] + branch->rho_t < branch->size)) growths[0]++;
+	  if ((growths[1] < max_growth_ccw) &&
+	      (growths[1] < proposed_r_ccw) &&
+	      (growths[0] + growths[1] + branch->rho_t < branch->size)) growths[1]++;
+	}
+    }
+  else
+    {
+      while ((((growths[0] < max_growth_cw) && (growths[0] < proposed_r_cw)) ||
+	      ((growths[1] < max_growth_ccw) && (growths[1] < proposed_r_ccw))) &&
+	     (growths[0] + growths[1] + branch->rho_t < branch->size))
+	{
+	  if ((growths[1] < max_growth_ccw) &&
+	      (growths[1] < proposed_r_ccw) &&
+	      (growths[0] + growths[1] + branch->rho_t < branch->size)) growths[1]++;
+	  if ((growths[0] < max_growth_cw) &&
+	      (growths[0] < proposed_r_cw) &&
+	      (growths[0] + growths[1] + branch->rho_t < branch->size)) growths[0]++;
+	}
+    }
+
+  
+  return growths;
+  
 }
 
 
@@ -484,7 +647,7 @@ int btree::completed_fork_counter(node *branch)
   int fork_count = 0;
   if (branch->leaf == false)
     {
-      if (branch->rho == branch->size) fork_count += 1;
+      if (branch->complete == true) fork_count += 1;
       fork_count += completed_fork_counter(branch->left);
       fork_count += completed_fork_counter(branch->right);
     }
@@ -508,7 +671,7 @@ int btree::active_fork_counter(node *branch)
   int fork_count = 0;
   if (branch->leaf == false)
     {
-      if (branch->rho < branch->size) fork_count += 1;
+      if (branch->complete == false) fork_count += 1;
       fork_count += active_fork_counter(branch->left);
       fork_count += active_fork_counter(branch->right);
     }
@@ -560,7 +723,7 @@ vector<string> btree::traverse_completed_forks(vector<string> forks, int i, node
   if (forks.size() == 0)
     {
       if ((branch->leaf == false) &&
-	  (branch->rho == branch->size))
+	  (branch->complete == true))
 	{ 
 	  forks.push_back("m");
 	}
@@ -568,7 +731,7 @@ vector<string> btree::traverse_completed_forks(vector<string> forks, int i, node
 
   // case for other nodes
   if ((branch->leaf == false) &&
-      (branch->rho == branch->size))
+      (branch->complete == true))
     {
       forks.push_back(forks[i]+"l");
       forks = traverse_completed_forks(forks,forks.size()-1,branch->left);
@@ -599,7 +762,7 @@ vector<string> btree::traverse_active_forks(vector<string> forks, string f, node
   
   if (branch->leaf == false)
     { 
-      if (branch->rho < branch->size)
+      if (branch->complete == false)
 	{ 
 	  forks.push_back(f);
 	}
@@ -628,7 +791,7 @@ int btree::branch_size(node *branch)
   
   if (branch->leaf == false)
     {
-      s += branch->rho;
+      s += branch->rho_t;
       s += branch_size(branch->left);
       s += branch_size(branch->right);
     }
@@ -643,8 +806,7 @@ void btree::solve_topology()
   int temp_start, target_size;
   string free_leaf;
   string query_leaf;
-  node *free_branch;
-  node *query_branch;
+  node *free_branch, *query_branch, *ref_branch;
 
   int N_leaves = count_total_leaves();
   vector<string> leaves = get_leaves();
@@ -652,7 +814,8 @@ void btree::solve_topology()
   bool match;
   int j_q, j_f;
 
-  int mid, d_start, d_end;
+  int mid;
+  //int mid, d_start, d_end;
 
   temp_start = 0;
 
@@ -699,12 +862,15 @@ void btree::solve_topology()
 	    }
 
 	  // set the target size
-	  target_size = query_branch->rho;
+	  target_size = query_branch->rho_t;
 
-	  // descend to leftmost leaf of query branch
-	  while (query_branch->leaf == false)
+	  // set the ref_branch to the query branch
+	  ref_branch = query_branch;
+
+	  // descend to leftmost leaf of ref branch
+	  while (ref_branch->leaf == false)
 	    {
-	      query_branch = query_branch->left;
+	      ref_branch = ref_branch->left;
 	    }
 	  
 	}
@@ -712,7 +878,17 @@ void btree::solve_topology()
       // set the start, end, and mid
       free_branch->topo.start = temp_start;
       free_branch->topo.end = temp_start + target_size - 1;
-      free_branch->topo.mid = (free_branch->topo.start + free_branch->topo.end)/2;
+      // free_branch->topo.mid = (free_branch->topo.start + free_branch->topo.end)/2;
+      if ((query_branch->complete == true) ||
+	  (i == 0))
+	{
+	  free_branch->topo.mid = free_branch->topo.start + target_size/2;
+	}
+      else
+	{
+	  free_branch->topo.mid = free_branch->topo.end - query_branch->rho_cw;
+	}
+
 
       // increase the starting location by the added size
       temp_start += target_size;
@@ -727,13 +903,16 @@ void btree::solve_topology()
       else
 	{
 
-	  d_start = target_size/2;
-	  d_end = target_size - d_start;
+	  // d_start = target_size/2;
+	  // d_end = target_size - d_start;
 
-	  mid = query_branch->topo.mid;
+	  mid = ref_branch->topo.mid;
 
-	  free_branch->topo.start_link = mid - d_start;
-	  free_branch->topo.end_link = mid + d_end + 1;
+	  // free_branch->topo.start_link = mid - d_start;
+	  // free_branch->topo.end_link = mid + d_end + 1;
+
+	  free_branch->topo.start_link = mid - query_branch->rho_ccw;
+	  free_branch->topo.end_link = mid + query_branch->rho_cw + 1;
 	  
 	}
       
@@ -864,8 +1043,9 @@ void btree::update_region_counts(vector<chromo_region> &c_rs)
       circ_size = count_branch->size;
       // exists_size = count_branch->topo.end - count_branch->topo.start;
       // offset = count_branch->topo.mid - count_branch->topo.start;
-      exists_size = count_branch->parent->rho;
-      offset = exists_size/2;	
+      exists_size = count_branch->parent->rho_t;
+      // offset = exists_size/2;
+      offset = count_branch->parent->rho_ccw; 
 
       // cout << exists_size << endl;
       // cout << offset << endl;
@@ -1173,19 +1353,29 @@ void btree::print_branch(node *branch)
   
   if (branch->leaf == false)
     {
-      int max_size;
+      int max_size_cw, max_size_ccw, max_size_t;
       if (branch->parent != nullptr)
 	{
-	  max_size = branch->parent->rho;
+	  max_size_t = branch->parent->rho_t;
+	  max_size_cw = branch->parent->rho_cw;
+	  max_size_ccw = branch->parent->rho_ccw;
 	}
       else
 	{
-	  max_size = branch->size;
+	  max_size_t = branch->size;
+	  max_size_cw = max_size_t - branch->rho_ccw;
+	  max_size_ccw = max_size_t - branch->rho_cw;
 	}
       cout << gen_offset
-	   << "rho = "
-	   << branch->rho
-	   << "/" << max_size
+	   << "rho_t = "
+	   << branch->rho_t
+	   << "/" << max_size_t
+	   << ", rho_cw = "
+	   << branch->rho_cw
+	   << "/" << max_size_cw
+	   << ", rho_ccw = "
+	   << branch->rho_ccw
+	   << "/" << max_size_ccw
 	   << endl;
     }
 

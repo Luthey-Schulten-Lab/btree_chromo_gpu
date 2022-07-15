@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <vector>
 #include <memory>
+#include <random>
 
 using namespace std;
 
@@ -20,8 +21,8 @@ struct node
 {
   int gen;
   int size;
-  int rho;
-  bool leaf;
+  int rho_t, rho_cw, rho_ccw;
+  bool leaf, complete;
   theta_topo topo;
   node *parent;
   node *left;
@@ -31,7 +32,7 @@ struct node
 struct fork_rho
 {
   string fork;
-  int rho;
+  int rho_cw, rho_ccw;
 };
 
 struct btree_state
@@ -86,13 +87,17 @@ public:
   // recursively destroys tree
   void destroy_tree();
 
+  // prng seeding
+  void prng_seed(int s);
+
   // prints entire tree and information
   void print_tree();
 
   // initialize, branch, and grow at branches
   void initialize_tree(int s);
   int branch(string loc);
-  int grow_at_branch(string loc, int r);
+  int grow_at_branch_sym(string loc, int r);
+  int grow_at_branch_asym(string loc, int r_cw, int r_ccw);
 
   // prepare and dump state
   void prepare_state(btree_state st);
@@ -145,12 +150,20 @@ private:
   // recursively print branch topology
   void print_branch(node *branch);
 
+  // parse transform of form "(branch)_cw(rho_cw)_ccw(rho_ccw)"
+  fork_rho parse_transform(string s);
+
   // used for calculating tree state
   int leaf_counter(node *branch);
   int total_fork_counter(node *branch);
   int completed_fork_counter(node *branch);
   int active_fork_counter(node *branch);
   int branch_size(node *branch);
+
+  // used for calculating growth
+  int get_max_growth_cw(node *branch);
+  int get_max_growth_ccw(node *branch);
+  array<int,2> partition_growths_sym(node *branch, int proposed_r_cw, int proposed_r_ccw);
 
   // create centered CG maps per branch
   void centered_CG_map(vector<CG_locus> &loci, node *branch, int f_CG);
@@ -166,6 +179,9 @@ private:
   void split_branch(node *branch);
   node *parse_dir(node *branch, char d);
 
+
+  uniform_real_distribution<> u_dist;
+  mt19937 rand_eng;
   node *root;
   
 

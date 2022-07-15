@@ -1,10 +1,12 @@
+prng_seed:50
+
 input_state:/home/ben/Workspace/btree_chromo/test_case/in_state_test.txt
 
 regions_file:/home/ben/Workspace/btree_chromo/test_case/region_test.txt,0
 
-solve_topology
-
 print
+
+#solve_topology
 
 transforms_file:/home/ben/Workspace/btree_chromo/test_case/state_trans_test.txt
 
@@ -16,7 +18,7 @@ dump_regions:/home/ben/Workspace/btree_chromo/test_case/out_region_test.txt
 
 print
 
-update_CG_map:20
-dump_CG_map:/home/ben/Workspace/btree_chromo/test_case/out_CG_test.txt,10,0
+#update_CG_map:20
+#dump_CG_map:/home/ben/Workspace/btree_chromo/test_case/out_CG_test.txt,20,0
 
 output_state:/home/ben/Workspace/btree_chromo/test_case/out_state_test.txt

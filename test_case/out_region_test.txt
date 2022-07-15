@@ -1,5 +1,5 @@
 region1,96,4:4
 region2,87,13:4
-region3,14,29:2
-region4,44,54:0
-region5,71,85:2
+region3,14,29:4
+region4,44,54:4
+region5,71,85:4
