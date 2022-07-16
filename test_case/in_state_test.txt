@@ -1,4 +1,4 @@
-size=100
-m_cw80_ccw20
-ml_cw20_ccw80
-mr_cw20_ccw80
+size=10
+m_cw4_ccw4
+ml_cw1_ccw2
+mr_cw1_ccw1

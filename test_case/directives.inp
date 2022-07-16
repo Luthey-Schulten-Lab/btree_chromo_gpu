@@ -18,7 +18,7 @@ dump_regions:/home/ben/Workspace/btree_chromo/test_case/out_region_test.txt
 
 print
 
-#update_CG_map:20
-#dump_CG_map:/home/ben/Workspace/btree_chromo/test_case/out_CG_test.txt,20,0
+update_CG_map:3
+dump_CG_map:/home/ben/Workspace/btree_chromo/test_case/out_CG_test.txt,3,0
 
 output_state:/home/ben/Workspace/btree_chromo/test_case/out_state_test.txt

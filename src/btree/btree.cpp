@@ -428,7 +428,12 @@ int btree::grow_at_branch_asym(string loc, int r_cw, int r_ccw)
       g_branch->rho_ccw += part_growths[1];
       g_branch->rho_t = g_branch->rho_cw + g_branch->rho_ccw;
 
-      if (g_branch->rho_t == g_branch->size) g_branch->complete = true;
+      if (g_branch->rho_t == g_branch->size)
+	{
+	  g_branch->complete = true;
+	  g_branch->rho_cw = g_branch->size;
+	  g_branch->rho_ccw = g_branch->size;
+	}
     
     }
   
@@ -498,9 +503,20 @@ array<int,2> btree::partition_growths_sym(node *branch, int proposed_r_cw, int p
   max_growth_cw = get_max_growth_cw(branch);
   max_growth_ccw = get_max_growth_ccw(branch);
 
-  uniform_real_distribution<double> u_dist(0.0,1.0);
-  double ur = u_dist(rand_eng);
-  if (ur < 0.5) cw_first = false;
+  if (branch->rho_cw < branch->rho_ccw)
+    {
+      cw_first = true;
+    }
+  else if (branch->rho_ccw < branch->rho_cw)
+    {
+      cw_first = false;
+    }
+  else
+    {
+      uniform_real_distribution<double> u_dist(0.0,1.0);
+      double ur = u_dist(rand_eng);
+      if (ur < 0.5) cw_first = false;
+    }
 
   if (cw_first == true)
     {
@@ -806,7 +822,9 @@ void btree::solve_topology()
   int temp_start, target_size;
   string free_leaf;
   string query_leaf;
-  node *free_branch, *query_branch, *ref_branch;
+  node *free_branch; // free branch whose topology is being determined
+  node *query_branch; // branch queried for sizing of free branch
+  node *link_branch; // branch that free branch is linked to
 
   int N_leaves = count_total_leaves();
   vector<string> leaves = get_leaves();
@@ -861,62 +879,76 @@ void btree::solve_topology()
 	      
 	    }
 
-	  // set the target size
+	  // set the target size from query branch
 	  target_size = query_branch->rho_t;
 
-	  // set the ref_branch to the query branch
-	  ref_branch = query_branch;
+	  // set the link_branch to the query branch
+	  link_branch = query_branch;
 
-	  // descend to leftmost leaf of ref branch
-	  while (ref_branch->leaf == false)
+	  // descend to leftmost leaf of link branch
+	  while (link_branch->leaf == false)
 	    {
-	      ref_branch = ref_branch->left;
+	      link_branch = link_branch->left;
 	    }
 	  
 	}
 
-      // set the start, end, and mid
-      free_branch->topo.start = temp_start;
-      free_branch->topo.end = temp_start + target_size - 1;
-      // free_branch->topo.mid = (free_branch->topo.start + free_branch->topo.end)/2;
-      if ((query_branch->complete == true) ||
-	  (i == 0))
-	{
-	  free_branch->topo.mid = free_branch->topo.start + target_size/2;
-	}
-      else
-	{
-	  free_branch->topo.mid = free_branch->topo.end - query_branch->rho_cw;
-	}
+      // start constructing the topology
 
 
-      // increase the starting location by the added size
+      if (target_size > 0)
+	{
+
+	  // set the start, end, and mid
+	  free_branch->topo.start = temp_start;
+	  free_branch->topo.end = temp_start + target_size - 1;
+	  // free_branch->topo.mid = (free_branch->topo.start + free_branch->topo.end)/2;
+
+	  // if on the first branch or the query branch is complete, then set midpoint using size
+	  if ((query_branch->complete == true) ||
+	      (i == 0))
+	    {
+	      // set midpoint
+	      free_branch->topo.mid = free_branch->topo.start + target_size/2;
+	      free_branch->topo.start_link = free_branch->topo.end;
+	      // create a circle
+	      free_branch->topo.end_link = free_branch->topo.start;
+	    }
+	  // otherwise determine the midpoint and create a theta structure
+	  else
+	    {
+
+	      // align midpoint with link branch
+	      mid = link_branch->topo.mid;
+	      
+	      if (query_branch->rho_cw == 0)
+		{
+		  free_branch->topo.mid = free_branch->topo.end;
+		  free_branch->topo.start_link = mid - query_branch->rho_ccw;
+		  free_branch->topo.end_link = mid + 1;
+		}
+	      else if (query_branch->rho_ccw == 0)
+		{
+		  free_branch->topo.mid = free_branch->topo.start;
+		  free_branch->topo.start_link = mid - 1;
+		  free_branch->topo.end_link = mid + query_branch->rho_cw;
+		}
+	      else
+		{
+		  free_branch->topo.mid = free_branch->topo.end - query_branch->rho_cw;
+		  free_branch->topo.start_link = mid - query_branch->rho_ccw;
+		  free_branch->topo.end_link = mid + query_branch->rho_cw + 1;
+		}
+
+	      if (target_size == free_branch->size - 1) free_branch->topo.end_link = free_branch->topo.start_link;
+	    }
+
+	} // end if for target_size
+
+      	  // increase the starting location by the added size
       temp_start += target_size;
-
-      // create circular configuration if replication is complete
-      if (target_size == free_branch->size)
-	{
-	  free_branch->topo.start_link = free_branch->topo.end;
-	  free_branch->topo.end_link = free_branch->topo.start;
-	}
-      // create a theta configuration
-      else
-	{
-
-	  // d_start = target_size/2;
-	  // d_end = target_size - d_start;
-
-	  mid = ref_branch->topo.mid;
-
-	  // free_branch->topo.start_link = mid - d_start;
-	  // free_branch->topo.end_link = mid + d_end + 1;
-
-	  free_branch->topo.start_link = mid - query_branch->rho_ccw;
-	  free_branch->topo.end_link = mid + query_branch->rho_cw + 1;
-	  
-	}
       
-    }
+    } // end loop over free branches
   
 }
 
@@ -1041,11 +1073,11 @@ void btree::update_region_counts(vector<chromo_region> &c_rs)
 
       // calculate appropriate offset from topology
       circ_size = count_branch->size;
-      // exists_size = count_branch->topo.end - count_branch->topo.start;
-      // offset = count_branch->topo.mid - count_branch->topo.start;
+      exists_size = count_branch->topo.end - count_branch->topo.start + 1;
+      offset = count_branch->topo.mid - count_branch->topo.start;
       exists_size = count_branch->parent->rho_t;
       // offset = exists_size/2;
-      offset = count_branch->parent->rho_ccw; 
+      // offset = count_branch->parent->rho_ccw; 
 
       // cout << exists_size << endl;
       // cout << offset << endl;
@@ -1061,8 +1093,8 @@ void btree::update_region_counts(vector<chromo_region> &c_rs)
 
 	  if ((start_circ >= 0) &&
 	      (end_circ >= 0) &&
-	      (start_circ < exists_size) &&
-	      (end_circ < exists_size))
+	      (start_circ <= exists_size) &&
+	      (end_circ <= exists_size))
 	    {
 
 	      c_r.count += 1;
@@ -1229,7 +1261,8 @@ void btree::centered_CG_map(vector<CG_locus> &loci, node *branch, int f_CG)
 
   CG_locus l;
   int N = branch->topo.end - branch->topo.start + 1;
-  int ori_idx_m = branch->topo.mid - branch->topo.start;
+  // int ori_idx_m = branch->topo.mid - branch->topo.start;
+  int ori_idx_m = branch->topo.mid - branch->topo.start - 1;
   int ori_idx_p = ori_idx_m + 1;
 
   int N_cum, N_CG_cum;
