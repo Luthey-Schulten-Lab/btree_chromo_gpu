@@ -161,6 +161,21 @@ int btree_driver::execute_directives()
 	  require_CG_update = true;
 	}
 
+      // apply random transformations
+      else if (command == "random_transforms")
+	{
+	  if (params.size() != 1)
+	    {
+	      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+	      return 0;
+	    }
+	  random_transforms(stoi(params[0]));
+	  // require a topology update
+	  require_topo_update = true;
+	  // require a coarse-graining update
+	  require_CG_update = true;
+	}
+
       // write the state to an output file
       else if (command == "output_state")
 	{

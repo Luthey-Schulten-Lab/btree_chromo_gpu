@@ -110,6 +110,7 @@ public:
 
   // apply transformations to btree
   void apply_transforms(btree_transforms tr);
+  void random_transforms(int r);
 
   // queries about tree state
   int count_total_leaves();
@@ -121,6 +122,7 @@ public:
   int count_completed_forks(string loc);
   int count_active_forks(string loc);
   int total_size();
+  int max_size();
 
   // solve the theta structure topology
   void solve_topology();

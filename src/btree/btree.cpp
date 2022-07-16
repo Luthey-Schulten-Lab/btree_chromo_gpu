@@ -553,6 +553,67 @@ array<int,2> btree::partition_growths_sym(node *branch, int proposed_r_cw, int p
 }
 
 
+// function to perform random growths
+void btree::random_transforms(int r)
+{
+  int rem = r;
+  int potential_size = max_size();
+  vector<string> forks;
+  int N_parts, N_forks, fork_add, fork_rem, r_cw, r_ccw;
+  vector<int> partitions;
+
+
+  while ((rem > 0) &&
+	 (total_size() < potential_size))
+    {
+
+        forks = get_active_forks();
+	N_forks = count_active_forks();
+	N_parts = N_forks - 1;
+
+	partitions.clear();
+
+	uniform_int_distribution<int> unif_dist(0,rem);
+
+	for (int i=0; i<N_parts; i++)
+	  {
+	    partitions.push_back(unif_dist(rand_eng));
+	  }
+
+	sort(partitions.begin(),partitions.end());
+
+	for (int i=0; i<N_forks; i++)
+	  {
+
+	    if (i == 0)
+	      {
+		fork_add = partitions[i]-1;
+	      }
+	    else if(i == N_forks-1)
+	      {
+		fork_add = rem - partitions[i] + 1;
+	      }
+	    else
+	      {
+		fork_add = partitions[i] - partitions[i-1] + 1;
+	      }
+
+	    binomial_distribution<int> binom_dist(fork_add,0.5);
+
+	    r_cw = binom_dist(rand_eng);
+	    r_ccw = fork_add - r_cw;
+
+	    fork_rem = grow_at_branch_asym(forks[i],r_cw,r_ccw);
+
+	    rem -= (fork_add - fork_rem);
+	    
+	  }
+	
+    }
+  
+}
+
+
 // function get pointer for a branch given the code
 node *btree::get_branch(string loc)
 {
@@ -813,6 +874,13 @@ int btree::branch_size(node *branch)
     }
   
   return s;
+}
+
+
+// calculate the maximum possible size of the system
+int btree::max_size()
+{
+  return (root->size)*count_total_leaves();
 }
 
 
