@@ -559,57 +559,78 @@ void btree::random_transforms(int r)
   int rem = r;
   int potential_size = max_size();
   vector<string> forks;
-  int N_parts, N_forks, fork_add, fork_rem, r_cw, r_ccw;
+  int N_forks, fork_add, fork_rem, r_cw, r_ccw;
+  int cycle_rem;
   vector<int> partitions;
 
 
+  // do while units remain  and the total size is the less than the maximum possible size
   while ((rem > 0) &&
 	 (total_size() < potential_size))
     {
 
-        forks = get_active_forks();
-	N_forks = count_active_forks();
-	N_parts = N_forks - 1;
+      // get the set of active forks
+      forks = get_active_forks();
+      N_forks = count_active_forks();
 
-	partitions.clear();
+      partitions.clear();
 
-	uniform_int_distribution<int> unif_dist(0,rem);
+      cycle_rem = rem;
 
-	for (int i=0; i<N_parts; i++)
-	  {
-	    partitions.push_back(unif_dist(rand_eng));
-	  }
+      uniform_int_distribution<int> unif_dist(0,rem);
 
-	sort(partitions.begin(),partitions.end());
+      // sample partitions
+      for (int i=0; i<N_forks; i++)
+	{
+	  partitions.push_back(unif_dist(rand_eng));
+	}
 
-	for (int i=0; i<N_forks; i++)
-	  {
+      // sort the partitions
+      sort(partitions.begin(),partitions.end());
 
-	    if (i == 0)
-	      {
-		fork_add = partitions[i]-1;
-	      }
-	    else if(i == N_forks-1)
-	      {
-		fork_add = rem - partitions[i] + 1;
-	      }
-	    else
-	      {
-		fork_add = partitions[i] - partitions[i-1] + 1;
-	      }
+      // cout << "rem = " << rem << endl;
+      // for (int i=0; i<N_parts; i++)
+      // 	{
+      // 	  cout << partitions[i] << endl;
+      // 	}
 
-	    binomial_distribution<int> binom_dist(fork_add,0.5);
+      for (int i=0; i<N_forks; i++)
+	{
+	  
+	  if (partitions[i] > 0)
+	    {
+	      if (i == 0)
+		{
+		  fork_add = partitions[i];
+		}
+	      else if(i == N_forks-1)
+		{
+		  fork_add = cycle_rem - partitions.back();
+		}
+	      else
+		{
+		  fork_add = partitions[i] - partitions[i-1];
+		}
 
-	    r_cw = binom_dist(rand_eng);
-	    r_ccw = fork_add - r_cw;
+	      if (fork_add > 0)
+		{
+		  binomial_distribution<int> binom_dist(fork_add,0.5);
+		  r_cw = binom_dist(rand_eng);
+		  r_ccw = fork_add - r_cw;
+		  fork_rem = grow_at_branch_asym(forks[i],r_cw,r_ccw);
+		  rem -= (fork_add - fork_rem);
+		}
+	    }
 
-	    fork_rem = grow_at_branch_asym(forks[i],r_cw,r_ccw);
+	  // cout << forks[i] << endl;
+	  // cout << " fork_add = " << fork_add << endl;
+	  // cout << " fork_rem = " << fork_rem << endl;
 
-	    rem -= (fork_add - fork_rem);
+	  // cout << " rem = " << rem << endl;
 	    
-	  }
+	} // end loop over forks
 	
-    }
+    } // end loop over remaining units
   
 }
 
