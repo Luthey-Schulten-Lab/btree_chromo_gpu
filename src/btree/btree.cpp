@@ -1185,9 +1185,9 @@ void btree::update_region_counts(vector<chromo_region> &c_rs)
 
       // calculate appropriate offset from topology
       circ_size = count_branch->size;
-      // exists_size = count_branch->topo.end - count_branch->topo.start + 1;
-      offset = count_branch->topo.mid - count_branch->topo.start;
-      exists_size = count_branch->parent->rho_t;
+      exists_size = count_branch->topo.end - count_branch->topo.start + 1;
+      offset = count_branch->topo.mid - count_branch->topo.start + 1;
+      // exists_size = count_branch->parent->rho_t;
       // offset = exists_size/2;
       // offset = count_branch->parent->rho_ccw; 
 
@@ -1205,8 +1205,8 @@ void btree::update_region_counts(vector<chromo_region> &c_rs)
 
 	  if ((start_circ >= 0) &&
 	      (end_circ >= 0) &&
-	      (start_circ <= exists_size) &&
-	      (end_circ <= exists_size))
+	      (start_circ < exists_size) &&
+	      (end_circ < exists_size))
 	    {
 
 	      c_r.count += 1;

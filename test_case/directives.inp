@@ -10,11 +10,11 @@ print
 
 #transforms_file:/home/ben/Workspace/btree_chromo/test_case/state_trans_test.txt
 
-random_transforms:500
+#random_transforms:500
 
-transform:m_cw200_ccw200
+#transform:m_cw200_ccw200
 
-solve_topology
+#solve_topology
 
 dump_topology:/home/ben/Workspace/btree_chromo/test_case/topo_test.txt,0
 
@@ -22,7 +22,7 @@ dump_regions:/home/ben/Workspace/btree_chromo/test_case/out_region_test.txt
 
 print
 
-update_CG_map:1000
-dump_CG_map:/home/ben/Workspace/btree_chromo/test_case/out_CG_test.txt,1000,0
+#update_CG_map:1000
+#dump_CG_map:/home/ben/Workspace/btree_chromo/test_case/out_CG_test.txt,1000,0
 
 output_state:/home/ben/Workspace/btree_chromo/test_case/out_state_test.txt

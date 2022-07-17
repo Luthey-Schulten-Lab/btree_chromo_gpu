@@ -1,3 +1,6 @@
 region1,0,0:2
-region2,8,9:2
-region3,2,3:2
+region2,99,99:2
+region3,99,0:2
+region4,0,1:2
+region5,98,99:2
+region6,97,97:1

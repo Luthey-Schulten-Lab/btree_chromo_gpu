@@ -1,4 +1,2 @@
-size=10000
-m_cw4_ccw4
-ml_cw1_ccw2
-mr_cw1_ccw1
+size=100
+m_cw3_ccw2
