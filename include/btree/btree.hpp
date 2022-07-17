@@ -93,11 +93,9 @@ public:
   // prints entire tree and information
   void print_tree();
 
-  // initialize, branch, and grow at branches
+  // initialize and branch
   void initialize_tree(int s);
   int branch(string loc);
-  int grow_at_branch_sym(string loc, int r);
-  int grow_at_branch_asym(string loc, int r_cw, int r_ccw);
 
   // prepare and dump state
   void prepare_state(btree_state st);
@@ -108,8 +106,12 @@ public:
   btree_state read_state(string st_filename);
   btree_transforms read_transforms(string tr_filename);
 
+  // parse transform of form "(branch)_cw(rho_cw)_ccw(rho_ccw)"
+  fork_rho parse_transform(string s);
+
   // apply transformations to btree
   void apply_transforms(btree_transforms tr);
+  void single_transform(fork_rho f_r);
   void random_transforms(int r);
 
   // queries about tree state
@@ -117,10 +119,6 @@ public:
   int count_total_forks();
   int count_completed_forks();
   int count_active_forks();
-  int count_leaves(string loc);
-  int count_total_forks(string loc);
-  int count_completed_forks(string loc);
-  int count_active_forks(string loc);
   int total_size();
   int max_size();
 
@@ -152,10 +150,11 @@ private:
   // recursively print branch topology
   void print_branch(node *branch);
 
-  // parse transform of form "(branch)_cw(rho_cw)_ccw(rho_ccw)"
-  fork_rho parse_transform(string s);
-
   // used for calculating tree state
+  int count_leaves(string loc);
+  int count_total_forks(string loc);
+  int count_completed_forks(string loc);
+  int count_active_forks(string loc);
   int leaf_counter(node *branch);
   int total_fork_counter(node *branch);
   int completed_fork_counter(node *branch);
@@ -163,6 +162,8 @@ private:
   int branch_size(node *branch);
 
   // used for calculating growth
+  int grow_at_branch_sym(string loc, int r);
+  int grow_at_branch_asym(string loc, int r_cw, int r_ccw);
   int get_max_growth_cw(node *branch);
   int get_max_growth_ccw(node *branch);
   array<int,2> partition_growths_sym(node *branch, int proposed_r_cw, int proposed_r_ccw);

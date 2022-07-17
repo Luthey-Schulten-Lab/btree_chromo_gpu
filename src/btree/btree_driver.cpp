@@ -80,6 +80,7 @@ int btree_driver::execute_directives()
 
   cout << "\n---BEGIN EXECUTING DIRECTIVES---\n" << endl;
 
+  // loop over directives
   for (string drctv: drctvs)
     {
 
@@ -125,9 +126,13 @@ int btree_driver::execute_directives()
 	  cout << "\n" << endl;
 	}
 
+      
+
       //////////////////
       // COMMAND LIST //
       //////////////////
+
+      
 
       // read input state from a file
       if (command == "input_state")
@@ -145,6 +150,7 @@ int btree_driver::execute_directives()
 	  require_CG_update = true;
 	}
 
+      
       // apply state transformations from a file
       else if (command == "transforms_file")
 	{
@@ -161,6 +167,23 @@ int btree_driver::execute_directives()
 	  require_CG_update = true;
 	}
 
+      
+      // apply state transformations from a file
+      else if (command == "transform")
+	{
+	  if (params.size() != 1)
+	    {
+	      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+	      return 0;
+	    }
+	  single_transform(parse_transform(params[0]));
+	  // require a topology update
+	  require_topo_update = true;
+	  // require a coarse-graining update
+	  require_CG_update = true;
+	}
+
+      
       // apply random transformations
       else if (command == "random_transforms")
 	{
@@ -176,6 +199,7 @@ int btree_driver::execute_directives()
 	  require_CG_update = true;
 	}
 
+      
       // write the state to an output file
       else if (command == "output_state")
 	{
@@ -187,6 +211,7 @@ int btree_driver::execute_directives()
 	  write_state(params[0],dump_state());
 	}
 
+      
       // apply state transformations from a file
       else if (command == "regions_file")
 	{
@@ -201,6 +226,7 @@ int btree_driver::execute_directives()
 	  regions_present = true;
 	}
 
+      
       // apply state transformations from a file
       else if (command == "dump_regions")
 	{
@@ -228,6 +254,7 @@ int btree_driver::execute_directives()
 	    }
 	}
 
+      
       // write the topology to an output file
       else if (command == "dump_topology")
 	{
@@ -245,6 +272,7 @@ int btree_driver::execute_directives()
 	  dump_topology(params[0],stoi(params[1]));
 	}
 
+      
       // solve the topology of the current state
       else if (command == "solve_topology")
 	{
@@ -270,6 +298,7 @@ int btree_driver::execute_directives()
 	  driver_CG = update_CG_map(stoi(params[0]));
 	}
 
+      
       // update the CG map
       else if (command == "dump_CG_map")
 	{
@@ -293,6 +322,7 @@ int btree_driver::execute_directives()
 	  dump_CG_map(params[0],stoi(params[2]),driver_CG);
 	}
 
+      
       // seed the PRNG
       else if (command == "prng_seed")
 	{
@@ -306,6 +336,7 @@ int btree_driver::execute_directives()
 	  
 	}
 
+      
       // print the current state
       else if (command == "print")
 	{
@@ -318,7 +349,7 @@ int btree_driver::execute_directives()
 	  print_tree();
 	}
 
-    }
+    } // end loop over directives
   cout << "---END EXECUTING DIRECTIVES---\n" << endl;
   
   return 0;

@@ -81,7 +81,9 @@ Use the testcase for an example: **./program /home/ben/Workspace/btree_chromo/te
 
 *Possible Directives (parameters are comma-separated and following ':' when needed)*
  - input_state:input_file - *creates state from input_file*
+ - transform:(b)_(r_cw)_(r_ccw) - *applies single transform to branch (b), with replication extents (r_cw) and (r_ccw)*
  - transforms_file:transforms_file - *applies transforms stored in transforms_file*
+ - random_transforms:N - *applies random transforms until (N) units are added or the maximum size is reached*
  - output_state:output_file - *writes state to output_file*
  - solve_topology - *solves bond topology of system*
  - dump_topology:topology_file,idx - *dumps topology to topology_file with selected indexing convention (idx)*

@@ -133,6 +133,29 @@ void btree::apply_transforms(btree_transforms tr)
 }
 
 
+
+// function to apply a single transform to the binary tree
+void btree::single_transform(fork_rho f_r)
+{
+
+  int error_code;
+  btree_state st = dump_state();
+  
+  error_code = grow_at_branch_asym(f_r.fork,f_r.rho_cw,f_r.rho_ccw);
+
+  if (error_code == -1)
+    {
+      cout << "ERROR: impossible state, destroying tree and returning to initial state" << endl;
+
+      // destroy the impossible tree and return to the initial state
+      destroy_tree();
+      prepare_state(st);
+      return;
+    }
+      
+}
+
+
 // function to write a binary tree state to a file
 void btree::write_state(string st_filename, btree_state st)
 {
@@ -1162,7 +1185,7 @@ void btree::update_region_counts(vector<chromo_region> &c_rs)
 
       // calculate appropriate offset from topology
       circ_size = count_branch->size;
-      exists_size = count_branch->topo.end - count_branch->topo.start + 1;
+      // exists_size = count_branch->topo.end - count_branch->topo.start + 1;
       offset = count_branch->topo.mid - count_branch->topo.start;
       exists_size = count_branch->parent->rho_t;
       // offset = exists_size/2;

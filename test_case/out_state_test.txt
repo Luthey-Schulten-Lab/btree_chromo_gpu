@@ -1,4 +1,4 @@
-size=10
-m_cw4_ccw5
-ml_cw2_ccw3
-mr_cw2_ccw2
+size=10000
+m_cw341_ccw329
+ml_cw76_ccw69
+mr_cw48_ccw50
