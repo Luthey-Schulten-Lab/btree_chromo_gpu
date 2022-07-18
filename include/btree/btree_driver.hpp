@@ -2,6 +2,7 @@
 #define INCLUDE_BTREE_DRIVER_HPP
 
 #include <btree/btree.hpp>
+#include <btree/gillespie_solver.hpp>
 
 using namespace std;
 
@@ -59,6 +60,7 @@ private:
   int prng_seed(vector<string> &params);
   int print_state(drctv_reqs &reqs);
 
+  gillespie_solver solver;
   btree driver_bt;
   btree_state driver_st; // state structure
   btree_transforms driver_tr; // transform structure

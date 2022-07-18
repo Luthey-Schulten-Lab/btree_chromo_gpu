@@ -10,11 +10,11 @@ print
 
 #transforms_file:/home/ben/Workspace/btree_chromo/test_case/state_trans_test.txt
 
-random_transforms:500
+random_transforms:50
 
-#transform:m_cw200_ccw200
+#transform:m_cw20_ccw20
 
-#update_topology
+update_topology
 
 dump_topology:/home/ben/Workspace/btree_chromo/test_case/topo_test.txt,0
 

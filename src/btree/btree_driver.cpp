@@ -1,4 +1,5 @@
 #include <btree/btree_driver.hpp>
+#include <btree/gillespie_solver.hpp>
 
 // constructor
 btree_driver::btree_driver()
@@ -234,9 +235,9 @@ int btree_driver::execute_directives()
   return 0;
 }
 
-///////////////////////
-// set of directives //
-///////////////////////
+////////////////////////////////////////////
+// set of functions to perform directives //
+////////////////////////////////////////////
 
 
 
