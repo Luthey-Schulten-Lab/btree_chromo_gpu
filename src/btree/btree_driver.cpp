@@ -3,7 +3,7 @@
 // constructor
 btree_driver::btree_driver()
 {
-  reset_root();
+  driver_bt.reset_root();
 }
 
 
@@ -11,7 +11,7 @@ btree_driver::btree_driver()
 btree_driver::~btree_driver()
 {
   // cout << "btree_driver destructor after destroy" << endl;
-  destroy_tree();
+  driver_bt.destroy_tree();
   // cout << "btree_driver destructor after destroy" << endl;
 } 
 
@@ -73,10 +73,13 @@ int btree_driver::execute_directives()
   string cmd_delim = ":";
   string param_delim = ",";
   int delim;
+  int error_code = 0;
 
-  bool require_topo_update = true;
-  bool require_CG_update = true;
-  bool regions_present = false;
+  drctv_reqs reqs;
+
+  reqs.topo_update = true;
+  reqs.CG_update = true;
+  reqs.regions_present = false;
 
   cout << "\n---BEGIN EXECUTING DIRECTIVES---\n" << endl;
 
@@ -137,220 +140,315 @@ int btree_driver::execute_directives()
       // read input state from a file
       if (command == "input_state")
 	{
-	  if (params.size() != 1)
-	    {
-	      cout << "ERROR: wrong number of parameters, correct input file" << endl;
-	      return 0;
-	    }
-	  driver_st = read_state(params[0]);
-	  prepare_state(driver_st);
-	  // require a topology update
-	  require_topo_update = true;
-	  // require a coarse-graining update
-	  require_CG_update = true;
+	  error_code = input_state(params,reqs);
+	}
+      
+
+      // write the state to an output file
+      else if (command == "output_state")
+	{
+	  error_code = output_state(params);
 	}
 
       
       // apply state transformations from a file
       else if (command == "transforms_file")
 	{
-	  if (params.size() != 1)
-	    {
-	      cout << "ERROR: wrong number of parameters, correct input file" << endl;
-	      return 0;
-	    }
-	  driver_tr = read_transforms(params[0]);
-	  apply_transforms(driver_tr);
-	  // require a topology update
-	  require_topo_update = true;
-	  // require a coarse-graining update
-	  require_CG_update = true;
+	  error_code = transforms_file(params,reqs);
 	}
 
       
       // apply state transformations from a file
       else if (command == "transform")
 	{
-	  if (params.size() != 1)
-	    {
-	      cout << "ERROR: wrong number of parameters, correct input file" << endl;
-	      return 0;
-	    }
-	  single_transform(parse_transform(params[0]));
-	  // require a topology update
-	  require_topo_update = true;
-	  // require a coarse-graining update
-	  require_CG_update = true;
+	  error_code = transform(params,reqs);
 	}
 
       
       // apply random transformations
       else if (command == "random_transforms")
 	{
-	  if (params.size() != 1)
-	    {
-	      cout << "ERROR: wrong number of parameters, correct input file" << endl;
-	      return 0;
-	    }
-	  random_transforms(stoi(params[0]));
-	  // require a topology update
-	  require_topo_update = true;
-	  // require a coarse-graining update
-	  require_CG_update = true;
-	}
-
-      
-      // write the state to an output file
-      else if (command == "output_state")
-	{
-	  if (params.size() != 1)
-	    {
-	      cout << "ERROR: wrong number of parameters, correct input file" << endl;
-	      return 0;
-	    }
-	  write_state(params[0],dump_state());
+	  error_code = random_transforms(params,reqs);
 	}
 
       
       // apply state transformations from a file
       else if (command == "regions_file")
 	{
-	  if (params.size() != 2)
-	    {
-	      cout << "ERROR: wrong number of parameters, correct input file" << endl;
-	      return 0;
-	    }
-	  driver_rg.clear();
-	  driver_rg = read_regions(params[0],stoi(params[1]));
-	  // flag for regions being present
-	  regions_present = true;
+	  error_code = regions_file(params,reqs);
 	}
 
       
       // apply state transformations from a file
       else if (command == "dump_regions")
 	{
-	  if (params.size() != 1)
-	    {
-	      cout << "ERROR: wrong number of parameters, correct input file" << endl;
-	      return 0;
-	    }
-	  if (regions_present == true)
-	    {
-	      
-	      // update topology before updating regions
-	      if (require_topo_update == true)
-		{
-		  solve_topology();
-		  require_topo_update = false;
-		}
- 
-	      update_region_counts(driver_rg);
-	      dump_regions(params[0],driver_rg);
-	    }
-	  else
-	    {
-	      cout << "  missing (read_regions), no regions to dump" << endl;
-	    }
+	  error_code = dump_regions(params,reqs);
 	}
 
       
       // write the topology to an output file
       else if (command == "dump_topology")
 	{
-	  if (params.size() != 2)
-	    {
-	      cout << "ERROR: wrong number of parameters, correct input file" << endl;
-	      return 0;
-	    }
-	  // update topology before dumping
-	  if (require_topo_update == true)
-	    {
-	      solve_topology();
-	      require_topo_update = false;
-	    }
-	  dump_topology(params[0],stoi(params[1]));
+	  error_code = dump_topology(params,reqs);
 	}
 
       
       // solve the topology of the current state
-      else if (command == "solve_topology")
+      else if (command == "update_topology")
 	{
-	  solve_topology();
-	  // disable flag for topology updating after an update
-	  require_topo_update = false;
+	  error_code = update_topology(reqs);
 	}
 
       // update the CG map
       else if (command == "update_CG_map")
 	{
-	  if (params.size() != 1)
-	    {
-	      cout << "ERROR: wrong number of parameters, correct input file" << endl;
-	      return 0;
-	    }
-	  // update topology before dumping
-	  if (require_topo_update == true)
-	    {
-	      solve_topology();
-	      require_topo_update = false;
-	    }
-	  driver_CG = update_CG_map(stoi(params[0]));
+	  error_code = update_CG_map(params,reqs);
 	}
 
       
       // update the CG map
       else if (command == "dump_CG_map")
 	{
-	  if (params.size() != 3)
-	    {
-	      cout << "ERROR: wrong number of parameters, correct input file" << endl;
-	      return 0;
-	    }
-	  // update topology before updating CG_map
-	  if (require_topo_update == true)
-	    {
-	      solve_topology();
-	      require_topo_update = false;
-	    }
-	  // update CG_map before dumping
-	  if (require_CG_update == true)
-	    {
-	      driver_CG = update_CG_map(stoi(params[1]));
-	      require_CG_update = false;
-	    }
-	  dump_CG_map(params[0],stoi(params[2]),driver_CG);
+	  error_code = dump_CG_map(params,reqs);
 	}
 
       
       // seed the PRNG
       else if (command == "prng_seed")
 	{
-	  if (params.size() != 1)
-	    {
-	      cout << "ERROR: wrong number of parameters, correct input file" << endl;
-	      return 0;
-	    }
-	  // seed the PRNG
-	  prng_seed(stoi(params[0]));
-	  
+	  error_code = prng_seed(params);
 	}
 
       
       // print the current state
       else if (command == "print")
 	{
-	  // update topology before printing
-	  if (require_topo_update == true)
-	    {
-	      solve_topology();
-	      require_topo_update = false;
-	    }
-	  print_tree();
+	  error_code = print_state(reqs);
 	}
+
+      if (error_code != 0) return 1;
 
     } // end loop over directives
   cout << "---END EXECUTING DIRECTIVES---\n" << endl;
   
+  return 0;
+}
+
+///////////////////////
+// set of directives //
+///////////////////////
+
+
+
+int btree_driver::input_state(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 1)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  driver_st = driver_bt.read_state(params[0]);
+  driver_bt.prepare_state(driver_st);
+  // require a topology update
+  reqs.topo_update = true;
+  // require a coarse-graining update
+  reqs.CG_update = true;
+  return 0;
+}
+
+
+int btree_driver::output_state(vector<string> &params)
+{
+  if (params.size() != 1)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  driver_bt.write_state(params[0],driver_bt.dump_state());
+  return 0;
+}
+
+int btree_driver::transforms_file(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 1)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  driver_tr = driver_bt.read_transforms(params[0]);
+  driver_bt.apply_transforms(driver_tr);
+  // require a topology update
+  reqs.topo_update = true;
+  // require a coarse-graining update
+  reqs.CG_update = true;
+  return 0;
+}
+
+
+int btree_driver::transform(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 1)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  driver_bt.single_transform(driver_bt.parse_transform(params[0]));
+  // require a topology update
+  reqs.topo_update = true;
+  // require a coarse-graining update
+  reqs.CG_update = true;
+  return 0;
+}
+
+
+int btree_driver::random_transforms(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 1)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  driver_bt.random_transforms(stoi(params[0]));
+  // require a topology update
+  reqs.topo_update = true;
+  // require a coarse-graining update
+  reqs.CG_update = true;
+  return 0;
+}
+
+
+int btree_driver::regions_file(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 2)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  driver_rg.clear();
+  driver_rg = driver_bt.read_regions(params[0],stoi(params[1]));
+  // flag for regions being present
+  reqs.regions_present = true;
+  return 0;
+}
+
+
+int btree_driver::dump_regions(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 1)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  if (reqs.regions_present == true)
+    {
+	      
+      // update topology before updating regions
+      if (reqs.topo_update == true)
+	{
+	  driver_bt.solve_topology();
+	  reqs.topo_update = false;
+	}
+ 
+      driver_bt.update_region_counts(driver_rg);
+      driver_bt.dump_regions(params[0],driver_rg);
+    }
+  else
+    {
+      cout << "  missing (read_regions), no regions to dump" << endl;
+    }
+  return 0;
+}
+
+
+int btree_driver::dump_topology(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 2)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  // update topology before dumping
+  if (reqs.topo_update == true)
+    {
+      driver_bt.solve_topology();
+      reqs.topo_update = false;
+    }
+  driver_bt.dump_topology(params[0],stoi(params[1]));
+  return 0;
+}
+
+int btree_driver::update_topology(drctv_reqs &reqs)
+{
+  driver_bt.solve_topology();
+  // disable flag for topology updating after an update
+  reqs.topo_update = false;
+  return 0;
+}
+
+
+int btree_driver::update_CG_map(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 1)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  // update topology before dumping
+  if (reqs.topo_update == true)
+    {
+      driver_bt.solve_topology();
+      reqs.topo_update = false;
+    }
+  driver_CG = driver_bt.update_CG_map(stoi(params[0]));
+  return 0;
+}
+
+
+int btree_driver::dump_CG_map(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 3)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  // update topology before updating CG_map
+  if (reqs.topo_update == true)
+    {
+      driver_bt.solve_topology();
+      reqs.topo_update = false;
+    }
+  // update CG_map before dumping
+  if (reqs.CG_update == true)
+    {
+      driver_CG = driver_bt.update_CG_map(stoi(params[1]));
+      reqs.CG_update = false;
+    }
+  driver_bt.dump_CG_map(params[0],stoi(params[2]),driver_CG);
+  return 0;
+}
+
+
+int btree_driver::prng_seed(vector<string> &params)
+{
+  if (params.size() != 1)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  // seed the PRNG
+  driver_bt.prng_seed(stoi(params[0]));
+  return 0;
+}
+
+
+int btree_driver::print_state(drctv_reqs &reqs)
+{
+  // update topology before printing
+  if (reqs.topo_update == true)
+    {
+      driver_bt.solve_topology();
+      reqs.topo_update = false;
+    }
+  driver_bt.print_tree();
   return 0;
 }

@@ -85,7 +85,7 @@ Use the testcase for an example: **./program /home/ben/Workspace/btree_chromo/te
  - transforms_file:transforms_file - *applies transforms stored in transforms_file*
  - random_transforms:N - *applies random transforms until (N) units are added or the maximum size is reached*
  - output_state:output_file - *writes state to output_file*
- - solve_topology - *solves bond topology of system*
+ - update_topology - *solves bond topology of system*
  - dump_topology:topology_file,idx - *dumps topology to topology_file with selected indexing convention (idx)*
  - update_CG_map:f_CG - *update coarse-graining with selected factor (f_CG)*
  - dump_CG_map:CG_map_file,f_CG,idx - *dumps CG_map to CG_map_file with selected factor (f_CG) and indexing convention (idx)*

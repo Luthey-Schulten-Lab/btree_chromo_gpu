@@ -1017,8 +1017,8 @@ void btree::solve_topology()
 	  // free_branch->topo.mid = (free_branch->topo.start + free_branch->topo.end)/2;
 
 	  // if on the first branch or the query branch is complete, then set midpoint using size
-	  if ((query_branch->complete == true) ||
-	      (i == 0))
+	  if ((i == 0) ||
+	      (query_branch->complete == true)) // query branch will be undefined on first iteration
 	    {
 	      // set midpoint
 	      free_branch->topo.mid = free_branch->topo.start + target_size/2;

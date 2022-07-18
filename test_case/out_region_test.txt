@@ -3,4 +3,4 @@ region2,99,99:2
 region3,99,0:2
 region4,0,1:2
 region5,98,99:2
-region6,97,97:1
+region6,97,97:2
