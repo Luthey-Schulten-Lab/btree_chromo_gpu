@@ -8,7 +8,10 @@ using namespace std;
 
 struct drctv_reqs
 {
-  bool topo_update, CG_update, regions_present;
+  bool topo_update;
+  bool CG_update;
+  bool regions_present;
+  bool rep_model_present;
 };
 
 
@@ -60,8 +63,15 @@ private:
   int prng_seed(vector<string> &params);
   int print_state(drctv_reqs &reqs);
 
+  // replication model
+  int replication_model(vector<string> &params, drctv_reqs &reqs);
+
+  // classes
   gillespie_solver solver;
   btree driver_bt;
+
+  // structs
+  rep_model_params driver_rep_model; // replication model
   btree_state driver_st; // state structure
   btree_transforms driver_tr; // transform structure
   vector<chromo_region> driver_rg; // vector of chromo_regions

@@ -6,6 +6,16 @@
 using namespace std;
 
 
+struct rep_model_params
+{
+  double V;
+  double k_rep;
+  double k_c, k_d;
+  double k_hi, k_lo, k_on, k_off;
+  int N_hi, N_lo, N_fil;
+  int max_replisomes, N_init_DnaA;
+};
+
 class gillespie_solver
 {
 public:
@@ -16,14 +26,29 @@ public:
 
   // set the prng seed
   void prng_seed(int s);
+
+  // read the replication model
+  rep_model_params read_rep_model(string rep_model_filename);
+
+  // prepare the system
+  void prepare_system(rep_model_params r_m_p, int N_forks);
+
+  
   
 
 private:
 
-  void update_propensities();
-  void update_state();
+  void update_propensities(rep_model_params r_m_p);
+  void update_state(int j_rxn);
+
+  // functions for DnaA reaction model
+  int number_species(rep_model_params r_m_p, int N_forks);
+  int number_rxns(rep_model_params r_m_p, int N_forks);
+
+  
 
   mt19937 rand_eng;
+  uniform_real_distribution<double> u_rand;
 
 };
 

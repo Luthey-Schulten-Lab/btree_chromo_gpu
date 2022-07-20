@@ -81,6 +81,7 @@ int btree_driver::execute_directives()
   reqs.topo_update = true;
   reqs.CG_update = true;
   reqs.regions_present = false;
+  reqs.rep_model_present = false;
 
   cout << "\n---BEGIN EXECUTING DIRECTIVES---\n" << endl;
 
@@ -200,6 +201,7 @@ int btree_driver::execute_directives()
 	  error_code = update_topology(reqs);
 	}
 
+      
       // update the CG map
       else if (command == "update_CG_map")
 	{
@@ -207,10 +209,17 @@ int btree_driver::execute_directives()
 	}
 
       
-      // update the CG map
+      // dump the CG map
       else if (command == "dump_CG_map")
 	{
 	  error_code = dump_CG_map(params,reqs);
+	}
+
+      
+      // read the replication model
+      else if (command == "replication_model")
+	{
+	  error_code = replication_model(params,reqs);
 	}
 
       
@@ -425,6 +434,20 @@ int btree_driver::dump_CG_map(vector<string> &params, drctv_reqs &reqs)
       reqs.CG_update = false;
     }
   driver_bt.dump_CG_map(params[0],stoi(params[2]),driver_CG);
+  return 0;
+}
+
+
+int btree_driver::replication_model(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 1)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  driver_rep_model = solver.read_rep_model(params[0]);
+  // replication model is now present
+  reqs.rep_model_present = true;
   return 0;
 }
 
