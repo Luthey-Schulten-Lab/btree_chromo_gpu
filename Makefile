@@ -22,8 +22,9 @@ APP_DIR  := $(BUILD)/apps
 TARGET   := program
 INCLUDE  := -Iinclude/ -I${GCC_INC}
 SRC      :=                      \
+   $(wildcard src/rep_kinetics/*.cpp) \
    $(wildcard src/btree/*.cpp) \
-   $(wildcard src/*.cpp)         \
+   $(wildcard src/*.cpp) \
 
 OBJECTS  := $(SRC:%.cpp=$(OBJ_DIR)/%.o)
 DEPENDENCIES \
@@ -63,3 +64,4 @@ info:
 	@echo "[*] Sources:         ${SRC}         "
 	@echo "[*] Objects:         ${OBJECTS}     "
 	@echo "[*] Dependencies:    ${DEPENDENCIES}"
+	@echo "[*] Include:         ${INCLUDE}     "

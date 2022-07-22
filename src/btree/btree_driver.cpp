@@ -1,5 +1,4 @@
 #include <btree/btree_driver.hpp>
-#include <btree/gillespie_solver.hpp>
 
 // constructor
 btree_driver::btree_driver()
@@ -445,7 +444,7 @@ int btree_driver::replication_model(vector<string> &params, drctv_reqs &reqs)
       cout << "ERROR: wrong number of parameters, correct input file" << endl;
       return 1;
     }
-  driver_rep_model = solver.read_rep_model(params[0]);
+  // driver_rep_model = driver_rk.read_rep_model(params[0]);
   // replication model is now present
   reqs.rep_model_present = true;
   return 0;

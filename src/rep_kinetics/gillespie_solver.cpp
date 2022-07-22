@@ -1,4 +1,4 @@
-#include <btree/gillespie_solver.hpp>
+#include <rep_kinetics/gillespie_solver.hpp>
 
 // constructor
 gillespie_solver::gillespie_solver()
@@ -18,212 +18,71 @@ void gillespie_solver::prng_seed(int s)
   rand_eng.seed(s);
 }
 
+// int gillespie_solver::select_rxn(double r_rxn, double total_propensity)
+// {
 
-// read the replication model
-rep_model_params gillespie_solver::read_rep_model(string rep_model_filename)
-{
-  rep_model_params r_i_p;
+// }
 
-  fstream rep_model_file;
+// void gillespie_solver::update_propensities()
+// {
 
-  string param_delim, param, val;
-  int delim;
-  
-  string line;
+// }
 
-  rep_model_file.open(rep_model_filename, ios::in);
+// void gillespie_solver::update_state(int j_rxn)
+// {
 
-  if (!rep_model_file)
-    {
-      cout << "ERROR: file not opened in read_rep_model" << endl;
-    }
-  else
-    {
-      while (1)
-	{
-	  rep_model_file >> line;
-	  if (rep_model_file.eof()) break;
-	  
-
-	  if ((line.length() > 0) &&
-	      (line.find("#") != 0))
-	    {
-
-	      delim = line.find(param_delim);
-
-	      if (delim != -1)
-		{
-
-		  param = line.substr(0,delim);
-		  val = line.substr(delim+1,line.length());
-
-		  if (param == "V")
-		    {
-		      r_i_p.V = stod(val);
-		    }
-
-		  else if (param == "max_replisomes")
-		    {
-		      r_i_p.max_replisomes = stoi(val);
-		    }
-
-		  else if (param == "N_init_DnaA")
-		    {
-		      r_i_p.N_init_DnaA = stoi(val);
-		    }
-
-		  else if (param == "k_rep")
-		    {
-		      r_i_p.k_rep = stod(val);
-		    }
-		  
-		  else if (param == "k_c")
-		    {
-		      r_i_p.k_c = stod(val);
-		    }
-
-		  else if (param == "k_d")
-		    {
-		      r_i_p.k_d = stod(val);
-		    }
-
-
-		  else if (param == "N_hi")
-		    {
-		      r_i_p.N_hi = stoi(val);
-		    }
-
-
-		  else if (param == "k_hi")
-		    {
-		      r_i_p.k_hi = stod(val);
-		    }
-
-
-		  else if (param == "N_lo")
-		    {
-		      r_i_p.N_lo = stoi(val);
-		    }
-
-
-		  else if (param == "k_lo")
-		    {
-		      r_i_p.k_lo = stod(val);
-		    }
-
-
-		  else if (param == "N_fil")
-		    {
-		      r_i_p.N_fil = stoi(val);
-		    }
-
-		  else if (param == "k_on")
-		    {
-		      r_i_p.k_on = stod(val);
-		    }
-
-
-		  else if (param == "k_off")
-		    {
-		      r_i_p.k_off = stod(val);
-		    }
-
-
-		}
-	      	      
-	    }
-	      
-     	} // end while loop
-  
-    }
-  
-  rep_model_file.close();
-
-
-  return r_i_p;
-}
-
-// prepare the system state
-void gillespie_solver::prepare_system(rep_model_params r_m_p, int N_forks)
-{
-  int N_species = number_species(r_m_p,N_forks);
-  int N_rxns = number_rxns(r_m_p,N_forks);
-
-  cout << "N_species = " << N_species << endl;
-  cout << "N_rxns = " << N_rxns << endl;
-  
-}
-
+// }
 
 // run the system until max time or first-passage occurs
-void gillespie_solver::run_FPT(rep_model_params r_m_p, int N_forks, double t, double t_max)
-{
-  double r_t, r_rxn;
-  double dt, total_propensity;
-  int FPT_index = -1;
-  int j_rxn;
+// void gillespie_solver::run_FPT(double t, double t_max)
+// {
+//   double r_t, r_rxn;
+//   double dt, total_propensity;
+//   int FPT_index = -1;
+//   int j_rxn;
+
+//   r_rxn = 0.0;
+//   total_propensity = 0.0;
+//   j_rxn = 0;
   
-  while (1)
-    {
-      // sample random numbers for the reaction and time
-      r_t = u_rand(rand_eng);
-      r_rxn = u_rand(rand_eng);
+//   while (1)
+//     {
+//       // sample random numbers for the reaction and time
+//       r_t = u_rand(rand_eng);
+//       r_rxn = u_rand(rand_eng);
 
-      // update the propensities
-      update_propensities(r_m_p);
+//       // update the propensities
+//       update_propensities();
 
-      // calculate the total propensity
+//       // calculate the total propensity
       
 
-      // sample time based on total propensity
-      dt = -log(r_t)/total_propensity;
+//       // sample time based on total propensity
+//       dt = -log(r_t)/total_propensity;
       
-      // test of proposed time exceeds maximum
-      if (t+dt > t_max)
-	{
-	  t = t_max;
-	  break;
-	}
+//       // test of proposed time exceeds maximum
+//       if (t+dt > t_max)
+// 	{
+// 	  t = t_max;
+// 	  break;
+// 	}
 
-      // sample the reactions
-      j_rxn = select_rxn(total_propensity,propensities);
+//       // sample the reactions
+//       j_rxn = select_rxn(r_rxn,total_propensity);
       
-      // update the state
-      update_state(j_rxn);
+//       // update the state
+//       update_state(j_rxn);
 
-      // test for FPT species and break the loop if they are found
+//       // test for FPT species and break the loop if they are found
 
-      if (FPT_index != -1)
-	{
-	  t += dt;
-	  break
-	}
+//       if (FPT_index != -1)
+// 	{
+// 	  t += dt;
+// 	  break;
+// 	}
       
-    } // end while loop
-}
+//     } // end while loop
+// }
 
 
-// get the number of species based on the replication model
-int gillespie_solver::number_rep_species(rep_model_params r_m_p, int N_forks)
-{
-  int N_species = 0;
 
-  N_species += 1; // free DnaA
-
-  N_species += N_forks*(2+r_m_p.N_hi+r_m_p.N_lo+r_m_p.N_fil);
-
-  return N_species;
-}
-
-
-// get the number of reactions based on the replication model
-int gillespie_solver::number_rep_rxns(rep_model_params r_m_p, int N_forks)
-{
-  int N_rxns = 0;
-
-  N_rxns += 1; // free DnaA
-
-  N_rxns += N_forks*(2+r_m_p.N_hi+r_m_p.N_lo+r_m_p.N_fil);
-  
-  return N_rxns;
-}

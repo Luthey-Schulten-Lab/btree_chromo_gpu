@@ -2,7 +2,7 @@
 #define INCLUDE_BTREE_DRIVER_HPP
 
 #include <btree/btree.hpp>
-#include <btree/gillespie_solver.hpp>
+#include <rep_kinetics/replication_model.hpp>
 
 using namespace std;
 
@@ -67,7 +67,7 @@ private:
   int replication_model(vector<string> &params, drctv_reqs &reqs);
 
   // classes
-  gillespie_solver solver;
+  gillespie_solver driver_replicator;
   btree driver_bt;
 
   // structs

@@ -1,26 +1,17 @@
-#include <btree/gillespie_solver.hpp>
+#include <rep_kinetics/replication_model.hpp>
 
 // constructor
-gillespie_solver::gillespie_solver()
+replication_model::replication_model()
 {
-  rand_eng.seed(0);
-  u_rand = uniform_real_distribution<double>(0.0,1.0);
 }
 
 // destructor
-gillespie_solver::~gillespie_solver()
+replication_model::~replication_model()
 {
 }
-
-// prng seed
-void gillespie_solver::prng_seed(int s)
-{
-  rand_eng.seed(s);
-}
-
 
 // read the replication model
-rep_model_params gillespie_solver::read_rep_model(string rep_model_filename)
+rep_model_params replication_model::read_rep_model(string rep_model_filename)
 {
   rep_model_params r_i_p;
 
@@ -144,67 +135,18 @@ rep_model_params gillespie_solver::read_rep_model(string rep_model_filename)
 }
 
 // prepare the system state
-void gillespie_solver::prepare_system(rep_model_params r_m_p, int N_forks)
+void replication_model::prepare_system(rep_model_params r_m_p, int N_forks)
 {
-  int N_species = number_species(r_m_p,N_forks);
-  int N_rxns = number_rxns(r_m_p,N_forks);
+  int N_species = number_rep_species(r_m_p,N_forks);
+  int N_rxns = number_rep_rxns(r_m_p,N_forks);
 
   cout << "N_species = " << N_species << endl;
   cout << "N_rxns = " << N_rxns << endl;
   
 }
 
-
-// run the system until max time or first-passage occurs
-void gillespie_solver::run_FPT(rep_model_params r_m_p, int N_forks, double t, double t_max)
-{
-  double r_t, r_rxn;
-  double dt, total_propensity;
-  int FPT_index = -1;
-  int j_rxn;
-  
-  while (1)
-    {
-      // sample random numbers for the reaction and time
-      r_t = u_rand(rand_eng);
-      r_rxn = u_rand(rand_eng);
-
-      // update the propensities
-      update_propensities(r_m_p);
-
-      // calculate the total propensity
-      
-
-      // sample time based on total propensity
-      dt = -log(r_t)/total_propensity;
-      
-      // test of proposed time exceeds maximum
-      if (t+dt > t_max)
-	{
-	  t = t_max;
-	  break;
-	}
-
-      // sample the reactions
-      j_rxn = select_rxn(total_propensity,propensities);
-      
-      // update the state
-      update_state(j_rxn);
-
-      // test for FPT species and break the loop if they are found
-
-      if (FPT_index != -1)
-	{
-	  t += dt;
-	  break
-	}
-      
-    } // end while loop
-}
-
-
 // get the number of species based on the replication model
-int gillespie_solver::number_rep_species(rep_model_params r_m_p, int N_forks)
+int replication_model::number_rep_species(rep_model_params r_m_p, int N_forks)
 {
   int N_species = 0;
 
@@ -217,7 +159,7 @@ int gillespie_solver::number_rep_species(rep_model_params r_m_p, int N_forks)
 
 
 // get the number of reactions based on the replication model
-int gillespie_solver::number_rep_rxns(rep_model_params r_m_p, int N_forks)
+int replication_model::number_rep_rxns(rep_model_params r_m_p, int N_forks)
 {
   int N_rxns = 0;
 
