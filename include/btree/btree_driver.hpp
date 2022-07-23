@@ -64,10 +64,11 @@ private:
   int print_state(drctv_reqs &reqs);
 
   // replication model
-  int replication_model(vector<string> &params, drctv_reqs &reqs);
+  int rep_model(vector<string> &params, drctv_reqs &reqs);
 
   // classes
-  gillespie_solver driver_replicator;
+  // gillespie_solver driver_replicator;
+  replication_model driver_replicator;
   btree driver_bt;
 
   // structs

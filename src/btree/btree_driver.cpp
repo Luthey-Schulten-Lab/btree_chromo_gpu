@@ -218,7 +218,7 @@ int btree_driver::execute_directives()
       // read the replication model
       else if (command == "replication_model")
 	{
-	  error_code = replication_model(params,reqs);
+	  error_code = rep_model(params,reqs);
 	}
 
       
@@ -437,14 +437,14 @@ int btree_driver::dump_CG_map(vector<string> &params, drctv_reqs &reqs)
 }
 
 
-int btree_driver::replication_model(vector<string> &params, drctv_reqs &reqs)
+int btree_driver::rep_model(vector<string> &params, drctv_reqs &reqs)
 {
   if (params.size() != 1)
     {
       cout << "ERROR: wrong number of parameters, correct input file" << endl;
       return 1;
     }
-  // driver_rep_model = driver_rk.read_rep_model(params[0]);
+  driver_rep_model = driver_replicator.read_rep_model(params[0]);
   // replication model is now present
   reqs.rep_model_present = true;
   return 0;
