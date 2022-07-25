@@ -216,9 +216,16 @@ int btree_driver::execute_directives()
 
       
       // read the replication model
-      else if (command == "replication_model")
+      else if (command == "load_replication_model")
 	{
-	  error_code = rep_model(params,reqs);
+	  error_code = load_rep_model(params,reqs);
+	}
+
+
+      // replicate until t_max
+      else if (command == "replicate")
+	{
+	  error_code = replicate(params,reqs);
 	}
 
       
@@ -437,7 +444,7 @@ int btree_driver::dump_CG_map(vector<string> &params, drctv_reqs &reqs)
 }
 
 
-int btree_driver::rep_model(vector<string> &params, drctv_reqs &reqs)
+int btree_driver::load_rep_model(vector<string> &params, drctv_reqs &reqs)
 {
   if (params.size() != 1)
     {
@@ -447,6 +454,26 @@ int btree_driver::rep_model(vector<string> &params, drctv_reqs &reqs)
   driver_rep_model = driver_replicator.read_rep_model(params[0]);
   // replication model is now present
   reqs.rep_model_present = true;
+  return 0;
+}
+
+
+int btree_driver::replicate(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 1)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  // test if replication model is present
+  if (reqs.rep_model_present == false)
+    {
+      cout << "ERROR: missing replication model" << endl;
+      return 1;
+    }
+  driver_replicator.run_replicate_FPT(driver_rep_model,
+				      driver_bt.count_active_forks(),
+				      stod(params[0]));
   return 0;
 }
 

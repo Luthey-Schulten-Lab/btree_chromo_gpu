@@ -22,6 +22,6 @@ k_hi=1.0E+1
 N_lo=2
 k_lo=1.0E+1
 
-N_fil=27
+N_fil=3
 k_on=1.0E+1
 k_off=1.0E+1

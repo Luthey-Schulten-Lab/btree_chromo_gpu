@@ -22,6 +22,8 @@ rep_model_params replication_model::read_rep_model(string rep_model_filename)
   
   string line;
 
+  param_delim = "=";
+
   rep_model_file.open(rep_model_filename, ios::in);
 
   if (!rep_model_file)
@@ -47,6 +49,8 @@ rep_model_params replication_model::read_rep_model(string rep_model_filename)
 
 		  param = line.substr(0,delim);
 		  val = line.substr(delim+1,line.length());
+
+		  // cout << param << "=" << val << endl;
 
 		  if (param == "V")
 		    {
@@ -78,30 +82,25 @@ rep_model_params replication_model::read_rep_model(string rep_model_filename)
 		      r_i_p.k_d = stod(val);
 		    }
 
-
 		  else if (param == "N_hi")
 		    {
 		      r_i_p.N_hi = stoi(val);
 		    }
-
 
 		  else if (param == "k_hi")
 		    {
 		      r_i_p.k_hi = stod(val);
 		    }
 
-
 		  else if (param == "N_lo")
 		    {
 		      r_i_p.N_lo = stoi(val);
 		    }
 
-
 		  else if (param == "k_lo")
 		    {
 		      r_i_p.k_lo = stod(val);
 		    }
-
 
 		  else if (param == "N_fil")
 		    {
@@ -113,12 +112,10 @@ rep_model_params replication_model::read_rep_model(string rep_model_filename)
 		      r_i_p.k_on = stod(val);
 		    }
 
-
 		  else if (param == "k_off")
 		    {
 		      r_i_p.k_off = stod(val);
 		    }
-
 
 		}
 	      	      
@@ -142,6 +139,9 @@ void replication_model::prepare_system(rep_model_params r_m_p, int N_forks)
 
   cout << "N_species = " << N_species << endl;
   cout << "N_rxns = " << N_rxns << endl;
+
+  solver.prepare_reaction_system(N_species,N_rxns);
+  solver.print_reaction_system();
   
 }
 
@@ -150,11 +150,18 @@ int replication_model::number_rep_species(rep_model_params r_m_p, int N_forks)
 {
   int N_species = 0;
 
+  N_species += 2; // empty origin and origin with bubble
+
+  N_species += r_m_p.N_hi; // high affinity sites
+  N_species += r_m_p.N_lo; // low affinity sites
+  N_species += r_m_p.N_fil; // filament sites
+
+  N_species = N_forks*N_species;
+
   N_species += 1; // free DnaA
 
-  N_species += N_forks*(2+r_m_p.N_hi+r_m_p.N_lo+r_m_p.N_fil);
-
   return N_species;
+  
 }
 
 
@@ -163,9 +170,20 @@ int replication_model::number_rep_rxns(rep_model_params r_m_p, int N_forks)
 {
   int N_rxns = 0;
 
-  N_rxns += 1; // free DnaA
+  N_rxns += r_m_p.N_hi; // high affinity site binding beginning with empty origin
+  N_rxns += r_m_p.N_lo; // low affinity site binding beginning with last high affinity site
+  N_rxns += r_m_p.N_fil; // filament addition beginning with last low affinity site
+  N_rxns += 1; // filament to bubble
 
-  N_rxns += N_forks*(2+r_m_p.N_hi+r_m_p.N_lo+r_m_p.N_fil);
+  N_rxns = N_forks*N_rxns;
+
+  N_rxns += 2; // free DnaA creation and destruction
   
   return N_rxns;
+}
+
+void replication_model::run_replicate_FPT(rep_model_params r_m_p, int N_forks, double t_max)
+{
+  prepare_system(r_m_p,N_forks);
+  cout << t_max << endl;
 }

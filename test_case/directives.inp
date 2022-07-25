@@ -25,6 +25,8 @@ print
 #update_CG_map:1000
 #dump_CG_map:/home/ben/Workspace/btree_chromo/test_case/out_CG_test.txt,1000,0
 
-replication_model:/home/ben/Workspace/btree_chromo/test_case/rep_init_model.txt
+load_replication_model:/home/ben/Workspace/btree_chromo/test_case/rep_init_model.txt
+
+replicate:10.0
 
 output_state:/home/ben/Workspace/btree_chromo/test_case/out_state_test.txt

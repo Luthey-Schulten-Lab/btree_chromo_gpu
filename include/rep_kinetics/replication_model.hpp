@@ -35,6 +35,8 @@ public:
   // read the replication model
   rep_model_params read_rep_model(string rep_model_filename);
 
+  // simulate the system until t_max
+  void run_replicate_FPT(rep_model_params r_m_p, int N_forks, double t_max);
   
 private:
 
@@ -46,6 +48,7 @@ private:
   int number_rep_rxns(rep_model_params r_m_p, int N_forks);
 
   gillespie_solver solver;
+  int N_species, M_rxns, N_forks;
   
 };
 

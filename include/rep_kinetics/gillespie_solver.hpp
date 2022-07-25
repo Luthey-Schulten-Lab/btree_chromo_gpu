@@ -6,6 +6,7 @@
 #include <memory>
 #include <random>
 #include <cmath>
+#include <iostream>
 
 using namespace std;
 
@@ -24,8 +25,29 @@ public:
   // run the system until max time or first-passage occurs
   void run_FPT(double t, double t_max);
 
+  // prepare the reaction system
+  void prepare_reaction_system(int N_species, int N_rxns);
+
+  // print the reaction system
+  void print_reaction_system();
   
 private:
+
+  // set N and M
+  void set_N(int N_species);
+  void set_M(int M_rxns);
+
+  // initialize and destroy state vector
+  void initialize_x();
+  void destroy_x();
+
+  // initialize and destroy FPT state vector
+  void initialize_xFPT();
+  void destroy_xFPT();
+  
+  // initialize and destroy stoichiometry matrix
+  void initialize_S();
+  void destroy_S();
 
   // functions for Gillespie loop
   int select_rxn(double r_rxn, double total_propensity);
@@ -33,6 +55,8 @@ private:
   void update_state(int j_rxn);
 
   // private variables
+  int N, M; // N species, M reactions
+  int *x, *xFPT, **S; // state vector x, FPT state vector xFPT, and stoichiometry matrix S
   mt19937 rand_eng;
   uniform_real_distribution<double> u_rand;
 
