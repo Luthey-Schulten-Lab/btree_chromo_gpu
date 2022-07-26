@@ -471,6 +471,10 @@ int btree_driver::replicate(vector<string> &params, drctv_reqs &reqs)
       cout << "ERROR: missing replication model" << endl;
       return 1;
     }
+
+  vector<init_loc> init_dist;
+  init_loc free_DnaA;
+  
   driver_replicator.run_replicate_FPT(driver_rep_model,
 				      driver_bt.count_active_forks(),
 				      stod(params[0]));

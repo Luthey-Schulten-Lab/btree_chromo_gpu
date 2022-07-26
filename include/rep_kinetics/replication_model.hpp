@@ -24,6 +24,12 @@ struct rep_model_params
   int max_replisomes, N_init_DnaA;
 };
 
+struct init_loc
+{
+  string loc;
+  int N;
+};
+
 class replication_model
 {
 public:
