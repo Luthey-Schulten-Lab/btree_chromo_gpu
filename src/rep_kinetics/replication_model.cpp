@@ -132,21 +132,26 @@ rep_model_params replication_model::read_rep_model(string rep_model_filename)
 }
 
 // prepare the system state
-void replication_model::prepare_system(rep_model_params r_m_p, int N_forks)
+void replication_model::prepare_system(rep_model_params r_m_p, int N_leaves)
 {
-  int N_species = number_rep_species(r_m_p,N_forks);
-  int N_rxns = number_rep_rxns(r_m_p,N_forks);
+  int N_species = number_rep_species(r_m_p,N_leaves);
+  int N_rxns = number_rep_rxns(r_m_p,N_leaves);
+  vector<reaction> rxns;
 
   cout << "N_species = " << N_species << endl;
   cout << "N_rxns = " << N_rxns << endl;
 
   solver.prepare_reaction_system(N_species,N_rxns);
   solver.print_reaction_system();
+
+  get_reactions(r_m_p,N_leaves,rxns);
+  
+  solver.set_S(rxns);
   
 }
 
 // get the number of species based on the replication model
-int replication_model::number_rep_species(rep_model_params r_m_p, int N_forks)
+int replication_model::number_rep_species(rep_model_params r_m_p, int N_leaves)
 {
   int N_species = 0;
 
@@ -156,7 +161,7 @@ int replication_model::number_rep_species(rep_model_params r_m_p, int N_forks)
   N_species += r_m_p.N_lo; // low affinity sites
   N_species += r_m_p.N_fil; // filament sites
 
-  N_species = N_forks*N_species;
+  N_species = N_leaves*N_species;
 
   N_species += 1; // free DnaA
 
@@ -166,7 +171,7 @@ int replication_model::number_rep_species(rep_model_params r_m_p, int N_forks)
 
 
 // get the number of reactions based on the replication model
-int replication_model::number_rep_rxns(rep_model_params r_m_p, int N_forks)
+int replication_model::number_rep_rxns(rep_model_params r_m_p, int N_leaves)
 {
   int N_rxns = 0;
 
@@ -175,15 +180,59 @@ int replication_model::number_rep_rxns(rep_model_params r_m_p, int N_forks)
   N_rxns += r_m_p.N_fil; // filament addition beginning with last low affinity site
   N_rxns += 1; // filament to bubble
 
-  N_rxns = N_forks*N_rxns;
+  N_rxns = N_leaves*N_rxns;
 
   N_rxns += 2; // free DnaA creation and destruction
   
   return N_rxns;
 }
 
-void replication_model::run_replicate_FPT(rep_model_params r_m_p, int N_forks, double t_max)
+void replication_model::get_reactions(rep_model_params r_m_p, int N_leaves, vector<reaction> &rxns)
 {
-  prepare_system(r_m_p,N_forks);
-  cout << t_max << endl;
+
+  reaction r;
+  int df = 1;
+  int dl = r_m_p.N_hi + r_m_p.N_lo + r_m_p.N_fil + 1;
+  int c = 0;
+
+  rxns.clear();
+  
+  solver.reset_reaction(r);
+
+  // DnaA creation
+  solver.add_reaction_output(r,0,1);
+  rxns.push_back(r);
+  
+  solver.reset_reaction(r);
+
+  // DnaA destruction
+  solver.add_reaction_input(r,0,1);
+  rxns.push_back(r);
+  solver.reset_reaction(r);
+
+  for (int i=0; i<N_leaves; i++)
+    {
+      c = 0;
+
+      // add reactions for high-affinity sites
+      for (int j=0; j<r_m_p.N_hi; j++)
+	{
+	  // input is empty hi site and free DnaA
+	  solver.add_reaction_input(r,0,1);
+	  solver.add_reaction_input(r,df+i*dl+c+j,1);
+	  solver.add_reaction_output(r,df+i*dl+c+j+1,1);
+	  rxns.push_back(r);
+	  solver.reset_reaction(r);
+	}
+      
+    }
+
+  cout << rxns.size() << endl;
+}
+
+void replication_model::run_replicate_FPT(rep_model_params r_m_p, vector<init_loc> &init_dist, double &t, double &t_max)
+{
+  prepare_system(r_m_p,static_cast<int>(init_dist.size())-1);
+  t += t_max/2.0;
+  init_dist.back().N = -1;
 }

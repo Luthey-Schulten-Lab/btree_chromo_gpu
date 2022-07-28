@@ -46,7 +46,7 @@ void gillespie_solver::destroy_x()
   if (x != nullptr)
     {
       delete[] x;
-      xFPT = nullptr;
+      x = nullptr;
     }
 }
 
@@ -130,8 +130,50 @@ void gillespie_solver::set_M(int N_rxns)
     }
 }
 
+void gillespie_solver::set_S(vector<reaction> &rxns)
+{
+  for (size_t j=0; j<rxns.size(); j++)
+    {
+      for (species_count s_c : rxns[j].inputs)
+	{
+	  cout << s_c.id << " " << -s_c.n << endl;
+	  S[j][s_c.id] -= s_c.n;
+	}
+      for (species_count s_c : rxns[j].outputs)
+	{
+	  cout << s_c.id << " " << s_c.n << endl;
+	  S[j][s_c.id] += s_c.n;
+	}
+    }
+}
+
+void gillespie_solver::reset_reaction(reaction &r)
+{
+  r.inputs.clear();
+  r.outputs.clear();
+}
+
+void gillespie_solver::add_reaction_input(reaction &r, int id, int n)
+{
+  species_count s_c;
+  s_c.id = id;
+  s_c.n = n;
+  r.inputs.push_back(s_c);
+}
+
+void gillespie_solver::add_reaction_output(reaction &r, int id, int n)
+{
+  species_count s_c;
+  s_c.id = id;
+  s_c.n = n;
+  r.outputs.push_back(s_c);
+}
+
 void gillespie_solver::prepare_reaction_system(int N_species, int N_rxns)
 {
+  destroy_x();
+  destroy_xFPT();
+  destroy_S();
   cout << "setting M and N" << endl;
   set_N(N_species);
   set_M(N_rxns);

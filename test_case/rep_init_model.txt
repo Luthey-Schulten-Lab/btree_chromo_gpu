@@ -16,7 +16,7 @@ k_d=1.0E+0
 
 # DnaA filament details
 
-N_hi=1
+N_hi=2
 k_hi=1.0E+1
 
 N_lo=2

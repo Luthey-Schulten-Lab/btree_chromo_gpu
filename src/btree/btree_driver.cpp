@@ -472,12 +472,106 @@ int btree_driver::replicate(vector<string> &params, drctv_reqs &reqs)
       return 1;
     }
 
-  vector<init_loc> init_dist;
-  init_loc free_DnaA;
+  vector<init_loc> init_dist, new_leaves;
+  string rep_leaf;
+  init_loc i_l;
+  double t, dt, t_max;
+  int rep_amount, error_code, i_rep;
+
+  // create an initial distribution with only free DnaA
+  init_dist.clear();
   
-  driver_replicator.run_replicate_FPT(driver_rep_model,
-				      driver_bt.count_active_forks(),
-				      stod(params[0]));
+  i_l.loc = "free";
+  i_l.N = driver_rep_model.N_init_DnaA;
+
+  init_dist.push_back(i_l);
+  
+  for (string leaf : driver_bt.get_leaves())
+    {
+      i_l.loc = leaf;
+      i_l.N = 0;
+
+      init_dist.push_back(i_l);
+    }
+
+  t = 0.0;
+  t_max = stod(params[0]);
+
+  cout << "Performing random replications until t = " << t_max << "\n" << endl;
+
+  while (t < t_max)
+    {
+
+      dt = t;
+
+      for (init_loc temp_i_l : init_dist)
+	{
+	  cout << temp_i_l.loc << " = " << temp_i_l.N << endl;
+	}
+
+      // run Gillespie algorithm until an initiation event occurs
+      driver_replicator.run_replicate_FPT(driver_rep_model,
+					  init_dist,
+					  t,
+					  t_max);
+
+      for (init_loc temp_i_l : init_dist)
+	{
+	  cout << temp_i_l.loc << " = " << temp_i_l.N << endl;
+	}
+      
+      // calculate time difference
+      dt = t - dt;
+
+      // calculate amount of replicated DNA prior to new replication event
+      // amount is proportional to time difference and number of active forks
+      rep_amount = driver_rep_model.k_rep*min(2*driver_bt.count_active_forks(),
+					      driver_rep_model.max_replisomes)*dt;
+
+      cout << "\nreplication event at t = " << t << endl;
+      cout << "\t" << rep_amount << " units were replicated on active forks prior to event" << endl;
+
+      // perform random replications
+      driver_bt.random_transforms(rep_amount);
+
+      // clear the new leaves
+      new_leaves.clear();
+      
+      // update the distribution to represent the new number of leaves and determine the branch leaf
+      for (size_t i=0; i<init_dist.size(); i++)
+	{
+	  if (init_dist[i].N == -1)
+	    {
+	      i_rep = i;
+	      break;
+	    }
+	}
+
+      rep_leaf = init_dist[i_rep].loc;
+      cout << rep_leaf << endl;
+      init_dist.erase(init_dist.begin()+i_rep);
+
+      i_l.N = 0;
+      i_l.loc = rep_leaf + "l";
+      new_leaves.push_back(i_l);
+      i_l.loc = rep_leaf + "r";
+      new_leaves.push_back(i_l);
+
+      init_dist.insert(init_dist.begin()+i_rep,new_leaves.begin(),new_leaves.end());
+
+      for (init_loc temp_i_l : init_dist)
+	{
+	  cout << temp_i_l.loc << " = " << temp_i_l.N << endl;
+	}
+
+      cout << "\tsplitting at initiated branch (" << rep_leaf << ") and updating initiator distribution\n" << endl;
+
+      // branch the btree at the replicating leaf
+      error_code = driver_bt.branch(rep_leaf);
+
+      if (error_code == 1) return 1;
+      
+    }				      
   return 0;
 }
 

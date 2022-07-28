@@ -1,2 +1,4 @@
 size=100
-m_cw29_ccw26
+m_cw37_ccw35
+mr_cw6_ccw7
+mrr_cw0_ccw0

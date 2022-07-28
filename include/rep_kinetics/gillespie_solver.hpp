@@ -10,6 +10,16 @@
 
 using namespace std;
 
+struct species_count
+{
+  int id;
+  int n;
+};
+
+struct reaction
+{
+  vector<species_count> inputs, outputs;
+};
 
 class gillespie_solver
 {
@@ -30,6 +40,15 @@ public:
 
   // print the reaction system
   void print_reaction_system();
+
+  void reset_reaction(reaction &r);
+  void add_reaction_input(reaction &r, int id, int n);
+  void add_reaction_output(reaction &r, int id, int n);
+  
+  // set arrays
+  void set_x();
+  void set_xFPT();
+  void set_S(vector<reaction> &rxns);
   
 private:
 
