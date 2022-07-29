@@ -43,22 +43,28 @@ public:
   rep_model_params read_rep_model(string rep_model_filename);
 
   // simulate the system until t_max
-  void run_replicate_FPT(rep_model_params r_m_p, vector<init_loc> &init_dist, double &t, double &t_max);
+  void run_replicate_FPT(rep_model_params &rep_model, vector<init_loc> &init_dist, double &t, double &t_max);
   
 private:
 
+  // convert initiator distribution to species counts and vice-versa
+  vector<species_count> id_to_sc(vector<init_loc> &init_dist);
+  vector<init_loc> sc_to_id(vector<species_count> &s_cs);
+  vector<species_count> state_to_sc();
+
   // prepare the system
-  void prepare_system(rep_model_params r_m_p, int N_leaves);
+  void prepare_system(rep_model_params rep_model, int n);
 
   // get the reactions
-  void get_reactions(rep_model_params r_m_p, int N_leaves, vector<reaction> &rxns);
+  void get_reactions(vector<reaction> &rxns);
   void reset_reaction(reaction *r);
 
   // functions for DnaA reaction model
-  int number_rep_species(rep_model_params r_m_p, int N_leaves);
-  int number_rep_rxns(rep_model_params r_m_p, int N_leaves);
+  int number_rep_species();
+  int number_rep_rxns();
 
   gillespie_solver solver;
+  rep_model_params r_m_p;
   int N_species, M_rxns, N_leaves;
   
 };

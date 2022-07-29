@@ -61,7 +61,7 @@ void gillespie_solver::initialize_xFPT()
 
       for (int i=0; i<N; i++)
 	{
-	  x[i] = 0;
+	  xFPT[i] = -1;
 	}
       
     }
@@ -74,6 +74,33 @@ void gillespie_solver::destroy_xFPT()
     {
       delete[] xFPT;
       xFPT = nullptr;
+    }
+}
+
+void gillespie_solver::initialize_W()
+{
+  destroy_W();
+  
+  if (N > 0)
+    {
+      
+      W = new double[N];
+
+      for (int i=0; i<M; i++)
+	{
+	  W[i] = 0.0;
+	}
+      
+    }
+  
+}
+
+void gillespie_solver::destroy_W()
+{
+  if (W != nullptr)
+    {
+      delete[] W;
+      W = nullptr;
     }
 }
 
@@ -130,18 +157,32 @@ void gillespie_solver::set_M(int N_rxns)
     }
 }
 
+void gillespie_solver::set_x(vector<species_count> &s_cs)
+{
+  for (species_count s_c : s_cs)
+    {
+      x[s_c.id] = s_c.n;
+    }
+}
+
+void gillespie_solver::set_xFPT(vector<species_count> &s_cs)
+{
+  for (species_count s_c : s_cs)
+    {
+      x[s_c.id] = s_c.n;
+    }
+}
+
 void gillespie_solver::set_S(vector<reaction> &rxns)
 {
   for (size_t j=0; j<rxns.size(); j++)
     {
       for (species_count s_c : rxns[j].inputs)
 	{
-	  cout << s_c.id << " " << -s_c.n << endl;
 	  S[j][s_c.id] -= s_c.n;
 	}
       for (species_count s_c : rxns[j].outputs)
 	{
-	  cout << s_c.id << " " << s_c.n << endl;
 	  S[j][s_c.id] += s_c.n;
 	}
     }
@@ -187,13 +228,20 @@ void gillespie_solver::prepare_reaction_system(int N_species, int N_rxns)
 
 void gillespie_solver::print_reaction_system()
 {
-  
+
   cout << "x, state vector" << endl;
   for (int i=0; i<N-1; i++)
     {
       cout << x[i] << ",";
     }
   cout << x[N-1] << endl;
+  
+  cout << "xFPT, first-passage state vector" << endl;
+  for (int i=0; i<N-1; i++)
+    {
+      cout << xFPT[i] << ",";
+    }
+  cout << xFPT[N-1] << endl;
   
   cout << "S, stoichiometric matrix" << endl;
   for (int j=0; j<M-1; j++)

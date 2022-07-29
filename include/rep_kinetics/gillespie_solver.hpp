@@ -46,8 +46,8 @@ public:
   void add_reaction_output(reaction &r, int id, int n);
   
   // set arrays
-  void set_x();
-  void set_xFPT();
+  void set_x(vector<species_count> &s_cs);
+  void set_xFPT(vector<species_count> &s_cs);
   void set_S(vector<reaction> &rxns);
   
 private:
@@ -63,6 +63,10 @@ private:
   // initialize and destroy FPT state vector
   void initialize_xFPT();
   void destroy_xFPT();
+
+  // initialize and destroy the rate vector
+  void initialize_W();
+  void destroy_W();
   
   // initialize and destroy stoichiometry matrix
   void initialize_S();
@@ -72,10 +76,12 @@ private:
   int select_rxn(double r_rxn, double total_propensity);
   void update_propensities();
   void update_state(int j_rxn);
+  int test_FPT();
 
   // private variables
   int N, M; // N species, M reactions
   int *x, *xFPT, **S; // state vector x, FPT state vector xFPT, and stoichiometry matrix S
+  double *W; // rate vector
   mt19937 rand_eng;
   uniform_real_distribution<double> u_rand;
 
