@@ -1,5 +1,5 @@
-# volume
-V=1.0E-6
+# volume - [liter]
+V=3.3E-17
 
 # initial DnaA count
 N_init_DnaA=10
@@ -8,20 +8,26 @@ N_init_DnaA=10
 max_replisomes=8
 
 # average replication rate per replisome, bp/s
-k_rep=1.0E+0
+k_rep=1.0E+1
 
 # DnaA creation and destruction
-k_c=1.0E+0
+# units - [s*-1]
+k_c=10.0E+0
+# units - [particle^-1*s*-1]
 k_d=1.0E+0
 
 # DnaA filament details
 
 N_hi=2
-k_hi=1.0E+1
+# units - [particle^-1*s*-1]
+k_hi=1.3E-17
 
 N_lo=2
-k_lo=1.0E+1
+# units - [particle^-1*s*-1]
+k_lo=5.8E-20
 
 N_fil=3
-k_on=1.0E+1
-k_off=1.0E+1
+# units - [particle^-1*s*-1]
+k_on=1.7E-19
+# units - [s*-1]
+k_off=5.5E-1

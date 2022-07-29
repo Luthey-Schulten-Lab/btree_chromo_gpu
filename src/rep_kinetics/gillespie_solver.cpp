@@ -165,11 +165,11 @@ void gillespie_solver::set_x(vector<species_count> &s_cs)
     }
 }
 
-void gillespie_solver::set_xFPT(vector<species_count> &s_cs)
+void gillespie_solver::set_xFPT(vector<species_count> s_cs)
 {
   for (species_count s_c : s_cs)
     {
-      x[s_c.id] = s_c.n;
+      xFPT[s_c.id] = s_c.n;
     }
 }
 
@@ -186,6 +186,28 @@ void gillespie_solver::set_S(vector<reaction> &rxns)
 	  S[j][s_c.id] += s_c.n;
 	}
     }
+}
+
+void gillespie_solver::set_propensity_fxn(void (*func)(int *xf, double *Wf))
+{
+  rate_func = func;
+}
+
+vector<species_count> gillespie_solver::state_to_sc()
+{
+  vector<species_count> s_cs;
+  species_count s_c;
+
+  for (int i=0; i<N; i++)
+    {
+      if (x[i] > 0)
+	{
+	  s_c.id = i;
+	  s_c.n = x[i];
+	  s_cs.push_back(s_c);
+	}
+    }
+  return s_cs;
 }
 
 void gillespie_solver::reset_reaction(reaction &r)
@@ -267,10 +289,20 @@ void gillespie_solver::print_reaction_system()
 // }
 
 // update the propensities based on the current system state
-// void gillespie_solver::update_propensities()
-// {
+void gillespie_solver::update_propensities()
+{
+  rate_func(x,W);
+}
 
-// }
+// test the xFPT
+int gillespie_solver::test_FPT()
+{
+  for (int i=0; i<N; i++)
+    {
+      if (x[i] == xFPT[i]) return i;
+    }
+  return -1;
+}
 
 // update the system state based on the chosen reaction
 void gillespie_solver::update_state(int j_rxn)

@@ -47,8 +47,12 @@ public:
   
   // set arrays
   void set_x(vector<species_count> &s_cs);
-  void set_xFPT(vector<species_count> &s_cs);
+  void set_xFPT(vector<species_count> s_cs);
   void set_S(vector<reaction> &rxns);
+  void set_propensity_fxn(void (*func)(int *, double *));
+
+  // conver the state to species counts
+  vector<species_count> state_to_sc();
   
 private:
 
@@ -84,6 +88,7 @@ private:
   double *W; // rate vector
   mt19937 rand_eng;
   uniform_real_distribution<double> u_rand;
+  void (*rate_func)(int *, double *);
 
 };
 
