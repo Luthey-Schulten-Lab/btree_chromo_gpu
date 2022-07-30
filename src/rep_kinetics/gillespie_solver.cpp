@@ -15,6 +15,7 @@ gillespie_solver::gillespie_solver()
 // destructor
 gillespie_solver::~gillespie_solver()
 {
+  destroy_reaction_system();
 }
 
 // prng seed
@@ -23,6 +24,8 @@ void gillespie_solver::prng_seed(int s)
   rand_eng.seed(s);
 }
 
+
+// initialize the state vector
 void gillespie_solver::initialize_x()
 {
   destroy_x();
@@ -41,6 +44,8 @@ void gillespie_solver::initialize_x()
   
 }
 
+
+// destroy the state vector
 void gillespie_solver::destroy_x()
 {
   if (x != nullptr)
@@ -50,6 +55,8 @@ void gillespie_solver::destroy_x()
     }
 }
 
+
+// initialize the FPT vector
 void gillespie_solver::initialize_xFPT()
 {
   destroy_xFPT();
@@ -68,6 +75,8 @@ void gillespie_solver::initialize_xFPT()
   
 }
 
+
+// destroy the FPT vector
 void gillespie_solver::destroy_xFPT()
 {
   if (xFPT != nullptr)
@@ -77,6 +86,8 @@ void gillespie_solver::destroy_xFPT()
     }
 }
 
+
+// initialize the propensity vector
 void gillespie_solver::initialize_W()
 {
   destroy_W();
@@ -95,6 +106,8 @@ void gillespie_solver::initialize_W()
   
 }
 
+
+// destroy the propensity vector
 void gillespie_solver::destroy_W()
 {
   if (W != nullptr)
@@ -104,6 +117,8 @@ void gillespie_solver::destroy_W()
     }
 }
 
+
+// intialize the stoichiometry matrix
 void gillespie_solver::initialize_S()
 {
   destroy_S();
@@ -128,6 +143,8 @@ void gillespie_solver::initialize_S()
     }
 }
 
+
+// destroy the stoichiometry matrix
 void gillespie_solver::destroy_S()
 {
   if (S != nullptr)
@@ -141,6 +158,8 @@ void gillespie_solver::destroy_S()
     }
 }
 
+
+// set the number of species
 void gillespie_solver::set_N(int N_species)
 {
   if (N_species > 0)
@@ -149,6 +168,8 @@ void gillespie_solver::set_N(int N_species)
     }
 }
 
+
+// set the number of reactions
 void gillespie_solver::set_M(int N_rxns)
 {
   if (N_rxns > 0)
@@ -157,42 +178,52 @@ void gillespie_solver::set_M(int N_rxns)
     }
 }
 
+
+// set the state vector
 void gillespie_solver::set_x(vector<species_count> &s_cs)
 {
   for (species_count s_c : s_cs)
     {
-      x[s_c.id] = s_c.n;
+      x[s_c.id] = s_c.N;
     }
 }
 
+
+// set the FPT vector
 void gillespie_solver::set_xFPT(vector<species_count> s_cs)
 {
   for (species_count s_c : s_cs)
     {
-      xFPT[s_c.id] = s_c.n;
+      xFPT[s_c.id] = s_c.N;
     }
 }
 
+
+// set the stoichiometry matrix
 void gillespie_solver::set_S(vector<reaction> &rxns)
 {
   for (size_t j=0; j<rxns.size(); j++)
     {
       for (species_count s_c : rxns[j].inputs)
 	{
-	  S[j][s_c.id] -= s_c.n;
+	  S[j][s_c.id] -= s_c.N;
 	}
       for (species_count s_c : rxns[j].outputs)
 	{
-	  S[j][s_c.id] += s_c.n;
+	  S[j][s_c.id] += s_c.N;
 	}
     }
 }
 
+
+// set the propensity function
 void gillespie_solver::set_propensity_fxn(void (*func)(int *xf, double *Wf))
 {
   rate_func = func;
 }
 
+
+// conver the system state to species counts
 vector<species_count> gillespie_solver::state_to_sc()
 {
   vector<species_count> s_cs;
@@ -203,40 +234,18 @@ vector<species_count> gillespie_solver::state_to_sc()
       if (x[i] > 0)
 	{
 	  s_c.id = i;
-	  s_c.n = x[i];
+	  s_c.N = x[i];
 	  s_cs.push_back(s_c);
 	}
     }
   return s_cs;
 }
 
-void gillespie_solver::reset_reaction(reaction &r)
-{
-  r.inputs.clear();
-  r.outputs.clear();
-}
 
-void gillespie_solver::add_reaction_input(reaction &r, int id, int n)
+// initialize the reaction system
+void gillespie_solver::initialize_reaction_system(int N_species, int N_rxns)
 {
-  species_count s_c;
-  s_c.id = id;
-  s_c.n = n;
-  r.inputs.push_back(s_c);
-}
-
-void gillespie_solver::add_reaction_output(reaction &r, int id, int n)
-{
-  species_count s_c;
-  s_c.id = id;
-  s_c.n = n;
-  r.outputs.push_back(s_c);
-}
-
-void gillespie_solver::prepare_reaction_system(int N_species, int N_rxns)
-{
-  destroy_x();
-  destroy_xFPT();
-  destroy_S();
+  destroy_reaction_system();
   cout << "setting M and N" << endl;
   set_N(N_species);
   set_M(N_rxns);
@@ -246,8 +255,22 @@ void gillespie_solver::prepare_reaction_system(int N_species, int N_rxns)
   initialize_xFPT();
   cout << "initializing S" << endl;
   initialize_S();
+  cout << "initializing W" << endl;
+  initialize_W();
 }
 
+
+// destroy the reaction system
+void gillespie_solver::destroy_reaction_system()
+{
+  destroy_x();
+  destroy_xFPT();
+  destroy_S();
+  destroy_W();
+}
+
+
+// print the reaction system
 void gillespie_solver::print_reaction_system()
 {
 

@@ -12,6 +12,8 @@ btree_driver::~btree_driver()
 {
   // cout << "btree_driver destructor after destroy" << endl;
   driver_bt.destroy_tree();
+  driver_rg.clear();
+  drctvs.clear();
   // cout << "btree_driver destructor after destroy" << endl;
 } 
 
@@ -229,10 +231,17 @@ int btree_driver::execute_directives()
 	}
 
       
-      // seed the PRNG
-      else if (command == "prng_seed")
+      // seed the PRNG for the btree
+      else if (command == "btree_prng_seed")
 	{
-	  error_code = prng_seed(params);
+	  error_code = btree_prng_seed(params);
+	}
+
+
+      // seed the PRNG for the replicator
+      else if (command == "replicator_prng_seed")
+	{
+	  error_code = replicator_prng_seed(params);
 	}
 
       
@@ -451,7 +460,7 @@ int btree_driver::load_rep_model(vector<string> &params, drctv_reqs &reqs)
       cout << "ERROR: wrong number of parameters, correct input file" << endl;
       return 1;
     }
-  driver_rep_model = driver_replicator.read_rep_model(params[0]);
+  driver_replicator.read_rep_model(params[0]);
   // replication model is now present
   reqs.rep_model_present = true;
   return 0;
@@ -482,7 +491,7 @@ int btree_driver::replicate(vector<string> &params, drctv_reqs &reqs)
   init_dist.clear();
   
   i_l.loc = "free";
-  i_l.N = driver_rep_model.N_init_DnaA;
+  i_l.N = driver_replicator.get_N_init_DnaA();
 
   init_dist.push_back(i_l);
   
@@ -510,8 +519,7 @@ int btree_driver::replicate(vector<string> &params, drctv_reqs &reqs)
 	}
 
       // run Gillespie algorithm until an initiation event occurs
-      driver_replicator.run_replicate_FPT(driver_rep_model,
-					  init_dist,
+      driver_replicator.run_replicate_FPT(init_dist,
 					  t,
 					  t_max);
 
@@ -525,8 +533,8 @@ int btree_driver::replicate(vector<string> &params, drctv_reqs &reqs)
 
       // calculate amount of replicated DNA prior to new replication event
       // amount is proportional to time difference and number of active forks
-      rep_amount = driver_rep_model.k_rep*min(2*driver_bt.count_active_forks(),
-					      driver_rep_model.max_replisomes)*dt;
+      rep_amount = driver_replicator.get_k_rep()*min(2*driver_bt.count_active_forks(),
+						     driver_replicator.get_max_replisomes())*dt;
 
       cout << "\nreplication event at t = " << t << endl;
       cout << "\t" << rep_amount << " units were replicated on active forks prior to event" << endl;
@@ -576,7 +584,7 @@ int btree_driver::replicate(vector<string> &params, drctv_reqs &reqs)
 }
 
 
-int btree_driver::prng_seed(vector<string> &params)
+int btree_driver::btree_prng_seed(vector<string> &params)
 {
   if (params.size() != 1)
     {
@@ -585,6 +593,19 @@ int btree_driver::prng_seed(vector<string> &params)
     }
   // seed the PRNG
   driver_bt.prng_seed(stoi(params[0]));
+  return 0;
+}
+
+
+int btree_driver::replicator_prng_seed(vector<string> &params)
+{
+  if (params.size() != 1)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  // seed the PRNG
+  driver_replicator.prng_seed(stoi(params[0]));
   return 0;
 }
 

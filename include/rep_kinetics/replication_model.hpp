@@ -6,12 +6,11 @@
 #include <string>
 #include <cstring>
 #include <algorithm>
-#include <vector>
 #include <memory>
 #include <cmath>
 #include <iterator>
 
-#include <rep_kinetics/gillespie_solver.hpp>
+#include <rep_kinetics/rxn_manipulator.hpp>
 
 using namespace std;
 
@@ -40,15 +39,20 @@ public:
   ~replication_model();
 
   // read the replication model
-  rep_model_params read_rep_model(string rep_model_filename);
+  void read_rep_model(string rep_model_filename);
 
   // update the propensities
-  static void propensities(int *x, double *W);
+  void propensities(int *x, double *W);
 
-  // simulate the system until t_max
-  void run_replicate_FPT(rep_model_params &rep_model, vector<init_loc> &init_dist, double &t, double &t_max);
-  
-private:
+  // getters to access state of replication model
+  int get_N_init_DnaA();
+  int get_max_replisomes();
+  double get_k_rep();
+  int get_N_species();
+  int get_M_rxns();
+
+  // setter for number of leaves
+  void set_N_leaves(int n);
 
   // convert initiator distribution to species counts and vice-versa
   vector<species_count> id_to_sc(vector<init_loc> &init_dist);
@@ -57,21 +61,21 @@ private:
   // create the FPT species counts
   vector<species_count> create_xFPT();
 
-  // prepare the system
-  void prepare_system(rep_model_params rep_model, int n);
-
   // get the reactions
   void get_reactions(vector<reaction> &rxns);
-  void reset_reaction(reaction *r);
 
   // functions for DnaA reaction model
   void number_rep_species();
   void number_rep_rxns();
+  
+private:
 
-  gillespie_solver solver;
   rep_model_params r_m_p;
-  int N_species, M_rxns, N_leaves;
+  int N_species, M_rxns;
+  int N_leaves;
   int N_per_leaf;
+
+  rxn_manipulator rxn_manip;
   
 };
 

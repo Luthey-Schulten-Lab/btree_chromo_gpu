@@ -2,24 +2,14 @@
 #define INCLUDE_GILLESPIE_SOLVER_HPP
 
 #include <algorithm>
-#include <vector>
 #include <memory>
 #include <random>
 #include <cmath>
 #include <iostream>
 
+#include <rep_kinetics/rxn_manipulator.hpp>
+
 using namespace std;
-
-struct species_count
-{
-  int id;
-  int n;
-};
-
-struct reaction
-{
-  vector<species_count> inputs, outputs;
-};
 
 class gillespie_solver
 {
@@ -35,15 +25,12 @@ public:
   // run the system until max time or first-passage occurs
   void run_FPT(double t, double t_max);
 
-  // prepare the reaction system
-  void prepare_reaction_system(int N_species, int N_rxns);
+  // initialize and destroy the reaction system
+  void initialize_reaction_system(int N_species, int N_rxns);
+  void destroy_reaction_system();
 
   // print the reaction system
   void print_reaction_system();
-
-  void reset_reaction(reaction &r);
-  void add_reaction_input(reaction &r, int id, int n);
-  void add_reaction_output(reaction &r, int id, int n);
   
   // set arrays
   void set_x(vector<species_count> &s_cs);
@@ -51,7 +38,7 @@ public:
   void set_S(vector<reaction> &rxns);
   void set_propensity_fxn(void (*func)(int *, double *));
 
-  // conver the state to species counts
+  // convert the state to species counts
   vector<species_count> state_to_sc();
   
 private:

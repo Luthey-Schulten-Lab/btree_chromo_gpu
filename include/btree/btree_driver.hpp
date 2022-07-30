@@ -2,7 +2,7 @@
 #define INCLUDE_BTREE_DRIVER_HPP
 
 #include <btree/btree.hpp>
-#include <rep_kinetics/replication_model.hpp>
+#include <rep_kinetics/replicator.hpp>
 
 using namespace std;
 
@@ -60,7 +60,8 @@ private:
   int dump_CG_map(vector<string> &params, drctv_reqs &reqs);
 
   // miscellaneous
-  int prng_seed(vector<string> &params);
+  int btree_prng_seed(vector<string> &params);
+  int replicator_prng_seed(vector<string> &params);
   int print_state(drctv_reqs &reqs);
 
   // replication model
@@ -68,11 +69,10 @@ private:
   int replicate(vector<string> &params, drctv_reqs &reqs);
 
   // classes
-  replication_model driver_replicator;
+  replicator driver_replicator;
   btree driver_bt;
 
   // structs
-  rep_model_params driver_rep_model; // replication model
   btree_state driver_st; // state structure
   btree_transforms driver_tr; // transform structure
   vector<chromo_region> driver_rg; // vector of chromo_regions
