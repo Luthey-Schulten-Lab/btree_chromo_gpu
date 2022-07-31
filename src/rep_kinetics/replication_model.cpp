@@ -199,21 +199,17 @@ void replication_model::number_rep_rxns()
 }
 
 // prepare a vector of the reactions
-void replication_model::get_reactions(vector<reaction> &rxns)
+vector<reaction> replication_model::get_reactions()
 {
 
+  vector<reaction> rxns;
   reaction r;
   int df = 1;
   int c, db;
 
-  rxns.clear();
-  
-  rxn_manip.reset_reaction(r);
-
   // DnaA creation
   rxn_manip.add_reaction_output(r,0,1);
   rxns.push_back(r);
-  
   rxn_manip.reset_reaction(r);
 
   // DnaA destruction
@@ -275,7 +271,7 @@ void replication_model::get_reactions(vector<reaction> &rxns)
 	}
       
     }
-
+  return rxns;
 }
 
 vector<species_count> replication_model::id_to_sc(vector<init_loc> &init_dist)

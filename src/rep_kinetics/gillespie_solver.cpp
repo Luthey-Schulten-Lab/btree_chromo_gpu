@@ -8,6 +8,7 @@ gillespie_solver::gillespie_solver()
   S = nullptr;
   x = nullptr;
   xFPT = nullptr;
+  W = nullptr;
   rand_eng.seed(0);
   u_rand = uniform_real_distribution<double>(0.0,1.0);
 }
@@ -92,10 +93,10 @@ void gillespie_solver::initialize_W()
 {
   destroy_W();
   
-  if (N > 0)
+  if (M > 0)
     {
       
-      W = new double[N];
+      W = new double[M];
 
       for (int i=0; i<M; i++)
 	{

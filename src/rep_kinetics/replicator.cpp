@@ -63,8 +63,7 @@ void replicator::prepare_system(vector<init_loc> &init_dist)
 				    rep_model.get_M_rxns());
 
   // get reaction stoichiometries from the replication model
-  vector<reaction> rxns;
-  rep_model.get_reactions(rxns);
+  vector<reaction> rxns = rep_model.get_reactions();
 
   // set the reaction stoichiometries in the solver
   solver.set_S(rxns);
@@ -106,4 +105,6 @@ void replicator::run_replicate_FPT(vector<init_loc> &init_dist, double &t, doubl
   
   t += t_max/2.0;
   init_dist.back().N = -1;
+
+  solver.destroy_reaction_system();
 }

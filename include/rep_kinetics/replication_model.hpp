@@ -62,7 +62,7 @@ public:
   vector<species_count> create_xFPT();
 
   // get the reactions
-  void get_reactions(vector<reaction> &rxns);
+  vector<reaction> get_reactions();
 
   // functions for DnaA reaction model
   void number_rep_species();
