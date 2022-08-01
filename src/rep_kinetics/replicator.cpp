@@ -78,10 +78,10 @@ void replicator::prepare_system(vector<init_loc> &init_dist)
   solver.set_xFPT(rep_model.create_xFPT());
 
   // set the propensity function
-  // solver.set_propensity_fxn(propensities);
+  solver.set_replication_model(rep_model);
 
   // print the system as a sanity check
-  solver.print_reaction_system();
+  // solver.print_reaction_system();
   
 }
 
@@ -94,17 +94,22 @@ void replicator::run_replicate_FPT(vector<init_loc> &init_dist, double &t, doubl
   prepare_system(init_dist);
 
   // run the system
+  solver.run_FPT(t,t_max);
 
   // redistribute initiators based on FPT result
   rep_model.update_id_from_sc(init_dist,solver.state_to_sc());
 
-  for (init_loc temp_i_l : init_dist)
+  int fil_trigger = rep_model.get_N_per_leaf() - 1;
+
+  for (size_t i=1; i<init_dist.size(); i++)
     {
-      cout << temp_i_l.loc << " = " << temp_i_l.N << endl;
+      if (init_dist[i].N == fil_trigger)
+	{
+	  init_dist[i].N = -1;
+	  init_dist[0].N += fil_trigger;
+	  break;
+	}
     }
-  
-  t += t_max/2.0;
-  init_dist.back().N = -1;
 
   solver.destroy_reaction_system();
 }
