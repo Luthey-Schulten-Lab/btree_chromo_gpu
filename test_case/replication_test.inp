@@ -1,0 +1,17 @@
+btree_prng_seed:10
+
+replicator_prng_seed:16
+
+input_state:/home/ben/Workspace/btree_chromo/test_case/in_state_rep_test.txt
+
+print
+
+load_replication_model:/home/ben/Workspace/btree_chromo/test_case/rep_init_model.txt
+
+replicate:7200.0
+
+update_topology
+
+print
+
+output_state:/home/ben/Workspace/btree_chromo/test_case/out_state_rep_test.txt

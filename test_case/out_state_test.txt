@@ -1,4 +1,6 @@
 size=100
-m_cw37_ccw35
-mr_cw6_ccw7
-mrr_cw0_ccw0
+m_cw100_ccw100
+ml_cw100_ccw100
+mll_cw100_ccw100
+mlr_cw100_ccw100
+mr_cw100_ccw100

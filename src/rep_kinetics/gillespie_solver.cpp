@@ -240,16 +240,16 @@ vector<species_count> gillespie_solver::state_to_sc()
 void gillespie_solver::initialize_reaction_system(int N_species, int N_rxns)
 {
   destroy_reaction_system();
-  cout << "setting M and N" << endl;
+  // cout << "setting M and N" << endl;
   set_N(N_species);
   set_M(N_rxns);
-  cout << "initializing x" << endl;
+  // cout << "initializing x" << endl;
   initialize_x();
-  cout << "initializing xFPT" << endl;
+  // cout << "initializing xFPT" << endl;
   initialize_xFPT();
-  cout << "initializing S" << endl;
+  // cout << "initializing S" << endl;
   initialize_S();
-  cout << "initializing W" << endl;
+  // cout << "initializing W" << endl;
   initialize_W();
 }
 

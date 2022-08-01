@@ -536,8 +536,7 @@ int btree_driver::replicate(vector<string> &params, drctv_reqs &reqs)
       rep_amount = driver_replicator.get_k_rep()*min(2*driver_bt.count_active_forks(),
 						     driver_replicator.get_max_replisomes())*dt;
 
-      cout << "\nreplication event at t = " << t << endl;
-      cout << "\t" << rep_amount << " units were replicated on active forks prior to event" << endl;
+      cout << "\n" << rep_amount << " units were replicated on active forks prior to event" << endl;
 
       // perform random replications
       driver_bt.random_transforms(rep_amount);
@@ -559,31 +558,46 @@ int btree_driver::replicate(vector<string> &params, drctv_reqs &reqs)
 
       if (i_rep > 0)
 	{
+	  cout << "\nreplication event at t = " << t << endl;
 	  rep_leaf = init_dist[i_rep].loc;
-	  cout << "\tsplitting at initiated branch (" << rep_leaf << ") and updating initiator distribution\n" << endl;
-	  init_dist.erase(init_dist.begin()+i_rep);
 
-	  i_l.N = 0;
-	  i_l.loc = rep_leaf + "l";
-	  new_leaves.push_back(i_l);
-	  i_l.loc = rep_leaf + "r";
-	  new_leaves.push_back(i_l);
+	  // branch the btree at the replicating leaf
+	  error_code = driver_bt.branch(rep_leaf);
 
-	  init_dist.insert(init_dist.begin()+i_rep,new_leaves.begin(),new_leaves.end());
+	  if (error_code == 1)
+	    {
+	      return 1;
+	    }
+	  else
+	    {
+	      cout << "\tsplitting at initiated branch (" << rep_leaf << ") and updating initiator distribution\n" << endl;
+	      init_dist.erase(init_dist.begin()+i_rep);
+
+	      i_l.N = 0;
+	      i_l.loc = rep_leaf + "l";
+	      new_leaves.push_back(i_l);
+	      i_l.loc = rep_leaf + "r";
+	      new_leaves.push_back(i_l);
+
+	      init_dist.insert(init_dist.begin()+i_rep,new_leaves.begin(),new_leaves.end());
+
+	      for (init_loc temp_i_l : init_dist)
+		{
+		  cout << temp_i_l.loc << " = " << temp_i_l.N << endl;
+		}
+	    }
 	  
 	}
-
-      for (init_loc temp_i_l : init_dist)
-	{
-	  cout << temp_i_l.loc << " = " << temp_i_l.N << endl;
-	}
-
-      // branch the btree at the replicating leaf
-      error_code = driver_bt.branch(rep_leaf);
-
-      if (error_code == 1) return 1;
       
-    }				      
+    }
+
+  cout << "\nfinal initiator distribution" << endl;
+  for (init_loc temp_i_l : init_dist)
+    {
+      cout << temp_i_l.loc << " = " << temp_i_l.N << endl;
+    }
+  cout << "\n" << endl;
+  
   return 0;
 }
 

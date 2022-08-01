@@ -2,19 +2,20 @@
 V=3.3E-17
 
 # initial DnaA count
-N_init_DnaA=1
+N_init_DnaA=148
+#N_init_DnaA=74
 
 # maximum possible number of functional replisomes
 max_replisomes=8
 
 # average replication rate per replisome, bp/s
-k_rep=1.0E+1
+k_rep=5.0E+1
 
 # DnaA creation and destruction
 # units - [s*-1]
-k_c=60.0E+0
+k_c=1.0E-4
 # units - [particle^-1*s*-1]
-k_d=1.0E+0
+k_d=9.6E-5
 
 # DnaA filament details
 

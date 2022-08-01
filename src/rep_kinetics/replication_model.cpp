@@ -337,8 +337,8 @@ void replication_model::propensities(int *xf, double *Wf)
   int k;
   double inv_V = 1.0/r_m_p.V;
   
-  Wf[0] = r_m_p.k_c;
-  Wf[1] = r_m_p.k_d*xf[0];
+  Wf[0] = r_m_p.k_c*N_leaves; // create DnaA at rate proportional to number DnaA genes, i.e. leaves
+  Wf[1] = r_m_p.k_d*xf[0]; // degrade DnaA at rate based on presumed doubling time
 
   k = 2;
 
