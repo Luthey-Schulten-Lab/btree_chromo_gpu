@@ -159,6 +159,13 @@ int replication_model::get_M_rxns()
 }
 
 
+// get N_per_leaf
+int replication_model::get_N_per_leaf()
+{
+  return N_per_leaf;
+}
+
+
 // set the number of leaves
 void replication_model::set_N_leaves(int n)
 {
@@ -328,6 +335,7 @@ void replication_model::propensities(int *xf, double *Wf)
   int df = 1;
   int c, db;
   int k;
+  double inv_V = 1.0/r_m_p.V;
   
   Wf[0] = r_m_p.k_c;
   Wf[1] = r_m_p.k_d*xf[0];
@@ -343,7 +351,7 @@ void replication_model::propensities(int *xf, double *Wf)
       for (int j=0; j<r_m_p.N_hi; j++)
 	{
 	  // input is empty hi site and free DnaA
-	  Wf[k] = r_m_p.k_hi*xf[0]*xf[df+i*N_per_leaf+c+j];
+	  Wf[k] = r_m_p.k_hi*xf[0]*xf[df+i*N_per_leaf+c+j]*inv_V;
 	  k += 1;
 	  db += 1;
 	}
@@ -355,7 +363,7 @@ void replication_model::propensities(int *xf, double *Wf)
       for (int j=0; j<r_m_p.N_lo; j++)
 	{
 	  // input is empty lo site and free DnaA
-	  Wf[k] = r_m_p.k_lo*xf[0]*xf[df+i*N_per_leaf+c+j];
+	  Wf[k] = r_m_p.k_lo*xf[0]*xf[df+i*N_per_leaf+c+j]*inv_V;
 	  k += 1;
 	  db += 1;
 	}
@@ -366,7 +374,7 @@ void replication_model::propensities(int *xf, double *Wf)
       for (int j=0; j<r_m_p.N_fil; j++)
 	{
 	  // input is empty hi site and free DnaA
-	  Wf[k] = r_m_p.k_on*xf[0]*xf[df+i*N_per_leaf+c+j];
+	  Wf[k] = r_m_p.k_on*xf[0]*xf[df+i*N_per_leaf+c+j]*inv_V;
 	  k += 1;
 	  if (j < r_m_p.N_fil-1)
 	    {
@@ -379,4 +387,9 @@ void replication_model::propensities(int *xf, double *Wf)
 
   
 }
+
+// ptr replication_model::get_propensity_fxn()
+// {
+//   return &replication_model::propensities;
+// }
 

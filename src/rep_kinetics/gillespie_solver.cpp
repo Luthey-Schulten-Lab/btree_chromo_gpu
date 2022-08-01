@@ -217,13 +217,6 @@ void gillespie_solver::set_S(vector<reaction> &rxns)
 }
 
 
-// set the propensity function
-void gillespie_solver::set_propensity_fxn(void (*func)(int *xf, double *Wf))
-{
-  rate_func = func;
-}
-
-
 // conver the system state to species counts
 vector<species_count> gillespie_solver::state_to_sc()
 {
@@ -303,19 +296,37 @@ void gillespie_solver::print_reaction_system()
       cout << S[M-1][i] << ",";
     }
   cout << S[M-1][N-1] << endl;
+
+  cout << "W, propensity vector" << endl;
+  for (int i=0; i<M-1; i++)
+    {
+      cout << W[i] << ",";
+    }
+  cout << W[M-1] << endl;
 }
 
 
 // select a reaction based on the propensities
-// int gillespie_solver::select_rxn(double r_rxn, double total_propensity)
-// {
+int gillespie_solver::select_rxn(double r_rxn, double total_propensity)
+{
+  int j;
+  double utp = r_rxn*total_propensity;
+  double p;
 
-// }
+  j = 0;
+  p = W[j];
+  while (p <= utp)
+    {
+      j += 1;
+      p += W[j];
+    }
+  return j;
+}
 
 // update the propensities based on the current system state
-void gillespie_solver::update_propensities()
+void gillespie_solver::set_replication_model(replication_model &r_m)
 {
-  rate_func(x,W);
+  this->rep_model = r_m;
 }
 
 // test the xFPT
@@ -337,56 +348,79 @@ void gillespie_solver::update_state(int j_rxn)
     }
 }
 
+
+// update propensities
+void gillespie_solver::update_propensities()
+{
+  rep_model.propensities(x,W);
+}
+
+
+// calculate the total propensity
+double gillespie_solver::calc_total_propensity()
+{
+  double t_p = 0.0;
+  for (int j=0; j<M; j++)
+    {
+      t_p += W[j];
+    }
+  return t_p;
+}
+
 // run the system until max time or first-passage occurs
-// void gillespie_solver::run_FPT(double t, double t_max)
-// {
-//   double r_t, r_rxn;
-//   double dt, total_propensity;
-//   int FPT_index = -1;
-//   int j_rxn;
+void gillespie_solver::run_FPT(double &t, double &t_max)
+{
+  double r_t, r_rxn;
+  double dt, total_propensity;
+  int FPT_index = -1;
+  int j_rxn;
 
-//   r_rxn = 0.0;
-//   total_propensity = 0.0;
-//   j_rxn = 0;
+  r_rxn = 0.0;
+  total_propensity = 0.0;
+  j_rxn = 0;
   
-//   while (1)
-//     {
-//       // sample random numbers for the reaction and time
-//       r_t = u_rand(rand_eng);
-//       r_rxn = u_rand(rand_eng);
+  while (1)
+    {
 
-//       // update the propensities
-//       update_propensities();
+      // cout << "t=" << t << endl;
+      // sample random numbers for the reaction and time
+      r_t = u_rand(rand_eng);
+      r_rxn = u_rand(rand_eng);
 
-//       // calculate the total propensity
+      // update the propensities
+      update_propensities();
+
+      // calculate the total propensity
+      total_propensity = calc_total_propensity();
+
+      // sample time based on total propensity
+      dt = -log(r_t)/total_propensity;
+      // cout << "dt=" << dt << endl;
       
+      // test of proposed time exceeds maximum
+      if (t+dt > t_max)
+	{
+	  t = t_max;
+	  break;
+	}
+      else
+	{
+	  t += dt;
+	}
 
-//       // sample time based on total propensity
-//       dt = -log(r_t)/total_propensity;
+      // sample the reactions
+      j_rxn = select_rxn(r_rxn,total_propensity);
       
-//       // test of proposed time exceeds maximum
-//       if (t+dt > t_max)
-// 	{
-// 	  t = t_max;
-// 	  break;
-// 	}
+      // update the state
+      update_state(j_rxn);
 
-//       // sample the reactions
-//       j_rxn = select_rxn(r_rxn,total_propensity);
+      // test for FPT species and break the loop if they are found
+      FPT_index = test_FPT();
+
+      if (FPT_index != -1) break;
       
-//       // update the state
-//       update_state(j_rxn);
-
-//       // test for FPT species and break the loop if they are found
-
-//       if (FPT_index != -1)
-// 	{
-// 	  t += dt;
-// 	  break;
-// 	}
-      
-//     } // end while loop
-// }
+    } // end while loop
+}
 
 
 

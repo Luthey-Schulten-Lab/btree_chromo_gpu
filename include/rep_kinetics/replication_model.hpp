@@ -14,6 +14,11 @@
 
 using namespace std;
 
+class replication_model;
+
+// typedef void (replication_model::* ptr)(int *, double*);
+// typedef ptr (*pm)();
+
 struct rep_model_params
 {
   double V;
@@ -32,7 +37,11 @@ struct init_loc
 
 class replication_model
 {
+  
 public:
+
+  // typedef void (replication_model::* ptr)(int *, double*);
+  // typedef ptr (*pm)();
 
   // constructor and destructor
   replication_model();
@@ -43,12 +52,14 @@ public:
 
   // update the propensities
   void propensities(int *x, double *W);
+  // ptr get_propensity_fxn();
 
   // getters to access state of replication model
   int get_N_init_DnaA();
   int get_max_replisomes();
   double get_k_rep();
   int get_N_species();
+  int get_N_per_leaf();
   int get_M_rxns();
 
   // setter for number of leaves

@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include <rep_kinetics/rxn_manipulator.hpp>
+#include <rep_kinetics/replication_model.hpp>
 
 using namespace std;
 
@@ -23,7 +24,7 @@ public:
   void prng_seed(int s);
 
   // run the system until max time or first-passage occurs
-  void run_FPT(double t, double t_max);
+  void run_FPT(double &t, double &t_max);
 
   // initialize and destroy the reaction system
   void initialize_reaction_system(int N_species, int N_rxns);
@@ -36,10 +37,12 @@ public:
   void set_x(vector<species_count> &s_cs);
   void set_xFPT(vector<species_count> s_cs);
   void set_S(vector<reaction> &rxns);
-  void set_propensity_fxn(void (*func)(int *, double *));
+  void set_replication_model(replication_model &r_m);
 
   // convert the state to species counts
   vector<species_count> state_to_sc();
+
+  void update_propensities();
   
 private:
 
@@ -65,7 +68,7 @@ private:
 
   // functions for Gillespie loop
   int select_rxn(double r_rxn, double total_propensity);
-  void update_propensities();
+  double calc_total_propensity();
   void update_state(int j_rxn);
   int test_FPT();
 
@@ -75,7 +78,7 @@ private:
   double *W; // rate vector
   mt19937 rand_eng;
   uniform_real_distribution<double> u_rand;
-  void (*rate_func)(int *, double *);
+  replication_model rep_model;
 
 };
 

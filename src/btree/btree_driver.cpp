@@ -513,20 +513,20 @@ int btree_driver::replicate(vector<string> &params, drctv_reqs &reqs)
 
       dt = t;
 
-      for (init_loc temp_i_l : init_dist)
-	{
-	  cout << temp_i_l.loc << " = " << temp_i_l.N << endl;
-	}
+      // for (init_loc temp_i_l : init_dist)
+      // 	{
+      // 	  cout << temp_i_l.loc << " = " << temp_i_l.N << endl;
+      // 	}
 
       // run Gillespie algorithm until an initiation event occurs
       driver_replicator.run_replicate_FPT(init_dist,
 					  t,
 					  t_max);
 
-      for (init_loc temp_i_l : init_dist)
-	{
-	  cout << temp_i_l.loc << " = " << temp_i_l.N << endl;
-	}
+      // for (init_loc temp_i_l : init_dist)
+      // 	{
+      // 	  cout << temp_i_l.loc << " = " << temp_i_l.N << endl;
+      // 	}
       
       // calculate time difference
       dt = t - dt;
@@ -546,8 +546,10 @@ int btree_driver::replicate(vector<string> &params, drctv_reqs &reqs)
       new_leaves.clear();
       
       // update the distribution to represent the new number of leaves and determine the branch leaf
+      i_rep = 0;
       for (size_t i=0; i<init_dist.size(); i++)
 	{
+	  // cout << init_dist[i].loc << " = " << init_dist[i].N << endl;
 	  if (init_dist[i].N == -1)
 	    {
 	      i_rep = i;
@@ -555,24 +557,26 @@ int btree_driver::replicate(vector<string> &params, drctv_reqs &reqs)
 	    }
 	}
 
-      rep_leaf = init_dist[i_rep].loc;
-      cout << rep_leaf << endl;
-      init_dist.erase(init_dist.begin()+i_rep);
+      if (i_rep > 0)
+	{
+	  rep_leaf = init_dist[i_rep].loc;
+	  cout << "\tsplitting at initiated branch (" << rep_leaf << ") and updating initiator distribution\n" << endl;
+	  init_dist.erase(init_dist.begin()+i_rep);
 
-      i_l.N = 0;
-      i_l.loc = rep_leaf + "l";
-      new_leaves.push_back(i_l);
-      i_l.loc = rep_leaf + "r";
-      new_leaves.push_back(i_l);
+	  i_l.N = 0;
+	  i_l.loc = rep_leaf + "l";
+	  new_leaves.push_back(i_l);
+	  i_l.loc = rep_leaf + "r";
+	  new_leaves.push_back(i_l);
 
-      init_dist.insert(init_dist.begin()+i_rep,new_leaves.begin(),new_leaves.end());
+	  init_dist.insert(init_dist.begin()+i_rep,new_leaves.begin(),new_leaves.end());
+	  
+	}
 
       for (init_loc temp_i_l : init_dist)
 	{
 	  cout << temp_i_l.loc << " = " << temp_i_l.N << endl;
 	}
-
-      cout << "\tsplitting at initiated branch (" << rep_leaf << ") and updating initiator distribution\n" << endl;
 
       // branch the btree at the replicating leaf
       error_code = driver_bt.branch(rep_leaf);
