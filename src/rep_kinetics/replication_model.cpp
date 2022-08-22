@@ -167,9 +167,9 @@ int replication_model::get_N_per_leaf()
 
 
 // set the number of leaves
-void replication_model::set_N_leaves(int n)
+void replication_model::set_N_leaves(int N_leaves)
 {
-  N_leaves = n;
+  this->N_leaves = N_leaves;
 }
 
 

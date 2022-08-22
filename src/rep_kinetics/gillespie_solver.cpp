@@ -3,14 +3,14 @@
 // constructor
 gillespie_solver::gillespie_solver()
 {
-  N = -1;
-  M = -1;
-  S = nullptr;
-  x = nullptr;
-  xFPT = nullptr;
-  W = nullptr;
-  rand_eng.seed(0);
-  u_rand = uniform_real_distribution<double>(0.0,1.0);
+  this->N = -1;
+  this->M = -1;
+  this->S = nullptr;
+  this->x = nullptr;
+  this->xFPT = nullptr;
+  this->W = nullptr;
+  this->rand_eng.seed(0);
+  this->u_rand = uniform_real_distribution<double>(0.0,1.0);
 }
 
 // destructor
@@ -161,21 +161,21 @@ void gillespie_solver::destroy_S()
 
 
 // set the number of species
-void gillespie_solver::set_N(int N_species)
+void gillespie_solver::set_N(int N)
 {
-  if (N_species > 0)
+  if (N > 0)
     {
-      N = N_species;
+      this->N = N;
     }
 }
 
 
 // set the number of reactions
-void gillespie_solver::set_M(int N_rxns)
+void gillespie_solver::set_M(int M)
 {
-  if (N_rxns > 0)
+  if (M > 0)
     {
-      M = N_rxns;
+      this->M = M;
     }
 }
 
@@ -237,12 +237,12 @@ vector<species_count> gillespie_solver::state_to_sc()
 
 
 // initialize the reaction system
-void gillespie_solver::initialize_reaction_system(int N_species, int N_rxns)
+void gillespie_solver::initialize_reaction_system(int N, int M)
 {
   destroy_reaction_system();
   // cout << "setting M and N" << endl;
-  set_N(N_species);
-  set_M(N_rxns);
+  set_N(N);
+  set_M(M);
   // cout << "initializing x" << endl;
   initialize_x();
   // cout << "initializing xFPT" << endl;

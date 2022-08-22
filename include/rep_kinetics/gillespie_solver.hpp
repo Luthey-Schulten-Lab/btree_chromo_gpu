@@ -27,7 +27,7 @@ public:
   void run_FPT(double &t, double &t_max);
 
   // initialize and destroy the reaction system
-  void initialize_reaction_system(int N_species, int N_rxns);
+  void initialize_reaction_system(int N, int M);
   void destroy_reaction_system();
 
   // print the reaction system
@@ -47,8 +47,8 @@ public:
 private:
 
   // set N and M
-  void set_N(int N_species);
-  void set_M(int M_rxns);
+  void set_N(int N);
+  void set_M(int M);
 
   // initialize and destroy state vector
   void initialize_x();

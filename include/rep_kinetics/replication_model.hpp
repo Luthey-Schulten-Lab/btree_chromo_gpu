@@ -84,7 +84,7 @@ private:
   rep_model_params r_m_p;
   int N_species, M_rxns;
   int N_leaves;
-  int N_per_leaf;
+  int N_non_leaf, N_per_leaf;
 
   rxn_manipulator rxn_manip;
   
