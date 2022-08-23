@@ -8,7 +8,7 @@ print
 
 load_replication_model:/home/ben/Workspace/btree_chromo/test_case/rep_init_model.txt
 
-replicate:7200.0
+replicate:1.0
 
 update_topology
 

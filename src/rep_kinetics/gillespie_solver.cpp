@@ -225,7 +225,7 @@ vector<species_count> gillespie_solver::state_to_sc()
 
   for (int i=0; i<N; i++)
     {
-      if (x[i] > 0)
+      if (x[i] >= 0)
 	{
 	  s_c.id = i;
 	  s_c.N = x[i];
@@ -416,6 +416,15 @@ void gillespie_solver::run_FPT(double &t, double &t_max)
 
       // test for FPT species and break the loop if they are found
       FPT_index = test_FPT();
+
+      cout << "xf, final state vector" << endl;
+      for (int i=0; i<N-1; i++)
+	{
+	  cout << x[i] << ",";
+	}
+      cout << x[N-1] << endl;
+
+      cout << "FPT_index = " << FPT_index << endl;
 
       if (FPT_index != -1) break;
       

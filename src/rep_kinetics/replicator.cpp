@@ -47,11 +47,18 @@ double replicator::get_k_rep()
 }
 
 
+vector<species_count> replicator::get_reset_noninit()
+{
+  return this->rep_model.fresh_noninit_s_cs();
+}
+
+
 // prepare the system state using the replication model
-void replicator::prepare_system(vector<init_loc> &init_dist)
+void replicator::prepare_system(vector<species_count> &noninit_s_cs,
+				vector<init_loc> &init_dist)
 {
 
-  // set tje number of leaves in the replication model
+  // set the number of leaves in the replication model
   this->rep_model.set_N_leaves(static_cast<int>(init_dist.size())-1);
 
   // set the number of replication species and reactions in the replication model
@@ -69,10 +76,14 @@ void replicator::prepare_system(vector<init_loc> &init_dist)
   this->solver.set_S(rxns);
 
   // convert the initiator distribution to species counts
-  vector<species_count> s_cs = this->rep_model.id_to_sc(init_dist);
-  
-  // set the state vector
-  this->solver.set_x(s_cs);
+  vector<species_count> init_s_cs = this->rep_model.id_to_sc(init_dist);
+  // set the state vector values from the initiator distribution
+  this->solver.set_x(init_s_cs);
+
+  // update gene counts based on the number of leaves
+  this->rep_model.update_noninit_s_cs(noninit_s_cs);
+  // set the state vector values from the noninitiator species
+  this->solver.set_x(noninit_s_cs);
 
   // set the FPT state vector
   this->solver.set_xFPT(rep_model.create_xFPT());
@@ -81,28 +92,34 @@ void replicator::prepare_system(vector<init_loc> &init_dist)
   this->solver.set_replication_model(rep_model);
 
   // print the system as a sanity check
-  // this->solver.print_reaction_system();
+  this->solver.print_reaction_system();
   
 }
 
 
 
-void replicator::run_replicate_FPT(vector<init_loc> &init_dist, double &t, double &t_max)
+void replicator::run_replicate_FPT(vector<species_count> &noninit_s_cs,
+				   vector<init_loc> &init_dist,
+				   double &t, double &t_max)
 {
 
   // prepare the reaction system based on the reaction model
-  prepare_system(init_dist);
+  prepare_system(noninit_s_cs,
+		 init_dist);
 
   // run the system
   this->solver.run_FPT(t,t_max);
 
   // redistribute initiators based on FPT result
-  this->rep_model.update_id_from_sc(init_dist,solver.state_to_sc());
+  vector<species_count> solver_s_cs = this->solver.state_to_sc();
+  this->rep_model.update_init_from_solver_s_cs(init_dist,solver_s_cs);
+  this->rep_model.update_noninit_from_solver_s_cs(noninit_s_cs,solver_s_cs);
 
   int fil_trigger = this->rep_model.get_N_per_leaf() - 1;
-
+  cout << fil_trigger << endl;
   for (size_t i=1; i<init_dist.size(); i++)
     {
+      cout << init_dist[i].loc << " = " << init_dist[i].N << endl;
       if (init_dist[i].N == fil_trigger)
 	{
 	  init_dist[i].N = -1;

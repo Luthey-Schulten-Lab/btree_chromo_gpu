@@ -25,8 +25,10 @@ struct rep_model_params
   double k_rep;
   double k_c, k_d;
   double k_hi, k_lo, k_on, k_off;
+  double tau_SA, k_SA;
   int N_hi, N_lo, N_fil;
-  int max_replisomes, N_init_DnaA;
+  int max_replisomes;
+  int N_init_DnaA, N_init_SA;
 };
 
 struct init_loc
@@ -56,6 +58,7 @@ public:
 
   // getters to access state of replication model
   int get_N_init_DnaA();
+  int get_N_leaves();
   int get_max_replisomes();
   double get_k_rep();
   int get_N_species();
@@ -65,9 +68,16 @@ public:
   // setter for number of leaves
   void set_N_leaves(int n);
 
+  // return reset species counts of noninitiator species
+  vector<species_count> fresh_noninit_s_cs();
+  void update_noninit_s_cs(vector<species_count> &s_cs);
+  void update_noninit_from_solver_s_cs(vector<species_count> &noninit_s_cs,
+				       vector<species_count> &solver_s_cs);
+
   // convert initiator distribution to species counts and vice-versa
   vector<species_count> id_to_sc(vector<init_loc> &init_dist);
-  void update_id_from_sc(vector<init_loc> &init_dist, vector<species_count> s_cs);
+  void update_init_from_solver_s_cs(vector<init_loc> &init_dist,
+				    vector<species_count> &solver_s_cs);
 
   // create the FPT species counts
   vector<species_count> create_xFPT();

@@ -487,7 +487,7 @@ int btree_driver::replicate(vector<string> &params, drctv_reqs &reqs)
   double t, dt, t_max;
   int rep_amount, error_code, i_rep;
 
-  // create an initial distribution with only free DnaA
+  // create an initial distribution of initiator species with only free DnaA
   init_dist.clear();
   
   i_l.loc = "free";
@@ -503,6 +503,11 @@ int btree_driver::replicate(vector<string> &params, drctv_reqs &reqs)
       init_dist.push_back(i_l);
     }
 
+  // create the species counts of noninitiator species
+  vector<species_count> noninit_s_cs = driver_replicator.get_reset_noninit();
+
+
+  // set the current time and the maximum time
   t = 0.0;
   t_max = stod(params[0]);
 
@@ -513,20 +518,11 @@ int btree_driver::replicate(vector<string> &params, drctv_reqs &reqs)
 
       dt = t;
 
-      // for (init_loc temp_i_l : init_dist)
-      // 	{
-      // 	  cout << temp_i_l.loc << " = " << temp_i_l.N << endl;
-      // 	}
-
       // run Gillespie algorithm until an initiation event occurs
-      driver_replicator.run_replicate_FPT(init_dist,
+      driver_replicator.run_replicate_FPT(noninit_s_cs,
+					  init_dist,
 					  t,
 					  t_max);
-
-      // for (init_loc temp_i_l : init_dist)
-      // 	{
-      // 	  cout << temp_i_l.loc << " = " << temp_i_l.N << endl;
-      // 	}
       
       // calculate time difference
       dt = t - dt;
@@ -548,7 +544,7 @@ int btree_driver::replicate(vector<string> &params, drctv_reqs &reqs)
       i_rep = 0;
       for (size_t i=0; i<init_dist.size(); i++)
 	{
-	  // cout << init_dist[i].loc << " = " << init_dist[i].N << endl;
+	  cout << init_dist[i].loc << " = " << init_dist[i].N << endl;
 	  if (init_dist[i].N == -1)
 	    {
 	      i_rep = i;
@@ -585,6 +581,7 @@ int btree_driver::replicate(vector<string> &params, drctv_reqs &reqs)
 		{
 		  cout << temp_i_l.loc << " = " << temp_i_l.N << endl;
 		}
+
 	    }
 	  
 	}

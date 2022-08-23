@@ -1,9 +1,11 @@
 # volume - [liter]
 V=3.3E-17
+N_init_SA=1000
+tau_SA=7.2E+3
 
 # initial DnaA count
-N_init_DnaA=148
-#N_init_DnaA=74
+#N_init_DnaA=148
+N_init_DnaA=10
 
 # maximum possible number of functional replisomes
 max_replisomes=8
@@ -27,7 +29,8 @@ N_lo=2
 # units - [particle^-1*s*-1]
 k_lo=5.8E-20
 
-N_fil=27
+#N_fil=27
+N_fil=3
 # units - [particle^-1*s*-1]
 k_on=1.7E-19
 # units - [s*-1]
