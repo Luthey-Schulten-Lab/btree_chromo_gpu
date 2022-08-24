@@ -63,16 +63,17 @@ public:
   double get_k_rep();
   int get_N_species();
   int get_N_per_leaf();
+  int get_N_non_leaf();
   int get_M_rxns();
 
   // setter for number of leaves
   void set_N_leaves(int n);
 
   // return reset species counts of noninitiator species
-  vector<species_count> fresh_noninit_s_cs();
-  void update_noninit_s_cs(vector<species_count> &s_cs);
-  void update_noninit_from_solver_s_cs(vector<species_count> &noninit_s_cs,
-				       vector<species_count> &solver_s_cs);
+  void reset_noninit_s(int * &noninit_s);
+  void update_noninit_s(int *noninit_s);
+  void update_noninit_s_from_solver_s_cs(int *noninit_s,
+					 vector<species_count> &solver_s_cs);
 
   // convert initiator distribution to species counts and vice-versa
   vector<species_count> id_to_sc(vector<init_loc> &init_dist);

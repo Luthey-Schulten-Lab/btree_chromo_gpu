@@ -183,6 +183,12 @@ int replication_model::get_N_per_leaf()
   return N_per_leaf;
 }
 
+// get N_per_leaf
+int replication_model::get_N_non_leaf()
+{
+  return N_non_leaf;
+}
+
 
 // set the number of leaves
 void replication_model::set_N_leaves(int N_leaves)
@@ -203,10 +209,6 @@ void replication_model::number_rep_species()
   N_per_leaf += r_m_p.N_fil; // filament sites
 
   N_species = N_leaves*N_per_leaf;
-
-  N_non_leaf = 1; // free DnaA
-  N_non_leaf += 1; // SA particles
-  N_non_leaf += 1; // DnaA genes
 
   N_species += N_non_leaf;
   
@@ -315,36 +317,40 @@ vector<reaction> replication_model::get_reactions()
 }
 
 
-vector<species_count> replication_model::fresh_noninit_s_cs()
+// initialize array of noninitiator species
+void replication_model::reset_noninit_s(int * &noninit_s)
 {
-  species_count s_c;
-  vector<species_count> s_cs;
+
+  if (noninit_s != nullptr)
+    {
+      delete[] noninit_s;
+      noninit_s = nullptr;
+    }
+
+  N_non_leaf = 1; // free DnaA
+  N_non_leaf += 1; // SA particles
+  N_non_leaf += 1; // DnaA genes
+
+  noninit_s = new int[N_non_leaf-1];
+
+  for (int i=0; i<N_non_leaf-1; i++)
+    {
+      noninit_s[i] = 0;
+    }
 
   // SA particles
-  s_c.id = 0;
-  s_c.N = r_m_p.N_init_SA;
-  s_cs.push_back(s_c);
+  noninit_s[0] = r_m_p.N_init_SA;
 
-  // DnaA genes
-  s_c.id = 1;
-  s_c.N = 0;
-  s_cs.push_back(s_c);
-
-  return s_cs;
+  // DnaA genes, there has to be at least 1 gene copy by default
+  noninit_s[1] = 1;
   
 }
 
 
 // update the noninitiator species
-void replication_model::update_noninit_s_cs(vector<species_count> &s_cs)
+void replication_model::update_noninit_s(int *noninit_s)
 {
-  for (species_count &s_c : s_cs)
-    {
-      if (s_c.id == 1)
-	{
-	  s_c.N = N_leaves;
-	}
-    }
+  noninit_s[1] = N_leaves;
 }
 
 
@@ -375,6 +381,7 @@ void replication_model::update_init_from_solver_s_cs(vector<init_loc> &init_dist
     {
       if (s_c.id > N_non_leaf - 1)
 	{
+	  // cout << (s_c.id-N_non_leaf)/N_per_leaf+1 << " " << (s_c.id-N_non_leaf)%N_per_leaf << endl;
 	  init_dist[(s_c.id-N_non_leaf)/N_per_leaf+1].N = (s_c.id-N_non_leaf)%N_per_leaf;
 	}
       else if(s_c.id == N_non_leaf - 1)
@@ -384,12 +391,19 @@ void replication_model::update_init_from_solver_s_cs(vector<init_loc> &init_dist
     }
 }
 
-void replication_model::update_noninit_from_solver_s_cs(vector<species_count> &noninit_s_cs,
-							vector<species_count> &solver_s_cs)
+void replication_model::update_noninit_s_from_solver_s_cs(int *noninit_s,
+							  vector<species_count> &solver_s_cs)
 {
   for (int i=0; i<N_non_leaf-1; i++)
     {
-      noninit_s_cs[i].N = solver_s_cs[i].N;
+      noninit_s[i] = 0;
+    }
+  for (species_count &s_c : solver_s_cs)
+    {
+      if (s_c.id < N_non_leaf - 1)
+	{
+	  noninit_s[s_c.id] = s_c.N;
+	}
     }
 }
 
@@ -419,7 +433,16 @@ void replication_model::propensities(int *xf, double *Wf)
   inv_V = pow(inv_V,3.0/2.0);
   inv_V = 1.0/(min(inv_V,2.0)*r_m_p.V); // calculate the inverse volume based on the SA particle change
 
-  Wf[0] = r_m_p.k_SA; // create SA particles at rate given by SA doubling time (tau_SA)
+  // create SA particles at rate given by SA doubling time (tau_SA)
+  if (xf[0] < 2*r_m_p.N_init_SA)
+    {
+      Wf[0] = r_m_p.k_SA;
+    }
+  else
+    {
+      Wf[0] = 0.0;
+    }
+    
   Wf[1] = r_m_p.k_c*xf[1]; // create DnaA at rate proportional to number DnaA genes, i.e. leaves
   Wf[2] = r_m_p.k_d*xf[2]; // degrade DnaA at rate based on presumed doubling time
 

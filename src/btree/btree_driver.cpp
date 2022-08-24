@@ -486,6 +486,7 @@ int btree_driver::replicate(vector<string> &params, drctv_reqs &reqs)
   init_loc i_l;
   double t, dt, t_max;
   int rep_amount, error_code, i_rep;
+  int *noninit_s = nullptr;
 
   // create an initial distribution of initiator species with only free DnaA
   init_dist.clear();
@@ -504,7 +505,7 @@ int btree_driver::replicate(vector<string> &params, drctv_reqs &reqs)
     }
 
   // create the species counts of noninitiator species
-  vector<species_count> noninit_s_cs = driver_replicator.get_reset_noninit();
+  driver_replicator.reset_noninit_s(noninit_s);
 
 
   // set the current time and the maximum time
@@ -519,7 +520,7 @@ int btree_driver::replicate(vector<string> &params, drctv_reqs &reqs)
       dt = t;
 
       // run Gillespie algorithm until an initiation event occurs
-      driver_replicator.run_replicate_FPT(noninit_s_cs,
+      driver_replicator.run_replicate_FPT(noninit_s,
 					  init_dist,
 					  t,
 					  t_max);
@@ -532,7 +533,7 @@ int btree_driver::replicate(vector<string> &params, drctv_reqs &reqs)
       rep_amount = driver_replicator.get_k_rep()*min(2*driver_bt.count_active_forks(),
 						     driver_replicator.get_max_replisomes())*dt;
 
-      cout << "\n" << rep_amount << " units were replicated on active forks prior to event" << endl;
+      cout << "\n" << rep_amount << " units were replicated on active forks prior to event(/termination)" << endl;
 
       // perform random replications
       driver_bt.random_transforms(rep_amount);
@@ -544,7 +545,7 @@ int btree_driver::replicate(vector<string> &params, drctv_reqs &reqs)
       i_rep = 0;
       for (size_t i=0; i<init_dist.size(); i++)
 	{
-	  cout << init_dist[i].loc << " = " << init_dist[i].N << endl;
+	  // cout << init_dist[i].loc << " = " << init_dist[i].N << endl;
 	  if (init_dist[i].N == -1)
 	    {
 	      i_rep = i;
@@ -594,6 +595,12 @@ int btree_driver::replicate(vector<string> &params, drctv_reqs &reqs)
       cout << temp_i_l.loc << " = " << temp_i_l.N << endl;
     }
   cout << "\n" << endl;
+
+  if (noninit_s != nullptr)
+    {
+      delete[] noninit_s;
+      noninit_s = nullptr;
+    }
   
   return 0;
 }
