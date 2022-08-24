@@ -36,14 +36,11 @@ void btree_driver::read_directives(string drctvs_filename)
     }
   else
     {
-      while (1)
+      while (getline(drctvs_file,line))
 	{
-	  drctvs_file >> line;
-	  if (drctvs_file.eof()) break;
 	  
-
 	  if ((line.length() > 0) &&
-	      (line.find("#") != 0))
+	      (line.at(0) != '#'))
 	    {
 	      drctvs.push_back(line);
 	    }

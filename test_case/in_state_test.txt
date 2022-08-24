@@ -1,2 +1,2 @@
-size=100
-m_cw3_ccw2
+size=1000000
+m_cw20000_ccw10000

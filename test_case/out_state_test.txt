@@ -1,6 +1,4 @@
-size=100
-m_cw100_ccw100
-ml_cw100_ccw100
-mll_cw100_ccw100
-mlr_cw100_ccw100
-mr_cw100_ccw100
+size=1000000
+m_cw380202_ccw369976
+ml_cw324015_ccw318249
+mr_cw365436_ccw354966

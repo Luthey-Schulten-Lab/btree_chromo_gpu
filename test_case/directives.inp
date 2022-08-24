@@ -1,32 +1,45 @@
-prng_seed:10
+#set the prng seeds
+btree_prng_seed:10
+replicator_prng_seed:10
 
+#load an input state from a file and print
 input_state:/home/ben/Workspace/btree_chromo/test_case/in_state_test.txt
-
-#regions_file:/home/ben/Workspace/btree_chromo/test_case/region_test.txt,0
-
 print
 
-#update_topology
-
-#transforms_file:/home/ben/Workspace/btree_chromo/test_case/state_trans_test.txt
-
-random_transforms:50
-
-#transform:m_cw20_ccw20
-
-update_topology
-
-dump_topology:/home/ben/Workspace/btree_chromo/test_case/topo_test.txt,0
-
-#dump_regions:/home/ben/Workspace/btree_chromo/test_case/out_region_test.txt
-
+#transform the current state and print
+transform:m_cw5000_ccw5000
 print
 
-#update_CG_map:1000
-#dump_CG_map:/home/ben/Workspace/btree_chromo/test_case/out_CG_test.txt,1000,0
+#transform the current state using transforms stored in a file and print
+transforms_file:/home/ben/Workspace/btree_chromo/test_case/state_trans_test.txt
+print
 
+#apply random transforms to the current state until all units are used or the maximum size is reached and print
+random_transforms:50000
+print
+
+#load the initial input state and print
+input_state:/home/ben/Workspace/btree_chromo/test_case/in_state_test.txt
+print
+
+#load the kinetic model for replication initiation
 load_replication_model:/home/ben/Workspace/btree_chromo/test_case/rep_init_model.txt
 
+#run the replication initiation model and print
 replicate:7200.0
+print
 
+#update the topology and dump the topology to a dump file
+update_topology
+dump_topology:/home/ben/Workspace/btree_chromo/test_case/topo_test.txt,0
+
+#update the coarse-graining map and dump the map to a dump file
+update_CG_map:10000
+dump_CG_map:/home/ben/Workspace/btree_chromo/test_case/out_CG_test.txt,10000,0
+
+#load genome regions from a file and dump the region counts within the current btree state to a dump file
+regions_file:/home/ben/Workspace/btree_chromo/test_case/region_test.txt,0
+dump_regions:/home/ben/Workspace/btree_chromo/test_case/out_region_test.txt
+
+#dump the current state
 output_state:/home/ben/Workspace/btree_chromo/test_case/out_state_test.txt

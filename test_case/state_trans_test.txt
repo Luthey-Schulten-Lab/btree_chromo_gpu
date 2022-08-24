@@ -1,3 +1,3 @@
-m_cw0_ccw1
-ml_cw1_ccw1
-mr_cw1_ccw1
+m_cw10000_ccw10000
+ml_cw5000_ccw15000
+mr_cw10000_ccw5000

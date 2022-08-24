@@ -1,6 +1,6 @@
 region1,0,0
-region2,99,99
-region3,99,0
-region4,0,1
-region5,98,99
-region6,97,97
+region2,50,100
+region3,999900,101
+region4,700000,800000
+region5,10000,15000
+region6,400000,600000
