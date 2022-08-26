@@ -235,6 +235,13 @@ int btree_driver::execute_directives()
 	}
 
 
+      // write the LAMMPS system data
+      else if (command == "write_LAMMPS_data")
+	{
+	  error_code = write_LAMMPS_data(params);
+	}
+
+
       // seed the PRNG for the replicator
       else if (command == "replicator_prng_seed")
 	{
@@ -599,6 +606,18 @@ int btree_driver::replicate(vector<string> &params, drctv_reqs &reqs)
       noninit_s = nullptr;
     }
   
+  return 0;
+}
+
+
+int btree_driver::write_LAMMPS_data(vector<string> &params)
+{
+  if (params.size() != 1)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  driver_lmp_sys.write_data(params[0]);
   return 0;
 }
 

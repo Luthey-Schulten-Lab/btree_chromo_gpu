@@ -43,3 +43,6 @@ dump_regions:/home/ben/Workspace/btree_chromo/test_case/out_region_test.txt
 
 #dump the current state
 output_state:/home/ben/Workspace/btree_chromo/test_case/out_state_test.txt
+
+#write a LAMMPS data file
+write_LAMMPS_data:/home/ben/Workspace/btree_chromo/test_case/data.test

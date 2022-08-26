@@ -22,6 +22,7 @@ APP_DIR  := $(BUILD)/apps
 TARGET   := program
 INCLUDE  := -Iinclude/ -I${GCC_INC}
 SRC      :=                      \
+   $(wildcard src/LAMMPS_sys/*.cpp) \
    $(wildcard src/rep_kinetics/*.cpp) \
    $(wildcard src/btree/*.cpp) \
    $(wildcard src/*.cpp) \

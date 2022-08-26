@@ -3,6 +3,7 @@
 
 #include <btree/btree.hpp>
 #include <rep_kinetics/replicator.hpp>
+#include <LAMMPS_sys/LAMMPS_sys.hpp>
 
 using namespace std;
 
@@ -68,9 +69,20 @@ private:
   int load_rep_model(vector<string> &params, drctv_reqs &reqs);
   int replicate(vector<string> &params, drctv_reqs &reqs);
 
+  // LAMMPS system
+  int load_mono_atoms(vector<string> &params, drctv_reqs &reqs);
+  int load_ribo_atoms(vector<string> &params, drctv_reqs &reqs);
+  int load_bdry_atoms(vector<string> &params, drctv_reqs &reqs);
+  int write_LAMMPS_data(vector<string> &params);
+
+  /////////////
+  // objects //
+  /////////////
+
   // classes
   replicator driver_replicator;
   btree driver_bt;
+  LAMMPS_sys driver_lmp_sys;
 
   // structs
   btree_state driver_st; // state structure
