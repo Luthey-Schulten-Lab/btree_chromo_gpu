@@ -1457,6 +1457,55 @@ void btree::centered_CG_map(vector<CG_locus> &loci, node *branch, int f_CG)
 }
 
 
+// function to prepare the bonds
+void btree::prepare_bonds(int **&c, int *&t, int &N)
+{
+  
+  N = total_size() + count_active_forks();
+
+  t = new int[N];
+
+  c = new int*[N];
+  for (int i=0; i<N; i++)
+    {
+      c[i] = new int[2];
+    }
+
+  for (int i=0; i<N; i++)
+    {
+      t[i] = i;
+      c[i][0] = i;
+      c[i][1] = i + 1;
+    }
+  
+}
+
+
+// function to prepare the angles
+void btree::prepare_angles(int **&c, int *&t, int &N)
+{
+  
+  N = total_size() + count_active_forks();
+
+  t = new int[N];
+
+  c = new int*[N];
+  for (int i=0; i<N; i++)
+    {
+      c[i] = new int[3];
+    }
+
+  for (int i=0; i<N; i++)
+    {
+      t[i] = i;
+      c[i][0] = i - 1;
+      c[i][1] = i;
+      c[i][2] = i + 1;
+    }
+  
+}
+
+
 // function used by destructor
 void btree::destroy_tree(node *branch)
 {

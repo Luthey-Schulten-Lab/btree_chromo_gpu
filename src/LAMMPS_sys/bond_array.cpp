@@ -17,6 +17,7 @@ bond_array::~bond_array()
 void bond_array::set_N(int N)
 {
   this->N = N;
+  initialize_bonds();
 }
 
 // get the number of elements
@@ -60,3 +61,26 @@ void bond_array::destroy_bonds()
     }
 }
 
+
+// set bond element
+void bond_array::set_bond(int i, bond b)
+{
+  bonds[i] = b;
+  bonds[i].id = i + 1;
+}
+
+
+// write to stream
+void bond_array::write(fstream &data_file)
+{
+  data_file << "\nBonds # bond-ID bond-type i j\n" << endl;
+
+  for (int i=0; i<N; i++)
+    {
+      data_file << bonds[i].id << "\t"
+		<< bonds[i].type << "\t"
+		<< bonds[i].i << "\t"
+		<< bonds[i].j << endl;
+    }
+  
+}

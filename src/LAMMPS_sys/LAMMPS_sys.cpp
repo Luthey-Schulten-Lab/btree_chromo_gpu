@@ -15,6 +15,14 @@ LAMMPS_sys::~LAMMPS_sys()
 }
 
 
+// set the btree
+void LAMMPS_sys::set_btree(btree_state in_state)
+{
+  internal_btree.prepare_state(in_state);
+  internal_btree.solve_topology();
+}
+
+
 // concatenate atom arrays
 void LAMMPS_sys::cat_atom_array(atom_array &in_atoms, atom_array &cat_atoms)
 {
@@ -66,6 +74,132 @@ void LAMMPS_sys::cat_atom_array(atom_array &in_atoms, atom_array &cat_atoms)
 }
 
 
+// concatenate ellipsoid arrays
+void LAMMPS_sys::cat_ellipsoid_array(ellipsoid_array &in_ellipsoids, ellipsoid_array &cat_ellipsoids)
+{
+
+  // temporary array used during concatenation
+  ellipsoid_array temp_ellipsoids;
+  
+  // get the array sizes
+  int N_old = in_ellipsoids.get_N();
+  int N_cat = cat_ellipsoids.get_N();
+  int N_new = N_old + N_cat;
+
+  // store the current contents of the array
+  if (N_old > 0)
+    {
+
+      temp_ellipsoids.set_N(N_old);
+
+      for (int i=0; i<N_old; i++)
+	{
+	  temp_ellipsoids.set_ellipsoid(i,in_ellipsoids.get_ellipsoid(i));
+	}      
+      
+    }
+
+  // resize the array
+  in_ellipsoids.set_N(N_new);
+
+  // copy the prior contents of the array
+  if (N_old > 0)
+    {
+      for (int i=0; i<N_old; i++)
+	{
+	  in_ellipsoids.set_ellipsoid(i,temp_ellipsoids.get_ellipsoid(i));
+	}
+    }
+
+  // concatenate the new contents
+  if (N_cat > 0)
+    {
+      for (int i=0; i<N_cat; i++)
+	{ 
+	  in_ellipsoids.set_ellipsoid(i+N_old,cat_ellipsoids.get_ellipsoid(i));
+	}
+    }
+  
+}
+
+
+// set the bonds in the system
+void LAMMPS_sys::set_bonds()
+{
+  int **c, *t, N;
+
+  c = nullptr;
+  t = nullptr;
+
+  internal_btree.prepare_bonds(c,t,N);
+
+  // set the bond array size
+  bonds.set_N(N);
+
+  // fill the bond array
+  bond temp_b;
+  temp_b.id = 0;
+  for (int i=0; i<N; i++)
+    {
+      temp_b.type = t[i];
+      temp_b.i = c[i][0];
+      temp_b.j = c[i][1];
+      bonds.set_bond(i,temp_b);
+    }
+  
+  // destroy the arrays
+  for (int i=0; i<N; i++)
+    {
+      delete[] c[i];
+    }
+  delete[] c;
+  delete[] t;
+}
+
+
+// set the angless in the system
+void LAMMPS_sys::set_angles()
+{
+  int **c, *t, N;
+
+  c = nullptr;
+  t = nullptr;
+
+  internal_btree.prepare_angles(c,t,N);
+
+  // set the angle array size
+  angles.set_N(N);
+
+  // fill the angle array
+  angle temp_a;
+  temp_a.id = 0;
+  for (int i=0; i<N; i++)
+    {
+      temp_a.type = t[i];
+      temp_a.i = c[i][0];
+      temp_a.j = c[i][1];
+      temp_a.k = c[i][2];
+      angles.set_angle(i,temp_a);
+    }
+  
+  // destroy the arrays
+  for (int i=0; i<N; i++)
+    {
+      delete[] c[i];
+    }
+  delete[] c;
+  delete[] t;
+}
+
+
+// prepare the topology
+void LAMMPS_sys::prepare_topology()
+{
+  set_bonds();
+  set_angles();
+}
+
+
 // function to create test data for testing
 void LAMMPS_sys::prepare_test_data()
 {
@@ -92,11 +226,17 @@ void LAMMPS_sys::merge_system_components()
 {
 
   atoms.set_N(0);
-  ellipsoids.set_N(0);
 
   cat_atom_array(atoms,mono_atoms);
   cat_atom_array(atoms,ribo_atoms);
   cat_atom_array(atoms,bdry_atoms);
+
+  ellipsoids.set_N(0);
+
+  mono_ellipsoids.set_min_id(1);
+  cat_ellipsoid_array(ellipsoids,mono_ellipsoids);
+  ribo_ellipsoids.set_min_id(mono_ellipsoids.get_N()+1);
+  cat_ellipsoid_array(ellipsoids,ribo_ellipsoids);
   
 }
 
@@ -121,6 +261,21 @@ void LAMMPS_sys::finalize_system()
   mono_atoms.set_ellipsoid_flag_all(1);
   ribo_atoms.set_ellipsoid_flag_all(1);
   bdry_atoms.set_ellipsoid_flag_all(0);
+
+  vec mono_shape;
+  mono_shape.x = 34.0;
+  mono_shape.y = 34.0;
+  mono_shape.z = 34.0;
+
+  vec ribo_shape;
+  ribo_shape.x = 200.0;
+  ribo_shape.y = 200.0;
+  ribo_shape.z = 200.0;
+
+  mono_ellipsoids.set_shape_all(mono_shape);
+  ribo_ellipsoids.set_shape_all(ribo_shape);
+
+  prepare_topology();
   
   merge_system_components();
   calc_bbox();
@@ -130,6 +285,8 @@ void LAMMPS_sys::finalize_system()
 // write the system to a data file
 void LAMMPS_sys::write_data(string data_filename)
 {
+
+  internal_btree.print_tree();
 
   prepare_test_data();
 
@@ -162,16 +319,19 @@ void LAMMPS_sys::write_data(string data_filename)
       data_file << angles.get_N() << "\t\tangles" << endl;
       data_file << N_angle_types << "\t\tangle types" << endl;
 
-      data_file << "\n\n" << endl;
+      data_file << "\n" << endl;
       
       // write atom information
       atoms.write(data_file);
 
       // write ellipsoid information
+      ellipsoids.write(data_file);
 
       // write bond information
+      bonds.write(data_file);
 
       // write angle information
+      angles.write(data_file);
       
     }
 

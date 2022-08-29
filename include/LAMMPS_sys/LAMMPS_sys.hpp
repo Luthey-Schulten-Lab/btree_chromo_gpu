@@ -8,6 +8,7 @@
 #include <vector>
 #include <memory>
 
+#include <btree/btree.hpp>
 #include <LAMMPS_sys/vec_quat_manipulator.hpp>
 #include <LAMMPS_sys/atom_array.hpp>
 #include <LAMMPS_sys/ellipsoid_array.hpp>
@@ -24,6 +25,10 @@ public:
   LAMMPS_sys();
   ~LAMMPS_sys();
 
+  // set the btree
+  void set_btree(btree_state in_state);
+
+  // write the data
   void write_data(string data_filename);
   
 private:
@@ -32,6 +37,12 @@ private:
 
   // concatenate arrays
   void cat_atom_array(atom_array &in_atoms, atom_array &cat_atoms);
+  void cat_ellipsoid_array(ellipsoid_array &in_ellipsoids, ellipsoid_array &cat_ellipsoids);
+
+  // determine the system's topology
+  void prepare_topology();
+  void set_bonds();
+  void set_angles();
 
   // prepare the system prior to output
   void finalize_system();
@@ -45,6 +56,8 @@ private:
   ellipsoid_array ellipsoids, mono_ellipsoids, ribo_ellipsoids;
   bond_array bonds;
   angle_array angles;
+
+  btree internal_btree;
 
 };
 

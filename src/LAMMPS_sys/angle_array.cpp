@@ -17,6 +17,7 @@ angle_array::~angle_array()
 void angle_array::set_N(int N)
 {
   this->N = N;
+  initialize_angles();
 }
 
 // get the number of elements
@@ -61,3 +62,27 @@ void angle_array::destroy_angles()
     }
 }
 
+
+// set angle element
+void angle_array::set_angle(int i, angle a)
+{
+  angles[i] = a;
+  angles[i].id = i + 1;
+}
+
+
+// write to stream
+void angle_array::write(fstream &data_file)
+{
+  data_file << "\nAngles # angle-ID angle-type i j k\n" << endl;
+
+  for (int i=0; i<N; i++)
+    {
+      data_file << angles[i].id << "\t"
+		<< angles[i].type << "\t"
+		<< angles[i].i << "\t"
+		<< angles[i].j << "\t"
+		<< angles[i].k << endl;
+    }
+  
+}

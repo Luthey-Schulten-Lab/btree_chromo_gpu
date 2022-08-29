@@ -29,13 +29,14 @@ public:
 
   // manipulate columns
   void reset_ids();
-  void set_types(int *type);
-  void set_type_all(int type);
-  void set_ellipsoid_flag_all(int ellipsoid_flat);
-  void set_mol_ids(int *mol_id);
-  void set_mol_id_all(int mol_id);
-  void set_densities(double *density);
-  void set_density_all(double density);
+  void set_types(int *type); // set element-wise types
+  void set_type_all(int type); // set type for all atoms
+  void set_ellipsoid_flag_all(int ellipsoid_flag); // set ellipsoid flag for all atoms
+  void set_mol_ids(int *mol_id); // set element-wise mol ids
+  void set_mol_id_all(int mol_id); // set single mol id for all atoms
+  void set_densities(double *density); // set element-wise densities
+  void set_density_all(double density); // set single density for all atoms
+  void set_coords(vec *r); // set element-wise positions
   
 
   // setter and getter for elements

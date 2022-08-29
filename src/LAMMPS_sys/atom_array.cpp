@@ -136,7 +136,7 @@ void atom_array::set_density_all(double density)
 // write to stream
 void atom_array::write(fstream &data_file)
 {
-  data_file << "Atoms # atom-ID atom-type x y z molecule-ID ellipsoid-flag density\n" << endl;
+  data_file << "\nAtoms # atom-ID atom-type x y z molecule-ID ellipsoid-flag density\n" << endl;
 
   for (int i=0; i<N; i++)
     {

@@ -17,6 +17,7 @@ ellipsoid_array::~ellipsoid_array()
 void ellipsoid_array::set_N(int N)
 {
   this->N = N;
+  initialize_ellipsoids();
 }
 
 // get the number of elements
@@ -62,4 +63,58 @@ void ellipsoid_array::destroy_ellipsoids()
       delete[] ellipsoids;
       ellipsoids = nullptr;
     }
+}
+
+
+// setter for elements
+void ellipsoid_array::set_ellipsoid(int i, ellipsoid e)
+{
+  ellipsoids[i] = e;
+}
+
+
+// getter for elements
+ellipsoid ellipsoid_array::get_ellipsoid(int i)
+{
+  return ellipsoids[i];
+}
+
+
+// set the minimum atom id and range accordingly [min,min+N)
+void ellipsoid_array::set_min_id(int min_id)
+{
+  for (int i=0; i<N; i++)
+    {
+      ellipsoids[i].id = min_id + i;
+    }
+}
+
+
+// set the shape of all ellipsoids
+void ellipsoid_array::set_shape_all(vec shape)
+{
+  for (int i=0; i<N; i++)
+    {
+      ellipsoids[i].s = shape;
+    }
+}
+
+
+// write to stream
+void ellipsoid_array::write(fstream &data_file)
+{
+  data_file << "\nEllipsoids # atom-ID shapex shapey shapez quatw quati quatj quatk\n" << endl;
+
+  for (int i=0; i<N; i++)
+    {        
+      data_file << ellipsoids[i].id << "\t"
+		<< ellipsoids[i].s.x << "\t"
+		<< ellipsoids[i].s.y << "\t"
+		<< ellipsoids[i].s.z << "\t"
+		<< ellipsoids[i].q.w << "\t"
+		<< ellipsoids[i].q.i << "\t"
+		<< ellipsoids[i].q.j << "\t"
+		<< ellipsoids[i].q.k << endl;
+    }
+  
 }

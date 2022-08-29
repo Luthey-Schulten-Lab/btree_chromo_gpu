@@ -139,6 +139,10 @@ public:
   vector<string> get_completed_forks();
   vector<string> get_active_forks();
   vector<string> get_leaves();
+
+  // create the topologies
+  void prepare_bonds(int **&c, int *&t, int &N);
+  void prepare_angles(int **&c, int *&t, int &N);
   
   void foo();
 
