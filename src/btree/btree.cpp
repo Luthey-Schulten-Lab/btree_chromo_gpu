@@ -1458,8 +1458,10 @@ void btree::centered_CG_map(vector<CG_locus> &loci, node *branch, int f_CG)
 
 
 // function to prepare the bonds
-void btree::prepare_bonds(int **&c, int *&t, int &N)
+void btree::prepare_bonds(int **&c, int *&t, int &N, int idx)
 {
+
+  node *topo_leaf;
   
   N = total_size() + count_active_forks();
 
@@ -1471,21 +1473,70 @@ void btree::prepare_bonds(int **&c, int *&t, int &N)
       c[i] = new int[2];
     }
 
-  for (int i=0; i<N; i++)
+  int i_bond = 0;
+  // iterate over leaves in system
+  vector<string>leaves = get_leaves();
+  for (int i_leaf=0; i_leaf<count_total_leaves(); i_leaf++)
     {
-      t[i] = i;
-      c[i][0] = i;
-      c[i][1] = i + 1;
+      
+      topo_leaf = get_branch(leaves[i_leaf]);
+
+      // test if leaf is complete
+      if ((topo_leaf->topo.start_link == topo_leaf->topo.end) &&
+	  (topo_leaf->topo.end_link == topo_leaf->topo.start))
+	{
+	  for (int i=0; i<topo_leaf->size; i++)
+	    {
+	      t[i_bond] = 1;
+	      c[i_bond][0] = topo_leaf->topo.start + i;
+	      c[i_bond][1] = topo_leaf->topo.start + (i+1)%(topo_leaf->size);
+	      i_bond += 1;
+	    }
+	}
+      else
+	{
+	  // bond at start
+	  t[i_bond] = 1;
+	  c[i_bond][0] = topo_leaf->topo.start_link;
+	  c[i_bond][1] = topo_leaf->topo.start;
+	  i_bond += 1;
+
+	  // bonds in middle
+	  for (int i=topo_leaf->topo.start; i<topo_leaf->topo.end; i++)
+	    {
+	      t[i_bond] = 1;
+	      c[i_bond][0] = i;
+	      c[i_bond][1] = i + 1;
+	      i_bond += 1;
+	    }
+
+	  // bond at end
+	  t[i_bond] = 1;
+	  c[i_bond][0] = topo_leaf->topo.end;
+	  c[i_bond][1] = topo_leaf->topo.end_link;
+	  i_bond += 1;
+	}
+      
     }
   
+  // apply indexing convention
+  for (int i=0; i<N; i++)
+    {
+      for (int j=0; j<3; j++)
+	{
+	  c[i][j] += idx;
+	}
+    }
 }
 
 
 // function to prepare the angles
-void btree::prepare_angles(int **&c, int *&t, int &N)
+void btree::prepare_angles(int **&c, int *&t, int &N, int idx)
 {
   
-  N = total_size() + count_active_forks();
+  node *topo_leaf, *supp_leaf;
+  
+  N = 2*(total_size() + count_active_forks());
 
   t = new int[N];
 
@@ -1495,14 +1546,215 @@ void btree::prepare_angles(int **&c, int *&t, int &N)
       c[i] = new int[3];
     }
 
+  int i_angle = 0;
+  // iterate over leaves in system
+  vector<string>leaves = get_leaves();
+  for (int i_leaf=0; i_leaf<count_total_leaves(); i_leaf++)
+    {
+      
+      topo_leaf = get_branch(leaves[i_leaf]);
+
+      // test if leaf is complete
+      if ((topo_leaf->topo.start_link == topo_leaf->topo.end) &&
+	  (topo_leaf->topo.end_link == topo_leaf->topo.start))
+	{
+	  for (int i=0; i<topo_leaf->size; i++)
+	    {
+	      t[i_angle] = 1;
+	      c[i_angle][0] = topo_leaf->topo.start + (i+topo_leaf->size-1)%(topo_leaf->size);
+	      c[i_angle][1] = topo_leaf->topo.start + i;
+	      c[i_angle][2] = topo_leaf->topo.start + (i+1)%(topo_leaf->size);
+	      i_angle += 1;
+
+	      t[i_angle] = 2;
+	      for (int j=0; j<3; j++)
+		{
+		  c[i_angle][j] = c[i_angle-1][j];
+		}
+	      i_angle += 1;
+	    }
+	}
+      else
+	{
+
+	  // determine chromosome containing start_link and end_link, thereby supporting the current topo_leaf
+	  for (int j_leaf=0; j_leaf<i_leaf; j_leaf++)
+	    {
+	      supp_leaf = get_branch(leaves[j_leaf]);
+
+	      if ((topo_leaf->topo.start_link >= supp_leaf->topo.start) &&
+		  (topo_leaf->topo.end_link <= supp_leaf->topo.end)) break;
+	    }
+
+	  // correct angles centered about start_link on supp_leaf
+	  for (int j_angle=0; j_angle<i_angle; j_angle++)
+	    {
+	      if (c[j_angle][1] == topo_leaf->topo.start_link)
+		{
+		  if (t[j_angle] == 1)
+		    {
+		      t[j_angle] = 3;
+		    }
+		  else if(t[j_angle] == 2)
+		    {
+		      t[j_angle] = 4;
+		    }
+		}
+	    }
+
+	  // angle centered about start_link on topo_leaf
+	  t[i_angle] = 3;
+	  if (topo_leaf->topo.start_link == supp_leaf->topo.start)
+	    {
+	      c[i_angle][0] = supp_leaf->topo.start_link;
+	    }
+	  else
+	    {
+	      c[i_angle][0] = topo_leaf->topo.start_link - 1;
+	    }
+	  c[i_angle][1] = topo_leaf->topo.start_link;
+	  c[i_angle][2] = topo_leaf->topo.start;
+	  i_angle += 1;
+
+	  t[i_angle] = 4;
+	  for (int j=0; j<3; j++)
+	    {
+	      c[i_angle][j] = c[i_angle-1][j];
+	    }
+	  i_angle += 1;
+
+	  // angle at start
+	  t[i_angle] = 1;
+	  c[i_angle][0] = topo_leaf->topo.start_link;
+	  c[i_angle][1] = topo_leaf->topo.start;
+	  c[i_angle][2] = min(topo_leaf->topo.start+1,topo_leaf->topo.end);
+	  i_angle += 1;
+
+	  t[i_angle] = 2;
+	  for (int j=0; j<3; j++)
+	    {
+	      c[i_angle][j] = c[i_angle-1][j];
+	    }
+	  i_angle += 1;
+
+	  // angles in middle
+	  for (int i=topo_leaf->topo.start+1; i<topo_leaf->topo.end-1; i++)
+	    {
+	      t[i_angle] = 1;
+	      c[i_angle][0] = i - 1;
+	      c[i_angle][1] = i;
+	      c[i_angle][2] = i + 1;
+	      i_angle += 1;
+
+	      t[i_angle] = 2;
+	      for (int j=0; j<3; j++)
+		{
+		  c[i_angle][j] = c[i_angle-1][j];
+		}
+	      i_angle += 1;
+	    }
+
+	  // angle at end
+	  t[i_angle] = 1;
+	  c[i_angle][0] = max(topo_leaf->topo.end-1,topo_leaf->topo.start);
+	  c[i_angle][1] = topo_leaf->topo.end;
+	  c[i_angle][2] = topo_leaf->topo.end_link;
+	  i_angle += 1;
+	  
+	  t[i_angle] = 2;
+	  for (int j=0; j<3; j++)
+	    {
+	      c[i_angle][j] = c[i_angle-1][j];
+	    }
+	  i_angle += 1;
+
+	  // correct angles centered about end_link on supp_leaf
+	  for (int j_angle=0; j_angle<i_angle; j_angle++)
+	    {
+	      if (c[j_angle][1] == topo_leaf->topo.end_link)
+		{
+		  if (t[j_angle] == 1)
+		    {
+		      t[j_angle] = 3;
+		    }
+		  else if(t[j_angle] == 2)
+		    {
+		      t[j_angle] = 4;
+		    }
+		}
+	    }
+
+	  // angle centered about end_link on topo_leaf
+	  t[i_angle] = 3;
+	  c[i_angle][0] = topo_leaf->topo.end;
+	  c[i_angle][1] = topo_leaf->topo.end_link;
+	  if (topo_leaf->topo.end_link == supp_leaf->topo.end)
+	    {
+	      c[i_angle][2] = supp_leaf->topo.end_link;
+	    }
+	  else
+	    {
+	      c[i_angle][2] = topo_leaf->topo.end_link - 1;
+	    }
+	  i_angle += 1;
+
+	  t[i_angle] = 4;
+	  for (int j=0; j<3; j++)
+	    {
+	      c[i_angle][j] = c[i_angle-1][j];
+	    }
+	  i_angle += 1;
+	  
+	}
+    }
+
+  // apply indexing convention
   for (int i=0; i<N; i++)
     {
-      t[i] = i;
-      c[i][0] = i - 1;
-      c[i][1] = i;
-      c[i][2] = i + 1;
+      for (int j=0; j<3; j++)
+	{
+	  c[i][j] += idx;
+	}
+    }  
+}
+
+
+// prepare the types
+void btree::prepare_types(int *&t, int &N, int base_type)
+{
+  node *topo_leaf;
+
+  t = new int[N];
+
+  // iterate over leaves in system
+  vector<string>leaves = get_leaves();
+  for (int i_leaf=0; i_leaf<count_total_leaves(); i_leaf++)
+    {
+      
+      topo_leaf = get_branch(leaves[i_leaf]);
+
+      // unmodified monomers
+      for (int i=topo_leaf->topo.start; i<topo_leaf->topo.end+1; i++)
+	{
+	  t[i] = base_type;
+	}
+
+      // add oris at the midpoints
+      t[topo_leaf->topo.mid] = base_type + 1;
+
+      // create a ter if the leaf is complete
+      if ((topo_leaf->topo.start_link == topo_leaf->topo.end) &&
+	  (topo_leaf->topo.end_link == topo_leaf->topo.start))
+	{
+	  t[topo_leaf->topo.start] = base_type + 2;
+	}
+      else // create forks
+	{
+	  t[topo_leaf->topo.start_link] = base_type + 3;
+	  t[topo_leaf->topo.end_link] = base_type + 3;
+	}
+
     }
-  
 }
 
 

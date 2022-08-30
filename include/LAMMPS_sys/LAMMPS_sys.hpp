@@ -43,6 +43,7 @@ private:
   void prepare_topology();
   void set_bonds();
   void set_angles();
+  void set_mono_types(int base_type);
 
   // prepare the system prior to output
   void finalize_system();

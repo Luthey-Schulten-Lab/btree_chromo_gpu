@@ -1,6 +1,8 @@
 #ifndef INCLUDE_VEC_QUAT_MANIPULATOR
 #define INCLUDE_VEC_QUAT_MANIPULATOR
 
+#include <cmath>
+
 using namespace std;
 
 struct vec
@@ -10,7 +12,8 @@ struct vec
 
 struct quat
 {
-  double w, i, j, k;
+  double w;
+  vec v;
 };
 
 class vec_quat_manipulator
@@ -20,7 +23,29 @@ public:
   // constructor and destructor
   vec_quat_manipulator();
   ~vec_quat_manipulator();
-  
+
+  vec v_null();
+
+  double v_dot(vec v, vec w);
+  double v_L2(vec v);
+  vec v_norm(vec v);
+  vec v_ax(double a, vec v);
+  vec v_xpy(vec v, vec w);
+  vec v_axpy(double a, vec v, vec w);
+  vec v_cross(vec v, vec w);
+
+  quat q_null();
+
+  double q_dot(quat q, quat p);
+  double q_L2(quat q);
+  quat q_norm(quat q);
+  quat q_inv(quat q);
+  quat q_ax(double a, quat q);
+  quat q_xpy(quat q, quat p);
+  quat q_axpy(double a, quat q, quat p);
+  quat q_mult(quat q, quat p);
+  quat q_conj(quat q);
+
 private:
   
 };

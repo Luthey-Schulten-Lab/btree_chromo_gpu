@@ -131,7 +131,7 @@ void LAMMPS_sys::set_bonds()
   c = nullptr;
   t = nullptr;
 
-  internal_btree.prepare_bonds(c,t,N);
+  internal_btree.prepare_bonds(c,t,N,1);
 
   // set the bond array size
   bonds.set_N(N);
@@ -165,7 +165,7 @@ void LAMMPS_sys::set_angles()
   c = nullptr;
   t = nullptr;
 
-  internal_btree.prepare_angles(c,t,N);
+  internal_btree.prepare_angles(c,t,N,1);
 
   // set the angle array size
   angles.set_N(N);
@@ -192,6 +192,22 @@ void LAMMPS_sys::set_angles()
 }
 
 
+// set the types
+void LAMMPS_sys::set_mono_types(int base_type)
+{
+  int *t, N;
+
+  t = nullptr;
+
+  internal_btree.prepare_types(t,N,base_type);
+
+  // set types in the atom array
+  mono_atoms.set_types(t);
+  
+  delete[] t;
+}
+
+
 // prepare the topology
 void LAMMPS_sys::prepare_topology()
 {
@@ -205,7 +221,7 @@ void LAMMPS_sys::prepare_test_data()
 {
 
   // initialize the mono, ribo, and bdry atoms
-  mono_atoms.set_N(10);
+  mono_atoms.set_N(internal_btree.total_size());
   ribo_atoms.set_N(5);
   bdry_atoms.set_N(20);
 
@@ -237,6 +253,7 @@ void LAMMPS_sys::merge_system_components()
   cat_ellipsoid_array(ellipsoids,mono_ellipsoids);
   ribo_ellipsoids.set_min_id(mono_ellipsoids.get_N()+1);
   cat_ellipsoid_array(ellipsoids,ribo_ellipsoids);
+  ellipsoids.normalize_quats();
   
 }
 
@@ -257,6 +274,7 @@ void LAMMPS_sys::finalize_system()
   
   bdry_atoms.set_type_all(1);
   ribo_atoms.set_type_all(2);
+  set_mono_types(3);
   
   mono_atoms.set_ellipsoid_flag_all(1);
   ribo_atoms.set_ellipsoid_flag_all(1);
@@ -278,6 +296,7 @@ void LAMMPS_sys::finalize_system()
   prepare_topology();
   
   merge_system_components();
+  
   calc_bbox();
 }
 

@@ -8,10 +8,10 @@ input_state:/home/ben/Workspace/btree_chromo/test_case/in_state_LAMMPS_test.txt
 #transform the current state and print
 transform:m_cw10_ccw10
 transform:ml_cw5_ccw10
-print
 
 #update the topology and print the system
 update_topology
+dump_topology:/home/ben/Workspace/btree_chromo/test_case/topo_LAMMPS_test.txt,1
 print
 
 #dump the current state

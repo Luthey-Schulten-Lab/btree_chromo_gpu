@@ -46,9 +46,9 @@ void ellipsoid_array::initialize_ellipsoids()
 	  ellipsoids[i].s.z = -1.0;
 	  // orientation
 	  ellipsoids[i].q.w = -1.0;
-	  ellipsoids[i].q.i = -1.0;
-	  ellipsoids[i].q.j = -1.0;
-	  ellipsoids[i].q.k = -1.0;
+	  ellipsoids[i].q.v.x = -1.0;
+	  ellipsoids[i].q.v.y = -1.0;
+	  ellipsoids[i].q.v.z = -1.0;
 	}
       
     }
@@ -100,6 +100,16 @@ void ellipsoid_array::set_shape_all(vec shape)
 }
 
 
+// normalize all quaternions
+void ellipsoid_array::normalize_quats()
+{
+  for (int i=0; i<N; i++)
+    {
+      ellipsoids[i].q = vqm.q_norm(ellipsoids[i].q);
+    }
+}
+
+
 // write to stream
 void ellipsoid_array::write(fstream &data_file)
 {
@@ -112,9 +122,9 @@ void ellipsoid_array::write(fstream &data_file)
 		<< ellipsoids[i].s.y << "\t"
 		<< ellipsoids[i].s.z << "\t"
 		<< ellipsoids[i].q.w << "\t"
-		<< ellipsoids[i].q.i << "\t"
-		<< ellipsoids[i].q.j << "\t"
-		<< ellipsoids[i].q.k << endl;
+		<< ellipsoids[i].q.v.x << "\t"
+		<< ellipsoids[i].q.v.y << "\t"
+		<< ellipsoids[i].q.v.z << endl;
     }
   
 }

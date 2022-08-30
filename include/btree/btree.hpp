@@ -141,8 +141,9 @@ public:
   vector<string> get_leaves();
 
   // create the topologies
-  void prepare_bonds(int **&c, int *&t, int &N);
-  void prepare_angles(int **&c, int *&t, int &N);
+  void prepare_bonds(int **&c, int *&t, int &N, int idx);
+  void prepare_angles(int **&c, int *&t, int &N, int idx);
+  void prepare_types(int *&t, int &N, int base_type);
   
   void foo();
 

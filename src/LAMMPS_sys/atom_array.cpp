@@ -93,6 +93,16 @@ void atom_array::reset_ids()
 }
 
 
+// set types
+void atom_array::set_types(int *&types)
+{
+  for (int i=0; i<N; i++)
+    {
+      atoms[i].type = types[i];
+    }
+}
+
+
 // set all types
 void atom_array::set_type_all(int type)
 {

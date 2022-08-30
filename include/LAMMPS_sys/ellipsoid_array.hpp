@@ -34,7 +34,8 @@ public:
   // manipulate columns
   void set_min_id(int min_id); // set the minimum atom id and range accordingly [min,min+N)
   void set_shape_all(vec shape); // set the shape of all ellipsoids
-  void set_quats(quat *q); // set element-wise orientations
+  void set_quats(quat *&q); // set element-wise orientations
+  void normalize_quats();
 
   // write atom data
   void write(fstream &data_file);
@@ -46,6 +47,7 @@ private:
 
   int N;
   ellipsoid *ellipsoids;
+  vec_quat_manipulator vqm;
   
 };
 #endif
