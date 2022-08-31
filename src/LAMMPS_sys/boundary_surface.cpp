@@ -1,0 +1,255 @@
+#include <LAMMPS_sys/boundary_surface.hpp>
+
+// constructor
+boundary_surface::boundary_surface()
+{
+}
+
+// destructor
+boundary_surface::~boundary_surface()
+{
+}
+
+
+// create a new tri_face
+tri_face boundary_surface::new_tri_face(int v0, int v1, int v2)
+{
+  tri_face f;
+  f.verts[0] = v0;
+  f.verts[1] = v1;
+  f.verts[2] = v2;
+  return f;
+}
+
+
+// project the coords onto the surface of a sphere
+void boundary_surface::project_to_sphere()
+{
+  for (size_t i=0; i<coords.size(); i++)
+    {
+      coords[i] = vqm.v_norm(coords[i]);
+    }
+}
+
+
+// project the coords onto the surface of a sphere
+void boundary_surface::scale_coords(double s)
+{
+  for (size_t i=0; i<coords.size(); i++)
+    {
+      coords[i] = vqm.v_ax(s,coords[i]);
+    }
+}
+
+
+// initialize a unit icosahedron
+void boundary_surface::unit_icosahedron()
+{
+  const double r[3] = {0.0,1.0,(1.0+sqrt(5.0))/2.0};
+  const int x_permut[3][3] = {{0,1,2},{1,2,0},{2,0,1}};
+  const int s_permut[4][3] = {{0,1,1},{0,-1,1},{0,-1,-1},{0,1,-1}};
+
+  tri_surf.clear();
+  coords.clear();
+
+  vec temp_r;
+
+  for (int i=0; i<3; i++)
+    {
+      for (int j=0; j<4; j++)
+	{
+
+	  temp_r = vqm.v_new(s_permut[j][x_permut[i][0]]*r[x_permut[i][0]],
+			     s_permut[j][x_permut[i][1]]*r[x_permut[i][1]],
+			     s_permut[j][x_permut[i][2]]*r[x_permut[i][2]]);
+
+	  coords.push_back(temp_r);
+
+	}
+    }
+
+
+  // upper pole
+  tri_surf.push_back(new_tri_face(0,1,8));
+  tri_surf.push_back(new_tri_face(0,8,4));
+  tri_surf.push_back(new_tri_face(0,4,5));
+  tri_surf.push_back(new_tri_face(0,5,11));
+  tri_surf.push_back(new_tri_face(0,11,1));
+
+  // lower pole
+  tri_surf.push_back(new_tri_face(2,3,9));
+  tri_surf.push_back(new_tri_face(2,9,7));
+  tri_surf.push_back(new_tri_face(2,7,6));
+  tri_surf.push_back(new_tri_face(2,6,10));
+  tri_surf.push_back(new_tri_face(2,10,3));
+
+  // upper equator
+  tri_surf.push_back(new_tri_face(1,7,8));
+  tri_surf.push_back(new_tri_face(8,9,4));
+  tri_surf.push_back(new_tri_face(4,3,5));
+  tri_surf.push_back(new_tri_face(5,10,11));
+  tri_surf.push_back(new_tri_face(11,6,1));
+
+  // lower equator
+  tri_surf.push_back(new_tri_face(3,4,9));
+  tri_surf.push_back(new_tri_face(9,8,7));
+  tri_surf.push_back(new_tri_face(7,1,6));
+  tri_surf.push_back(new_tri_face(6,11,10));
+  tri_surf.push_back(new_tri_face(10,5,3));
+  
+
+  project_to_sphere();
+  
+}
+
+
+// interpolate triangles within a single face
+void boundary_surface::interpolate_face(tri_face t_f, vector<edge_map> &unique_edges)
+{
+  
+  const int perm_edges[3][2] = {{0,1},{1,2},{2,0}};
+  int new_verts[3];
+  array<int,2> temp_edge;
+
+  for (int i=0; i<3; i++)
+    {
+      temp_edge[0] = t_f.verts[perm_edges[i][0]];
+      temp_edge[1] = t_f.verts[perm_edges[i][1]];
+
+      new_verts[i] = vert_from_edge(temp_edge,unique_edges);
+    }
+
+  //   0
+  //  3 5
+  // 1 4 2
+
+  // upper
+  tri_surf.push_back(new_tri_face(t_f.verts[0],new_verts[0],new_verts[2]));
+  // left
+  tri_surf.push_back(new_tri_face(t_f.verts[1],new_verts[1],new_verts[0]));
+  // right
+  tri_surf.push_back(new_tri_face(t_f.verts[2],new_verts[2],new_verts[1]));
+  // center triangle
+  tri_surf.push_back(new_tri_face(new_verts[0],new_verts[1],new_verts[2]));
+
+}
+
+
+// test edge equivalence
+bool boundary_surface::edge_equiv(array<int,2> &e0, array<int,2> &e1)
+{
+  if (((e0[0] == e1[0]) && (e0[1] == e1[1])) ||
+      ((e0[1] == e1[0]) && (e0[0] == e1[1])))
+    {
+      return true;
+    }
+  return false;
+}
+
+
+// find vertex from edge mapping
+int boundary_surface::vert_from_edge(array<int,2> &e, vector<edge_map> &edge_mapping)
+{
+  for (edge_map e_m : edge_mapping)
+    {
+      if (edge_equiv(e,e_m.edge)) return e_m.vert;
+    }
+  return -1;
+}
+
+
+// interpolate along the current surfaces
+void boundary_surface::interpolate_surface()
+{
+
+  const int perm_edges[3][2] = {{0,1},{1,2},{2,0}};
+  vector<tri_face> old_tri_surf = tri_surf;
+  tri_surf.clear();
+
+  // determine the set of unique edges between vertices
+  vector<array<int,2>> unique_edges;
+  bool new_edge;
+  array<int,2> temp_edge;
+
+  // loop over old faces
+  for (tri_face t_f : old_tri_surf)
+    {
+      // loop over edges in face of old surface
+      for (int j=0; j<3; j++)
+	{
+	  
+	  temp_edge[0] = t_f.verts[perm_edges[j][0]];
+	  temp_edge[1] = t_f.verts[perm_edges[j][1]];
+
+	  // loop over set of unique edges
+	  new_edge = true;
+	  for (array<int,2> edge : unique_edges)
+	    {
+	      if (edge_equiv(temp_edge,edge) == true)
+		{
+		  new_edge = false;
+		  break;
+		}
+	    }
+
+	  // add edge if unique
+	  if (new_edge == true) unique_edges.push_back(temp_edge);
+	  
+	}
+    }
+
+  int N_curr = static_cast<int>(unique_edges.size());
+  edge_map temp_e_m;
+  vector<edge_map> edge_mapping;
+  for (array<int,2> edge : unique_edges)
+    {
+      cout << edge[0] << "," << edge[1] << endl;
+      temp_e_m.vert = N_curr;
+      temp_e_m.edge = edge;
+      edge_mapping.push_back(temp_e_m);
+      coords.push_back((vqm.v_linterp(0.5,
+				      coords[edge[0]],
+				      coords[edge[1]])));
+    }
+
+  for (tri_face t_f : old_tri_surf)
+    {
+      interpolate_face(t_f,edge_mapping);
+    }
+  
+}
+
+
+// write the boundary coordinates to an xyz file
+void boundary_surface::write_xyz(string data_filename)
+{
+
+  // begin writing data file
+  
+  fstream data_file;
+
+  data_file.open(data_filename, ios::out);
+
+  if (!data_file)
+    {
+      cout << "ERROR: file not opened in write_xyz" << endl;
+    }
+  else
+    {
+
+      // write system summary
+      data_file << coords.size() << "\n" << endl;
+
+      for (vec r : coords)
+	{
+	  data_file << "C\t"
+		    << r.x << "\t"
+		    << r.y << "\t"
+		    << r.z << endl;
+	}
+      
+    }
+
+  data_file.close();
+  
+}

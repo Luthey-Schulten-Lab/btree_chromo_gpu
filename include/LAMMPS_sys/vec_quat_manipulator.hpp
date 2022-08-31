@@ -25,14 +25,17 @@ public:
   ~vec_quat_manipulator();
 
   vec v_null();
-
+  vec v_new(double x, double y, double z);
+  
   double v_dot(vec v, vec w);
   double v_L2(vec v);
   vec v_norm(vec v);
+  vec v_inv(vec v);
   vec v_ax(double a, vec v);
   vec v_xpy(vec v, vec w);
   vec v_axpy(double a, vec v, vec w);
   vec v_cross(vec v, vec w);
+  vec v_linterp(double s, vec v, vec w);
 
   quat q_null();
 

@@ -10,6 +10,7 @@
 
 #include <btree/btree.hpp>
 #include <LAMMPS_sys/vec_quat_manipulator.hpp>
+#include <LAMMPS_sys/boundary_surface.hpp>
 #include <LAMMPS_sys/atom_array.hpp>
 #include <LAMMPS_sys/ellipsoid_array.hpp>
 #include <LAMMPS_sys/bond_array.hpp>
@@ -59,6 +60,7 @@ private:
   angle_array angles;
 
   btree internal_btree;
+  boundary_surface b_surf;
 
 };
 

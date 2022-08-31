@@ -1,0 +1,62 @@
+#ifndef INCLUDE_BOUNDARY_SURFACE
+#define INCLUDE_BOUNDARY_SURFACE
+
+#include <iostream>
+#include <fstream>
+#include <cmath>
+#include <vector>
+#include <array>
+
+#include <LAMMPS_sys/vec_quat_manipulator.hpp>
+
+using namespace std;
+
+struct tri_face
+{
+  int verts[3];
+};
+
+struct edge_map
+{
+  int vert;
+  array<int,2> edge;
+};
+
+class boundary_surface
+{
+public:
+
+  // constructor and destructor
+  boundary_surface();
+  ~boundary_surface();
+
+  // surface initializations
+  void unit_icosahedron();
+  
+  // surface-wide operations
+  void project_to_sphere();
+  void scale_coords(double s);
+  void interpolate_surface();
+
+  // single face operations
+  void interpolate_face(tri_face t_f, vector<edge_map> &edge_mapping);
+
+  // write an xyz file for testing
+  void write_xyz(string data_filename);
+
+private:
+
+  tri_face new_tri_face(int v0, int v1, int v2);
+
+  // edge comparisons
+  bool edge_equiv(array<int,2> &e0, array<int,2> &e1);
+  int vert_from_edge(array<int,2> &e, vector<edge_map> &edge_mapping);
+  
+  vector<tri_face> tri_surf;
+  vector<vec> coords;
+
+  vec_quat_manipulator vqm;
+  
+};
+
+#endif

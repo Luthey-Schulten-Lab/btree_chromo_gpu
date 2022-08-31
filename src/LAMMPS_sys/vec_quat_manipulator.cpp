@@ -21,6 +21,15 @@ vec vec_quat_manipulator::v_null()
   return v;
 }
 
+vec vec_quat_manipulator::v_new(double x, double y, double z)
+{
+  vec v;
+  v.x = x;
+  v.y = y;
+  v.z = z;
+  return v;
+}
+
 double vec_quat_manipulator::v_dot(vec v, vec w)
 {
   return v.x*w.x + v.y*w.y + v.z*w.z;
@@ -36,6 +45,11 @@ vec vec_quat_manipulator::v_norm(vec v)
   return v_ax(1.0/sqrt(v_L2(v)),v);
 }
 
+vec vec_quat_manipulator::v_inv(vec v)
+{
+  return v_ax(-1.0,v);
+}
+
 vec vec_quat_manipulator::v_ax(double a, vec v)
 {
   vec ax;
@@ -49,14 +63,14 @@ vec vec_quat_manipulator::v_xpy(vec v, vec w)
 {
   vec xpy;
   xpy.x = v.x + w.x;
-  xpy.x = v.y + w.y;
+  xpy.y = v.y + w.y;
   xpy.z = v.z + w.z;
   return xpy;
 }
 
 vec vec_quat_manipulator::v_axpy(double a, vec v, vec w)
 { 
-  return v_ax(a,v_xpy(v,w));
+  return v_xpy(v_ax(a,v),w);
 }
 
 vec vec_quat_manipulator::v_cross(vec v, vec w)
@@ -66,6 +80,11 @@ vec vec_quat_manipulator::v_cross(vec v, vec w)
   c.y = v.z*w.x - v.x*w.z;
   c.z = v.x*w.y - v.y*w.x;
   return c;
+}
+
+vec vec_quat_manipulator::v_linterp(double s, vec v, vec w)
+{
+  return v_axpy(s,v_xpy(v,v_inv(w)),w);
 }
 
 // quaternion functions
