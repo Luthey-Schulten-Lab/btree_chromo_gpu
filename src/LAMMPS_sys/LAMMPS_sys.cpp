@@ -295,11 +295,7 @@ void LAMMPS_sys::finalize_system()
 
   prepare_topology();
 
-  b_surf.unit_icosahedron();
-  b_surf.project_to_sphere();
-  b_surf.interpolate_surface();
-  b_surf.project_to_sphere();
-  b_surf.scale_coords(100.0);
+  b_surf.generate_sphere(1000.0,50.0);
   b_surf.write_xyz("/home/ben/Workspace/btree_chromo/test_case/b_surf.xyz");
   
   merge_system_components();

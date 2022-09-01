@@ -103,6 +103,26 @@ void boundary_surface::unit_icosahedron()
 }
 
 
+// initialize a unit tetrahedron
+void boundary_surface::unit_tetrahedron()
+{
+  tri_surf.clear();
+  coords.clear();
+
+
+  coords.push_back(vqm.v_new(sqrt(8.0/9.0),0.0,-1.0/3.0));
+  coords.push_back(vqm.v_new(-sqrt(2.0/9.0),sqrt(2.0/3.0),-1.0/3.0));
+  coords.push_back(vqm.v_new(-sqrt(2.0/9.0),-sqrt(2.0/3.0),-1.0/3.0));
+  coords.push_back(vqm.v_new(0.0,0.0,1.0));
+
+  tri_surf.push_back(new_tri_face(0,1,2));
+  tri_surf.push_back(new_tri_face(1,2,3));
+  tri_surf.push_back(new_tri_face(2,3,0));
+  tri_surf.push_back(new_tri_face(0,1,3));
+
+}
+
+
 // interpolate triangles within a single face
 void boundary_surface::interpolate_face(tri_face t_f, vector<edge_map> &unique_edges)
 {
@@ -117,6 +137,8 @@ void boundary_surface::interpolate_face(tri_face t_f, vector<edge_map> &unique_e
       temp_edge[1] = t_f.verts[perm_edges[i][1]];
 
       new_verts[i] = vert_from_edge(temp_edge,unique_edges);
+
+      if (new_verts[i] == -1) cout << temp_edge[0] << "," << temp_edge[1] << " fail" << endl;
     }
 
   //   0
@@ -171,9 +193,13 @@ void boundary_surface::interpolate_surface()
   bool new_edge;
   array<int,2> temp_edge;
 
+  unique_edges.clear();
+
   // loop over old faces
   for (tri_face t_f : old_tri_surf)
     {
+
+      // cout << t_f.verts[0] << "," << t_f.verts[1] << "," << t_f.verts[2] << endl;
       // loop over edges in face of old surface
       for (int j=0; j<3; j++)
 	{
@@ -193,29 +219,57 @@ void boundary_surface::interpolate_surface()
 	    }
 
 	  // add edge if unique
-	  if (new_edge == true) unique_edges.push_back(temp_edge);
+	  if (new_edge == true)
+	    {
+	      unique_edges.push_back(temp_edge);
+	      // cout << temp_edge[0] << " " << temp_edge[1] << endl;
+	    }
 	  
 	}
     }
-
-  int N_curr = static_cast<int>(unique_edges.size());
   edge_map temp_e_m;
   vector<edge_map> edge_mapping;
+
+  edge_mapping.clear();
+  
   for (array<int,2> edge : unique_edges)
     {
-      cout << edge[0] << "," << edge[1] << endl;
-      temp_e_m.vert = N_curr;
-      temp_e_m.edge = edge;
-      edge_mapping.push_back(temp_e_m);
+      // cout << edge[0] << "," << edge[1] << endl;
       coords.push_back((vqm.v_linterp(0.5,
 				      coords[edge[0]],
 				      coords[edge[1]])));
+      temp_e_m.vert = coords.size() - 1;
+      temp_e_m.edge = edge;
+      edge_mapping.push_back(temp_e_m);
     }
 
+  cout << "number old_tri_surfs = " << old_tri_surf.size() << endl;
+  
   for (tri_face t_f : old_tri_surf)
     {
+      // cout << t_f.verts[0] << "," << t_f.verts[1] << "," << t_f.verts[2] << endl;
       interpolate_face(t_f,edge_mapping);
+      // cout << tri_surf.size() << endl;
     }
+
+  cout << "number tri_surfs = " << tri_surf.size() << endl;
+  
+}
+
+
+void boundary_surface::generate_sphere(double R, double r)
+{
+
+  size_t N_target = 4*pow((R+r)/r,2.0);
+  
+  unit_icosahedron();
+
+  while (coords.size() < N_target)
+    {
+      interpolate_surface();
+      project_to_sphere();
+    }
+  scale_coords(R+r);
   
 }
 
