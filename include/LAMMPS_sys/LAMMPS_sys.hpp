@@ -18,6 +18,17 @@
 
 using namespace std;
 
+struct sys_bbox
+{
+  vec r_min, r_max;
+};
+
+struct BD_lengths
+{
+  double r_sphere, r_bdry;
+  vec mono_shape, ribo_shape;
+};
+
 class LAMMPS_sys
 {
 public:
@@ -28,6 +39,14 @@ public:
 
   // set the btree
   void set_btree(btree_state in_state);
+
+  // read the Brownian dynamics lengths
+  void read_BD_lengths(string lengths_filename);
+
+  // read the monomer coordinates
+  void read_mono_coords(string coords_filename, bool row_major);
+  // read the ribo coordinates
+  void read_ribo_coords(string coords_filename, bool row_major);
 
   // write the data
   void write_data(string data_filename);
@@ -59,8 +78,12 @@ private:
   bond_array bonds;
   angle_array angles;
 
+  sys_bbox bbox;
+  BD_lengths BD_l;
   btree internal_btree;
   boundary_surface b_surf;
+
+  vec_quat_manipulator vqm;
 
 };
 

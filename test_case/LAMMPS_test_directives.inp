@@ -6,8 +6,8 @@ replicator_prng_seed:10
 input_state:/home/ben/Workspace/btree_chromo/test_case/in_state_LAMMPS_test.txt
 
 #transform the current state and print
-transform:m_cw10_ccw10
-transform:ml_cw5_ccw10
+#transform:m_cw10_ccw10
+#transform:ml_cw5_ccw10
 
 #update the topology and print the system
 update_topology
@@ -16,6 +16,9 @@ print
 
 #dump the current state
 output_state:/home/ben/Workspace/btree_chromo/test_case/out_state_LAMMPS_test.txt
+
+#load the BD lengths
+load_BD_lengths:/home/ben/Workspace/btree_chromo/test_case/in_BD_lengths_LAMMPS_test.txt
 
 #write a LAMMPS data file
 write_LAMMPS_data:/home/ben/Workspace/btree_chromo/test_case/data.test

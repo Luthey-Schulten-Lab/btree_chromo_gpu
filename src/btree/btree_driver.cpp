@@ -80,6 +80,7 @@ int btree_driver::execute_directives()
   reqs.CG_update = true;
   reqs.regions_present = false;
   reqs.rep_model_present = false;
+  reqs.BD_lengths_present = false;
 
   cout << "\n---BEGIN EXECUTING DIRECTIVES---\n" << endl;
 
@@ -235,10 +236,17 @@ int btree_driver::execute_directives()
 	}
 
 
+      // load file containing length-scales for BD simulations
+      else if (command == "load_BD_lengths")
+	{
+	  error_code = load_BD_lengths(params,reqs);
+	}
+      
+
       // write the LAMMPS system data
       else if (command == "write_LAMMPS_data")
 	{
-	  error_code = write_LAMMPS_data(params);
+	  error_code = write_LAMMPS_data(params,reqs);
 	}
 
 
@@ -610,13 +618,28 @@ int btree_driver::replicate(vector<string> &params, drctv_reqs &reqs)
 }
 
 
-int btree_driver::write_LAMMPS_data(vector<string> &params)
+int btree_driver::load_BD_lengths(vector<string> &params, drctv_reqs &reqs)
 {
   if (params.size() != 1)
     {
       cout << "ERROR: wrong number of parameters, correct input file" << endl;
       return 1;
     }
+  driver_lmp_sys.read_BD_lengths(params[0]);
+  // replication model is now present
+  reqs.BD_lengths_present = true;
+  return 0;
+}
+
+
+int btree_driver::write_LAMMPS_data(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 1)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  if (reqs.BD_lengths_present == false) return 1;
   driver_lmp_sys.set_btree(driver_bt.dump_state());
   driver_lmp_sys.write_data(params[0]);
   return 0;

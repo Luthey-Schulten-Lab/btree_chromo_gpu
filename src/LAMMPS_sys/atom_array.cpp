@@ -143,6 +143,46 @@ void atom_array::set_density_all(double density)
 }
 
 
+// set element-wise coordinates
+void atom_array::set_coords(vector<vec> rs)
+{
+  for (int i=0; i<N; i++)
+    {
+      atoms[i].r.x = rs[i].x;
+      atoms[i].r.y = rs[i].y;
+      atoms[i].r.z = rs[i].z;
+    }
+}
+
+
+// read coordinates from binary file
+void atom_array::read_bin_coords(string data_filename, bool row_major)
+{
+  fstream data_file;
+
+  data_file.open(data_filename, ios::in | ios::binary);
+    
+  if (!data_file)
+    {
+      cout << "ERROR: file not opened in write_data" << endl;
+    }
+  else
+    {
+      if (row_major == true)
+	{
+	  cout << "row major" << endl;
+	}
+      else
+	{
+	  cout << "col major" << endl;
+	}
+    }
+
+  data_file.close();
+    
+}
+
+
 // write to stream
 void atom_array::write(fstream &data_file)
 {
@@ -152,9 +192,9 @@ void atom_array::write(fstream &data_file)
     {
       data_file << atoms[i].id << "\t"
 		<< atoms[i].type << "\t"
-		<< atoms[i].r.x << "\t"
-		<< atoms[i].r.y << "\t"
-		<< atoms[i].r.z << "\t"
+		<< atoms[i].r.x << "  \t"
+		<< atoms[i].r.y << "  \t"
+		<< atoms[i].r.z << "  \t"
 		<< atoms[i].mol_id << "\t"
 		<< atoms[i].ellipsoid_flag << "\t"
 		<< atoms[i].density << endl;

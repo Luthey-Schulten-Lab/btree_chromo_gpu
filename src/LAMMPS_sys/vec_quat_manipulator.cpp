@@ -87,6 +87,34 @@ vec vec_quat_manipulator::v_linterp(double s, vec v, vec w)
   return v_axpy(s,v_xpy(v,v_inv(w)),w);
 }
 
+void vec_quat_manipulator::v_array_from_vector(double **&x, int &N, vector<vec> &vs)
+{
+
+  N = static_cast<int>(vs.size());
+  
+  x = new double*[N];
+  for (int i=0; i<N; i++)
+    {
+      x[i] = new double[3];
+      x[i][0] = vs[i].x;
+      x[i][1] = vs[i].y;
+      x[i][2] = vs[i].z;
+    }
+  
+}
+
+void vec_quat_manipulator::v_vector_from_array(vector<vec> &vs, double **&x, int &N)
+{
+
+  vs.clear();
+  
+  for (int i=0; i<N; i++)
+    {
+      vs.push_back(v_new(x[i][0],x[i][1],x[i][2]));
+    }
+  
+}
+
 // quaternion functions
 
 quat vec_quat_manipulator::q_null()

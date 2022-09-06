@@ -13,6 +13,7 @@ struct drctv_reqs
   bool CG_update;
   bool regions_present;
   bool rep_model_present;
+  bool BD_lengths_present;
 };
 
 
@@ -73,7 +74,8 @@ private:
   int load_mono_atoms(vector<string> &params, drctv_reqs &reqs);
   int load_ribo_atoms(vector<string> &params, drctv_reqs &reqs);
   int load_bdry_atoms(vector<string> &params, drctv_reqs &reqs);
-  int write_LAMMPS_data(vector<string> &params);
+  int load_BD_lengths(vector<string> &params, drctv_reqs &reqs);
+  int write_LAMMPS_data(vector<string> &params, drctv_reqs &reqs);
 
   /////////////
   // objects //

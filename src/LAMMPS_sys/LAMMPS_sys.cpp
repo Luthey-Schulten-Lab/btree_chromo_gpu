@@ -223,7 +223,6 @@ void LAMMPS_sys::prepare_test_data()
   // initialize the mono, ribo, and bdry atoms
   mono_atoms.set_N(internal_btree.total_size());
   ribo_atoms.set_N(5);
-  bdry_atoms.set_N(20);
 
   mono_ellipsoids.set_N(mono_atoms.get_N());
   ribo_ellipsoids.set_N(ribo_atoms.get_N());
@@ -241,18 +240,24 @@ void LAMMPS_sys::prepare_test_data()
 void LAMMPS_sys::merge_system_components()
 {
 
+  // reinitialize the total atom array
   atoms.set_N(0);
 
+  // concatenate the mono, ribo, and bdry atom arrays
   cat_atom_array(atoms,mono_atoms);
   cat_atom_array(atoms,ribo_atoms);
   cat_atom_array(atoms,bdry_atoms);
 
+  // reinitialize the total ellipsoid array
   ellipsoids.set_N(0);
 
+  // concatenate the mono and ribo ellipsoid arrays
   mono_ellipsoids.set_min_id(1);
   cat_ellipsoid_array(ellipsoids,mono_ellipsoids);
   ribo_ellipsoids.set_min_id(mono_ellipsoids.get_N()+1);
   cat_ellipsoid_array(ellipsoids,ribo_ellipsoids);
+
+  // normalize the quaternions in the total ellipsoid array
   ellipsoids.normalize_quats();
   
 }
@@ -262,6 +267,53 @@ void LAMMPS_sys::merge_system_components()
 void LAMMPS_sys::calc_bbox()
 {
   
+  atom a;
+
+  // determine hte maximum and minimum coordinates from the atom array
+  for (int i=0; i<atoms.get_N(); i++)
+    {
+      a = atoms.get_atom(i);
+
+      if (i == 0)
+	{
+
+	  // initialize maximums
+	  bbox.r_max.x = a.r.x;
+	  bbox.r_max.y = a.r.y;
+	  bbox.r_max.z = a.r.z;
+
+	  // initialize minimums
+	  bbox.r_min.x = a.r.x;
+	  bbox.r_min.y = a.r.y;
+	  bbox.r_min.z = a.r.z;
+	  
+	}
+      else
+	{
+
+	  // update maximums
+	  if (a.r.x > bbox.r_max.x) bbox.r_max.x = a.r.x;
+	  if (a.r.y > bbox.r_max.y) bbox.r_max.y = a.r.y;
+	  if (a.r.z > bbox.r_max.z) bbox.r_max.z = a.r.z;
+
+	  // update minimums
+	  if (a.r.x < bbox.r_min.x) bbox.r_min.x = a.r.x;
+	  if (a.r.y < bbox.r_min.y) bbox.r_min.y = a.r.y;
+	  if (a.r.z < bbox.r_min.z) bbox.r_min.z = a.r.z;
+      
+	}
+    }
+
+  vec r_mid = vqm.v_linterp(0.5,bbox.r_min,bbox.r_max);
+  vec dr = vqm.v_xpy(bbox.r_max,vqm.v_inv(bbox.r_min));
+  dr = vqm.v_ax(0.5,dr);
+
+  double s = 1.2; // scale factor
+
+  // create bbox that is centered about the system and scaled to enclose all particles
+  bbox.r_min = vqm.v_axpy(-s,dr,r_mid);
+  bbox.r_max = vqm.v_axpy(s,dr,r_mid);
+  
 }
 
 
@@ -269,38 +321,125 @@ void LAMMPS_sys::calc_bbox()
 void LAMMPS_sys::finalize_system()
 {
 
+  // prepare boundary atoms
+  b_surf.generate_sphere(BD_l.r_sphere,BD_l.r_bdry);
+  bdry_atoms.set_N(b_surf.get_N_verts());
+  bdry_atoms.set_coords(b_surf.get_coords());
+  // b_surf.write_xyz("/home/ben/Workspace/btree_chromo/test_case/test_b_surf.xyz");
+
+  // place the ribo and bdry atoms in individual molecules for convenience
   bdry_atoms.set_mol_id_all(1);
   ribo_atoms.set_mol_id_all(2);
-  
+
+  // set the mono, ribo, and bdry types
   bdry_atoms.set_type_all(1);
   ribo_atoms.set_type_all(2);
   set_mono_types(3);
-  
+
+  // set the ellipsoid flags for mono, ribo, and bdry atoms
   mono_atoms.set_ellipsoid_flag_all(1);
   ribo_atoms.set_ellipsoid_flag_all(1);
   bdry_atoms.set_ellipsoid_flag_all(0);
 
-  vec mono_shape;
-  mono_shape.x = 34.0;
-  mono_shape.y = 34.0;
-  mono_shape.z = 34.0;
+  // set the ellipsoid shapes for mono and ribo atoms
+  mono_ellipsoids.set_shape_all(BD_l.mono_shape);
+  ribo_ellipsoids.set_shape_all(BD_l.ribo_shape);
 
-  vec ribo_shape;
-  ribo_shape.x = 200.0;
-  ribo_shape.y = 200.0;
-  ribo_shape.z = 200.0;
-
-  mono_ellipsoids.set_shape_all(mono_shape);
-  ribo_ellipsoids.set_shape_all(ribo_shape);
-
+  // prepare the system's topology based on the current binary tree
   prepare_topology();
 
-  b_surf.generate_sphere(1000.0,50.0);
-  b_surf.write_xyz("/home/ben/Workspace/btree_chromo/test_case/b_surf.xyz");
-  
+  // merge the individual arrays before writing the system
   merge_system_components();
-  
+
+  // determine the bounding box
   calc_bbox();
+  
+}
+
+
+// read the the Brownian dynamics lengths
+void LAMMPS_sys::read_BD_lengths(string lengths_filename)
+{
+  fstream lengths_file;
+
+  string param_delim, param, val;
+  int delim;
+  
+  string line;
+
+  param_delim = "=";
+
+  lengths_file.open(lengths_filename, ios::in);
+
+  if (!lengths_file)
+    {
+      cout << "ERROR: file not opened in read_BD_lengths" << endl;
+    }
+  else
+    {
+      while (1)
+	{
+	  lengths_file >> line;
+	  if (lengths_file.eof()) break;
+	  
+
+	  if ((line.length() > 0) &&
+	      (line.find("#") != 0))
+	    {
+
+	      delim = line.find(param_delim);
+
+	      if (delim != -1)
+		{
+
+		  param = line.substr(0,delim);
+		  val = line.substr(delim+1,line.length());
+
+		  // cout << param << "=" << val << endl;
+
+		  if (param == "r_sphere")
+		    {
+		      BD_l.r_sphere = stod(val);
+		    }
+
+		  else if (param == "r_bdry")
+		    {
+		      BD_l.r_bdry = stod(val);
+		    }
+
+		  else if (param == "mono_shape_x")
+		    {
+		      BD_l.mono_shape.x = stod(val);
+		    }
+
+		  else if (param == "mono_shape_y")
+		    {
+		      BD_l.mono_shape.y = stod(val);
+		    }
+
+		  else if (param == "mono_shape_z")
+		    {
+		      BD_l.mono_shape.z = stod(val);
+		    }
+
+		  else if (param == "ribo_shape_x")
+		    {
+		      BD_l.ribo_shape.x = stod(val);
+		    }
+
+		  else if (param == "ribo_shape_y")
+		    {
+		      BD_l.ribo_shape.y = stod(val);
+		    }
+
+		  else if (param == "ribo_shape_z")
+		    {
+		      BD_l.ribo_shape.z = stod(val);
+		    }
+		}
+	    }
+	} // end while loop
+    }
 }
 
 
@@ -308,7 +447,7 @@ void LAMMPS_sys::finalize_system()
 void LAMMPS_sys::write_data(string data_filename)
 {
 
-  internal_btree.print_tree();
+  // internal_btree.print_tree();
 
   prepare_test_data();
 
@@ -335,13 +474,17 @@ void LAMMPS_sys::write_data(string data_filename)
 
       data_file << atoms.get_N() << "\t\tatoms" << endl;
       data_file << N_atom_types << "\t\tatom types" << endl;
-      data_file << ellipsoids.get_N() << "\t\tatoms" << endl;
+      data_file << ellipsoids.get_N() << "\t\tellipsoids" << endl;
       data_file << bonds.get_N() << "\t\tbonds" << endl;
       data_file << N_bond_types << "\t\tbond types" << endl;
       data_file << angles.get_N() << "\t\tangles" << endl;
       data_file << N_angle_types << "\t\tangle types" << endl;
 
       data_file << "\n" << endl;
+
+      data_file << bbox.r_min.x << "\t" << bbox.r_max.x << "\txlo xhi" << endl;
+      data_file << bbox.r_min.y << "\t" << bbox.r_max.y << "\tylo yhi" << endl;
+      data_file << bbox.r_min.z << "\t" << bbox.r_max.z << "\tzlo zhi" << endl;
       
       // write atom information
       atoms.write(data_file);

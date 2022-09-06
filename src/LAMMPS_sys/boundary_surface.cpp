@@ -243,7 +243,7 @@ void boundary_surface::interpolate_surface()
       edge_mapping.push_back(temp_e_m);
     }
 
-  cout << "number old_tri_surfs = " << old_tri_surf.size() << endl;
+  // cout << "number old_tri_surfs = " << old_tri_surf.size() << endl;
   
   for (tri_face t_f : old_tri_surf)
     {
@@ -252,7 +252,7 @@ void boundary_surface::interpolate_surface()
       // cout << tri_surf.size() << endl;
     }
 
-  cout << "number tri_surfs = " << tri_surf.size() << endl;
+  // cout << "number tri_surfs = " << tri_surf.size() << endl;
   
 }
 
@@ -271,6 +271,20 @@ void boundary_surface::generate_sphere(double R, double r)
     }
   scale_coords(R+r);
   
+}
+
+
+// getter for coordinates
+vector<vec> boundary_surface::get_coords()
+{
+  return coords;
+}
+
+
+// getter for number of vertices
+int boundary_surface::get_N_verts()
+{
+  return static_cast<int>(coords.size());
 }
 
 

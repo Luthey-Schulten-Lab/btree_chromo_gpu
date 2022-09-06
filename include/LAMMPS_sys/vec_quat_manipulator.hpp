@@ -2,6 +2,7 @@
 #define INCLUDE_VEC_QUAT_MANIPULATOR
 
 #include <cmath>
+#include <vector>
 
 using namespace std;
 
@@ -36,6 +37,9 @@ public:
   vec v_axpy(double a, vec v, vec w);
   vec v_cross(vec v, vec w);
   vec v_linterp(double s, vec v, vec w);
+
+  void v_array_from_vector(double **&x, int &N, vector<vec> &vs);
+  void v_vector_from_array(vector<vec> &vs, double **&x, int &N);
 
   quat q_null();
 

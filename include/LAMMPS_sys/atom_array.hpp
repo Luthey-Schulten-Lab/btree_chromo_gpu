@@ -2,6 +2,7 @@
 #define INCLUDE_ATOM_ARRAY_HPP
 
 #include <memory>
+#include <iostream>
 #include <fstream>
 
 #include <LAMMPS_sys/vec_quat_manipulator.hpp>
@@ -36,8 +37,11 @@ public:
   void set_mol_id_all(int mol_id); // set single mol id for all atoms
   void set_densities(double *&densities); // set element-wise densities
   void set_density_all(double density); // set single density for all atoms
-  void set_coords(vec *r); // set element-wise positions
-  
+  void set_coords(vector<vec> rs); // set element-wise coordinates
+
+  // read coordinates from files
+  void read_bin_coords(string data_filename, bool row_major);
+  void read_dat_coords(string data_filename);
 
   // setter and getter for elements
   void set_atom(int i, atom a);

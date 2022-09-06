@@ -1,3 +1,1 @@
-size=100
-m_cw30_ccw20
-ml_cw5_ccw10
+size=1000

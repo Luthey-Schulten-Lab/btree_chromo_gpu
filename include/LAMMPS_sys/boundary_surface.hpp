@@ -45,6 +45,10 @@ public:
   // single face operations
   void interpolate_face(tri_face t_f, vector<edge_map> &edge_mapping);
 
+  // getters
+  vector<vec> get_coords();
+  int get_N_verts();
+
   // write an xyz file for testing
   void write_xyz(string data_filename);
 
