@@ -25,7 +25,7 @@ void replication_model::read_rep_model(string rep_model_filename)
 
   rep_model_file.open(rep_model_filename, ios::in);
 
-  if (!rep_model_file)
+  if (!rep_model_file.is_open())
     {
       cout << "ERROR: file not opened in read_rep_model" << endl;
     }
@@ -131,12 +131,12 @@ void replication_model::read_rep_model(string rep_model_filename)
 	    }
 	      
      	} // end while loop
+
+      rep_model_file.close();
   
     }
 
   r_m_p.k_SA = r_m_p.N_init_SA/r_m_p.tau_SA;
-  
-  rep_model_file.close();
 
 }
 

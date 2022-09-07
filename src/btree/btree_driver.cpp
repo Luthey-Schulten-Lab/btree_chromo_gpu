@@ -30,7 +30,7 @@ void btree_driver::read_directives(string drctvs_filename)
   cout << "\nREADING DIRECTIVES:\n" << endl;
   cout << "\t" << drctvs_filename << endl;
 
-  if (!drctvs_file)
+  if (!drctvs_file.is_open())
     {
       cout << "ERROR: file not opened in read_directives" << endl;
     }
@@ -46,10 +46,10 @@ void btree_driver::read_directives(string drctvs_filename)
 	    }
 	      
      	}
-  
+
+      drctvs_file.close();
     }
   
-  drctvs_file.close();
 }
 
 // function print all directives
@@ -76,6 +76,7 @@ int btree_driver::execute_directives()
 
   drctv_reqs reqs;
 
+  reqs.btree_initialized = false;
   reqs.topo_update = true;
   reqs.CG_update = true;
   reqs.regions_present = false;
@@ -236,6 +237,27 @@ int btree_driver::execute_directives()
 	}
 
 
+      // load file containing the monomer coordinates
+      else if (command == "load_mono_coords")
+	{
+	  error_code = load_mono_coords(params,reqs);
+	}
+
+
+      // load file containing the monomer coordinates
+      else if (command == "load_ribo_coords")
+	{
+	  error_code = load_ribo_coords(params,reqs);
+	}
+
+
+      // load file containing the monomer coordinates
+      else if (command == "load_bdry_coords")
+	{
+	  error_code = load_bdry_coords(params,reqs);
+	}
+
+
       // load file containing length-scales for BD simulations
       else if (command == "load_BD_lengths")
 	{
@@ -271,6 +293,8 @@ int btree_driver::execute_directives()
   return 0;
 }
 
+
+
 ////////////////////////////////////////////
 // set of functions to perform directives //
 ////////////////////////////////////////////
@@ -286,6 +310,8 @@ int btree_driver::input_state(vector<string> &params, drctv_reqs &reqs)
     }
   driver_st = driver_bt.read_state(params[0]);
   driver_bt.prepare_state(driver_st);
+  // btree is now initialized
+  reqs.btree_initialized = true;
   // require a topology update
   reqs.topo_update = true;
   // require a coarse-graining update
@@ -632,6 +658,57 @@ int btree_driver::load_BD_lengths(vector<string> &params, drctv_reqs &reqs)
 }
 
 
+int btree_driver::load_mono_coords(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 2)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  if (reqs.btree_initialized == false)
+    {
+      cout << "ERROR: empty btree" << endl;
+      return 1;
+    }
+  int e = driver_lmp_sys.read_mono_coords(params[0],params[1]);
+  return e;
+}
+
+
+int btree_driver::load_ribo_coords(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 2)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  if (reqs.btree_initialized == false)
+    {
+      cout << "ERROR: empty btree" << endl;
+      return 1;
+    }
+  int e = driver_lmp_sys.read_ribo_coords(params[0],params[1]);
+  return e;
+}
+
+
+int btree_driver::load_bdry_coords(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 2)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  if (reqs.btree_initialized == false)
+    {
+      cout << "ERROR: empty btree" << endl;
+      return 1;
+    }
+  int e = driver_lmp_sys.read_bdry_coords(params[0],params[1]);
+  return e;
+}
+
+
 int btree_driver::write_LAMMPS_data(vector<string> &params, drctv_reqs &reqs)
 {
   if (params.size() != 1)
@@ -639,7 +716,16 @@ int btree_driver::write_LAMMPS_data(vector<string> &params, drctv_reqs &reqs)
       cout << "ERROR: wrong number of parameters, correct input file" << endl;
       return 1;
     }
-  if (reqs.BD_lengths_present == false) return 1;
+  if (reqs.btree_initialized == false)
+    {
+      cout << "ERROR: empty btree" << endl;
+      return 1;
+    }
+  if (reqs.BD_lengths_present == false)
+    {
+      cout << "ERROR: missing BD lengths" << endl;
+      return 1;
+    }
   driver_lmp_sys.set_btree(driver_bt.dump_state());
   driver_lmp_sys.write_data(params[0]);
   return 0;

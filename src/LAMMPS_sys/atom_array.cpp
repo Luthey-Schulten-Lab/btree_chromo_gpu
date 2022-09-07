@@ -156,29 +156,89 @@ void atom_array::set_coords(vector<vec> rs)
 
 
 // read coordinates from binary file
-void atom_array::read_bin_coords(string data_filename, bool row_major)
+int atom_array::read_bin_coords(string data_filename, string order, bool force_resize)
 {
   fstream data_file;
 
-  data_file.open(data_filename, ios::in | ios::binary);
+  data_file.open(data_filename, ios::in | ios::binary | ios::ate);
+
+  // int data_size = 4;
     
-  if (!data_file)
+  if (!data_file.is_open())
     {
       cout << "ERROR: file not opened in write_data" << endl;
+      return 1;
     }
   else
     {
-      if (row_major == true)
+
+      // read in the binary file
+      streampos size = data_file.tellg();
+      char *memblock;
+      double *x;
+
+      int data_size = sizeof(double);
+      char vals[sizeof(double)];
+      int N_data = size/data_size;
+      cout << "N_data = " << N_data << endl;
+      int N_bin_atoms = N_data/3;
+      cout << "N_bin_atoms = " << N_bin_atoms << endl;
+
+      // test for resizing
+      if (force_resize)
 	{
-	  cout << "row major" << endl;
+	  set_N(N_bin_atoms);
 	}
       else
 	{
-	  cout << "col major" << endl;
+	  if (N_bin_atoms != get_N())
+	    {
+	      cout << "ERROR: incorrect atom_array size" << endl;
+	      return 1;
+	    }
 	}
-    }
 
-  data_file.close();
+      memblock = new char[size];
+      
+      data_file.seekg(0, ios::beg);
+
+      data_file.read(memblock,size);
+
+      data_file.close();
+
+      x = new double[N_data];
+
+      for (int i=0; i<N_data; i++)
+	{
+	  for (int j=0; j<data_size; j++)
+	    {
+	      vals[j] = memblock[i*data_size+j];
+	    }
+	  memcpy(&x[i], vals, 8);
+	}
+      
+      if (order == "col")
+	{
+	  cout << "col major" << endl;
+	  for (int i=0; i<3; i++)
+	    {
+	      cout << x[i] << endl;
+	    }
+	}
+      else if (order == "row")
+	{
+	  cout << "row major" << endl;
+	  for (int i=0; i<3; i++)
+	    {
+	      cout << x[i] << endl;
+	    }
+	}
+
+      delete memblock;
+      delete x;
+      return 0;
+      
+    }
     
 }
 

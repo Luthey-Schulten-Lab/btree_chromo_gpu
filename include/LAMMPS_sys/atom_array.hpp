@@ -4,6 +4,7 @@
 #include <memory>
 #include <iostream>
 #include <fstream>
+#include <cstring>
 
 #include <LAMMPS_sys/vec_quat_manipulator.hpp>
 
@@ -40,8 +41,7 @@ public:
   void set_coords(vector<vec> rs); // set element-wise coordinates
 
   // read coordinates from files
-  void read_bin_coords(string data_filename, bool row_major);
-  void read_dat_coords(string data_filename);
+  int read_bin_coords(string data_filename, string order, bool force_resize);
 
   // setter and getter for elements
   void set_atom(int i, atom a);

@@ -20,6 +20,7 @@ void LAMMPS_sys::set_btree(btree_state in_state)
 {
   internal_btree.prepare_state(in_state);
   internal_btree.solve_topology();
+  mono_atoms.set_N(internal_btree.total_size());
 }
 
 
@@ -371,7 +372,7 @@ void LAMMPS_sys::read_BD_lengths(string lengths_filename)
 
   lengths_file.open(lengths_filename, ios::in);
 
-  if (!lengths_file)
+  if (!lengths_file.is_open())
     {
       cout << "ERROR: file not opened in read_BD_lengths" << endl;
     }
@@ -439,7 +440,28 @@ void LAMMPS_sys::read_BD_lengths(string lengths_filename)
 		}
 	    }
 	} // end while loop
+      lengths_file.close();
     }
+}
+
+
+// read the monomer coordinates - disallow resizing
+int LAMMPS_sys::read_mono_coords(string coords_filename, string order)
+{
+  return mono_atoms.read_bin_coords(coords_filename,order,true);
+}
+
+
+// read the ribosome coordinates - allow resizing
+int LAMMPS_sys::read_ribo_coords(string coords_filename, string order)
+{
+  return ribo_atoms.read_bin_coords(coords_filename,order,true);
+}
+
+// read the boundary coordinates - allow resizing
+int LAMMPS_sys::read_bdry_coords(string coords_filename, string order)
+{
+  return bdry_atoms.read_bin_coords(coords_filename,order,true);
 }
 
 
@@ -462,7 +484,7 @@ void LAMMPS_sys::write_data(string data_filename)
 
   data_file.open(data_filename, ios::out);
 
-  if (!data_file)
+  if (!data_file.is_open())
     {
       cout << "ERROR: file not opened in write_data" << endl;
     }
@@ -497,9 +519,9 @@ void LAMMPS_sys::write_data(string data_filename)
 
       // write angle information
       angles.write(data_file);
-      
-    }
 
-  data_file.close();
+
+      data_file.close();
+    }
   
 }

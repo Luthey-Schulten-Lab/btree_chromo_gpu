@@ -44,9 +44,11 @@ public:
   void read_BD_lengths(string lengths_filename);
 
   // read the monomer coordinates
-  void read_mono_coords(string coords_filename, bool row_major);
+  int read_mono_coords(string coords_filename, string order);
   // read the ribo coordinates
-  void read_ribo_coords(string coords_filename, bool row_major);
+  int read_ribo_coords(string coords_filename, string order);
+  // read the bdry coordinates
+  int read_bdry_coords(string coords_filename, string order);
 
   // write the data
   void write_data(string data_filename);

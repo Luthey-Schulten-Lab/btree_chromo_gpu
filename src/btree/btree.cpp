@@ -163,7 +163,7 @@ void btree::write_state(string st_filename, btree_state st)
 
   st_file.open(st_filename, ios::out);
 
-  if (!st_file)
+  if (!st_file.is_open())
     {
       cout << "ERROR: file not opened in write_state" << endl;
     }
@@ -181,9 +181,8 @@ void btree::write_state(string st_filename, btree_state st)
 	    endl;
       
 	}
+      st_file.close();
     }
-
-  st_file.close();
 }
 
 
@@ -205,7 +204,7 @@ btree_state btree::read_state(string st_filename)
 
   // cout << st_filename << endl;
 
-  if (!st_file)
+  if (!st_file.is_open())
     {
       st.size = -1;
       cout << "ERROR: file not opened in read_state" << endl;
@@ -242,10 +241,9 @@ btree_state btree::read_state(string st_filename)
 	    }
       
 	}
-  
+
+      st_file.close();
     }
-  
-  st_file.close();
 
   return st;
 }
@@ -265,7 +263,7 @@ btree_transforms btree::read_transforms(string tr_filename)
 
   // cout << tr_filename << endl;
 
-  if (!tr_file)
+  if (!tr_file.is_open())
     {
       cout << "ERROR: file not opened in read_transforms" << endl;
     }
@@ -281,10 +279,10 @@ btree_transforms btree::read_transforms(string tr_filename)
 	  tr.fork_rhos.push_back(f_r);
 
      	}
-  
+
+      tr_file.close();
+      
     }
-  
-  tr_file.close();
 
   return tr;
 }
@@ -1074,7 +1072,7 @@ void btree::dump_topology(string topo_filename, int idx)
 
   topo_file.open(topo_filename, ios::out);
 
-  if (!topo_file)
+  if (!topo_file.is_open())
     {
       cout << "ERROR: file not opened in dump_topology" << endl;
     }
@@ -1101,9 +1099,10 @@ void btree::dump_topology(string topo_filename, int idx)
       
 	}
 
+      topo_file.close();
+      
     }
 
-  topo_file.close();
 }
 
 
@@ -1122,7 +1121,7 @@ vector<chromo_region> btree::read_regions(string rg_filename, int idx)
   
   rg_file.open(rg_filename, ios::in);
 
-  if (!rg_file)
+  if (!rg_file.is_open())
     {
       cout << "ERROR: file not opened in read_regions" << endl;
     }
@@ -1152,10 +1151,10 @@ vector<chromo_region> btree::read_regions(string rg_filename, int idx)
 	  c_rs.push_back(c_r);
 	  
 	}
-  
+
+      rg_file.close();
+      
     }
-  
-  rg_file.close();
 
   return c_rs;
   
@@ -1227,7 +1226,7 @@ void btree::dump_regions(string rg_filename, vector<chromo_region> c_rs)
 
   rg_file.open(rg_filename, ios::out);
 
-  if (!rg_file)
+  if (!rg_file.is_open())
     {
       cout << "ERROR: file not opened in dump_regions" << endl;
     }
@@ -1245,9 +1244,10 @@ void btree::dump_regions(string rg_filename, vector<chromo_region> c_rs)
       
 	}
 
-    }
+      rg_file.close();
 
-  rg_file.close();
+    }
+  
 }
 
 void btree::dump_CG_map(string CG_filename, int idx, CG_map &m)
@@ -1256,7 +1256,7 @@ void btree::dump_CG_map(string CG_filename, int idx, CG_map &m)
 
   CG_file.open(CG_filename, ios::out);
 
-  if (!CG_file)
+  if (!CG_file.is_open())
     {
       cout << "ERROR: file not opened in dump_CG_map" << endl;
     }
@@ -1308,9 +1308,10 @@ void btree::dump_CG_map(string CG_filename, int idx, CG_map &m)
       
 	}
 
+      CG_file.close();
+
     }
 
-  CG_file.close();
 }
 
 

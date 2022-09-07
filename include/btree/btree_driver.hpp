@@ -9,6 +9,7 @@ using namespace std;
 
 struct drctv_reqs
 {
+  bool btree_initialized;
   bool topo_update;
   bool CG_update;
   bool regions_present;
@@ -71,9 +72,11 @@ private:
   int replicate(vector<string> &params, drctv_reqs &reqs);
 
   // LAMMPS system
-  int load_mono_atoms(vector<string> &params, drctv_reqs &reqs);
-  int load_ribo_atoms(vector<string> &params, drctv_reqs &reqs);
-  int load_bdry_atoms(vector<string> &params, drctv_reqs &reqs);
+  int load_mono_coords(vector<string> &params, drctv_reqs &reqs);
+  int load_mono_quats(vector<string> &params, drctv_reqs &reqs);
+  int load_ribo_coords(vector<string> &params, drctv_reqs &reqs);
+  int load_ribo_quats(vector<string> &params, drctv_reqs &reqs);
+  int load_bdry_coords(vector<string> &params, drctv_reqs &reqs);
   int load_BD_lengths(vector<string> &params, drctv_reqs &reqs);
   int write_LAMMPS_data(vector<string> &params, drctv_reqs &reqs);
 
