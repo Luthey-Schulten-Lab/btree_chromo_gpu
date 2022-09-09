@@ -2,6 +2,7 @@
 #define INCLUDE_BTREE_DRIVER_HPP
 
 #include <btree/btree.hpp>
+#include <btree/mapper.hpp>
 #include <rep_kinetics/replicator.hpp>
 #include <LAMMPS_sys/LAMMPS_sys.hpp>
 
@@ -15,6 +16,8 @@ struct drctv_reqs
   bool regions_present;
   bool rep_model_present;
   bool BD_lengths_present;
+  bool map_initial_present;
+  bool map_final_present;
 };
 
 
@@ -80,6 +83,11 @@ private:
   int load_BD_lengths(vector<string> &params, drctv_reqs &reqs);
   int write_LAMMPS_data(vector<string> &params, drctv_reqs &reqs);
 
+  // mapper
+  int set_initial_state(drctv_reqs &reqs);
+  int set_final_state(drctv_reqs &reqs);
+  int map_replication(drctv_reqs &reqs);
+
   /////////////
   // objects //
   /////////////
@@ -87,6 +95,7 @@ private:
   // classes
   replicator driver_replicator;
   btree driver_bt;
+  mapper driver_mapper;
   LAMMPS_sys driver_lmp_sys;
 
   // structs

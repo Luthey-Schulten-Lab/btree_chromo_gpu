@@ -111,7 +111,7 @@ int btree_driver::execute_directives()
 	    }
 	  params.push_back(temp_params);
 
-	  cout << "COMMAND: " << command << endl;
+	  cout << "\nCOMMAND: " << command << endl;
 	  for (long unsigned int i=0; i<params.size(); i++)
 	    {
 	      cout << "\tparam_" << i
@@ -262,6 +262,27 @@ int btree_driver::execute_directives()
       else if (command == "load_BD_lengths")
 	{
 	  error_code = load_BD_lengths(params,reqs);
+	}
+
+
+      // set initial state for mapper
+      else if (command == "set_initial_state")
+	{
+	  error_code = set_initial_state(reqs);
+	}
+
+
+      // set final state for mapper
+      else if (command == "set_final_state")
+	{
+	  error_code = set_final_state(reqs);
+	}
+
+
+      // map the replication based on the initial and final states
+      else if (command == "map_replication")
+	{
+	  error_code = map_replication(reqs);
 	}
       
 
@@ -670,6 +691,7 @@ int btree_driver::load_mono_coords(vector<string> &params, drctv_reqs &reqs)
       cout << "ERROR: empty btree" << endl;
       return 1;
     }
+  driver_lmp_sys.set_btree(driver_bt.dump_state());
   int e = driver_lmp_sys.read_mono_coords(params[0],params[1]);
   return e;
 }
@@ -726,8 +748,50 @@ int btree_driver::write_LAMMPS_data(vector<string> &params, drctv_reqs &reqs)
       cout << "ERROR: missing BD lengths" << endl;
       return 1;
     }
-  driver_lmp_sys.set_btree(driver_bt.dump_state());
   driver_lmp_sys.write_data(params[0]);
+  return 0;
+}
+
+
+int btree_driver::set_initial_state(drctv_reqs &reqs)
+{
+  if (reqs.btree_initialized == false)
+    {
+      cout << "ERROR: empty btree" << endl;
+      return 1;
+    }
+  driver_mapper.set_initial_state(driver_bt.dump_state());
+  reqs.map_initial_present = true;
+  return 0;
+}
+
+
+int btree_driver::set_final_state(drctv_reqs &reqs)
+{
+  if (reqs.btree_initialized == false)
+    {
+      cout << "ERROR: empty btree" << endl;
+      return 1;
+    }
+  driver_mapper.set_final_state(driver_bt.dump_state());
+  reqs.map_final_present = true;
+  return 0;
+}
+
+
+int btree_driver::map_replication(drctv_reqs &reqs)
+{
+  if (reqs.map_initial_present == false)
+    {
+      cout << "ERROR: missing initial state" << endl;
+      return 1;
+    }
+  if (reqs.map_final_present == false)
+    {
+      cout << "ERROR: missing final state" << endl;
+      return 1;
+    }
+  driver_mapper.prepare_mapping();
   return 0;
 }
 

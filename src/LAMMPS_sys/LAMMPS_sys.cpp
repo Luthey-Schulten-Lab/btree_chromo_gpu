@@ -342,6 +342,10 @@ void LAMMPS_sys::finalize_system()
   ribo_atoms.set_ellipsoid_flag_all(1);
   bdry_atoms.set_ellipsoid_flag_all(0);
 
+  // prepare the ellipsoid arrays
+  mono_ellipsoids.set_N(mono_atoms.get_N());
+  ribo_ellipsoids.set_N(ribo_atoms.get_N());
+
   // set the ellipsoid shapes for mono and ribo atoms
   mono_ellipsoids.set_shape_all(BD_l.mono_shape);
   ribo_ellipsoids.set_shape_all(BD_l.ribo_shape);
@@ -448,7 +452,7 @@ void LAMMPS_sys::read_BD_lengths(string lengths_filename)
 // read the monomer coordinates - disallow resizing
 int LAMMPS_sys::read_mono_coords(string coords_filename, string order)
 {
-  return mono_atoms.read_bin_coords(coords_filename,order,true);
+  return mono_atoms.read_bin_coords(coords_filename,order,false);
 }
 
 
@@ -471,7 +475,7 @@ void LAMMPS_sys::write_data(string data_filename)
 
   // internal_btree.print_tree();
 
-  prepare_test_data();
+  // prepare_test_data();
 
 
   // finalize the system before printing

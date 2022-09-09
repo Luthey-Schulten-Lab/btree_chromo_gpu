@@ -1,0 +1,40 @@
+#ifndef INCLUDE_MAPPER_HPP
+#define INCLUDE_MAPPER_HPP
+
+#include <btree/btree.hpp>
+
+using namespace std;
+
+class mapper
+{
+public:
+
+  // constructor and destructor
+  mapper();
+  ~mapper();
+
+  // setters for states
+  void set_initial_state(btree_state st);
+  void set_final_state(btree_state st);
+
+  // prepare the mapping
+  void prepare_mapping();
+
+private:
+
+  // calculate the state difference
+  btree_transforms state_diff(btree_state initial_state, btree_state final_state);
+
+  // initialize/destroy the map
+  void initialize_map();
+  void destroy_map();
+
+  // btrees
+  btree initial_bt, final_bt;
+
+  int ***m;
+  int N_initial, N_final, N_transforms;
+
+};
+
+#endif

@@ -5,26 +5,26 @@ replicator_prng_seed:10
 #load an input state from a file and print
 input_state:/home/ben/Workspace/btree_chromo/test_case/in_state_LAMMPS_test.txt
 
-#transform the current state and print
-#transform:m_cw10_ccw10
-#transform:ml_cw5_ccw10
-
-#update the topology and print the system
-update_topology
-dump_topology:/home/ben/Workspace/btree_chromo/test_case/topo_LAMMPS_test.txt,1
-print
-
-#dump the current state
-output_state:/home/ben/Workspace/btree_chromo/test_case/out_state_LAMMPS_test.txt
-
 #load the BD lengths
 load_BD_lengths:/home/ben/Workspace/btree_chromo/test_case/in_BD_lengths_LAMMPS_test.txt
 
 #load the monomer coordinates
-load_mono_coords:/home/ben/Data/sc_chains/1000mono_testcase_100ribos/x_chain_1000mono_testcase_100ribos_rep00001.bin,row
+#load_mono_coords:/home/ben/Data/sc_chains/1000mono_testcase_100ribos/x_chain_1000mono_testcase_100ribos_rep00001.bin,row
+load_mono_coords:/mnt/HDD_linux/Data/sc_chains/1000mono_testcase_100ribos/x_chain_1000mono_testcase_100ribos_rep00001.bin,row
 
 #load the ribosome coordinates
-load_ribo_coords:/home/ben/Data/sc_chains/1000mono_testcase_100ribos/x_obst_1000mono_testcase_100ribos_rep00001.bin,row
+#load_ribo_coords:/home/ben/Data/sc_chains/1000mono_testcase_100ribos/x_obst_1000mono_testcase_100ribos_rep00001.bin,row
+load_ribo_coords:/mnt/HDD_linux/Data/sc_chains/1000mono_testcase_100ribos/x_obst_1000mono_testcase_100ribos_rep00001.bin,row
 
 #write a LAMMPS data file
 write_LAMMPS_data:/home/ben/Workspace/btree_chromo/test_case/data.test
+
+#transform the current state and print
+transform:m_cw100_ccw100
+set_initial_state
+transform:ml_cw50_ccw50
+transform:mlr_cw30_ccw30
+
+set_final_state
+
+map_replication

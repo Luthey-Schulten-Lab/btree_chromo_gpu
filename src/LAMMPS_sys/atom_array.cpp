@@ -143,14 +143,51 @@ void atom_array::set_density_all(double density)
 }
 
 
+// set individual coordinate
+void atom_array::set_coord(int i, vec r)
+{
+     atoms[i].r.x = r.x;
+     atoms[i].r.y = r.y;
+     atoms[i].r.z = r.z;
+}
+
+
 // set element-wise coordinates
 void atom_array::set_coords(vector<vec> rs)
 {
   for (int i=0; i<N; i++)
     {
-      atoms[i].r.x = rs[i].x;
-      atoms[i].r.y = rs[i].y;
-      atoms[i].r.z = rs[i].z;
+      set_coord(i,rs[i]);
+    }
+}
+
+
+
+// set the particle coordinates from a 1D array of doubles
+void atom_array::set_coords_arr(double *&x, string order)
+{
+
+  vec r;
+  
+  if (order == "col")
+    {
+      for (int i=0; i<N; i++)
+	{
+	  r.x = x[i];
+	  r.y = x[N+i];
+	  r.z = x[2*N+i];
+	  set_coord(i,r);
+	}
+    }
+  else if (order == "row")
+    {
+      for (int i=0; i<N; i++)
+	{
+	  r.x = x[3*i];
+	  r.y = x[3*i+1];
+	  r.z = x[3*i+2];
+	  set_coord(i,r);
+	}
     }
 }
 
@@ -216,25 +253,11 @@ int atom_array::read_bin_coords(string data_filename, string order, bool force_r
 	    }
 	  memcpy(&x[i], vals, 8);
 	}
-      
-      if (order == "col")
-	{
-	  cout << "col major" << endl;
-	  for (int i=0; i<3; i++)
-	    {
-	      cout << x[i] << endl;
-	    }
-	}
-      else if (order == "row")
-	{
-	  cout << "row major" << endl;
-	  for (int i=0; i<3; i++)
-	    {
-	      cout << x[i] << endl;
-	    }
-	}
 
       delete memblock;
+      
+      set_coords_arr(x,order);
+
       delete x;
       return 0;
       
