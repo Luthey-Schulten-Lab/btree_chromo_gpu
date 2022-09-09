@@ -39,6 +39,8 @@ public:
   void set_densities(double *&densities); // set element-wise densities
   void set_density_all(double density); // set single density for all atoms
   void set_coords(vector<vec> rs); // set element-wise coordinates
+  void set_coords_arr(double *&x, string order);
+  void set_coord(int i, vec r);
 
   // read coordinates from files
   int read_bin_coords(string data_filename, string order, bool force_resize);
