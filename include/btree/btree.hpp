@@ -35,16 +35,19 @@ struct fork_rho
   int rho_cw, rho_ccw;
 };
 
+typedef vector<fork_rho> btree_transforms;
+
 struct btree_state
 {
   int size;
-  vector<fork_rho> fork_rhos;
+  //vector<fork_rho> fork_rhos;
+  btree_transforms transforms;
 };
 
-struct btree_transforms
-{
-  vector<fork_rho> fork_rhos;
-};
+// struct btree_transforms
+// {
+//   vector<fork_rho> fork_rhos;
+// };
 
 struct chromo_region
 {

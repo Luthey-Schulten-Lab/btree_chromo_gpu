@@ -18,7 +18,7 @@ public:
   void set_final_state(btree_state st);
 
   // prepare the mapping
-  void prepare_mapping();
+  int prepare_mapping();
 
 private:
 
@@ -30,9 +30,9 @@ private:
   void destroy_map();
 
   // btrees
-  btree initial_bt, final_bt;
+  btree_state initial_st, final_st;
 
-  int ***m;
+  int ***m, *N_new;
   int N_initial, N_final, N_transforms;
 
 };

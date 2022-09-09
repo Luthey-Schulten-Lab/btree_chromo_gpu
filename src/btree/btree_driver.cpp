@@ -791,8 +791,8 @@ int btree_driver::map_replication(drctv_reqs &reqs)
       cout << "ERROR: missing final state" << endl;
       return 1;
     }
-  driver_mapper.prepare_mapping();
-  return 0;
+  int e = driver_mapper.prepare_mapping();
+  return e;
 }
 
 

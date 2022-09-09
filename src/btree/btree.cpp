@@ -43,7 +43,7 @@ void btree::prepare_state(btree_state st)
   int error_code;
   
   initialize_tree(st.size);
-  for (fork_rho f_r: st.fork_rhos)
+  for (fork_rho f_r: st.transforms)
     {
       
       error_code = grow_at_branch_asym(f_r.fork,f_r.rho_cw,f_r.rho_ccw);
@@ -80,7 +80,7 @@ btree_state btree::dump_state()
 	  f_r.rho_cw = temp_branch->rho_cw;
 	  f_r.rho_ccw = temp_branch->rho_ccw;
 
-	  st.fork_rhos.push_back(f_r);
+	  st.transforms.push_back(f_r);
 	  
 	}
 
@@ -93,7 +93,7 @@ btree_state btree::dump_state()
 	  f_r.rho_cw = temp_branch->rho_cw;
 	  f_r.rho_ccw = temp_branch->rho_ccw;
 
-	  st.fork_rhos.push_back(f_r);
+	  st.transforms.push_back(f_r);
 	  
 	}
       
@@ -114,7 +114,7 @@ void btree::apply_transforms(btree_transforms tr)
   int error_code;
   btree_state st = dump_state();
   
-  for (fork_rho f_r: tr.fork_rhos)
+  for (fork_rho f_r: tr)
     {
       
       error_code = grow_at_branch_asym(f_r.fork,f_r.rho_cw,f_r.rho_ccw);
@@ -172,7 +172,7 @@ void btree::write_state(string st_filename, btree_state st)
 
       st_file << "size=" << st.size << endl;
 
-      for (fork_rho f_r: st.fork_rhos)
+      for (fork_rho f_r: st.transforms)
 	{
       
 	  st_file << f_r.fork <<
@@ -236,7 +236,7 @@ btree_state btree::read_state(string st_filename)
 	    {
 	      
 	      f_r = parse_transform(line);
-	      st.fork_rhos.push_back(f_r);
+	      st.transforms.push_back(f_r);
 	      
 	    }
       
@@ -276,7 +276,7 @@ btree_transforms btree::read_transforms(string tr_filename)
 	  
 	  // cout << line << endl;
 	  f_r = parse_transform(line);
-	  tr.fork_rhos.push_back(f_r);
+	  tr.push_back(f_r);
 
      	}
 
