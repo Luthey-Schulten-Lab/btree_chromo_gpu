@@ -52,7 +52,7 @@ btree_transforms mapper::state_diff(btree_state initial_state, btree_state final
 	      f_r_temp = f_r_f;
 	      f_r_temp.rho_cw -= f_r_i.rho_cw;
 	      f_r_temp.rho_ccw -= f_r_i.rho_ccw;
-	      if ((f_r_temp.rho_cw > 0) || (f_r_temp.rho_ccw > 0)) fork_exists = true;
+	      if ((f_r_temp.rho_cw >= 0) || (f_r_temp.rho_ccw >= 0)) fork_exists = true;
 	      break;
 	    }
 	}
@@ -83,15 +83,19 @@ void mapper::initialize_map()
       for (int i=0; i<N_transforms; i++)
 	{
 	  m[i] = new int*[N_final];
-	}
-
-      for (int i=0; i<N_transforms; i++)
-	{
 	  for (int j=0; j<N_final; j++)
 	    {
 	      m[i][j] = new int[3];
 	    }
 	}
+
+      // for (int i=0; i<N_transforms; i++)
+      // 	{
+      // 	  for (int j=0; j<N_final; j++)
+      // 	    {
+      // 	      m[i][j] = new int[3];
+      // 	    }
+      // 	}
 
       // initialize the map to zero
       for (int i=0; i<N_transforms; i++)
@@ -130,7 +134,7 @@ void mapper::destroy_map()
 	    {
 	      delete[] m[i][j];
 	    }
-	  delete [] m[i];
+	  delete[] m[i];
 	}
       delete[] m;
       m = nullptr;
@@ -174,6 +178,9 @@ int mapper::prepare_mapping()
 
   btree_transforms diff_tr = state_diff(initial_st,final_st);
 
+  // destroy the map if it already exists
+  destroy_map();
+  
   N_initial = prev_bt.total_size();
   N_final = next_bt.total_size();
   N_transforms = static_cast<int>(diff_tr.size());
@@ -302,7 +309,7 @@ int mapper::prepare_mapping()
 	  // loop over the next leaves
 	  for (string leaf : next_leaves)
 	    {
-
+	      cout << "leaf = " << leaf << endl;
 	      if (leaf == l_d_lmax_next)
 		{
 
@@ -322,24 +329,35 @@ int mapper::prepare_mapping()
 
 		  topo_next = next_bt.get_leaf_topo(leaf);
 
-		  for (int j=0; j<(topo_next.end-topo_next.start+1); j++)
+		  // replication was completed by the transform
+		  if ((topo_next.start_link == topo_next.end) &&
+		      (topo_next.end_link == topo_next.start))
 		    {
-		      m[i_trans][topo_next.start+j][0] = topo_next.start + j; // mono in next state
-		      m[i_trans][topo_next.start+j][1] = (topo_next.start_link + 1) + j; // mono in prev state
-		      m[i_trans][topo_next.start+j][2] = -1; // direction
-		    }
 
-		  // apply reverse direction to matching strand
-		  for (int j=(topo_next.start_link+1); j<(topo_next.end_link); j++)
+		    }
+		  else // replication was not completed
 		    {
-		      for (int k=0; k<N_new[i_trans]; k++)
+		      
+		      for (int j=0; j<(topo_next.end-topo_next.start+1); j++)
 			{
-			  if ((m[i_trans][k][1] == j) && (m[i_trans][k][2] == 0))
+			  m[i_trans][topo_next.start+j][0] = topo_next.start + j; // mono in next state
+			  m[i_trans][topo_next.start+j][1] = (topo_next.start_link + 1) + j; // mono in prev state
+			  m[i_trans][topo_next.start+j][2] = -1; // direction
+			}
+
+		      // apply reverse direction to matching strand
+		      for (int j=(topo_next.start_link+1); j<(topo_next.end_link); j++)
+			{
+			  for (int k=0; k<N_new[i_trans]; k++)
 			    {
-			      m[i_trans][k][2] = 1;
-			      break;
+			      if ((m[i_trans][k][1] == j) && (m[i_trans][k][2] == 0))
+				{
+				  m[i_trans][k][2] = 1;
+				  break;
+				}
 			    }
 			}
+		      
 		    }
 		  
 		}
@@ -366,7 +384,7 @@ int mapper::prepare_mapping()
 	  // loop over the next leaves
 	  for (string leaf : next_leaves)
 	    {
-
+	      cout << "leaf = " << leaf << endl;
 	      if (leaf == l_d_lmax_next)
 		{
 
@@ -387,32 +405,43 @@ int mapper::prepare_mapping()
 		  topo_next = next_bt.get_leaf_topo(leaf);
 		  topo_prev = prev_bt.get_leaf_topo(r_d_lmax_prev);
 
-		  start_link_offset = topo_prev.start_link - topo_next.start_link;
-		  end_link_offset = topo_next.end_link - topo_prev.end_link;
-
-		  for (int j=0; j<(topo_next.end-end_link_offset+1-(topo_next.start+start_link_offset)); j++)
+		  // replication was completed by the transform
+		  if ((topo_next.start_link == topo_next.end) &&
+		      (topo_next.end_link == topo_next.start))
 		    {
-		      m[i_trans][(topo_next.start+start_link_offset)+j][0] = (topo_next.start+start_link_offset) + j;
-		      m[i_trans][(topo_next.start+start_link_offset)+j][1] = topo_prev.start + j;
-		      m[i_trans][(topo_next.start+start_link_offset)+j][2] = 0;
+
 		    }
-
-		  // replication fork traveling negtive direction along monomers towards ter
-		  for (int j=0; j<start_link_offset; j++)
+		  else // replication was not completed
 		    {
-		      m[i_trans][topo_next.start+j][0] = topo_next.start + j;
-		      m[i_trans][topo_next.start+j][1] = topo_next.start_link + j;
-		      m[i_trans][topo_next.start+j][2] = -1;
-		      m[i_trans][topo_next.start_link+j][2] = 1;
-		    }
 
-		  // replication fork traveling positive direction along monomers towards ter
-		  for (int j=0; j<end_link_offset; j++)
-		    {
-		      m[i_trans][topo_next.end-end_link_offset+j+1][0] = topo_next.end-end_link_offset + j + 1;
-		      m[i_trans][topo_next.end-end_link_offset+j+1][1] = topo_prev.end_link + j - 1;
-		      m[i_trans][topo_next.end-end_link_offset+j+1][2] = -1;
-		      m[i_trans][topo_prev.end_link+j-1][2] = 1;
+		      start_link_offset = topo_prev.start_link - topo_next.start_link;
+		      end_link_offset = topo_next.end_link - topo_prev.end_link;
+
+		      for (int j=0; j<(topo_next.end-end_link_offset+1-(topo_next.start+start_link_offset)); j++)
+			{
+			  m[i_trans][(topo_next.start+start_link_offset)+j][0] = (topo_next.start+start_link_offset) + j;
+			  m[i_trans][(topo_next.start+start_link_offset)+j][1] = topo_prev.start + j;
+			  m[i_trans][(topo_next.start+start_link_offset)+j][2] = 0;
+			}
+
+		      // replication fork traveling negtive direction along monomers towards ter
+		      for (int j=0; j<start_link_offset; j++)
+			{
+			  m[i_trans][topo_next.start+j][0] = topo_next.start + j;
+			  m[i_trans][topo_next.start+j][1] = topo_next.start_link + j;
+			  m[i_trans][topo_next.start+j][2] = -1;
+			  m[i_trans][topo_next.start_link+j][2] = 1;
+			}
+
+		      // replication fork traveling positive direction along monomers towards ter
+		      for (int j=0; j<end_link_offset; j++)
+			{
+			  m[i_trans][topo_next.end-end_link_offset+j+1][0] = topo_next.end-end_link_offset + j + 1;
+			  m[i_trans][topo_next.end-end_link_offset+j+1][1] = topo_prev.end_link + j - 1;
+			  m[i_trans][topo_next.end-end_link_offset+j+1][2] = -1;
+			  m[i_trans][topo_prev.end_link+j-1][2] = 1;
+			}
+		      
 		    }
 		  
 		}

@@ -19,7 +19,7 @@ load_ribo_coords:/mnt/HDD_linux/Data/sc_chains/1000mono_testcase_100ribos/x_obst
 set_initial_state
 
 #transform the current state and print
-transform:m_cw100_ccw100
+transform:m_cw400_ccw400
 transform:ml_cw50_ccw50
 transform:mlr_cw30_ccw30
 transform:mll_cw20_ccw20
@@ -29,6 +29,12 @@ transform:mlr_cw10_ccw10
 set_final_state
 
 write_mono_xyz:/home/ben/Workspace/btree_chromo/test_case/mono_before.xyz
+
+map_replication
+
+set_initial_state
+transform:m_cw80_ccw80
+set_final_state
 
 map_replication
 

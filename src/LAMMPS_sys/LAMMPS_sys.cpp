@@ -513,16 +513,16 @@ void LAMMPS_sys::apply_mono_mapping(vector<vector<array<int,3>>> map)
       mono_atoms.set_N(N_new);
       mono_ellipsoids.set_N(N_new);
 
-      cout << "N_old = " << N_old << endl;
-      cout << "N_new = " << N_new << endl;
+      // cout << "N_old = " << N_old << endl;
+      // cout << "N_new = " << N_new << endl;
       
 
       for (int i=0; i<N_new; i++)
 	{
 
-	  cout << map[i_trans][i][0] << "\t"
-	       << map[i_trans][i][1] << "\t"
-	       << map[i_trans][i][2] << endl;
+	  // cout << map[i_trans][i][0] << "\t"
+	  //      << map[i_trans][i][1] << "\t"
+	  //      << map[i_trans][i][2] << endl;
 
 	  // store the previous atom and ellipsoid
 	  t_a = temp_atoms.get_atom(map[i_trans][i][1]);
