@@ -469,6 +469,103 @@ int LAMMPS_sys::read_bdry_coords(string coords_filename, string order)
 }
 
 
+// apply mapping to the monomers
+void LAMMPS_sys::apply_mono_mapping(vector<vector<array<int,3>>> map)
+{
+  int N_trans, N_old, N_new;
+
+  atom_array temp_atoms;
+  ellipsoid_array temp_ellipsoids;
+  atom t_a;
+  ellipsoid t_e;
+  vec uy = vqm.v_new(0.0,1.0,0.0);
+  vec t_r;
+  quat t_q;
+  
+  N_trans = static_cast<int>(map.size());
+
+  for (int i_trans=0; i_trans<N_trans; i_trans++)
+    {
+
+      N_old = mono_atoms.get_N();
+
+      // store current atoms in temporary array
+      temp_atoms.set_N(N_old);
+
+      // set the elements of the temp array to the current monomers
+      for (int j=0; j<mono_atoms.get_N(); j++)
+	{
+	  temp_atoms.set_atom(j,mono_atoms.get_atom(j));
+	}
+
+      // store current ellipsoids in temporary array
+      temp_ellipsoids.set_N(N_old);
+
+      // set the elements of the temp array to the current monomers
+      for (int j=0; j<mono_ellipsoids.get_N(); j++)
+	{
+	  temp_ellipsoids.set_ellipsoid(j,mono_ellipsoids.get_ellipsoid(j));
+	}
+
+
+      // resize the atom and ellipsoid arrays
+      N_new = static_cast<int>(map[i_trans].size());
+      mono_atoms.set_N(N_new);
+      mono_ellipsoids.set_N(N_new);
+
+      cout << "N_old = " << N_old << endl;
+      cout << "N_new = " << N_new << endl;
+      
+
+      for (int i=0; i<N_new; i++)
+	{
+
+	  cout << map[i_trans][i][0] << "\t"
+	       << map[i_trans][i][1] << "\t"
+	       << map[i_trans][i][2] << endl;
+
+	  // store the previous atom and ellipsoid
+	  t_a = temp_atoms.get_atom(map[i_trans][i][1]);
+	  t_e = temp_ellipsoids.get_ellipsoid(map[i_trans][i][1]);
+
+
+	  if (map[i_trans][i][2] != 0)
+	    {
+	      
+	      if (map[i_trans][i][2] == 1)
+		{
+
+		  t_r = vqm.v_ax(1.0*BD_l.mono_shape.y/2.0,uy);
+
+		}
+	      else if(map[i_trans][i][2] == -1)
+		{
+
+		  t_r = vqm.v_ax(-1.0*BD_l.mono_shape.y/2.0,uy);
+
+		}
+
+	      t_q = vqm.v_to_q(t_r);
+	      t_q = vqm.q_mult(t_q,vqm.q_conj(vqm.q_norm(t_e.q)));
+	      t_q = vqm.q_mult(vqm.q_norm(t_e.q),t_q);
+	      t_r = vqm.q_to_v(t_q);
+
+	      t_a.r = vqm.v_xpy(t_a.r,t_r);
+	      
+	    }
+	  
+	  // set the atom array to the mapped elements
+	  mono_atoms.set_atom(map[i_trans][i][0],t_a);
+
+	  // set the ellipsoid array to the mapped elements
+	  mono_ellipsoids.set_ellipsoid(map[i_trans][i][0],t_e);
+	  
+	}
+      
+    }
+}
+
+
 // write the system to a data file
 void LAMMPS_sys::write_data(string data_filename)
 {

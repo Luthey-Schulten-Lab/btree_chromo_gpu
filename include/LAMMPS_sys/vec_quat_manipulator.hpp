@@ -53,6 +53,9 @@ public:
   quat q_mult(quat q, quat p);
   quat q_conj(quat q);
 
+  quat v_to_q(vec v);
+  vec q_to_v(quat q);
+
 private:
   
 };

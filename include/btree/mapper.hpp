@@ -20,7 +20,7 @@ public:
   // prepare the mapping
   int prepare_mapping();
 
-  vector<vector<int[3]>> get_map();
+  vector<vector<array<int,3>>> get_map();
 
 private:
 

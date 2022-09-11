@@ -456,3 +456,35 @@ int mapper::prepare_mapping()
   return 0;
   
 }
+
+
+// get the map
+vector<vector<array<int,3>>> mapper::get_map()
+{
+  vector<vector<array<int,3>>> map;
+  vector<array<int,3>> map_per_transform;
+  array<int,3> map_element;
+
+  for (int i_trans=0; i_trans<N_transforms; i_trans++)
+    {
+
+      map_per_transform.clear();
+
+      for (int i=0; i<N_new[i_trans]; i++)
+	{
+
+	  map_element[0] = m[i_trans][i][0];
+	  map_element[1] = m[i_trans][i][1];
+	  map_element[2] = m[i_trans][i][2];
+
+	  map_per_transform.push_back(map_element);
+	  
+	}
+
+      map.push_back(map_per_transform);
+      
+    }
+
+  return map;
+  
+}

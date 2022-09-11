@@ -16,18 +16,23 @@ load_mono_coords:/mnt/HDD_linux/Data/sc_chains/1000mono_testcase_100ribos/x_chai
 #load_ribo_coords:/home/ben/Data/sc_chains/1000mono_testcase_100ribos/x_obst_1000mono_testcase_100ribos_rep00001.bin,row
 load_ribo_coords:/mnt/HDD_linux/Data/sc_chains/1000mono_testcase_100ribos/x_obst_1000mono_testcase_100ribos_rep00001.bin,row
 
-#write a LAMMPS data file
-write_LAMMPS_data:/home/ben/Workspace/btree_chromo/test_case/data.test
-
 set_initial_state
 
 #transform the current state and print
 transform:m_cw100_ccw100
 transform:ml_cw50_ccw50
 transform:mlr_cw30_ccw30
+transform:mll_cw20_ccw20
+transform:mlrr_cw10_ccw10
+transform:mlr_cw10_ccw10
 
 set_final_state
 
+write_mono_xyz:/home/ben/Workspace/btree_chromo/test_case/mono_before.xyz
+
 map_replication
 
-write_mono_xyz:/home/ben/Workspace/btree_chromo/test_case/mono_before.xyz
+write_mono_xyz:/home/ben/Workspace/btree_chromo/test_case/mono_after.xyz
+
+#write a LAMMPS data file
+write_LAMMPS_data:/home/ben/Workspace/btree_chromo/test_case/data.test

@@ -816,6 +816,8 @@ int btree_driver::map_replication(drctv_reqs &reqs)
       return 1;
     }
   int e = driver_mapper.prepare_mapping();
+
+  driver_lmp_sys.apply_mono_mapping(driver_mapper.get_map());
   return e;
 }
 

@@ -182,3 +182,20 @@ quat vec_quat_manipulator::q_inv(quat q)
 {
   return q_ax(1.0/q_L2(q),q_conj(q));
 }
+
+
+// conversions
+
+// convert a vector to a quaternion
+quat vec_quat_manipulator::v_to_q(vec v)
+{
+  quat q = q_null();
+  q.v = v;
+  return q;
+}
+
+// convert a quaternion to a vector
+vec vec_quat_manipulator::q_to_v(quat q)
+{
+  return q.v;
+}
