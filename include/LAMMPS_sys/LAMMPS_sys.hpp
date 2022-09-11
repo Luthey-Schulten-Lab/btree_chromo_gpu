@@ -50,6 +50,9 @@ public:
   // read the bdry coordinates
   int read_bdry_coords(string coords_filename, string order);
 
+  // read the monomer coordinates
+  void write_mono_xyz(string data_filename);
+
   // write the data
   void write_data(string data_filename);
   

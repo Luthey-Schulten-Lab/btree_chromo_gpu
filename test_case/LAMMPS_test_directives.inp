@@ -19,12 +19,15 @@ load_ribo_coords:/mnt/HDD_linux/Data/sc_chains/1000mono_testcase_100ribos/x_obst
 #write a LAMMPS data file
 write_LAMMPS_data:/home/ben/Workspace/btree_chromo/test_case/data.test
 
+set_initial_state
+
 #transform the current state and print
 transform:m_cw100_ccw100
-set_initial_state
 transform:ml_cw50_ccw50
 transform:mlr_cw30_ccw30
 
 set_final_state
 
 map_replication
+
+write_mono_xyz:/home/ben/Workspace/btree_chromo/test_case/mono_before.xyz

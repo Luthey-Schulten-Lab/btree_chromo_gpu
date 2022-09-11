@@ -284,3 +284,38 @@ void atom_array::write(fstream &data_file)
     }
   
 }
+
+
+// write the boundary coordinates to an xyz file
+void atom_array::write_xyz(string data_filename)
+{
+
+  // begin writing data file
+  
+  fstream data_file;
+
+  data_file.open(data_filename, ios::out);
+
+  if (!data_file)
+    {
+      cout << "ERROR: file not opened in write_xyz" << endl;
+    }
+  else
+    {
+
+      // write system summary
+      data_file << N << "\n" << endl;
+
+      for (int i=0; i<N; i++)
+	{
+	  data_file << "C\t"
+		    << atoms[i].r.x << "\t"
+		    << atoms[i].r.y << "\t"
+		    << atoms[i].r.z << endl;
+	}
+      
+    }
+
+  data_file.close();
+  
+}

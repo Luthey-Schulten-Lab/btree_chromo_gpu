@@ -435,15 +435,15 @@ int mapper::prepare_mapping()
 
 	}
 
-      for (int k=0; k<N_new[i_trans]; k++)
-	{
-	  cout << k << " : "
-	       << m[i_trans][k][0] << ","
-	       << m[i_trans][k][1] << ","
-	       << m[i_trans][k][2] << endl;
-	}
+      // for (int k=0; k<N_new[i_trans]; k++)
+      // 	{
+      // 	  cout << k << " : "
+      // 	       << m[i_trans][k][0] << ","
+      // 	       << m[i_trans][k][1] << ","
+      // 	       << m[i_trans][k][2] << endl;
+      // 	}
 
-      cout << "\n" << endl;
+      // cout << "\n" << endl;
 
       // set the previous binary tree state to the next state
       prev_bt.prepare_state(next_bt.dump_state());

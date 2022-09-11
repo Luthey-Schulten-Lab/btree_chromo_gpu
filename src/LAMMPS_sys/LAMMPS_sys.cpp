@@ -529,3 +529,10 @@ void LAMMPS_sys::write_data(string data_filename)
     }
   
 }
+
+
+// write an xyz file with the monomer atoms
+void LAMMPS_sys::write_mono_xyz(string data_filename)
+{
+  mono_atoms.write_xyz(data_filename);
+}

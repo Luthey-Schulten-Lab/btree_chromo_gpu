@@ -20,6 +20,8 @@ public:
   // prepare the mapping
   int prepare_mapping();
 
+  vector<vector<int[3]>> get_map();
+
 private:
 
   // calculate the state difference

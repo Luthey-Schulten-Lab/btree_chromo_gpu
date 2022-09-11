@@ -82,6 +82,7 @@ private:
   int load_bdry_coords(vector<string> &params, drctv_reqs &reqs);
   int load_BD_lengths(vector<string> &params, drctv_reqs &reqs);
   int write_LAMMPS_data(vector<string> &params, drctv_reqs &reqs);
+  int write_mono_xyz(vector<string> &params, drctv_reqs &reqs);
 
   // mapper
   int set_initial_state(drctv_reqs &reqs);

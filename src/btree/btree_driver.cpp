@@ -293,6 +293,13 @@ int btree_driver::execute_directives()
 	}
 
 
+      // write the LAMMPS system data
+      else if (command == "write_mono_xyz")
+	{
+	  error_code = write_mono_xyz(params,reqs);
+	}
+
+
       // seed the PRNG for the replicator
       else if (command == "replicator_prng_seed")
 	{
@@ -749,6 +756,23 @@ int btree_driver::write_LAMMPS_data(vector<string> &params, drctv_reqs &reqs)
       return 1;
     }
   driver_lmp_sys.write_data(params[0]);
+  return 0;
+}
+
+
+int btree_driver::write_mono_xyz(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 1)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  if (reqs.btree_initialized == false)
+    {
+      cout << "ERROR: empty btree" << endl;
+      return 1;
+    }
+  driver_lmp_sys.write_mono_xyz(params[0]);
   return 0;
 }
 
