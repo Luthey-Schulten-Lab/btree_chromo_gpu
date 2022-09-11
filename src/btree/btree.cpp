@@ -1106,6 +1106,17 @@ void btree::dump_topology(string topo_filename, int idx)
 }
 
 
+// get the topology of a single leaf
+theta_topo btree::get_leaf_topo(string loc)
+{
+  node *branch;
+
+  branch = get_branch(loc);
+
+  return branch->topo;
+}
+
+
 // function to read chromosome regions from file
 vector<chromo_region> btree::read_regions(string rg_filename, int idx)
 {

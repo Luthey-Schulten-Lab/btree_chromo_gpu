@@ -128,6 +128,7 @@ public:
   // solve the theta structure topology
   void solve_topology();
   void dump_topology(string topo_filename, int idx);
+  theta_topo get_leaf_topo(string loc);
 
   // update the coarse-graining map based on the current state
   CG_map update_CG_map(int f_CG);
