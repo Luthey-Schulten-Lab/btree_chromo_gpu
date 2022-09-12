@@ -38,31 +38,36 @@ btree_transforms mapper::state_diff(btree_state initial_state, btree_state final
 
   btree_transforms diff_tr;
   fork_rho f_r_temp;
-  bool fork_exists;
+  bool fork_exists, fork_growth;
   
   for (fork_rho f_r_f : final_state.transforms)
     {
       
       fork_exists = false;
+      fork_growth = false;
+      // cout << "f_r_f: " << f_r_f.fork << "_cw" << f_r_f.rho_cw << "_ccw" << f_r_f.rho_ccw << endl;
       
       for (fork_rho f_r_i : initial_state.transforms)
 	{
+	  // cout << "f_r_i: " << f_r_i.fork << "_cw" << f_r_i.rho_cw << "_ccw" << f_r_i.rho_ccw << endl;
+	  
 	  if (f_r_f.fork == f_r_i.fork)
 	    {
+	      fork_exists = true;
 	      f_r_temp = f_r_f;
-	      f_r_temp.rho_cw -= f_r_i.rho_cw;
-	      f_r_temp.rho_ccw -= f_r_i.rho_ccw;
-	      if ((f_r_temp.rho_cw >= 0) || (f_r_temp.rho_ccw >= 0)) fork_exists = true;
+	      f_r_temp.rho_cw = max(0,f_r_temp.rho_cw-f_r_i.rho_cw);
+	      f_r_temp.rho_ccw = max(0,f_r_temp.rho_ccw-f_r_i.rho_ccw);
+	      // cout << f_r_temp.fork << "_cw" << f_r_temp.rho_cw << "_ccw" << f_r_temp.rho_ccw << endl;
+	      if ((f_r_temp.rho_cw > 0) || (f_r_temp.rho_ccw > 0)) fork_growth = true;
 	      break;
 	    }
+	  
 	}
 
-      if (fork_exists == false)
-	{
-	  f_r_temp = f_r_f;
-	}
+      if (fork_exists == false) f_r_temp = f_r_f;
 
-      diff_tr.push_back(f_r_temp);
+      // cout << f_r_temp.fork << "_cw" << f_r_temp.rho_cw << "_ccw" << f_r_temp.rho_ccw << endl;
+      if ((fork_exists == false) || (fork_growth == true)) diff_tr.push_back(f_r_temp);
       
     }
 
@@ -334,6 +339,8 @@ int mapper::prepare_mapping()
 		      (topo_next.end_link == topo_next.start))
 		    {
 
+		      
+		      
 		    }
 		  else // replication was not completed
 		    {
