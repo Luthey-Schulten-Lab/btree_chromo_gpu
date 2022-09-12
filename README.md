@@ -36,6 +36,14 @@ Use the testcase for an example: **./program /home/ben/Workspace/btree_chromo/te
  - dump_CG_map:CG_map_file,f_CG,idx - *dumps CG_map to CG_map_file with selected factor (f_CG) and indexing convention (idx)*
  - regions_file:regions_file,idx - *reads chromosome regions from regions_file with selected indexing convention (idx)*
  - dump_regions:regions_count_file - *updates regions counts given current state and dumps counts to regions_count_file*
+ - load_BD_lengths:BD_length_file - *reads lengths for Brownian dynamics simulation*
+ - load_mono_coords:coords_file,order - *reads binary file with monomer coordinates (doubles) using data ordering convention (row/col)*
+ - load_ribo_coords:coords_file,order - *reads binary file with ribosome coordinates (doubles) using data ordering convention (row/col)*
+ - write_LAMMPS_data:LAMMPS_data_file - *write a LAMMPS file (data.*) using the current mono, ribo, and bdry coordinates, and the current replication state for the bond/angle topology*
+ - write_mono_xyz:mono_file_xyz - *write the current monomer coordinates as an .xyz file to load into VMD*
+ - set_initial_state - *set the initial state of the mapper to the current replication state*
+ - set_final_state - *set the final state of the mapper to the current replication state*
+ - map_replication - *based on the difference in final and initial replication states, determine new monomer coordinates and add new monomers to the LAMMPS system*
 
 ## Support
 brg4@illinois.edu
