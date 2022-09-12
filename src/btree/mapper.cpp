@@ -314,7 +314,7 @@ int mapper::prepare_mapping()
 	  // loop over the next leaves
 	  for (string leaf : next_leaves)
 	    {
-	      cout << "leaf = " << leaf << endl;
+	      // cout << "leaf = " << leaf << endl;
 	      if (leaf == l_d_lmax_next)
 		{
 
@@ -391,7 +391,7 @@ int mapper::prepare_mapping()
 	  // loop over the next leaves
 	  for (string leaf : next_leaves)
 	    {
-	      cout << "leaf = " << leaf << endl;
+	      // cout << "leaf = " << leaf << endl;
 	      if (leaf == l_d_lmax_next)
 		{
 
