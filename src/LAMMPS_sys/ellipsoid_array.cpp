@@ -16,8 +16,11 @@ ellipsoid_array::~ellipsoid_array()
 // set the number of elements
 void ellipsoid_array::set_N(int N)
 {
-  this->N = N;
-  initialize_ellipsoids();
+  if (N != this->N)
+    {
+      this->N = N;
+      initialize_ellipsoids();
+    }
 }
 
 // get the number of elements

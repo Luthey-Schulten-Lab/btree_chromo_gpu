@@ -19,12 +19,12 @@ load_ribo_coords:/home/ben/Data/sc_chains/1000mono_testcase_100ribos/x_obst_1000
 set_initial_state
 
 #transform the current state and print
-transform:m_cw400_ccw400
-transform:ml_cw50_ccw50
-transform:mlr_cw30_ccw30
-transform:mll_cw20_ccw20
-transform:mlrr_cw10_ccw10
-transform:mlr_cw10_ccw10
+transform:m_cw200_ccw300
+#transform:ml_cw50_ccw50
+#transform:mlr_cw30_ccw30
+#transform:mll_cw20_ccw20
+#transform:mlrr_cw10_ccw10
+#transform:mlr_cw10_ccw10
 
 set_final_state
 
@@ -34,7 +34,7 @@ map_replication
 
 set_initial_state
 output_state:/home/ben/Workspace/btree_chromo/test_case/rep_test_before.txt
-transform:m_cw80_ccw80
+transform:m_cw300_ccw200
 set_final_state
 output_state:/home/ben/Workspace/btree_chromo/test_case/rep_test_after.txt
 

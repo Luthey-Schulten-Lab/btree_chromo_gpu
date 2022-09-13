@@ -15,12 +15,14 @@
 
 CXX      := -g++
 CXXFLAGS := -pedantic-errors -Wall -Wextra -Werror
-LDFLAGS  := -L${GCC_LIB} -lstdc++ -lm -std=c++17
+#LDFLAGS  := -L${GCC_LIB} -lstdc++ -lm -std=c++17
+LDFLAGS  := -L${GCC_LIB} -L${LAMMPS_LIB} -lstdc++ -lm -std=c++17 -llammps_twistable_BD_OMP
 BUILD    := ./build
 OBJ_DIR  := $(BUILD)/objects
 APP_DIR  := $(BUILD)/apps
 TARGET   := program
-INCLUDE  := -Iinclude/ -I${GCC_INC}
+#INCLUDE  := -Iinclude/ -I${GCC_INC}
+INCLUDE  := -Iinclude/ -I${GCC_INC} -I${LAMMPS_INC}
 SRC      :=                      \
    $(wildcard src/LAMMPS_sys/*.cpp) \
    $(wildcard src/rep_kinetics/*.cpp) \

@@ -3,9 +3,9 @@
 // constructor
 LAMMPS_sys::LAMMPS_sys()
 {
-  N_atom_types = 0;
-  N_angle_types = 0;
-  N_bond_types = 0;
+  N_atom_types = 6;
+  N_angle_types = 4;
+  N_bond_types = 1;
 }
 
 
@@ -336,6 +336,11 @@ void LAMMPS_sys::finalize_system()
   bdry_atoms.set_type_all(1);
   ribo_atoms.set_type_all(2);
   set_mono_types(3);
+
+  // set the mono, ribo, and bdry densities
+  mono_atoms.set_density_all(1.0);
+  ribo_atoms.set_density_all(1.0);
+  bdry_atoms.set_density_all(1.0);
 
   // set the ellipsoid flags for mono, ribo, and bdry atoms
   mono_atoms.set_ellipsoid_flag_all(1);

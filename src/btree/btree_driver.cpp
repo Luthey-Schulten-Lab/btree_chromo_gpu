@@ -755,6 +755,7 @@ int btree_driver::write_LAMMPS_data(vector<string> &params, drctv_reqs &reqs)
       cout << "ERROR: missing BD lengths" << endl;
       return 1;
     }
+  driver_lmp_sys.set_btree(driver_bt.dump_state());
   driver_lmp_sys.write_data(params[0]);
   return 0;
 }

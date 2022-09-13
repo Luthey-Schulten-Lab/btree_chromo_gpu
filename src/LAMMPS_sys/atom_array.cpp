@@ -16,8 +16,11 @@ atom_array::~atom_array()
 // set the number of elements
 void atom_array::set_N(int N)
 {
-  this->N = N;
-  initialize_atoms();
+  if (N != this->N)
+    {
+      this->N = N;
+      initialize_atoms();
+    }
 }
 
 // get the number of elements

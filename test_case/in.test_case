@@ -1,0 +1,136 @@
+# LAMMPS script for replicating circular DNA modeled as twistable polymers (Brackley et al., J. Chem. Phys. 2014)
+# Author: Benjamin R. Gilbert (UIUC)
+# Email: brg4@illinois.edu
+
+############################################
+# variables specifying simulation protocol #
+############################################
+
+# variable with number of processors for OMP
+variable nProc internal 20
+
+# directory with DNA model files (properties, parameters, and basic routines)
+variable DNA_model_dir string /home/ben/Workspace/btree_chromo/LAMMPS_DNA_model/
+
+# input files for initial conditions
+variable input_dir string ./ # input directory
+variable input_file_label string test # label for input files
+
+# output files
+variable output_dir string ./ # output directory
+variable output_file_label string test # label for output files
+
+# RNG seeds
+variable rng_seed internal 111111 # RNG seed of form XXXXXX
+
+# run length and timestep
+variable steps internal 100000 # steps following minimization
+variable delta_t internal 1.0E+5 # timestep size [fs]
+
+# compute and dump frequencies
+variable T_freq_m internal 1000 # thermo freq during minimization
+variable D_freq_m internal 1000 # dump freq during minimization
+variable T_freq_r internal 10000 # thermo freq during run
+variable D_freq_r internal 10000 # dump freq during run
+
+#################################
+# prepare LAMMPS for simulation #
+#################################
+
+package omp ${nProc} neigh yes
+
+units real
+atom_style hybrid angle ellipsoid
+boundary p p p
+atom_modify id yes map hash
+
+#######################################
+# create system state from input file #
+#######################################
+
+print """
+---------------------
+---[ Input State ]---
+---------------------
+"""
+
+variable input_file string ${input_dir}data.${input_file_label}
+print "INITIAL CONDITIONS: ${input_file}"
+variable output_file string ${output_dir}${output_file_label}
+print "OUTPUT FILE LABELS: ${output_file}"
+
+# read the specified input file to prepare the system
+read_data ${input_file}
+
+# include file with DNA physical parameters
+include ${DNA_model_dir}lmp.DNA_physical_params
+
+# create springs to hold the boundary
+variable bdry_spring equal 10.0*${kBT}
+fix bdrySpring bdry spring/self ${bdry_spring}
+
+#######################
+# minimize the system #
+#######################
+
+# include file with minimization subroutine
+include ${DNA_model_dir}subroutine.min_HarmonicSoft_HarmonicWCA_FENEWCA
+
+####################################################
+# set the DNA twistable polymer model prior to run #
+####################################################
+
+# include file with DNA model with FENE potentials forbidding strand crossings
+include ${DNA_model_dir}lmp.twistable_DNA_model_FENE_omp
+
+# set the neighbor type
+neighbor ${r_ribo} bin
+neigh_modify every 1 delay 5 check yes page 100000 exclude type 1 1
+
+
+######################################
+# fix commands for Brownian dynamics #
+######################################
+
+# BD fix for DNA
+fix dnaBD DNA brownian/asphere/omp ${T} ${rng_seed} &
+gamma_r_eigen ${gamma_r_mono} ${gamma_r_mono} ${gamma_r_mono} &
+gamma_t_eigen ${gamma_t_mono} ${gamma_t_mono} ${gamma_t_mono}
+
+# BD fix for ribosomes
+fix ribosBD ribos brownian/asphere/omp ${T} ${rng_seed} &
+gamma_r_eigen ${gamma_r_ribo} ${gamma_r_ribo} ${gamma_r_ribo} &
+gamma_t_eigen ${gamma_t_ribo} ${gamma_t_ribo} ${gamma_t_ribo}
+
+#################################
+# computes performed during run #
+#################################
+
+# include file with computes and logging for MSD
+include ${DNA_model_dir}subroutine.MSD_logging
+
+# compute to calculate orientations
+compute quat DNAribos property/atom quatw quati quatj quatk
+
+##########################
+# thermo and dump styles #
+##########################
+
+# set custom thermo style
+thermo		${T_freq_r}
+thermo_style custom step &
+epair ebond eangle c_angleE[1] c_angleE[2] c_angleE[3] &
+c_dnaMSD[4] c_ribosMSD[4]
+
+# set custom dump style
+dump            dumplammpstrj all custom ${D_freq_r} ${output_file}.lammpstrj id type x y z c_quat[*]
+dump_modify     dumplammpstrj first yes
+
+##################
+# run the system #
+##################
+
+reset_timestep 0 # reset timestep following any possible minimization routines
+
+timestep	${delta_t} # set the timestep
+run		${steps} # run the system

@@ -199,7 +199,7 @@ int mapper::prepare_mapping()
   bool new_fork, daughter_found, leaf_match;
   vector<string> prev_leaves;
   vector<string> next_leaves;
-  theta_topo topo_prev, topo_next;
+  theta_topo topo_prev, topo_next, topo_special;
 
   for (int i_trans=0; i_trans<N_transforms; i_trans++)
     {
@@ -333,13 +333,20 @@ int mapper::prepare_mapping()
 		{
 
 		  topo_next = next_bt.get_leaf_topo(leaf);
+		  topo_prev = prev_bt.get_leaf_topo(l_d_lmax_prev);
 
 		  // replication was completed by the transform
 		  if ((topo_next.start_link == topo_next.end) &&
 		      (topo_next.end_link == topo_next.start))
 		    {
 
-		      
+		      for (int j=0; j<(topo_next.end-topo_next.start+1); j++)
+			{
+			  m[i_trans][topo_next.start+j][0] = topo_next.start + j; // mono in next state
+			  m[i_trans][topo_next.start+j][1] = topo_prev.start + j; // mono in prev state
+			  m[i_trans][topo_next.start+j][2] = -1; // direction
+			  m[i_trans][topo_prev.start+j][2] = 1; // direction along opposite strand
+			}
 		      
 		    }
 		  else // replication was not completed
@@ -416,6 +423,39 @@ int mapper::prepare_mapping()
 		  if ((topo_next.start_link == topo_next.end) &&
 		      (topo_next.end_link == topo_next.start))
 		    {
+
+		      topo_special = next_bt.get_leaf_topo(l_d_lmax_next);
+
+		      start_link_offset = topo_prev.start_link - topo_special.start;
+		      end_link_offset = topo_special.end - topo_prev.end_link + 1;
+		      // cout << "start_link_offset = " << start_link_offset << endl;
+		      // cout << "end_link_offset = " << end_link_offset << endl;
+
+		      for (int j=0; j<(topo_next.end-end_link_offset-(topo_next.start+start_link_offset)); j++)
+			{
+			  m[i_trans][(topo_next.start+start_link_offset)+j][0] = (topo_next.start+start_link_offset) + j;
+			  m[i_trans][(topo_next.start+start_link_offset)+j][1] = topo_prev.start + j;
+			  m[i_trans][(topo_next.start+start_link_offset)+j][2] = 0;
+			}
+
+		      // replication fork traveling negtive direction along monomers towards ter
+		      for (int j=0; j<start_link_offset; j++)
+			{
+			  m[i_trans][topo_next.start+j][0] = topo_next.start + j;
+			  m[i_trans][topo_next.start+j][1] = topo_special.start + j;
+			  m[i_trans][topo_next.start+j][2] = -1;
+			  m[i_trans][topo_special.start+j][2] = 1;
+			}
+
+		      // replication fork traveling positive direction along monomers towards ter
+		      for (int j=0; j<(end_link_offset+1); j++)
+			{
+			  m[i_trans][topo_next.end-end_link_offset+j][0] = topo_next.end-end_link_offset + j;
+			  m[i_trans][topo_next.end-end_link_offset+j][1] = topo_prev.end_link + j - 1;
+			  m[i_trans][topo_next.end-end_link_offset+j][2] = -1;
+			  m[i_trans][topo_prev.end_link+j-1][2] = 1;
+			}
+
 
 		    }
 		  else // replication was not completed
