@@ -3,6 +3,13 @@
 ## Description
 Program to model theta structures of replicating bacterial chromosomes.
 
+ - /src - *source files for program*
+ - /include - *header files for program*
+ - /test_case - *test cases to demonstrate program*
+ - /LAMMPS_src_additions - *source files to be added to LAMMPS build for DNA polymer model*
+ - /LAMMPS_DNA_model - *files to be included in LAMMPS simulations running DNA polymer model*
+ - /LAMMPS_basic_input_scripts - *basic input scripts for LAMMPS simulations of DNA polymer model*
+
 ## Installation
 
 **make all**

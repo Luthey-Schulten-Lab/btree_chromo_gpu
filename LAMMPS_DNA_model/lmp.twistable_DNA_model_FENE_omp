@@ -1,0 +1,40 @@
+# variables describing energetic parameters
+variable k_stretch equal 2.7516E-1 # [Kcal/(mol*A^2)]
+variable l_equil equal 2.0*${r_mono}
+#variable k_bend equal 13.1*${kBT} #  [Kcal/(mol*rad^2)]
+variable k_bend equal (1.374E+1)*${kBT} #  [Kcal/mol]
+variable k_twist equal (1.344E+1)*${kBT} # [Kcal/mol]
+variable k_align equal 2*${k_twist} # [Kcal/mol]
+variable FENE_scale equal 1.9E+1
+variable k_stretch_FENE equal ${FENE_scale}*${k_stretch}*4.23E-3 # [Kcal/(mol*A^2)]
+#variable R0_FENE equal 1.2*${sigma_mono_mono} # [A]
+variable R0_FENE equal ${sigma_mono_mono}*(1.0+1.0*(sqrt(2.0)-1.0)) # [A]
+variable epsilon_FENE equal ${FENE_scale}*0.11 # [Kcal/mol]
+variable sigma_FENE equal ${sigma_mono_mono} # [A]
+
+print """
+ -----------------------------------------------------
+ ---[ Twistable DNA (FENE), Energetic Parameters  ]---
+ -----------------------------------------------------
+  kBT = ${kBT} [Kcal/mol]
+  k_stretch_FENE = ${k_stretch_FENE} [Kcal/(mol*A^2)]
+  R0_FENE = ${R0_FENE} [A]
+  epsilon_FENE = ${epsilon_FENE} [Kcal/mol]
+  sigma_FENE = ${sigma_FENE} [A]
+  k_bend = ${k_bend} [Kcal/mol]
+  k_twist = ${k_twist} [Kcal/mol]
+  k_align = ${k_align} [Kcal/mol]
+"""
+
+# bond potentials
+bond_style fene/omp
+bond_coeff 1 ${k_stretch_FENE} ${R0_FENE} ${epsilon_FENE} ${sigma_FENE}
+
+# angle potentials
+angle_style   hybrid polytorsion/omp cosine/omp harmonic/omp
+angle_coeff   1 cosine/omp ${k_bend} # primary polymer chain angles
+angle_coeff   2 polytorsion/omp ${k_align} ${k_twist} # primary polymer chain twist
+angle_coeff   3 harmonic/omp ${k_bend} 120.0 # replication fork angles
+angle_coeff   4 polytorsion/omp ${k_align} ${k_twist} # replication fork twist
+
+special_bonds fene angle yes
