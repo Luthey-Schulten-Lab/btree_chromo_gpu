@@ -1033,21 +1033,64 @@ void btree::solve_topology()
 	      
 	      if (query_branch->rho_cw == 0)
 		{
+		  // determine the midpoint
 		  free_branch->topo.mid = free_branch->topo.end;
-		  free_branch->topo.start_link = mid - query_branch->rho_ccw;
+		  // determine the start link
+		  if ((mid - query_branch->rho_ccw) > link_branch->topo.start)
+		    {
+		      free_branch->topo.start_link = mid - query_branch->rho_ccw;
+		    }
+		  else
+		    {
+		      free_branch->topo.start_link = link_branch->topo.end +
+			((mid - query_branch->rho_ccw) - link_branch->topo.start);
+		    }
+		  // determine the end link
 		  free_branch->topo.end_link = mid + 1;
 		}
 	      else if (query_branch->rho_ccw == 0)
 		{
+		  // determine the midpoint
 		  free_branch->topo.mid = free_branch->topo.start;
+		  // determine the start link
 		  free_branch->topo.start_link = mid - 1;
-		  free_branch->topo.end_link = mid + query_branch->rho_cw;
+		  // determine the end link
+		  if ((mid + query_branch->rho_cw) <= link_branch->topo.end)
+		    {
+		      free_branch->topo.end_link = mid + query_branch->rho_cw;
+		    }
+		  else
+		    {
+		      free_branch->topo.end_link = (link_branch->topo.start) +
+			((mid + query_branch->rho_cw) - link_branch->topo.end);
+		    }
 		}
 	      else
 		{
-		  free_branch->topo.mid = free_branch->topo.end - query_branch->rho_cw;
-		  free_branch->topo.start_link = mid - query_branch->rho_ccw;
-		  free_branch->topo.end_link = mid + query_branch->rho_cw + 1;
+		  // determine the midpoint
+		  free_branch->topo.mid = free_branch->topo.start + query_branch->rho_ccw;
+
+		  // determine the start link
+		  if ((mid - query_branch->rho_ccw) > link_branch->topo.start)
+		    {
+		      free_branch->topo.start_link = mid - query_branch->rho_ccw;
+		    }
+		  else
+		    {
+		      free_branch->topo.start_link = link_branch->topo.end +
+			((mid - query_branch->rho_ccw) - link_branch->topo.start);
+		    }
+
+		  // determine the end link
+		  if ((mid + query_branch->rho_cw) <= link_branch->topo.end)
+		    {
+		      free_branch->topo.end_link = mid + query_branch->rho_cw;
+		    }
+		  else
+		    {
+		      free_branch->topo.end_link = (link_branch->topo.start) +
+			((mid + query_branch->rho_cw) - link_branch->topo.end);
+		    }
 		}
 
 	      if (target_size == free_branch->size - 1) free_branch->topo.end_link = free_branch->topo.start_link;
