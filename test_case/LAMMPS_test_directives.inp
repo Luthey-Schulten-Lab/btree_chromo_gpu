@@ -9,22 +9,17 @@ input_state:/home/ben/Workspace/btree_chromo/test_case/in_state_LAMMPS_test.txt
 load_BD_lengths:/home/ben/Workspace/btree_chromo/test_case/in_BD_lengths_LAMMPS_test.txt
 
 #load the monomer coordinates
-load_mono_coords:/home/ben/Data/sc_chains/1000mono_testcase_100ribos/x_chain_1000mono_testcase_100ribos_rep00001.bin,row
+load_mono_coords:/home/ben/Data/sc_chains/12mono_testcase_100ribos/x_chain_12mono_testcase_100ribos_rep00001.bin,row
 #load_mono_coords:/mnt/HDD_linux/Data/sc_chains/1000mono_testcase_100ribos/x_chain_1000mono_testcase_100ribos_rep00001.bin,row
 
 #load the ribosome coordinates
-load_ribo_coords:/home/ben/Data/sc_chains/1000mono_testcase_100ribos/x_obst_1000mono_testcase_100ribos_rep00001.bin,row
+load_ribo_coords:/home/ben/Data/sc_chains/12mono_testcase_100ribos/x_obst_12mono_testcase_100ribos_rep00001.bin,row
 #load_ribo_coords:/mnt/HDD_linux/Data/sc_chains/1000mono_testcase_100ribos/x_obst_1000mono_testcase_100ribos_rep00001.bin,row
 
 set_initial_state
 
 #transform the current state and print
-transform:m_cw100_ccw100
-#transform:ml_cw50_ccw50
-#transform:mlr_cw30_ccw30
-#transform:mll_cw20_ccw20
-#transform:mlrr_cw10_ccw10
-#transform:mlr_cw10_ccw10
+transform:m_cw7_ccw1
 
 set_final_state
 
@@ -34,7 +29,7 @@ map_replication
 
 set_initial_state
 output_state:/home/ben/Workspace/btree_chromo/test_case/rep_test_before.txt
-transform:m_cw300_ccw300
+transform:m_cw1_ccw2
 set_final_state
 output_state:/home/ben/Workspace/btree_chromo/test_case/rep_test_after.txt
 
