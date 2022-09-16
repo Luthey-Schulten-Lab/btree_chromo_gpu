@@ -15,19 +15,19 @@ int main(int argc, char *argv[])
 
   string drctv_filename(argv[argc-1]);
 
-  // driver.read_directives("/home/ben/Workspace/btree_chromo/test_case/directives.inp");
+  // read the directives from the directive file
   driver.read_directives(drctv_filename);
+
+  // print the directives to be executed
   driver.print_directives();
 
+  // execute the directives
   error_code = driver.execute_directives();
 
   if (error_code != 0)
     {
       cout << "error during directive execution" << endl;
     } 
-
-  
-  // program::foo();
 
   return 0;
 }

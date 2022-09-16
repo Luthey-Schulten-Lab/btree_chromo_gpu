@@ -313,11 +313,14 @@ int mapper::prepare_mapping()
       if (new_fork == true)
 	{
 	  cout << "new leaf will be created" << endl;
+	  
 	  // loop over the next leaves
 	  for (string leaf : next_leaves)
 	    {
 	      // cout << "leaf = " << leaf << endl;
-	      if (leaf == l_d_lmax_next)
+	      
+	      if (leaf == l_d_lmax_next) // leaf is leftmost descendant of left daughter at growth fork
+		
 		{
 
 		  topo_next = next_bt.get_leaf_topo(leaf);
@@ -333,7 +336,9 @@ int mapper::prepare_mapping()
 		    }
 
 		}
-	      else if (leaf == r_d_lmax_next)
+	      
+	      else if (leaf == r_d_lmax_next) // leaf is leftmost descendant of right daughter at growth fork
+		
 		{
 
 		  topo_next = next_bt.get_leaf_topo(leaf);
@@ -355,7 +360,9 @@ int mapper::prepare_mapping()
 			}
 		      
 		    }
+		  
 		  else // replication was not completed
+		    
 		    {
 		      
 		      for (int j=0; j<(topo_next.end-topo_next.start+1); j++)
@@ -393,10 +400,12 @@ int mapper::prepare_mapping()
 			  m[i_trans][prev_mono][2] = 1; // direction along opposite strand
 			}
 		      
-		    }
+		    } // end conditional for replication completion
 		  
 		}
-	      else
+	      
+	      else // leaf is not subject to monomer additions
+		
 		{
 
 		  topo_next = next_bt.get_leaf_topo(leaf);
@@ -411,19 +420,23 @@ int mapper::prepare_mapping()
 		      m[i_trans][next_mono][2] = 0; // direction
 		    }
 
-		}
+		} // end conditional leaf type
 
-	    }
+	    } // end loop over new leaves
 
-	}
-      else
+	} 
+      
+      else // no new leaf was created
+	
 	{
 	  cout << "no new leaf will be created" << endl;
 	  // loop over the next leaves
 	  for (string leaf : next_leaves)
 	    {
 	      // cout << "leaf = " << leaf << endl;
-	      if (leaf == l_d_lmax_next)
+	      
+	      if (leaf == l_d_lmax_next) // leaf is leftmost descendant of left daughter at growth fork
+		
 		{
 
 		  topo_next = next_bt.get_leaf_topo(leaf);
@@ -439,7 +452,9 @@ int mapper::prepare_mapping()
 		    }
 
 		}
-	      else if (leaf == r_d_lmax_next)
+	      
+	      else if (leaf == r_d_lmax_next) // leaf is leftmost descendant of right daughter at growth fork
+		
 		{
 
 		  topo_next = next_bt.get_leaf_topo(leaf);
@@ -452,87 +467,120 @@ int mapper::prepare_mapping()
 
 		      topo_special = next_bt.get_leaf_topo(l_d_lmax_next);
 
-		      start_link_offset = topo_prev.start_link - topo_special.start;
-		      end_link_offset = topo_special.end - topo_prev.end_link + 1;
-		      cout << "start_link_offset = " << start_link_offset << endl;
-		      cout << "end_link_offset = " << end_link_offset << endl;
-
-		      for (int j=0; j<(topo_next.end-end_link_offset-(topo_next.start+start_link_offset)); j++)
+		      // ccw not past ter and cw not past ter in prev leaf
+		      if ((topo_prev.start_link <= topo_special.mid) && (topo_prev.end_link > topo_special.mid))
 			{
-			  prev_mono = topo_prev.start + j;
-			  next_mono = (topo_next.start+start_link_offset) + j;
-			  m[i_trans][next_mono][0] = next_mono; // mono in next state
-			  m[i_trans][next_mono][1] = prev_mono; // mono in prev state
-			  m[i_trans][next_mono][2] = 0; // direction
-			}
 
-		      // replication fork traveling negtive direction along monomers towards ter
-		      for (int j=0; j<start_link_offset; j++)
-			{
-			  prev_mono = topo_special.start + j;
-			  next_mono = topo_next.start + j;
-			  m[i_trans][next_mono][0] = next_mono; // mono in next state
-			  m[i_trans][next_mono][1] = prev_mono; // mono in prev state
-			  m[i_trans][next_mono][2] = -1; // direction
-			  m[i_trans][prev_mono][2] = 1; // direction along opposite strand
-			}
+			  start_link_offset = topo_prev.start_link - topo_special.start;
+			  end_link_offset = topo_special.end - topo_prev.end_link + 1;
+			  cout << "start_link_offset = " << start_link_offset << endl;
+			  cout << "end_link_offset = " << end_link_offset << endl;
 
-		      // replication fork traveling positive direction along monomers towards ter
-		      for (int j=0; j<(end_link_offset+1); j++)
-			{
-			  prev_mono = topo_prev.end_link + j - 1;
-			  next_mono = topo_next.end-end_link_offset + j;
-			  m[i_trans][next_mono][0] = next_mono; // mono in next state
-			  m[i_trans][next_mono][1] = prev_mono; // mono in prev state
-			  m[i_trans][next_mono][2] = -1; // direction
-			  m[i_trans][prev_mono][2] = 1; // direction along opposite strand
-			}
+			  for (int j=0; j<(topo_next.end-end_link_offset-(topo_next.start+start_link_offset)); j++)
+			    {
+			      prev_mono = topo_prev.start + j;
+			      next_mono = (topo_next.start+start_link_offset) + j;
+			      m[i_trans][next_mono][0] = next_mono; // mono in next state
+			      m[i_trans][next_mono][1] = prev_mono; // mono in prev state
+			      m[i_trans][next_mono][2] = 0; // direction
+			    }
 
+			  // replication fork traveling negtive direction along monomers towards ter
+			  for (int j=0; j<start_link_offset; j++)
+			    {
+			      prev_mono = topo_special.start + j;
+			      next_mono = topo_next.start + j;
+			      m[i_trans][next_mono][0] = next_mono; // mono in next state
+			      m[i_trans][next_mono][1] = prev_mono; // mono in prev state
+			      m[i_trans][next_mono][2] = -1; // direction
+			      m[i_trans][prev_mono][2] = 1; // direction along opposite strand
+			    }
 
-		    }
-		  else // replication was not completed
-		    {
-
-		      start_link_offset = topo_prev.start_link - topo_next.start_link;
-		      end_link_offset = topo_next.end_link - topo_prev.end_link;
-		      cout << "start_link_offset = " << start_link_offset << endl;
-		      cout << "end_link_offset = " << end_link_offset << endl;
-
-		      for (int j=0; j<(topo_next.end-end_link_offset+1-(topo_next.start+start_link_offset)); j++)
-			{
-			  prev_mono = topo_prev.start + j;
-			  next_mono = (topo_next.start+start_link_offset) + j;
-			  m[i_trans][next_mono][0] = next_mono; // mono in next state
-			  m[i_trans][next_mono][1] = prev_mono; // mono in prev state
-			  m[i_trans][next_mono][2] = 0; // direction
-			}
-
-		      // replication fork traveling negtive direction along monomers towards ter
-		      for (int j=0; j<start_link_offset; j++)
-			{
-			  prev_mono = topo_next.start_link + j;
-			  next_mono = topo_next.start + j;
-			  m[i_trans][next_mono][0] = next_mono; // mono in next state
-			  m[i_trans][next_mono][1] = prev_mono; // mono in prev state
-			  m[i_trans][next_mono][2] = -1; // direction
-			  m[i_trans][prev_mono][2] = 1; // direction along opposite strand
-			}
-
-		      // replication fork traveling positive direction along monomers towards ter
-		      for (int j=0; j<end_link_offset; j++)
-			{
-			  prev_mono = topo_prev.end_link + j - 1;
-			  next_mono = topo_next.end-end_link_offset + j + 1;
-			  m[i_trans][next_mono][0] = next_mono; // mono in next state
-			  m[i_trans][next_mono][1] = prev_mono; // mono in prev state
-			  m[i_trans][next_mono][2] = -1; // direction
-			  m[i_trans][prev_mono][2] = 1; // direction along opposite strand
-			}
+			  // replication fork traveling positive direction along monomers towards ter
+			  for (int j=0; j<(end_link_offset+1); j++)
+			    {
+			      prev_mono = topo_prev.end_link + j - 1;
+			      next_mono = topo_next.end-end_link_offset + j;
+			      m[i_trans][next_mono][0] = next_mono; // mono in next state
+			      m[i_trans][next_mono][1] = prev_mono; // mono in prev state
+			      m[i_trans][next_mono][2] = -1; // direction
+			      m[i_trans][prev_mono][2] = 1; // direction along opposite strand
+			    }
 		      
+			}
+		      else if (topo_prev.start_link > topo_special.mid) // ccw past Ter
+			{
+			      
+			}
+		      else if (topo_prev.end_link <= topo_special.mid) // cw past ter
+			{
+		      
+			}
+
 		    }
 		  
+		  else // replication was not completed
+		    
+		    {
+
+		      topo_special = next_bt.get_leaf_topo(l_d_lmax_next);
+
+		      // ccw not past ter and cw not past ter in prev leaf
+		      if ((topo_prev.start_link <= topo_special.mid) && (topo_prev.end_link > topo_special.mid))
+			{
+
+			  start_link_offset = topo_prev.start_link - topo_next.start_link;
+			  end_link_offset = topo_next.end_link - topo_prev.end_link;
+			  cout << "start_link_offset = " << start_link_offset << endl;
+			  cout << "end_link_offset = " << end_link_offset << endl;
+
+			  for (int j=0; j<(topo_next.end-end_link_offset+1-(topo_next.start+start_link_offset)); j++)
+			    {
+			      prev_mono = topo_prev.start + j;
+			      next_mono = (topo_next.start+start_link_offset) + j;
+			      m[i_trans][next_mono][0] = next_mono; // mono in next state
+			      m[i_trans][next_mono][1] = prev_mono; // mono in prev state
+			      m[i_trans][next_mono][2] = 0; // direction
+			    }
+
+			  // replication fork traveling negtive direction along monomers towards ter
+			  for (int j=0; j<start_link_offset; j++)
+			    {
+			      prev_mono = topo_next.start_link + j;
+			      next_mono = topo_next.start + j;
+			      m[i_trans][next_mono][0] = next_mono; // mono in next state
+			      m[i_trans][next_mono][1] = prev_mono; // mono in prev state
+			      m[i_trans][next_mono][2] = -1; // direction
+			      m[i_trans][prev_mono][2] = 1; // direction along opposite strand
+			    }
+
+			  // replication fork traveling positive direction along monomers towards ter
+			  for (int j=0; j<end_link_offset; j++)
+			    {
+			      prev_mono = topo_prev.end_link + j - 1;
+			      next_mono = topo_next.end-end_link_offset + j + 1;
+			      m[i_trans][next_mono][0] = next_mono; // mono in next state
+			      m[i_trans][next_mono][1] = prev_mono; // mono in prev state
+			      m[i_trans][next_mono][2] = -1; // direction
+			      m[i_trans][prev_mono][2] = 1; // direction along opposite strand
+			    }
+		      
+			}
+		      else if (topo_prev.start_link > topo_special.mid) // ccw past Ter
+			{
+			      
+			}
+		      else if (topo_prev.end_link <= topo_special.mid) // cw past ter
+			{
+		      
+			}
+		      
+		    } // end conditionals for replication completion
+		  
 		}
-	      else
+	      
+	      else // leaf is not subject to monomer additions
+		
 		{
 
 		  topo_next = next_bt.get_leaf_topo(leaf);
@@ -547,11 +595,11 @@ int mapper::prepare_mapping()
 		      m[i_trans][next_mono][2] = 0; // direction
 		    }
 
-		}
+		} // end conditional for leaf type
 
-	    }
+	    } // end loop over leaves
 
-	}
+	} // end conditional for a new leaf
 
       for (int k=0; k<N_new[i_trans]; k++)
 	{

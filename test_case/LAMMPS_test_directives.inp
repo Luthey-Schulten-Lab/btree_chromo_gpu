@@ -34,7 +34,7 @@ map_replication
 
 set_initial_state
 output_state:/home/ben/Workspace/btree_chromo/test_case/rep_test_before.txt
-transform:m_cw100_ccw500
+transform:m_cw300_ccw300
 set_final_state
 output_state:/home/ben/Workspace/btree_chromo/test_case/rep_test_after.txt
 
