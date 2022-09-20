@@ -1071,9 +1071,9 @@ void btree::solve_topology()
 		  free_branch->topo.mid = free_branch->topo.start + query_branch->rho_ccw;
 
 		  // determine the start link
-		  if ((mid - query_branch->rho_ccw) > link_branch->topo.start)
+		  if ((mid - query_branch->rho_ccw - 1) > link_branch->topo.start)
 		    {
-		      free_branch->topo.start_link = mid - query_branch->rho_ccw;
+		      free_branch->topo.start_link = mid - query_branch->rho_ccw - 1;
 		    }
 		  else
 		    {

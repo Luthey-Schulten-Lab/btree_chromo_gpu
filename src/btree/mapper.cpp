@@ -174,11 +174,11 @@ int mapper::prepare_mapping()
   next_bt.solve_topology();
 
   // print the initial state
-  cout << "initial tree\n" << endl;
+  cout << "initial tree before transforms\n" << endl;
   prev_bt.print_tree();
 
   // print the final state
-  cout << "final tree\n" << endl;
+  cout << "final tree after transforms\n" << endl;
   next_bt.print_tree();
 
   btree_transforms diff_tr = state_diff(initial_st,final_st);
@@ -298,11 +298,11 @@ int mapper::prepare_mapping()
 	  r_d_lmax_prev = r_d_lmax_next;
 	}
 
-      cout << map_fork << endl;
-      cout << "l_d_lmax_prev = " << l_d_lmax_prev << endl;
-      cout << "r_d_lmax_prev = " << r_d_lmax_prev << endl;
-      cout << "l_d_lmax_next = " << l_d_lmax_next << endl;
-      cout << "r_d_lmax_next = " << r_d_lmax_next << endl;
+      // cout << map_fork << endl;
+      // cout << "l_d_lmax_prev = " << l_d_lmax_prev << endl;
+      // cout << "r_d_lmax_prev = " << r_d_lmax_prev << endl;
+      // cout << "l_d_lmax_next = " << l_d_lmax_next << endl;
+      // cout << "r_d_lmax_next = " << r_d_lmax_next << endl;
 
       // print the next btree
       next_bt.print_tree();
@@ -312,7 +312,7 @@ int mapper::prepare_mapping()
 
       if (new_fork == true)
 	{
-	  cout << "new leaf will be created" << endl;
+	  // cout << "new leaf will be created" << endl;
 	  
 	  // loop over the next leaves
 	  for (string leaf : next_leaves)
@@ -429,7 +429,7 @@ int mapper::prepare_mapping()
       else // no new leaf was created
 	
 	{
-	  cout << "no new leaf will be created" << endl;
+	  // cout << "no new leaf will be created" << endl;
 	  // loop over the next leaves
 	  for (string leaf : next_leaves)
 	    {
@@ -473,8 +473,8 @@ int mapper::prepare_mapping()
 
 			  start_link_offset = topo_prev.start_link - topo_special.start;
 			  end_link_offset = topo_special.end - topo_prev.end_link + 1;
-			  cout << "start_link_offset = " << start_link_offset << endl;
-			  cout << "end_link_offset = " << end_link_offset << endl;
+			  // cout << "start_link_offset = " << start_link_offset << endl;
+			  // cout << "end_link_offset = " << end_link_offset << endl;
 
 			  for (int j=0; j<(topo_next.end-end_link_offset-(topo_next.start+start_link_offset)); j++)
 			    {
@@ -598,8 +598,8 @@ int mapper::prepare_mapping()
 
 			      start_link_offset = topo_prev.start_link - topo_next.start_link;
 			      end_link_offset = topo_next.end_link - topo_prev.end_link;
-			      cout << "start_link_offset = " << start_link_offset << endl;
-			      cout << "end_link_offset = " << end_link_offset << endl;
+			      // cout << "start_link_offset = " << start_link_offset << endl;
+			      // cout << "end_link_offset = " << end_link_offset << endl;
 
 			      for (int j=0; j<(topo_next.end-end_link_offset+1-(topo_next.start+start_link_offset)); j++)
 				{
@@ -633,16 +633,99 @@ int mapper::prepare_mapping()
 				}
 
 			    }
-			  else if (topo_prev.start_link > topo_special.mid) // ccw past Ter in next leaf
+			  else if (topo_next.start_link > topo_special.mid) // ccw past Ter in next leaf
 			    {
 
-			      
+			      start_link_offset = (topo_prev.start_link - topo_special.start + 1) + (topo_special.end - topo_next.start_link);
+			      end_link_offset = topo_next.end_link - topo_prev.end_link;
+			      // cout << "start_link_offset = " << start_link_offset << endl;
+			      // cout << "end_link_offset = " << end_link_offset << endl;
+
+			      for (int j=0; j<(topo_next.end-end_link_offset+1-(topo_next.start+start_link_offset)); j++)
+				{
+				  prev_mono = topo_prev.start + j;
+				  next_mono = (topo_next.start + start_link_offset) + j;
+				  m[i_trans][next_mono][0] = next_mono; // mono in next state
+				  m[i_trans][next_mono][1] = prev_mono; // mono in prev state
+				  m[i_trans][next_mono][2] = 0; // direction
+				}
+
+			      // replication fork traveling ccw direction along monomers past Ter
+			      for (int j=0; j<start_link_offset; j++)
+				{
+				  if (j < (topo_prev.start_link - topo_special.start + 1))
+				    {
+				      prev_mono = topo_prev.start_link - j;
+				    }
+				  else
+				    {
+				      prev_mono = (topo_special.end + (topo_prev.start_link - topo_special.start + 1)) - j;
+				    }
+				  next_mono = (topo_next.start + start_link_offset - 1) - j;
+				  m[i_trans][next_mono][0] = next_mono; // mono in next state
+				  m[i_trans][next_mono][1] = prev_mono; // mono in prev state
+				  m[i_trans][next_mono][2] = -1; // direction
+				  m[i_trans][prev_mono][2] = 1; // direction along opposite strand
+				}
+
+			      // replication fork traveling cw direction along monomers towards Ter
+			      for (int j=0; j<end_link_offset; j++)
+				{
+				  prev_mono = topo_prev.end_link + j;
+				  next_mono = (topo_next.end - end_link_offset + 1) + j;
+				  m[i_trans][next_mono][0] = next_mono; // mono in next state
+				  m[i_trans][next_mono][1] = prev_mono; // mono in prev state
+				  m[i_trans][next_mono][2] = -1; // direction
+				  m[i_trans][prev_mono][2] = 1; // direction along opposite strand
+				}
 			  
 			    }
-			  else if (topo_prev.end_link <= topo_special.mid) // cw past Ter in next leaf
+			  else if (topo_next.end_link <= topo_special.mid) // cw past Ter in next leaf
 			    {
 
-			      
+			      start_link_offset = topo_prev.start_link - topo_next.start_link;
+			      end_link_offset = (topo_special.end - topo_prev.end_link + 1) + (topo_next.end_link - topo_special.start);
+			      // cout << "start_link_offset = " << start_link_offset << endl;
+			      // cout << "end_link_offset = " << end_link_offset << endl;
+
+			      for (int j=0; j<(topo_next.end-end_link_offset+1-(topo_next.start+start_link_offset)); j++)
+				{
+				  prev_mono = topo_prev.start + j;
+				  next_mono = (topo_next.start + start_link_offset) + j;
+				  m[i_trans][next_mono][0] = next_mono; // mono in next state
+				  m[i_trans][next_mono][1] = prev_mono; // mono in prev state
+				  m[i_trans][next_mono][2] = 0; // direction
+				}
+
+			      // replication fork traveling ccw direction along monomers towards Ter
+			      for (int j=0; j<start_link_offset; j++)
+				{
+				  prev_mono = (topo_prev.start_link - start_link_offset + 1) + j;
+				  next_mono = topo_next.start + j;
+				  m[i_trans][next_mono][0] = next_mono; // mono in next state
+				  m[i_trans][next_mono][1] = prev_mono; // mono in prev state
+				  m[i_trans][next_mono][2] = -1; // direction
+				  m[i_trans][prev_mono][2] = 1; // direction along opposite strand
+				}
+
+			      // replication fork traveling cw direction along monomers past Ter
+			      for (int j=0; j<end_link_offset; j++)
+				{
+				  if (j < (topo_special.end - topo_prev.end_link + 1))
+				    {
+				      prev_mono = topo_prev.end_link + j;
+				    }
+				  else
+				    {
+				      prev_mono = (topo_special.start - (topo_special.end - topo_prev.end_link + 1)) + j;
+				    }
+				  next_mono = (topo_next.end - end_link_offset + 1) + j;
+				  m[i_trans][next_mono][0] = next_mono; // mono in next state
+				  m[i_trans][next_mono][1] = prev_mono; // mono in prev state
+				  m[i_trans][next_mono][2] = -1; // direction
+				  m[i_trans][prev_mono][2] = 1; // direction along opposite strand
+				}
+
 			  
 			    }
 		      
@@ -654,8 +737,8 @@ int mapper::prepare_mapping()
 
 			  start_link_offset = topo_prev.start_link - topo_next.start_link;
 			  end_link_offset = topo_next.end_link - topo_prev.end_link;
-			  cout << "start_link_offset = " << start_link_offset << endl;
-			  cout << "end_link_offset = " << end_link_offset << endl;
+			  // cout << "start_link_offset = " << start_link_offset << endl;
+			  // cout << "end_link_offset = " << end_link_offset << endl;
 
 			  for (int j=0; j<(topo_next.end-end_link_offset+1-(topo_next.start+start_link_offset)); j++)
 			    {
@@ -687,8 +770,7 @@ int mapper::prepare_mapping()
 			      m[i_trans][next_mono][2] = -1; // direction
 			      m[i_trans][prev_mono][2] = 1; // direction along opposite strand
 			    }
-			  
-			  
+			  			  
 			}
 		      else if (topo_prev.end_link <= topo_special.mid) // cw past Ter in prev leaf
 			{
@@ -697,8 +779,8 @@ int mapper::prepare_mapping()
 
 			  start_link_offset = topo_prev.start_link - topo_next.start_link;
 			  end_link_offset = topo_next.end_link - topo_prev.end_link;
-			  cout << "start_link_offset = " << start_link_offset << endl;
-			  cout << "end_link_offset = " << end_link_offset << endl;
+			  // cout << "start_link_offset = " << start_link_offset << endl;
+			  // cout << "end_link_offset = " << end_link_offset << endl;
 
 			  for (int j=0; j<(topo_next.end-end_link_offset+1-(topo_next.start+start_link_offset)); j++)
 			    {
@@ -759,15 +841,15 @@ int mapper::prepare_mapping()
 
 	} // end conditional for a new leaf
 
-      for (int k=0; k<N_new[i_trans]; k++)
-	{
-	  cout << k << " : "
-	       << m[i_trans][k][0] << ","
-	       << m[i_trans][k][1] << ","
-	       << m[i_trans][k][2] << endl;
-	}
+      // for (int k=0; k<N_new[i_trans]; k++)
+      // 	{
+      // 	  cout << k << " : "
+      // 	       << m[i_trans][k][0] << ","
+      // 	       << m[i_trans][k][1] << ","
+      // 	       << m[i_trans][k][2] << endl;
+      // 	}
 
-      cout << "\n" << endl;
+      // cout << "\n" << endl;
 
       // set the previous binary tree state to the next state
       prev_bt.prepare_state(next_bt.dump_state());

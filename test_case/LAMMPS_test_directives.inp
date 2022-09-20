@@ -19,7 +19,7 @@ load_ribo_coords:/home/ben/Data/sc_chains/12mono_testcase_100ribos/x_obst_12mono
 set_initial_state
 
 #transform the current state and print
-transform:m_cw7_ccw1
+transform:m_cw2_ccw3
 
 set_final_state
 
@@ -29,7 +29,7 @@ map_replication
 
 set_initial_state
 output_state:/home/ben/Workspace/btree_chromo/test_case/rep_test_before.txt
-transform:m_cw1_ccw2
+transform:m_cw2_ccw3
 set_final_state
 output_state:/home/ben/Workspace/btree_chromo/test_case/rep_test_after.txt
 
