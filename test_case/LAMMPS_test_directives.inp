@@ -9,17 +9,17 @@ input_state:/home/ben/Workspace/btree_chromo/test_case/in_state_LAMMPS_test.txt
 load_BD_lengths:/home/ben/Workspace/btree_chromo/test_case/in_BD_lengths_LAMMPS_test.txt
 
 #load the monomer coordinates
-load_mono_coords:/home/ben/Data/sc_chains/12mono_testcase_100ribos/x_chain_12mono_testcase_100ribos_rep00001.bin,row
-#load_mono_coords:/mnt/HDD_linux/Data/sc_chains/1000mono_testcase_100ribos/x_chain_1000mono_testcase_100ribos_rep00001.bin,row
+#load_mono_coords:/home/ben/Data/sc_chains/12mono_testcase_100ribos/x_chain_12mono_testcase_100ribos_rep00001.bin,row
+load_mono_coords:/home/ben/Data/sc_chains/1000mono_testcase_100ribos/x_chain_1000mono_testcase_100ribos_rep00001.bin,row
 
 #load the ribosome coordinates
-load_ribo_coords:/home/ben/Data/sc_chains/12mono_testcase_100ribos/x_obst_12mono_testcase_100ribos_rep00001.bin,row
-#load_ribo_coords:/mnt/HDD_linux/Data/sc_chains/1000mono_testcase_100ribos/x_obst_1000mono_testcase_100ribos_rep00001.bin,row
+#load_ribo_coords:/home/ben/Data/sc_chains/12mono_testcase_100ribos/x_obst_12mono_testcase_100ribos_rep00001.bin,row
+load_ribo_coords:/home/ben/Data/sc_chains/1000mono_testcase_100ribos/x_obst_1000mono_testcase_100ribos_rep00001.bin,row
 
 set_initial_state
 
 #transform the current state and print
-transform:m_cw2_ccw3
+transform:m_cw100_ccw100
 
 set_final_state
 
@@ -28,8 +28,12 @@ write_mono_xyz:/home/ben/Workspace/btree_chromo/test_case/mono_before.xyz
 map_replication
 
 set_initial_state
-output_state:/home/ben/Workspace/btree_chromo/test_case/rep_test_before.txt
-transform:m_cw2_ccw3
+
+transform:m_cw50_ccw50
+transform:ml_cw75_ccw75
+#transform:mr_cw100_ccw150
+#transform:mrr_cw50_ccw50
+
 set_final_state
 output_state:/home/ben/Workspace/btree_chromo/test_case/rep_test_after.txt
 
@@ -39,3 +43,7 @@ write_mono_xyz:/home/ben/Workspace/btree_chromo/test_case/mono_after.xyz
 
 #write a LAMMPS data file
 write_LAMMPS_data:/home/ben/Workspace/btree_chromo/test_case/data.test
+
+prepare_simulator:log.test
+
+simulator_run_file:/home/ben/Workspace/btree_chromo/test_case/in.test_case

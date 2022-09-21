@@ -3,9 +3,9 @@
 // constructor
 LAMMPS_sys::LAMMPS_sys()
 {
-  N_atom_types = 6;
-  N_angle_types = 4;
-  N_bond_types = 1;
+  N_atom_types = 6; // 0 bdry, 1 ribo, 2 mono(m), 3 ori(o), 4 ter(t), 5 fork(f)
+  N_angle_types = 4; // linear m-m/o/t-m, twist m-m/o/t-m, linear m-f-m, twist m-f-m
+  N_bond_types = 1; // m/o/t-m/o/t
 }
 
 

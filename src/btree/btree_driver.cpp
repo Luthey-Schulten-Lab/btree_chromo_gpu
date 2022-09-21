@@ -293,6 +293,20 @@ int btree_driver::execute_directives()
 	}
 
 
+      // prepare the simulator
+      else if (command == "prepare_simulator")
+	{
+	  error_code = prepare_simulator(params,reqs);
+	}
+
+
+      // prepare the simulator
+      else if (command == "simulator_run_file")
+	{
+	  error_code = simulator_run_file(params,reqs);
+	}
+
+
       // write the LAMMPS system data
       else if (command == "write_mono_xyz")
 	{
@@ -820,6 +834,36 @@ int btree_driver::map_replication(drctv_reqs &reqs)
 
   driver_lmp_sys.apply_mono_mapping(driver_mapper.get_map());
   return e;
+}
+
+
+int btree_driver::prepare_simulator(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 1)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  driver_lmp_simulator.LAMMPS_initialize(params[0]);
+  reqs.simulator_prepared = true;
+  return 0;
+}
+
+
+int btree_driver::simulator_run_file(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 1)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  if (reqs.simulator_prepared == false)
+    {
+      cout << "ERROR: missing simulator" << endl;
+      return 1;
+    }
+  driver_lmp_simulator.include_file(params[0]);
+  return 0;
 }
 
 

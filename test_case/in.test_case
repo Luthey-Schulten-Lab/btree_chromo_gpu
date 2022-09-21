@@ -13,11 +13,11 @@ variable nProc internal 20
 variable DNA_model_dir string /home/ben/Workspace/btree_chromo/LAMMPS_DNA_model/
 
 # input files for initial conditions
-variable input_dir string ./ # input directory
+variable input_dir string /home/ben/Workspace/btree_chromo/test_case/ # input directory
 variable input_file_label string test # label for input files
 
 # output files
-variable output_dir string ./ # output directory
+variable output_dir string /home/ben/Workspace/btree_chromo/test_case/ # output directory
 variable output_file_label string test # label for output files
 
 # RNG seeds

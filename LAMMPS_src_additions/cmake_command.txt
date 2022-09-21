@@ -23,6 +23,9 @@ cmake -B build_twistable_OMP/ -S lammps/cmake/ -DBUILD_MPI=yes -DBUILD_OMP=yes -
 
 
 # command for only OpenMP and MPI for acceleration
+
+# home desktop
 cmake -B build_twistable_BD_OMP/ -S lammps/cmake/ -DBUILD_MPI=yes -DBUILD_OMP=yes -DLAMMPS_MACHINE=twistable_BD_OMP -DBUILD_SHARED_LIBS=yes -DCMAKE_INSTALL_PREFIX=/usr/local/Suites/LAMMPS/twistable_BD_OMP -DMPIEXEC_EXECUTABLE=/usr/local/Tools/OpenMPI/4.1.1/bin/mpicxx -DPKG_OPENMP=yes -DPKG_MOLECULE=yes -DPKG_ASPHERE=yes -DPKG_BROWNIAN=yes -DPKG_RIGID=yes -DPKG_CG-DNA=yes -DPKG_EXTRA-MOLECULE=yes -DPKG_MOLFILE=yes -DMOLFILE_INCLUDE_DIR=/usr/local/Suites/VMD/1.9.4a51/vmd/plugins/include
 
+# ZLS workstation
 cmake -B build_twistable_BD_OMP/ -S lammps/cmake/ -DBUILD_MPI=yes -DBUILD_OMP=yes -DLAMMPS_MACHINE=twistable_BD_OMP -DBUILD_SHARED_LIBS=yes -DCMAKE_INSTALL_PREFIX=/usr/local/Software/LAMMPS/twistable_BD_OMP -DMPIEXEC_EXECUTABLE=/usr/local/Libraries/OpenMPI/4.1.1/bin/mpicxx -DPKG_OPENMP=yes -DPKG_MOLECULE=yes -DPKG_ASPHERE=yes -DPKG_BROWNIAN=yes -DPKG_RIGID=yes -DPKG_CG-DNA=yes -DPKG_EXTRA-MOLECULE=yes -DPKG_MOLFILE=yes -DMOLFILE_INCLUDE_DIR=/usr/local/Software/VMD/1.9.4a55/vmd/plugins/include

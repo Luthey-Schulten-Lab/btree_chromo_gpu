@@ -5,6 +5,7 @@
 #include <btree/mapper.hpp>
 #include <rep_kinetics/replicator.hpp>
 #include <LAMMPS_sys/LAMMPS_sys.hpp>
+#include <LAMMPS_sys/LAMMPS_simulator.hpp>
 
 using namespace std;
 
@@ -18,6 +19,7 @@ struct drctv_reqs
   bool BD_lengths_present;
   bool map_initial_present;
   bool map_final_present;
+  bool simulator_prepared;
 };
 
 
@@ -89,6 +91,10 @@ private:
   int set_final_state(drctv_reqs &reqs);
   int map_replication(drctv_reqs &reqs);
 
+  // simulator
+  int prepare_simulator(vector<string> &params, drctv_reqs &reqs);
+  int simulator_run_file(vector<string> &params, drctv_reqs &reqs);
+
   /////////////
   // objects //
   /////////////
@@ -98,6 +104,7 @@ private:
   btree driver_bt;
   mapper driver_mapper;
   LAMMPS_sys driver_lmp_sys;
+  LAMMPS_simulator driver_lmp_simulator;
 
   // structs
   btree_state driver_st; // state structure

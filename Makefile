@@ -15,14 +15,25 @@
 
 CXX      := -g++
 CXXFLAGS := -pedantic-errors -Wall -Wextra -Werror
-#LDFLAGS  := -L${GCC_LIB} -lstdc++ -lm -std=c++17
-LDFLAGS  := -L${GCC_LIB} -L${LAMMPS_LIB} -lstdc++ -lm -std=c++17 -llammps_twistable_BD_OMP
+
+BASE_LDFLAGS  := -L${GCC_LIB} -lstdc++ -lm -std=c++17
+OPENMPI_LDFLAGS := -L${OpenMPI_LIB} -lmpi -pthread -Wl,-rpath -Wl,${OpenMPI_LIB} -Wl,--enable-new-dtags
+FMT_LDFLAGS := -L${fmt_LIB} -lfmt
+LAMMPS_LDFLAGS := ${LAMMPS_LIB}/liblammps_twistable_BD_OMP.so
+LDFLAGS := ${BASE_LDFLAGS} ${OPENMPI_LDFLAGS} ${FMT_LDFLAGS} ${LAMMPS_LDFLAGS}
+
+BASE_INCLUDE  := -Iinclude/ -I${GCC_INC}
+OPENMPI_INCLUDE := -I${OpenMPI_INC}
+FMT_INCLUDE := -I${fmt_INC}
+LAMMPS_INCLUDE := -I/home/ben/Software/Suites/LAMMPS/lammps/src
+INCLUDE := ${BASE_INCLUDE} ${OPENMPI_INCLUDE} ${FMT_INCLUDE} ${LAMMPS_INCLUDE}
+
 BUILD    := ./build
 OBJ_DIR  := $(BUILD)/objects
 APP_DIR  := $(BUILD)/apps
+
 TARGET   := program
-#INCLUDE  := -Iinclude/ -I${GCC_INC}
-INCLUDE  := -Iinclude/ -I${GCC_INC} -I${LAMMPS_INC}
+
 SRC      :=                      \
    $(wildcard src/LAMMPS_sys/*.cpp) \
    $(wildcard src/rep_kinetics/*.cpp) \
