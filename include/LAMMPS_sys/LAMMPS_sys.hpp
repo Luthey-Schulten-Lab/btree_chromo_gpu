@@ -58,6 +58,12 @@ public:
 
   // write the data
   void write_data(string data_filename);
+
+  // getters for the total system state
+  int get_N_total();
+
+  // setters for the total system state
+  void set_coords_arr_total(double *&x, string order);
   
 private:
 

@@ -467,6 +467,7 @@ int LAMMPS_sys::read_ribo_coords(string coords_filename, string order)
   return ribo_atoms.read_bin_coords(coords_filename,order,true);
 }
 
+
 // read the boundary coordinates - allow resizing
 int LAMMPS_sys::read_bdry_coords(string coords_filename, string order)
 {
@@ -637,4 +638,18 @@ void LAMMPS_sys::write_data(string data_filename)
 void LAMMPS_sys::write_mono_xyz(string data_filename)
 {
   mono_atoms.write_xyz(data_filename);
+}
+
+
+// get the total number of atoms in the sytem
+int LAMMPS_sys::get_N_total()
+{
+  return atoms.get_N();
+}
+
+
+// set the total coordinate array for the system
+void LAMMPS_sys::set_coords_arr_total(double *&x, string order)
+{
+  atoms.set_coords_arr(x,order);
 }

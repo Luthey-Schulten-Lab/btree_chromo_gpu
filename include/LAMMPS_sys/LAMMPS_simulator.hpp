@@ -37,6 +37,10 @@ public:
   void LAMMPS_destroy();
 
   void include_file(string filename);
+
+  void set_lmp_sys(LAMMPS_sys *lmp_sys);
+
+  void sim_to_sys();
   
 private:
 
@@ -44,7 +48,10 @@ private:
   int sim_MPI_size; // MPI size
   int sim_MPI_rank; // current MPI rank
 
+  // objects
   LAMMPS_NS::LAMMPS *lmp;
+  LAMMPS_sys *lmp_sys;
+  
   
 
 };

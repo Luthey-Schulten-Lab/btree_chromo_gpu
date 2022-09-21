@@ -300,10 +300,17 @@ int btree_driver::execute_directives()
 	}
 
 
-      // prepare the simulator
+      // run a file using the simulator
       else if (command == "simulator_run_file")
 	{
 	  error_code = simulator_run_file(params,reqs);
+	}
+
+
+      // sync the simulator and the system
+      else if (command == "sync_simulator_and_system")
+	{
+	  error_code = sync_simulator_and_system(reqs);
 	}
 
 
@@ -845,6 +852,7 @@ int btree_driver::prepare_simulator(vector<string> &params, drctv_reqs &reqs)
       return 1;
     }
   driver_lmp_simulator.LAMMPS_initialize(params[0]);
+  driver_lmp_simulator.set_lmp_sys(&driver_lmp_sys);
   reqs.simulator_prepared = true;
   return 0;
 }
@@ -863,6 +871,18 @@ int btree_driver::simulator_run_file(vector<string> &params, drctv_reqs &reqs)
       return 1;
     }
   driver_lmp_simulator.include_file(params[0]);
+  return 0;
+}
+
+
+int btree_driver::sync_simulator_and_system(drctv_reqs &reqs)
+{
+  if (reqs.simulator_prepared == false)
+    {
+      cout << "ERROR: missing simulator" << endl;
+      return 1;
+    }
+  driver_lmp_simulator.sim_to_sys();
   return 0;
 }
 

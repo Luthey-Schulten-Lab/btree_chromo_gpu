@@ -24,14 +24,14 @@ variable output_file_label string test # label for output files
 variable rng_seed internal 111111 # RNG seed of form XXXXXX
 
 # run length and timestep
-variable steps internal 100000 # steps following minimization
+variable steps internal 10000 # steps following minimization
 variable delta_t internal 1.0E+5 # timestep size [fs]
 
 # compute and dump frequencies
-variable T_freq_m internal 1000 # thermo freq during minimization
-variable D_freq_m internal 1000 # dump freq during minimization
-variable T_freq_r internal 10000 # thermo freq during run
-variable D_freq_r internal 10000 # dump freq during run
+variable T_freq_m internal 100 # thermo freq during minimization
+variable D_freq_m internal 100 # dump freq during minimization
+variable T_freq_r internal 1000 # thermo freq during run
+variable D_freq_r internal 1000 # dump freq during run
 
 #################################
 # prepare LAMMPS for simulation #
