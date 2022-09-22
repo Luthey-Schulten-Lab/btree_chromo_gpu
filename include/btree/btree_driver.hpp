@@ -95,6 +95,7 @@ private:
   int prepare_simulator(vector<string> &params, drctv_reqs &reqs);
   int simulator_run_file(vector<string> &params, drctv_reqs &reqs);
   int sync_simulator_and_system(drctv_reqs &reqs);
+  int clear_simulator(drctv_reqs &reqs);
 
   /////////////
   // objects //

@@ -37,6 +37,7 @@ public:
   void LAMMPS_destroy();
 
   void include_file(string filename);
+  void clear();
 
   void set_lmp_sys(LAMMPS_sys *lmp_sys);
 

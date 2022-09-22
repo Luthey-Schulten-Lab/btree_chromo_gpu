@@ -10,11 +10,11 @@ load_BD_lengths:/home/ben/Workspace/btree_chromo/test_case/in_BD_lengths_LAMMPS_
 
 #load the monomer coordinates
 #load_mono_coords:/home/ben/Data/sc_chains/12mono_testcase_100ribos/x_chain_12mono_testcase_100ribos_rep00001.bin,row
-load_mono_coords:/home/ben/Data/sc_chains/1000mono_testcase_100ribos/x_chain_1000mono_testcase_100ribos_rep00002.bin,row
+load_mono_coords:/home/ben/Data/sc_chains/1000mono_testcase_100ribos/x_chain_1000mono_testcase_100ribos_rep00006.bin,row
 
 #load the ribosome coordinates
 #load_ribo_coords:/home/ben/Data/sc_chains/12mono_testcase_100ribos/x_obst_12mono_testcase_100ribos_rep00001.bin,row
-load_ribo_coords:/home/ben/Data/sc_chains/1000mono_testcase_100ribos/x_obst_1000mono_testcase_100ribos_rep00002.bin,row
+load_ribo_coords:/home/ben/Data/sc_chains/1000mono_testcase_100ribos/x_obst_1000mono_testcase_100ribos_rep00006.bin,row
 
 set_initial_state
 
@@ -46,9 +46,22 @@ write_mono_xyz:/home/ben/Workspace/btree_chromo/test_case/mono_after.xyz
 #write a LAMMPS data file
 write_LAMMPS_data:/home/ben/Workspace/btree_chromo/test_case/data.test
 
-
 simulator_run_file:/home/ben/Workspace/btree_chromo/test_case/in.test_case
 
 sync_simulator_and_system
 
-write_mono_xyz:/home/ben/Workspace/btree_chromo/test_case/mono_postrun.xyz
+clear_simulator
+
+set_initial_state
+
+transform:m_cw150_ccw150
+transform:ml_cw50_ccw50
+transform:mlr_cw50_ccw50
+
+set_final_state
+
+map_replication
+
+write_LAMMPS_data:/home/ben/Workspace/btree_chromo/test_case/data.test
+
+simulator_run_file:/home/ben/Workspace/btree_chromo/test_case/in.test_case

@@ -314,6 +314,13 @@ int btree_driver::execute_directives()
 	}
 
 
+      // sync the simulator and the system
+      else if (command == "clear_simulator")
+	{
+	  error_code = clear_simulator(reqs);
+	}
+
+
       // write the LAMMPS system data
       else if (command == "write_mono_xyz")
 	{
@@ -883,6 +890,18 @@ int btree_driver::sync_simulator_and_system(drctv_reqs &reqs)
       return 1;
     }
   driver_lmp_simulator.sim_to_sys();
+  return 0;
+}
+
+
+int btree_driver::clear_simulator(drctv_reqs &reqs)
+{
+  if (reqs.simulator_prepared == false)
+    {
+      cout << "ERROR: missing simulator" << endl;
+      return 1;
+    }
+  driver_lmp_simulator.clear();
   return 0;
 }
 

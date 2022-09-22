@@ -75,6 +75,13 @@ void LAMMPS_simulator::include_file(string filename)
 }
 
 
+// clear the LAMMPS system state
+void LAMMPS_simulator::clear()
+{
+  lmp->input->one("clear");
+}
+
+
 // dump the simulation state to the system state
 void LAMMPS_simulator::sim_to_sys()
 {
