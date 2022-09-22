@@ -110,7 +110,10 @@ gamma_t_eigen ${gamma_t_ribo} ${gamma_t_ribo} ${gamma_t_ribo}
 include ${DNA_model_dir}subroutine.MSD_logging
 
 # compute to calculate orientations
-compute quat DNAribos property/atom quatw quati quatj quatk
+compute quat all property/atom quatw quati quatj quatk
+
+# compute to track ids
+compute id_track all property/atom id
 
 ##########################
 # thermo and dump styles #
@@ -123,7 +126,7 @@ epair ebond eangle c_angleE[1] c_angleE[2] c_angleE[3] &
 c_dnaMSD[4] c_ribosMSD[4]
 
 # set custom dump style
-dump            dumplammpstrj all custom ${D_freq_r} ${output_file}.lammpstrj id type x y z c_quat[*]
+dump            dumplammpstrj all custom ${D_freq_r} ${output_file}.lammpstrj id c_id_track type x y z c_quat[*]
 dump_modify     dumplammpstrj first yes
 
 ##################

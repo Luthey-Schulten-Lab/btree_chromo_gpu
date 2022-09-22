@@ -113,6 +113,57 @@ void ellipsoid_array::normalize_quats()
 }
 
 
+// set individual quaternion
+void ellipsoid_array::set_quat(int i, quat q)
+{
+  ellipsoids[i].q.w = q.w;
+  ellipsoids[i].q.v.x = q.v.x;
+  ellipsoids[i].q.v.y = q.v.y;
+  ellipsoids[i].q.v.z = q.v.z;
+}
+
+
+// set element-wise quaternions
+void ellipsoid_array::set_quats(vector<quat> qs)
+{
+  for (int i=0; i<N; i++)
+    {
+      set_quat(i,qs[i]);
+    }
+}
+
+
+// set the particle coordinates from a 1D array of doubles
+void ellipsoid_array::set_quats_arr(double *&q, string order)
+{
+
+  quat p;
+  
+  if (order == "col")
+    {
+      for (int i=0; i<N; i++)
+	{
+	  p.w = q[i];
+	  p.v.x = q[N+i];
+	  p.v.y = q[2*N+i];
+	  p.v.z = q[3*N+i];
+	  set_quat(i,p);
+	}
+    }
+  else if (order == "row")
+    {
+      for (int i=0; i<N; i++)
+	{
+	  p.w = q[3*i];
+	  p.v.z = q[3*i+1];
+	  p.v.y = q[3*i+2];
+	  p.v.z = q[3*i+3];
+	  set_quat(i,p);
+	}
+    }
+}
+
+
 // write to stream
 void ellipsoid_array::write(fstream &data_file)
 {

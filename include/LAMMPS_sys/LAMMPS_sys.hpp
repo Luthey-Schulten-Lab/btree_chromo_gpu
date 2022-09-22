@@ -61,9 +61,16 @@ public:
 
   // getters for the total system state
   int get_N_total();
+  int get_N_mono();
+  int get_N_ribo();
+  int get_N_bdry();
 
   // setters for the total system state
   void set_coords_arr_total(double *&x, string order);
+  void set_quats_arr_total(double *&q, string order);
+
+  // sync the subarrays
+  void sync_subarrays();
   
 private:
 

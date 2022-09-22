@@ -648,8 +648,78 @@ int LAMMPS_sys::get_N_total()
 }
 
 
+// get the number of mono atoms
+int LAMMPS_sys::get_N_mono()
+{
+  return mono_atoms.get_N();
+}
+
+
+// get the number of mono atoms
+int LAMMPS_sys::get_N_ribo()
+{
+  return ribo_atoms.get_N();
+}
+
+
+// get the number of mono atoms
+int LAMMPS_sys::get_N_bdry()
+{
+  return bdry_atoms.get_N();
+}
+
+
 // set the total coordinate array for the system
 void LAMMPS_sys::set_coords_arr_total(double *&x, string order)
 {
   atoms.set_coords_arr(x,order);
+}
+
+
+// set the total coordinate array for the system
+void LAMMPS_sys::set_quats_arr_total(double *&q, string order)
+{
+  ellipsoids.set_quats_arr(q,order);
+}
+
+
+// sync the subarrays with the total arrays
+void LAMMPS_sys::sync_subarrays()
+{
+  int N_mono, N_ribo, N_bdry;
+
+  N_mono = mono_atoms.get_N();
+  N_ribo = ribo_atoms.get_N();
+  N_bdry = bdry_atoms.get_N();
+  
+  // copy to mono_atoms
+  for (int i=0; i<N_mono; i++)
+    {
+      mono_atoms.set_atom(i,atoms.get_atom(i));
+    }
+
+  // copy to ribo_atoms
+  for (int i=0; i<N_ribo; i++)
+    {
+      ribo_atoms.set_atom(i,atoms.get_atom(i+N_mono));
+    }
+
+  // copy to bdry_atoms
+  for (int i=0; i<N_bdry; i++)
+    {
+      bdry_atoms.set_atom(i,atoms.get_atom(i+N_mono+N_ribo));
+    }
+
+  // copy to mono_ellipsoids
+  for (int i=0; i<N_mono; i++)
+    {
+      mono_ellipsoids.set_ellipsoid(i,ellipsoids.get_ellipsoid(i));
+    }
+
+  // copy to ribo_ellipsoids
+  for (int i=0; i<N_ribo; i++)
+    {
+      ribo_ellipsoids.set_ellipsoid(i,ellipsoids.get_ellipsoid(i+N_mono));
+    }
+  
 }

@@ -71,7 +71,6 @@ void LAMMPS_simulator::set_lmp_sys(LAMMPS_sys *lmp_sys)
 // feed an include file to LAMMPS simulation object
 void LAMMPS_simulator::include_file(string filename)
 {
-  lmp_sys->write_mono_xyz("/home/ben/Workspace/btree_chromo/test_case/test_mono_internal.xyz");
   lmp->input->one(("include " + filename).c_str());
 }
 
@@ -80,26 +79,62 @@ void LAMMPS_simulator::include_file(string filename)
 void LAMMPS_simulator::sim_to_sys()
 {
   int N = lmp_sys->get_N_total();
+  int N_mono = lmp_sys->get_N_mono();
+  int N_ribo = lmp_sys->get_N_ribo();
+  // int N_bdry = lmp_sys->get_N_bdry();
+
+  int N_mono_ribo = N_mono + N_ribo;
 
   if (N > 0)
     {
-      cout << "N_atoms = " << N << endl;
+
+      // copy the coordinates to the system state
+      
       double *coords = new double[3*N];
-  
+
+      // 1 for per-atom type, 3 for size of data (x_i,x_j,x_k)
       lammps_gather_atoms(lmp, const_cast<char*>("x"), 1, 3, coords);
 
-      cout << "finished gathering atoms" << endl;
       lmp_sys->set_coords_arr_total(coords,"row");
 
-      // need to repeat procedure with quaternions for ellipsoids
-
-      // need to separate atoms into mono_atoms, ribo_atoms, and bdry_atoms
-
-      // need to separate ellipsoids into mono_ellipsoids and ribo_ellipsoids
-      
-      lmp_sys->write_mono_xyz("/home/ben/Workspace/btree_chromo/test_case/test_mono_internal2.xyz");
-
       delete[] coords;
+
+      // copy the quaternions to the system state
+
+      // get the quats from a compute
+      void *quats_p;
+      // 1 for LMP_STYLE_ATOM, 2 for LMP_TYPE_ARRAY
+      quats_p = lammps_extract_compute(lmp,const_cast<char*>("quat"),1,2);
+      double **quats_2d{static_cast<double**>(quats_p)};
+
+      // get the ids to match up the quats
+      void *ids_p;
+      // 1 for LMP_STYLE_ATOM, 1 for LMP_TYPE_VECTOR
+      ids_p = lammps_extract_compute(lmp,const_cast<char*>("id_track"),1,1);
+      double *ids{static_cast<double*>(ids_p)};
+
+      double *quats = new double[4*N_mono_ribo];
+
+      int id;
+      for (int i=0; i<N; i++)
+	{
+	  id = int(ids[i]);
+	  if (id <= N_mono_ribo)
+	    {
+	      for (int j=0; j<4; j++)
+		{
+		  quats[4*(id-1)+j] = quats_2d[i][j];
+		}
+	    }
+	}
+
+      lmp_sys->set_quats_arr_total(quats,"row");
+
+      delete[] quats;
+
+      // sync the subarrays with the total array
+      
+      lmp_sys->sync_subarrays();
       
     }
 }
