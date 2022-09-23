@@ -6,20 +6,22 @@
 
 The program is organized in the following manner:
 
-Upon execution a **btree_driver** executes a series of directives stored in a file provided by the user (a full list of directives is provided in the 'Usage' section). The **btree_driver** contains the following objects.
-    
-    - btree - *a specialized binary tree class representing replicating circular dsDNA in nested theta structures that can only be manipulated using public member functions representing processes physically possible for circular dsDNA*
-      - determines topology when system is represented as circular(/theta structure) polymers for arbitrary replication states
-      - counts genome features at nucleotide resolution for arbitrary replication states
-      - prepares coarse-graining into chromosomal loci for contact map calculations for arbitrary replication states
+Upon execution a **btree_driver** executes a series of directives stored in a file provided by the user (a full list of directives is provided in the 'Usage' section).
 
-    - replicator - *a class containing a stochastic chemical kinetics model for DNA replication initiation due to DnaA, which then simulates trajectories in the space of replication states using the Gillespie method*
+The **btree_driver** contains the following objects.
+
+- btree - *a specialized binary tree class representing replicating circular dsDNA in nested theta structures that can only be manipulated using public member functions representing processes physically possible for circular dsDNA*
+ - determines topology when system is represented as circular(/theta structure) polymers (for arbitrary replication states)
+ - counts genome features at nucleotide resolution (for arbitrary replication states)
+ - prepares coarse-graining into chromosomal loci for contact map calculations (for arbitrary replication states)
+
+- replicator - *a class containing a stochastic chemical kinetics model for DNA replication initiation due to DnaA, which then simulates trajectories in the space of replication states using the Gillespie method*
        
-    - LAMMPS_sys - *a class storing the spatial (and other) information of a system of replicating circular dsDNA (monomers of ellipsoidal), ribosomes (ellipsoidal particles), and boundary particles (point-like particles) for use in Brownian dynamics simulations using LAMMPS*
+- LAMMPS_sys - *a class storing the spatial (and other) information of a system of replicating circular dsDNA (monomers of ellipsoidal), ribosomes (ellipsoidal particles), and boundary particles (point-like particles) for use in Brownian dynamics simulations using LAMMPS*
        
-    - mapper - *a class that governs the creation of new DNA monomers in the spatial model given an 'initial replication state' and a 'final replication state' using the train-track model of replication*
+- mapper - *a class that governs the creation of new DNA monomers in the spatial model given an 'initial replication state' and a 'final replication state' using the train-track model of replication*
        
-    - LAMMPS_simulator - *a class that runs Brownian dynamics and accessory routines using LAMMPS to simulate the spatial model*
+- LAMMPS_simulator - *a class that runs Brownian dynamics and accessory routines using LAMMPS to simulate the spatial model*
 
 Member functions of the **btree_driver** control the interactions and exchange of information between these different objects.
 
@@ -35,7 +37,7 @@ By combining a series of directives together a user could perform the following 
    8) Output the counts of genome features.
    9) Output the coarse-graining for contact map calculations.
 
-   The user now has A) a replication state halfway through the cell cycle, B) a matching spatial model, C) the counts of genome features in this replication state, and D) the coarse-graining necessary to calculate chromosome contact maps for replicating chromosomes.
+   The user now has **A)** a replication state halfway through the cell cycle, **B)** a matching spatial model, **C)** the counts of genome features in this replication state, and **D)** the coarse-graining necessary to calculate chromosome contact maps for replicating chromosomes.
 
 ## Repository directory structure
 
