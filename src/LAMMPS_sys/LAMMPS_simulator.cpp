@@ -44,8 +44,6 @@ void LAMMPS_simulator::LAMMPS_initialize(string logfile)
   int lmpargc = sizeof(lmpargv)/sizeof(const char *);
 
   lmp = new LAMMPS_NS::LAMMPS(lmpargc, (char **)lmpargv, MPI_COMM_WORLD);
-
-  cout << logfile << endl;
   
 }
 

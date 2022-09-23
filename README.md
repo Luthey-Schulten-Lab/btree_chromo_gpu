@@ -1,7 +1,41 @@
 # btree_chromo
 
 ## Description
-Program to model theta structures of replicating bacterial chromosomes.
+
+**C++ program to model theta structures of replicating bacterial chromosomes using binary trees.**
+
+The program is organized in the following manner:
+
+    Upon execution a **btree_driver** executes a series of directives stored in a file provided by the user (a full list of directives is provided in the 'Usage' section). The **btree_driver** contains the following objects.
+    
+       - btree - *a specialized binary tree class representing replicating circular dsDNA in nested theta structures that can only be manipulated using public member functions representing processes physically possible for circular dsDNA*
+       	 - determines topology when system is represented as circular(/theta structure) polymers for arbitrary replication states
+	 - counts genome features at nucleotide resolution for arbitrary replication states
+	 - prepares coarse-graining into chromosomal loci for contact map calculations for arbitrary replication states
+	 
+       - replicator - *a class containing a stochastic chemical kinetics model for DNA replication initiation due to DnaA, which then simulates trajectories in the space of replication states using the Gillespie method*
+       
+       - LAMMPS_sys - *a class storing the spatial (and other) information of a system of replicating circular dsDNA (monomers of ellipsoidal), ribosomes (ellipsoidal particles), and boundary particles (point-like particles) for use in Brownian dynamics simulations using LAMMPS*
+       
+       - mapper - *a class that governs the creation of new DNA monomers in the spatial model given an 'initial replication state' and a 'final replication state' using the train-track model of replication*
+       
+       - LAMMPS_simulator - *a class that runs Brownian dynamics and accessory routines using LAMMPS to simulate the spatial model*
+
+By combining a series of directives together a user could perform the following example protocol.
+
+   1) Define a circular chromosome of a specific size.
+   2) Read a file containing defined genome features.
+   3) Load a model of DnaA replication initiation.
+   4) Load the spatial model of a DNA structure in the polymer representation matching the specified size.
+   5) Run the replicator to determine a final replication state at halfway through the cell cycle.
+   6) Use the mapper to create new DNA monomers in the spatial model given the change in replication states.
+   7) Simulate the spatial model using Brownian dynamics in LAMMPS.
+   8) Output the counts of genome features.
+   9) Output the coarse-graining for contact map calculations.
+
+   The user now has A) a replication state halfway through the cell cycle, B) a matching spatial model, C) the counts of genome features in this replication state, and D) the coarse-graining necessary to calculate chromosome contact maps for replicating chromosomes.
+
+## Repository directory structure
 
  - /src - *source files for program*
  - /include - *header files for program*
@@ -12,13 +46,25 @@ Program to model theta structures of replicating bacterial chromosomes.
 
 ## Installation
 
-**make all**
+   1) Install **OpenMPI** - *I built v4.1.4 from source using GCC-v12.1.0*
+   2) Install **fmt Library** - *I built v9.1.0 from source using GCC-v12.1.0*
+   3) Follow instructions in '/LAMMPS_src_additions' to make the additions to the LAMMPS source code
+   4) Build and install the modified version of **LAMMPS** - *I built the 2022/02/17 release using GCC-v12.1.0*
+   5) Edit the following variables in the Makefile to match your installations from the previous steps. - *I used environment variables to specify these local installations on my machine in a bash scripts, but you can type them in manually if you would prefer.*
+      - **OPENMPI_LDFLAGS**
+      - **FMT_LDFLAGS**
+      - **LAMMPS_LDFLAGS**
+      - **OPENMPI_INCLUDE**
+      - **FMT_INCLUDE**
+      - **LAMMPS_INCLUDE**
+
+    6) **make all**
 
 The executable (*program*) will be in /build/apps.
 
 ## Usage
 
-Prepare a *directives.inp* file containing the directives to be executed by the binary tree program. Lines beginning with '#' are ignoreed.
+Prepare a *directives.inp* file containing the directives to be executed by the binary tree program. Lines beginning with '#' are ignored.
 
 Prepare any input files needed for the chosen directives.
 
@@ -51,6 +97,10 @@ Use the testcase for an example: **./program /home/ben/Workspace/btree_chromo/te
  - set_initial_state - *set the initial state of the mapper to the current replication state*
  - set_final_state - *set the final state of the mapper to the current replication state*
  - map_replication - *based on the difference in final and initial replication states, determine new monomer coordinates and add new monomers to the LAMMPS system*
+ - prepare_simulator:log_file - *initialize MPI and a LAMMPS object that writes its output to log_file, all further commands with 'simulator' in their name will use this LAMMPS object*
+ - simulator_run_file:run_file - *executes the 'include' command to run the LAMMPS commands stored in run_file*
+ - sync_simulator_and_system - *copies the current simulation state to the LAMMPS_sys object used to control the topology*
+ - clear_simulator - *execute the 'clear' command to clear the LAMMPS object*
 
 ## Support
 brg4@illinois.edu
