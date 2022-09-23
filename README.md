@@ -6,20 +6,22 @@
 
 The program is organized in the following manner:
 
-    Upon execution a **btree_driver** executes a series of directives stored in a file provided by the user (a full list of directives is provided in the 'Usage' section). The **btree_driver** contains the following objects.
+Upon execution a **btree_driver** executes a series of directives stored in a file provided by the user (a full list of directives is provided in the 'Usage' section). The **btree_driver** contains the following objects.
     
-       - btree - *a specialized binary tree class representing replicating circular dsDNA in nested theta structures that can only be manipulated using public member functions representing processes physically possible for circular dsDNA*
-       	 - determines topology when system is represented as circular(/theta structure) polymers for arbitrary replication states
-	 - counts genome features at nucleotide resolution for arbitrary replication states
-	 - prepares coarse-graining into chromosomal loci for contact map calculations for arbitrary replication states
-	 
-       - replicator - *a class containing a stochastic chemical kinetics model for DNA replication initiation due to DnaA, which then simulates trajectories in the space of replication states using the Gillespie method*
+    - btree - *a specialized binary tree class representing replicating circular dsDNA in nested theta structures that can only be manipulated using public member functions representing processes physically possible for circular dsDNA*
+      - determines topology when system is represented as circular(/theta structure) polymers for arbitrary replication states
+      - counts genome features at nucleotide resolution for arbitrary replication states
+      - prepares coarse-graining into chromosomal loci for contact map calculations for arbitrary replication states
+
+    - replicator - *a class containing a stochastic chemical kinetics model for DNA replication initiation due to DnaA, which then simulates trajectories in the space of replication states using the Gillespie method*
        
-       - LAMMPS_sys - *a class storing the spatial (and other) information of a system of replicating circular dsDNA (monomers of ellipsoidal), ribosomes (ellipsoidal particles), and boundary particles (point-like particles) for use in Brownian dynamics simulations using LAMMPS*
+    - LAMMPS_sys - *a class storing the spatial (and other) information of a system of replicating circular dsDNA (monomers of ellipsoidal), ribosomes (ellipsoidal particles), and boundary particles (point-like particles) for use in Brownian dynamics simulations using LAMMPS*
        
-       - mapper - *a class that governs the creation of new DNA monomers in the spatial model given an 'initial replication state' and a 'final replication state' using the train-track model of replication*
+    - mapper - *a class that governs the creation of new DNA monomers in the spatial model given an 'initial replication state' and a 'final replication state' using the train-track model of replication*
        
-       - LAMMPS_simulator - *a class that runs Brownian dynamics and accessory routines using LAMMPS to simulate the spatial model*
+    - LAMMPS_simulator - *a class that runs Brownian dynamics and accessory routines using LAMMPS to simulate the spatial model*
+
+Member functions of the **btree_driver** control the interactions and exchange of information between these different objects.
 
 By combining a series of directives together a user could perform the following example protocol.
 
@@ -51,14 +53,14 @@ By combining a series of directives together a user could perform the following 
    3) Follow instructions in '/LAMMPS_src_additions' to make the additions to the LAMMPS source code
    4) Build and install the modified version of **LAMMPS** - *I built the 2022/02/17 release using GCC-v12.1.0*
    5) Edit the following variables in the Makefile to match your installations from the previous steps. - *I used environment variables to specify these local installations on my machine in a bash scripts, but you can type them in manually if you would prefer.*
-      - **OPENMPI_LDFLAGS**
-      - **FMT_LDFLAGS**
-      - **LAMMPS_LDFLAGS**
-      - **OPENMPI_INCLUDE**
-      - **FMT_INCLUDE**
-      - **LAMMPS_INCLUDE**
+   - **OPENMPI_LDFLAGS**
+   - **FMT_LDFLAGS**
+   - **LAMMPS_LDFLAGS**
+   - **OPENMPI_INCLUDE**
+   - **FMT_INCLUDE**
+   - **LAMMPS_INCLUDE**
 
-    6) **make all**
+   6) **make all**
 
 The executable (*program*) will be in /build/apps.
 
