@@ -6,10 +6,14 @@ fix ribosSpring ribos spring/self ${ribos_spring}
 include ${DNA_model_dir}/potentials/lmp.twistable_DNA_model_FENE_omp
 
 # include file with neighbor setup
-include ${DNA_model_dir}/protocol_subroutiines/subroutine.neighbor_setup
+include ${DNA_model_dir}/protocol_subroutines/subroutine.neighbor_setup
 
 # include file with hard pair potentials
 include ${DNA_model_dir}/potentials/lmp.DNA_pair_hard_omp
+
+# thermo for minimization
+thermo		${T_freq_m}
+thermo_style custom step emol epair ebond eangle c_angleE[1] c_angleE[2] c_angleE[3]
 
 # run the minimization
 min_style cg
