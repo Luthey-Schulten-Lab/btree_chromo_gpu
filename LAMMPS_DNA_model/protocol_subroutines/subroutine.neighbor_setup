@@ -1,0 +1,3 @@
+# set the neighbor type
+neighbor ${r_ribo} bin
+neigh_modify every 1 delay 5 check yes page 100000 exclude type 1 1

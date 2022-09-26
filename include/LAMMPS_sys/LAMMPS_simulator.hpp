@@ -25,6 +25,20 @@
 
 using namespace std;
 
+struct simulation_protocol
+{
+
+  int nProc;
+  int sim_rng_seed;
+
+  string DNA_model_dir, input_dir, output_dir;
+  string input_file_label, output_file_label;
+
+  double delta_t;
+  
+
+};
+
 class LAMMPS_simulator
 {
 public:
@@ -42,6 +56,16 @@ public:
   void set_lmp_sys(LAMMPS_sys *lmp_sys);
 
   void sim_to_sys();
+
+  // minimization routines
+  void minimize_soft_harmonic();
+  void minimize_hard_harmonic();
+  void minimize_hard_FENE();
+
+  // run routines
+  void run_soft_harmonic();
+  void run_hard_harmonic();
+  void run_hard_FENE();
   
 private:
 
