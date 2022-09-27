@@ -82,6 +82,11 @@ int btree_driver::execute_directives()
   reqs.regions_present = false;
   reqs.rep_model_present = false;
   reqs.BD_lengths_present = false;
+  reqs.simulator_prepared = false;
+  reqs.DNA_model = false;
+  reqs.output_details = false;
+  reqs.delta_t = false;
+  reqs.lmp_data_present = false;
 
   cout << "\n---BEGIN EXECUTING DIRECTIVES---\n" << endl;
 
@@ -137,10 +142,20 @@ int btree_driver::execute_directives()
       // COMMAND LIST //
       //////////////////
 
-      
+
+      ////////////////////////////
+      // Binary Tree Directives //
+      ////////////////////////////
+
+
+      // seed the PRNG for the btree
+      if (command == "btree_prng_seed")
+	{
+	  error_code = btree_prng_seed(params);
+	}      
 
       // read input state from a file
-      if (command == "input_state")
+      else if (command == "input_state")
 	{
 	  error_code = input_state(params,reqs);
 	}
@@ -215,6 +230,18 @@ int btree_driver::execute_directives()
 	  error_code = dump_CG_map(params,reqs);
 	}
 
+
+      // print the current state
+      else if (command == "print")
+	{
+	  error_code = print_state(reqs);
+	}
+
+      
+      ///////////////////////////
+      // Replicator Directives //
+      ///////////////////////////
+ 
       
       // read the replication model
       else if (command == "load_replication_model")
@@ -229,13 +256,18 @@ int btree_driver::execute_directives()
 	  error_code = replicate(params,reqs);
 	}
 
-      
-      // seed the PRNG for the btree
-      else if (command == "btree_prng_seed")
+
+      // seed the PRNG for the replicator
+      else if (command == "replicator_prng_seed")
 	{
-	  error_code = btree_prng_seed(params);
+	  error_code = replicator_prng_seed(params);
 	}
 
+
+      ///////////////////////////
+      // LAMMPS_sys Directives //
+      ///////////////////////////
+      
 
       // load file containing the monomer coordinates
       else if (command == "load_mono_coords")
@@ -292,6 +324,18 @@ int btree_driver::execute_directives()
 	  error_code = write_LAMMPS_data(params,reqs);
 	}
 
+      
+      // write the LAMMPS system data
+      else if (command == "write_mono_xyz")
+	{
+	  error_code = write_mono_xyz(params,reqs);
+	}
+
+      
+      //////////////////////////
+      // Simulator Directives //
+      //////////////////////////
+      
 
       // prepare the simulator
       else if (command == "prepare_simulator")
@@ -301,9 +345,9 @@ int btree_driver::execute_directives()
 
 
       // run a file using the simulator
-      else if (command == "simulator_run_file")
+      else if (command == "simulator_include_file")
 	{
-	  error_code = simulator_run_file(params,reqs);
+	  error_code = simulator_include_file(params,reqs);
 	}
 
 
@@ -320,26 +364,111 @@ int btree_driver::execute_directives()
 	  error_code = clear_simulator(reqs);
 	}
 
-
-      // write the LAMMPS system data
-      else if (command == "write_mono_xyz")
-	{
-	  error_code = write_mono_xyz(params,reqs);
-	}
-
-
-      // seed the PRNG for the replicator
-      else if (command == "replicator_prng_seed")
-	{
-	  error_code = replicator_prng_seed(params);
-	}
-
       
-      // print the current state
-      else if (command == "print")
+      // run a file using the simulator
+      else if (command == "simulator_include_file")
 	{
-	  error_code = print_state(reqs);
+	  error_code = simulator_include_file(params,reqs);
 	}
+
+
+      // run a file using the simulator
+      else if (command == "simulator_include_file")
+	{
+	  error_code = simulator_include_file(params,reqs);
+	}
+
+
+      // set the prng_seed for the simulator
+      else if (command == "simulator_set_prng_seed")
+	{
+	  error_code = simulator_set_prng_seed(params,reqs);
+	}
+
+
+      // set the number of processors for the simulator
+      else if (command == "simulator_set_nProc")
+	{
+	  error_code = simulator_set_nProc(params,reqs);
+	}
+
+
+      // set the DNA model for the simulator
+      else if (command == "simulator_set_DNA_model")
+	{
+	  error_code = simulator_set_DNA_model(params,reqs);
+	}
+
+
+      // set the output details for the simulator
+      else if (command == "simulator_set_output_details")
+	{
+	  error_code = simulator_set_output_details(params,reqs);
+	}
+
+
+      // set the timestep for the simulator
+      else if (command == "simulator_set_delta_t")
+	{
+	  error_code = simulator_set_delta_t(params,reqs);
+	}
+
+
+      // minimize with soft potentials and harmonic bonds
+      else if (command == "simulator_minimize_soft_harmonic")
+	{
+	  error_code = simulator_minimize<0,0>(params,reqs);
+	}
+
+
+      // minimize with hard potentials and harmonic bonds
+      else if (command == "simulator_minimize_hard_harmonic")
+	{
+	  error_code = simulator_minimize<1,0>(params,reqs);
+	}
+
+
+      // minimize with soft potentials and FENE bonds
+      else if (command == "simulator_minimize_soft_FENE")
+	{
+	  error_code = simulator_minimize<0,1>(params,reqs);
+	}
+
+
+      // minimize with hard potentials and FENE bonds
+      else if (command == "simulator_minimize_hard_FENE")
+	{
+	  error_code = simulator_minimize<1,1>(params,reqs);
+	}
+
+
+      // run with soft potentials and harmonic bonds
+      else if (command == "simulator_run_soft_harmonic")
+	{
+	  error_code = simulator_run<0,0>(params,reqs);
+	}
+
+
+      // run with hard potentials and harmonic bonds
+      else if (command == "simulator_run_hard_harmonic")
+	{
+	  error_code = simulator_run<1,0>(params,reqs);
+	}
+
+
+      // run with soft potentials and FENE bonds
+      else if (command == "simulator_run_soft_FENE")
+	{
+	  error_code = simulator_run<0,1>(params,reqs);
+	}
+
+
+      // run with hard potentials and FENE bonds
+      else if (command == "simulator_run_hard_FENE")
+	{
+	  error_code = simulator_run<1,1>(params,reqs);
+	}
+
 
       if (error_code != 0) return 1;
 
@@ -865,7 +994,7 @@ int btree_driver::prepare_simulator(vector<string> &params, drctv_reqs &reqs)
 }
 
 
-int btree_driver::simulator_run_file(vector<string> &params, drctv_reqs &reqs)
+int btree_driver::simulator_include_file(vector<string> &params, drctv_reqs &reqs)
 {
   if (params.size() != 1)
     {
@@ -902,6 +1031,180 @@ int btree_driver::clear_simulator(drctv_reqs &reqs)
       return 1;
     }
   driver_lmp_simulator.clear();
+  return 0;
+}
+
+
+int btree_driver::simulator_set_nProc(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 1)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  if (reqs.simulator_prepared == false)
+    {
+      cout << "ERROR: missing simulator" << endl;
+      return 1;
+    }
+  driver_lmp_simulator.set_nProc(stoi(params[0]));  
+  return 0;
+}
+
+
+int btree_driver::simulator_set_prng_seed(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 1)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  if (reqs.simulator_prepared == false)
+    {
+      cout << "ERROR: missing simulator" << endl;
+      return 1;
+    }
+  driver_lmp_simulator.set_prng_seed(stoi(params[0]));  
+  return 0;
+}
+
+
+int btree_driver::simulator_set_DNA_model(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 1)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  if (reqs.simulator_prepared == false)
+    {
+      cout << "ERROR: missing simulator" << endl;
+      return 1;
+    }
+  driver_lmp_simulator.set_DNA_model_dir(params[0]);
+  reqs.DNA_model = true;
+  return 0;
+}
+
+
+int btree_driver::simulator_set_output_details(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 1)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  if (reqs.simulator_prepared == false)
+    {
+      cout << "ERROR: missing simulator" << endl;
+      return 1;
+    }
+  driver_lmp_simulator.set_output_details(params[0],params[1]);
+  reqs.output_details = true;
+  return 0;
+}
+
+
+int btree_driver::simulator_set_delta_t(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 1)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  if (reqs.simulator_prepared == false)
+    {
+      cout << "ERROR: missing simulator" << endl;
+      return 1;
+    }
+  driver_lmp_simulator.set_delta_t(stod(params[0]));
+  reqs.delta_t = true;
+  return 0;
+}
+
+
+int btree_driver::simulator_read_data(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 1)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  
+  if (reqs.simulator_prepared == false)
+    {
+      cout << "ERROR: missing simulator" << endl;
+      return 1;
+    }
+  else if (reqs.DNA_model == false)
+    {
+      cout << "ERROR: missing DNA model" << endl;
+      return 1;
+    }
+  else if (reqs.output_details == false)
+    {
+      cout << "ERROR: missing output details" << endl;
+      return 1;
+    }
+  else if (reqs.delta_t == false)
+    {
+      cout << "ERROR: missing timestep" << endl;
+      return 1;
+    }
+
+  driver_lmp_simulator.clear();
+  driver_lmp_simulator.reset_protocol_variables();
+  driver_lmp_simulator.global_setup();
+  driver_lmp_simulator.read_data(params[0]);
+
+  reqs.lmp_data_present = true;
+  
+  return 0;  
+}
+
+
+template<int SOFT_HARD, int HARMONIC_FENE>
+int btree_driver::simulator_minimize(vector<string> &params, drctv_reqs &reqs)
+{
+
+  if (params.size() != 1)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+
+  if (reqs.lmp_data_present == false)
+    {
+      cout << "ERROR: missing LAMMPS data for simulator" << endl;
+      return 1;
+    }
+
+  thermo_dump_parameters t_d_p;
+
+  // run the minimization
+  if (SOFT_HARD == 0)
+    {
+      if (HARMONIC_FENE == 0)
+	{
+	  driver_lmp_simulator.minimize_soft_harmonic(t_d_p);
+	}
+      else if (HARMONIC_FENE == 1)
+	{
+	  driver_lmp_simulator.minimize_soft_FENE(t_d_p);
+	}
+    }
+  else if (SOFT_HARD == 1)
+    {
+      if (HARMONIC_FENE == 0)
+	{
+	  driver_lmp_simulator.minimize_soft_harmonic(t_d_p);
+	}
+      else if (HARMONIC_FENE == 1)
+	{
+	  driver_lmp_simulator.minimize_soft_FENE(t_d_p);
+	}
+    }
+
   return 0;
 }
 

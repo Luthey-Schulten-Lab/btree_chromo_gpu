@@ -25,18 +25,12 @@
 
 using namespace std;
 
-struct simulation_protocol
+struct thermo_dump_parameters
 {
-
-  int nProc;
-  int sim_rng_seed;
-
-  string DNA_model_dir, input_dir, output_dir;
-  string input_file_label, output_file_label;
-
-  double delta_t;
-  
-
+  // bool multi_rep; // multiple replicates requiring replicate number
+  bool append, write_first; // append to dump file, write first timestep
+  // int rep, rep_padding; // replicate number, padding for replicate label
+  int dump_freq, thermo_freq; // dump frequency and thermo frequency
 };
 
 class LAMMPS_simulator
@@ -55,17 +49,38 @@ public:
 
   void set_lmp_sys(LAMMPS_sys *lmp_sys);
 
+  // sync the simulator to the system
   void sim_to_sys();
 
+  // set nProc for simulator
+  void set_nProc(int nProc);
+  // set the DNA model
+  void set_DNA_model_dir(string DNA_model_dir);
+  // set output location
+  void set_output_details(string output_dir, string output_file_label);
+  // set PRNG seed
+  void set_prng_seed(int s);
+  // set delta_t
+  void set_delta_t(double delta_t);
+
+  // simulation protocol
+  void reset_protocol_variables();
+  void global_setup();
+
+  // read_data
+  void read_data(string data_file);
+
   // minimization routines
-  void minimize_soft_harmonic();
-  void minimize_hard_harmonic();
-  void minimize_hard_FENE();
+  void minimize_soft_harmonic(thermo_dump_parameters t_d_p);
+  void minimize_hard_harmonic(thermo_dump_parameters t_d_p);
+  void minimize_soft_FENE(thermo_dump_parameters t_d_p);
+  void minimize_hard_FENE(thermo_dump_parameters t_d_p);
 
   // run routines
-  void run_soft_harmonic();
-  void run_hard_harmonic();
-  void run_hard_FENE();
+  void run_soft_harmonic(int N_steps, thermo_dump_parameters t_d_p);
+  void run_hard_harmonic(int N_steps, thermo_dump_parameters t_d_p);
+  void run_soft_FENE(int N_steps, thermo_dump_parameters t_d_p);
+  void run_hard_FENE(int N_steps, thermo_dump_parameters t_d_p);
   
 private:
 
@@ -73,7 +88,13 @@ private:
   int sim_MPI_size; // MPI size
   int sim_MPI_rank; // current MPI rank
 
+  int nProc; // number of processors for OpenMP
+  int prng_seed; // seed for PRNG within LAMMPS object
+  string DNA_model_dir, output_dir, output_file_label; // DNA model, output dir, and label for output files
+  double delta_t; // timestep
+
   // objects
+  
   LAMMPS_NS::LAMMPS *lmp;
   LAMMPS_sys *lmp_sys;
   

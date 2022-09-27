@@ -8,6 +8,9 @@ LAMMPS_simulator::LAMMPS_simulator()
   sim_MPI_size = 0;
   sim_MPI_rank = 0;
   lmp = nullptr;
+
+  nProc = 1;
+  prng_seed = 0;
 }
 
 
@@ -73,10 +76,103 @@ void LAMMPS_simulator::include_file(string filename)
 }
 
 
+// read data into LAMMPS simulation object
+void LAMMPS_simulator::read_data(string data_file)
+{
+  lmp->input->one(("read_data " + data_file).c_str());
+}
+
+
+// run the global setup with packages, units, atom_style, boundary, and atom_modify
+void LAMMPS_simulator::global_setup()
+{
+  lmp->input->one("include ${DNA_model_dir}/protocol_subroutines/subroutine.global_setup");
+}
+
+
 // clear the LAMMPS system state
 void LAMMPS_simulator::clear()
 {
   lmp->input->one("clear");
+}
+
+
+// set number of processors
+void LAMMPS_simulator::set_nProc(int nProc)
+{
+  // variable with number of processors for OpenMP
+  this->nProc = nProc;
+  lmp->input->one(("variable nProc internal " + to_string(this->nProc)).c_str());
+}
+
+
+// set DNA model
+void LAMMPS_simulator::set_DNA_model_dir(string DNA_model_dir)
+{
+  // directory with DNA model files (properties, parameters, and basic routines)
+  this->DNA_model_dir = DNA_model_dir;
+  lmp->input->one(("variable DNA_model_dir string " + this->DNA_model_dir).c_str());
+}
+
+
+// set output details
+void LAMMPS_simulator::set_output_details(string output_dir, string output_file_label)
+{
+  // output directory and file label
+  this->output_dir = output_dir;
+  this->output_file_label = output_file_label;
+  lmp->input->one(("variable output_dir string " + this->output_dir).c_str());
+  lmp->input->one(("variable output_file_label string " + this->output_file_label).c_str());
+}
+
+
+// set the PRNG seed
+void LAMMPS_simulator::set_prng_seed(int s)
+{
+  // PRNG seed for LAMMPS object
+  this->prng_seed = s;
+  string old_str = to_string(this->prng_seed);
+  auto seed_str = string(6 - min(6,static_cast<int>(old_str.length())),'0') + old_str;
+  lmp->input->one(("variable rng_seed internal " + seed_str).c_str());
+}
+
+
+// set the timestep
+void LAMMPS_simulator::set_delta_t(double delta_t)
+{
+  // timestep
+  this->delta_t = delta_t;
+  lmp->input->one(("variable delta_t internal " + to_string(delta_t)).c_str());
+}
+
+
+// reset variables specifying the simulation protocol
+void LAMMPS_simulator::reset_protocol_variables()
+{
+  // variable with number of processors for OpenMP
+  lmp->input->one(("variable nProc internal " + to_string(nProc)).c_str());
+
+  // directory with DNA model files (properties, parameters, and basic routines)
+  lmp->input->one(("variable DNA_model_dir string " + DNA_model_dir).c_str());
+
+  // output files
+  lmp->input->one(("variable output_dir string " + output_dir).c_str());
+  lmp->input->one(("variable output_file_label string " + output_file_label).c_str());
+
+  // PRNG seed for LAMMPS object
+  string old_str = to_string(prng_seed);
+  auto seed_str = string(6 - min(6,static_cast<int>(old_str.length())),'0') + old_str;
+  lmp->input->one(("variable rng_seed internal " + seed_str).c_str());
+
+  // timestep
+  lmp->input->one(("variable delta_t internal " + to_string(delta_t)).c_str());
+}
+
+
+// minimize with soft potentials and harmonic bonds
+void LAMMPS_simulator::minimize_soft_harmonic(thermo_dump_parameters t_d_p)
+{
+  lmp->input->one("include ${DNA_model_dir}/minimize_subroutines/subroutine.min_soft_harmonic");
 }
 
 

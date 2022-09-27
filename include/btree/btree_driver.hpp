@@ -20,6 +20,10 @@ struct drctv_reqs
   bool map_initial_present;
   bool map_final_present;
   bool simulator_prepared;
+  bool DNA_model;
+  bool output_details;
+  bool delta_t;
+  bool lmp_data_present;
 };
 
 
@@ -93,9 +97,24 @@ private:
 
   // simulator
   int prepare_simulator(vector<string> &params, drctv_reqs &reqs);
-  int simulator_run_file(vector<string> &params, drctv_reqs &reqs);
+  int simulator_include_file(vector<string> &params, drctv_reqs &reqs);
   int sync_simulator_and_system(drctv_reqs &reqs);
   int clear_simulator(drctv_reqs &reqs);
+  int simulator_read_data(vector<string> &params, drctv_reqs &reqs);
+  int simulator_set_nProc(vector<string> &params, drctv_reqs &reqs);
+  int simulator_set_prng_seed(vector<string> &params, drctv_reqs &reqs);
+  int simulator_set_DNA_model(vector<string> &params, drctv_reqs &reqs);
+  int simulator_set_output_details(vector<string> &params, drctv_reqs &reqs);
+  int simulator_set_delta_t(vector<string> &params, drctv_reqs &reqs);
+  
+  // simulator minimization routines
+  template <int SOFT_HARD, int HARMONIC_FENE>
+  int simulator_minimize(vector<string> &params, drctv_reqs &reqs);
+  
+  // simulator run routines
+  template <int SOFT_HARD, int HARMONIC_FENE>
+  int simulator_run(vector<string> &params, drctv_reqs &reqs);
+  
 
   /////////////
   // objects //
