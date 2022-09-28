@@ -33,6 +33,16 @@ struct thermo_dump_parameters
   int dump_freq, thermo_freq; // dump frequency and thermo frequency
 };
 
+struct compute_tracker
+{
+  bool quats, ids, MSD;
+};
+
+struct dump_tracker
+{
+  bool lammpstrj;
+};
+
 class LAMMPS_simulator
 {
 public:
@@ -77,23 +87,30 @@ public:
   void minimize_hard_FENE(thermo_dump_parameters t_d_p);
 
   // run routines
-  void run_soft_harmonic(int N_steps, thermo_dump_parameters t_d_p);
-  void run_hard_harmonic(int N_steps, thermo_dump_parameters t_d_p);
-  void run_soft_FENE(int N_steps, thermo_dump_parameters t_d_p);
-  void run_hard_FENE(int N_steps, thermo_dump_parameters t_d_p);
+  void run_soft_harmonic(unsigned long N_steps, thermo_dump_parameters t_d_p);
+  void run_hard_harmonic(unsigned long N_steps, thermo_dump_parameters t_d_p);
+  void run_soft_FENE(unsigned long N_steps, thermo_dump_parameters t_d_p);
+  void run_hard_FENE(unsigned long N_steps, thermo_dump_parameters t_d_p);
   
 private:
+
+  void compute_trigger(string compute_label);
+  void prepare_dump(thermo_dump_parameters &t_d_p);
 
   int sim_MPI_initialized, sim_MPI_finalized;
   int sim_MPI_size; // MPI size
   int sim_MPI_rank; // current MPI rank
 
+  unsigned long Nt;
   int nProc; // number of processors for OpenMP
   int prng_seed; // seed for PRNG within LAMMPS object
   string DNA_model_dir, output_dir, output_file_label; // DNA model, output dir, and label for output files
-  double delta_t; // timestep
+  double delta_t; // timestep size
 
   // objects
+
+  compute_tracker computes_active;
+  dump_tracker dumps_active;
   
   LAMMPS_NS::LAMMPS *lmp;
   LAMMPS_sys *lmp_sys;

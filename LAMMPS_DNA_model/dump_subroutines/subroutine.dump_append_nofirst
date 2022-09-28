@@ -1,0 +1,3 @@
+# set custom dump style
+dump            dumplammpstrj all custom ${D_freq} ${output_file}.lammpstrj id type x y z c_quat[*]
+dump_modify     dumplammpstrj append yes first no skip v_skip_condition

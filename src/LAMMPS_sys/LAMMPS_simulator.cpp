@@ -11,6 +11,7 @@ LAMMPS_simulator::LAMMPS_simulator()
 
   nProc = 1;
   prng_seed = 0;
+  Nt = 0;
 }
 
 
@@ -79,13 +80,23 @@ void LAMMPS_simulator::include_file(string filename)
 // read data into LAMMPS simulation object
 void LAMMPS_simulator::read_data(string data_file)
 {
+  // read the data
   lmp->input->one(("read_data " + data_file).c_str());
+
+  // include the physical parameterization of the DNA polymer model
+  lmp->input->one("include ${DNA_model_dir}/lmp.DNA_physical_params");
 }
 
 
 // run the global setup with packages, units, atom_style, boundary, and atom_modify
 void LAMMPS_simulator::global_setup()
 {
+
+  computes_active.quats = false;
+  computes_active.ids = false;
+  computes_active.MSD = false;
+  dumps_active.lammpstrj = false;
+  
   lmp->input->one("include ${DNA_model_dir}/protocol_subroutines/subroutine.global_setup");
 }
 
@@ -123,6 +134,7 @@ void LAMMPS_simulator::set_output_details(string output_dir, string output_file_
   this->output_file_label = output_file_label;
   lmp->input->one(("variable output_dir string " + this->output_dir).c_str());
   lmp->input->one(("variable output_file_label string " + this->output_file_label).c_str());
+  lmp->input->one("variable output_file string ${output_dir}${output_file_label}");
 }
 
 
@@ -138,11 +150,13 @@ void LAMMPS_simulator::set_prng_seed(int s)
 
 
 // set the timestep
+// void LAMMPS_simulator::set_delta_t(string delta_t)
 void LAMMPS_simulator::set_delta_t(double delta_t)
 {
   // timestep
   this->delta_t = delta_t;
   lmp->input->one(("variable delta_t internal " + to_string(delta_t)).c_str());
+  // lmp->input->one(("variable delta_t internal " + delta_t).c_str());
 }
 
 
@@ -158,6 +172,7 @@ void LAMMPS_simulator::reset_protocol_variables()
   // output files
   lmp->input->one(("variable output_dir string " + output_dir).c_str());
   lmp->input->one(("variable output_file_label string " + output_file_label).c_str());
+  lmp->input->one("variable output_file string ${output_dir}${output_file_label}");
 
   // PRNG seed for LAMMPS object
   string old_str = to_string(prng_seed);
@@ -166,13 +181,329 @@ void LAMMPS_simulator::reset_protocol_variables()
 
   // timestep
   lmp->input->one(("variable delta_t internal " + to_string(delta_t)).c_str());
+  // lmp->input->one(("variable delta_t internal " + delta_t).c_str());
 }
 
 
 // minimize with soft potentials and harmonic bonds
 void LAMMPS_simulator::minimize_soft_harmonic(thermo_dump_parameters t_d_p)
 {
+  // set thermo frequency
+  lmp->input->one(("variable T_freq internal " + to_string(t_d_p.thermo_freq)).c_str());
+
+  // include compute for ids
+  compute_trigger("ids");
+
+  // include compute for quats
+  compute_trigger("quats");
+
+  // include default thermo
+  lmp->input->one("include ${DNA_model_dir}/dump_subroutines/subroutine.default_thermo");
+
+  // include minimization subroutine
   lmp->input->one("include ${DNA_model_dir}/minimize_subroutines/subroutine.min_soft_harmonic");
+
+  // reset the number of timesteps to Nt
+  lmp->input->one(("reset_timestep " + to_string(Nt)).c_str());
+}
+
+
+
+// minimize with hard potentials and harmonic bonds
+void LAMMPS_simulator::minimize_hard_harmonic(thermo_dump_parameters t_d_p)
+{
+  // set thermo frequency
+  lmp->input->one(("variable T_freq internal " + to_string(t_d_p.thermo_freq)).c_str());
+
+  // include compute for ids
+  compute_trigger("ids");
+
+  // include compute for quats
+  compute_trigger("quats");
+
+  // include default thermo
+  lmp->input->one("include ${DNA_model_dir}/dump_subroutines/subroutine.default_thermo");
+
+  // include minimization subroutine
+  lmp->input->one("include ${DNA_model_dir}/minimize_subroutines/subroutine.min_hard_harmonic");
+
+  // reset the number of timesteps to Nt
+  lmp->input->one(("reset_timestep " + to_string(Nt)).c_str());
+}
+
+
+ 
+// minimize with soft potentials and FENE bonds
+void LAMMPS_simulator::minimize_soft_FENE(thermo_dump_parameters t_d_p)
+{
+  // set thermo frequency
+  lmp->input->one(("variable T_freq internal " + to_string(t_d_p.thermo_freq)).c_str());
+
+  // include compute for ids
+  compute_trigger("ids");
+
+  // include compute for quats
+  compute_trigger("quats");
+
+  // include default thermo
+  lmp->input->one("include ${DNA_model_dir}/dump_subroutines/subroutine.default_thermo");
+
+  // include minimization subroutine
+  lmp->input->one("include ${DNA_model_dir}/minimize_subroutines/subroutine.min_soft_FENE");
+
+  // reset the number of timesteps to Nt
+  lmp->input->one(("reset_timestep " + to_string(Nt)).c_str());
+}
+
+
+// minimize with hard potentials and FENE bonds
+void LAMMPS_simulator::minimize_hard_FENE(thermo_dump_parameters t_d_p)
+{
+  // set thermo frequency
+  lmp->input->one(("variable T_freq internal " + to_string(t_d_p.thermo_freq)).c_str());
+
+  // include compute for ids
+  compute_trigger("ids");
+
+  // include compute for quats
+  compute_trigger("quats");
+
+  // include default thermo
+  lmp->input->one("include ${DNA_model_dir}/dump_subroutines/subroutine.default_thermo");
+
+  // include minimization subroutine
+  lmp->input->one("include ${DNA_model_dir}/minimize_subroutines/subroutine.min_hard_FENE");
+
+  // reset the number of timesteps to Nt
+  lmp->input->one(("reset_timestep " + to_string(Nt)).c_str());
+}
+
+
+// run with soft potentials and harmonic bonds
+void LAMMPS_simulator::run_soft_harmonic(unsigned long N_steps, thermo_dump_parameters t_d_p)
+{
+  // reset the number of timesteps to Nt
+  lmp->input->one(("reset_timestep " + to_string(Nt)).c_str());
+  
+  // set thermo frequency
+  lmp->input->one(("variable T_freq internal " + to_string(t_d_p.thermo_freq)).c_str());
+
+  // set dump frequency
+  lmp->input->one(("variable D_freq internal " + to_string(t_d_p.dump_freq)).c_str());
+
+  // include compute for ids
+  compute_trigger("ids");
+
+  // include compute for quats
+  compute_trigger("quats");
+
+  // include compute for MSD
+  compute_trigger("MSD");
+
+  // include default thermo
+  lmp->input->one("include ${DNA_model_dir}/dump_subroutines/subroutine.MSD_thermo");
+
+  // include dump
+  prepare_dump(t_d_p);
+
+  // include run subroutine
+  lmp->input->one("include ${DNA_model_dir}/run_subroutines/subroutine.run_soft_harmonic");
+
+  // set the timestep
+  lmp->input->one("timestep ${delta_t}");
+  
+  // run for N_steps
+  lmp->input->one(("run " + to_string(N_steps)).c_str());
+
+  // increment Nt
+  Nt += N_steps;
+}
+
+
+// run with hard potentials and harmonic bonds
+void LAMMPS_simulator::run_hard_harmonic(unsigned long N_steps, thermo_dump_parameters t_d_p)
+{
+  // reset the number of timesteps to Nt
+  lmp->input->one(("reset_timestep " + to_string(Nt)).c_str());
+  
+  // set thermo frequency
+  lmp->input->one(("variable T_freq internal " + to_string(t_d_p.thermo_freq)).c_str());
+
+  // set dump frequency
+  lmp->input->one(("variable D_freq internal " + to_string(t_d_p.dump_freq)).c_str());
+
+  // include compute for ids
+  compute_trigger("ids");
+
+  // include compute for quats
+  compute_trigger("quats");
+
+  // include compute for MSD
+  compute_trigger("MSD");
+
+  // include default thermo
+  lmp->input->one("include ${DNA_model_dir}/dump_subroutines/subroutine.MSD_thermo");
+
+  // include dump
+  prepare_dump(t_d_p);
+
+  // include run subroutine
+  lmp->input->one("include ${DNA_model_dir}/run_subroutines/subroutine.run_hard_harmonic");
+
+  // set the timestep
+  lmp->input->one("timestep ${delta_t}");
+
+  // run for N_steps
+  lmp->input->one(("run " + to_string(N_steps)).c_str());
+
+  // increment Nt
+  Nt += N_steps;
+}
+
+
+// minimize with soft potentials and FENE bonds
+void LAMMPS_simulator::run_soft_FENE(unsigned long N_steps, thermo_dump_parameters t_d_p)
+{
+  // reset the number of timesteps to Nt
+  lmp->input->one(("reset_timestep " + to_string(Nt)).c_str());
+  
+  // set thermo frequency
+  lmp->input->one(("variable T_freq internal " + to_string(t_d_p.thermo_freq)).c_str());
+
+  // set dump frequency
+  lmp->input->one(("variable D_freq internal " + to_string(t_d_p.dump_freq)).c_str());
+
+  // include compute for ids
+  compute_trigger("ids");
+
+  // include compute for quats
+  compute_trigger("quats");
+
+  // include compute for MSD
+  compute_trigger("MSD");
+
+  // include default thermo
+  lmp->input->one("include ${DNA_model_dir}/dump_subroutines/subroutine.MSD_thermo");
+
+  // include dump
+  prepare_dump(t_d_p);
+
+  // include run subroutine
+  lmp->input->one("include ${DNA_model_dir}/run_subroutines/subroutine.run_soft_FENE");
+
+  // set the timestep
+  lmp->input->one("timestep ${delta_t}");
+
+  // run for N_steps
+  lmp->input->one(("run " + to_string(N_steps)).c_str());
+
+  // increment Nt
+  Nt += N_steps;
+}
+
+
+// minimize with hard potentials and FENE bonds
+void LAMMPS_simulator::run_hard_FENE(unsigned long N_steps, thermo_dump_parameters t_d_p)
+{
+  // reset the number of timesteps to Nt
+  lmp->input->one(("reset_timestep " + to_string(Nt)).c_str());
+  
+  // set thermo frequency
+  lmp->input->one(("variable T_freq internal " + to_string(t_d_p.thermo_freq)).c_str());
+
+  // set dump frequency
+  lmp->input->one(("variable D_freq internal " + to_string(t_d_p.dump_freq)).c_str());
+
+  // include compute for ids
+  compute_trigger("ids");
+
+  // include compute for quats
+  compute_trigger("quats");
+
+  // include compute for MSD
+  compute_trigger("MSD");
+
+  // include default thermo
+  lmp->input->one("include ${DNA_model_dir}/dump_subroutines/subroutine.MSD_thermo");
+
+  // include dump
+  prepare_dump(t_d_p);
+
+  // set the timestep
+  lmp->input->one("timestep ${delta_t}");
+
+  // include run subroutine
+  lmp->input->one("include ${DNA_model_dir}/run_subroutines/subroutine.run_hard_FENE");
+
+  // run for N_steps
+  lmp->input->one(("run " + to_string(N_steps)).c_str());
+
+  // increment Nt
+  Nt += N_steps;
+}
+
+
+// prepare the dump
+void LAMMPS_simulator::prepare_dump(thermo_dump_parameters &t_d_p)
+{
+  if (dumps_active.lammpstrj == true)
+    {
+      // undump the lammpstrj
+      lmp->input->one("undump lammpstrj");
+    }
+  else
+    {
+      dumps_active.lammpstrj = true;
+    }
+
+  lmp->input->one(("variable skip_condition equal \"step > "+ to_string(Nt) + "\"").c_str());
+  
+  // include dump
+  if (t_d_p.append == true)
+    {
+      lmp->input->one("include ${DNA_model_dir}/dump_subroutines/subroutine.dump_append_nofirst");
+    }
+  else
+    {
+      if (t_d_p.write_first == true)
+	{
+	  lmp->input->one("include ${DNA_model_dir}/dump_subroutines/subroutine.dump_noappend_first");
+	}
+      else
+	{
+	  lmp->input->one("include ${DNA_model_dir}/dump_subroutines/subroutine.dump_noappend_nofirst");
+	}
+    }
+}
+
+
+// trigger for preventing reuse of computes
+void LAMMPS_simulator::compute_trigger(string compute_label)
+{
+  if (compute_label == "ids")
+    {
+      if (computes_active.ids == false)
+	{
+	  lmp->input->one("include ${DNA_model_dir}/compute_subroutines/subroutine.compute_ids");
+	  computes_active.ids = true;
+	}
+    }
+  else if (compute_label == "quats")
+    {
+      if (computes_active.quats == false)
+	{
+	  lmp->input->one("include ${DNA_model_dir}/compute_subroutines/subroutine.compute_quats");
+	  computes_active.quats = true;
+	}
+    }
+  else if (compute_label == "MSD")
+    {
+      if (computes_active.MSD == false)
+	{
+	  lmp->input->one("include ${DNA_model_dir}/compute_subroutines/subroutine.compute_MSD");
+	  computes_active.MSD = true;
+	}
+    }
 }
 
 

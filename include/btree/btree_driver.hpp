@@ -50,6 +50,9 @@ private:
   // directives // 
   ////////////////
 
+  // create a new chromosome
+  int new_chromo(vector<string> &params, drctv_reqs &reqs);
+  
   // input-ouput
   int input_state(vector<string> &params, drctv_reqs &reqs);
   int output_state(vector<string> &params);

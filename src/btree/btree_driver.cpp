@@ -154,6 +154,14 @@ int btree_driver::execute_directives()
 	  error_code = btree_prng_seed(params);
 	}      
 
+      
+      // create a new chromosome
+      else if (command == "new_chromo")
+	{
+	  error_code = new_chromo(params,reqs);
+	}
+      
+      
       // read input state from a file
       else if (command == "input_state")
 	{
@@ -344,13 +352,6 @@ int btree_driver::execute_directives()
 	}
 
 
-      // run a file using the simulator
-      else if (command == "simulator_include_file")
-	{
-	  error_code = simulator_include_file(params,reqs);
-	}
-
-
       // sync the simulator and the system
       else if (command == "sync_simulator_and_system")
 	{
@@ -364,7 +365,7 @@ int btree_driver::execute_directives()
 	  error_code = clear_simulator(reqs);
 	}
 
-      
+
       // run a file using the simulator
       else if (command == "simulator_include_file")
 	{
@@ -372,10 +373,10 @@ int btree_driver::execute_directives()
 	}
 
 
-      // run a file using the simulator
-      else if (command == "simulator_include_file")
+      // read data (LAMMPS data.* file) into the simulator
+      else if (command == "simulator_read_data")
 	{
-	  error_code = simulator_include_file(params,reqs);
+	  error_code = simulator_read_data(params,reqs);
 	}
 
 
@@ -484,6 +485,25 @@ int btree_driver::execute_directives()
 // set of functions to perform directives //
 ////////////////////////////////////////////
 
+
+int btree_driver::new_chromo(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 1)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  driver_st.size = stoi(params[0]);
+  driver_st.transforms.clear();
+  driver_bt.prepare_state(driver_st);
+  // btree is now initialized
+  reqs.btree_initialized = true;
+  // require a topology update
+  reqs.topo_update = true;
+  // require a coarse-graining update
+  reqs.CG_update = true;
+  return 0;
+}
 
 
 int btree_driver::input_state(vector<string> &params, drctv_reqs &reqs)
@@ -1089,7 +1109,7 @@ int btree_driver::simulator_set_DNA_model(vector<string> &params, drctv_reqs &re
 
 int btree_driver::simulator_set_output_details(vector<string> &params, drctv_reqs &reqs)
 {
-  if (params.size() != 1)
+  if (params.size() != 2)
     {
       cout << "ERROR: wrong number of parameters, correct input file" << endl;
       return 1;
@@ -1118,6 +1138,7 @@ int btree_driver::simulator_set_delta_t(vector<string> &params, drctv_reqs &reqs
       return 1;
     }
   driver_lmp_simulator.set_delta_t(stod(params[0]));
+  // driver_lmp_simulator.set_delta_t(params[0]);
   reqs.delta_t = true;
   return 0;
 }
@@ -1181,6 +1202,11 @@ int btree_driver::simulator_minimize(vector<string> &params, drctv_reqs &reqs)
 
   thermo_dump_parameters t_d_p;
 
+  t_d_p.append = false;
+  t_d_p.write_first = true;
+  t_d_p.dump_freq = 0;
+  t_d_p.thermo_freq = stoi(params[0]);
+
   // run the minimization
   if (SOFT_HARD == 0)
     {
@@ -1202,6 +1228,63 @@ int btree_driver::simulator_minimize(vector<string> &params, drctv_reqs &reqs)
       else if (HARMONIC_FENE == 1)
 	{
 	  driver_lmp_simulator.minimize_soft_FENE(t_d_p);
+	}
+    }
+
+  return 0;
+}
+
+
+template<int SOFT_HARD, int HARMONIC_FENE>
+int btree_driver::simulator_run(vector<string> &params, drctv_reqs &reqs)
+{
+
+  if (params.size() != 5)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+
+  if (reqs.lmp_data_present == false)
+    {
+      cout << "ERROR: missing LAMMPS data for simulator" << endl;
+      return 1;
+    }
+
+  thermo_dump_parameters t_d_p;
+
+  t_d_p.append = false;
+  t_d_p.write_first = true;
+  if (params[3] == "append")
+    {
+      t_d_p.append = true;
+      t_d_p.write_first = false;
+    }
+  if (params[4] == "skip_first") t_d_p.write_first = false;
+  t_d_p.dump_freq = stoi(params[2]);
+  t_d_p.thermo_freq = stoi(params[1]);
+
+  // run the Brownian dynamics
+  if (SOFT_HARD == 0)
+    {
+      if (HARMONIC_FENE == 0)
+	{
+	  driver_lmp_simulator.run_soft_harmonic(stoul(params[0]),t_d_p);
+	}
+      else if (HARMONIC_FENE == 1)
+	{
+	  driver_lmp_simulator.run_soft_FENE(stoul(params[0]),t_d_p);
+	}
+    }
+  else if (SOFT_HARD == 1)
+    {
+      if (HARMONIC_FENE == 0)
+	{
+	  driver_lmp_simulator.run_soft_harmonic(stoul(params[0]),t_d_p);
+	}
+      else if (HARMONIC_FENE == 1)
+	{
+	  driver_lmp_simulator.run_soft_FENE(stoul(params[0]),t_d_p);
 	}
     }
 
