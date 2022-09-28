@@ -204,7 +204,7 @@ void LAMMPS_simulator::minimize_soft_harmonic(thermo_dump_parameters t_d_p)
   lmp->input->one("include ${DNA_model_dir}/minimize_subroutines/subroutine.min_soft_harmonic");
 
   // reset the number of timesteps to Nt
-  lmp->input->one(("reset_timestep " + to_string(Nt)).c_str());
+  // lmp->input->one(("reset_timestep " + to_string(Nt)).c_str());
 }
 
 
@@ -228,7 +228,7 @@ void LAMMPS_simulator::minimize_hard_harmonic(thermo_dump_parameters t_d_p)
   lmp->input->one("include ${DNA_model_dir}/minimize_subroutines/subroutine.min_hard_harmonic");
 
   // reset the number of timesteps to Nt
-  lmp->input->one(("reset_timestep " + to_string(Nt)).c_str());
+  // lmp->input->one(("reset_timestep " + to_string(Nt)).c_str());
 }
 
 
@@ -252,7 +252,7 @@ void LAMMPS_simulator::minimize_soft_FENE(thermo_dump_parameters t_d_p)
   lmp->input->one("include ${DNA_model_dir}/minimize_subroutines/subroutine.min_soft_FENE");
 
   // reset the number of timesteps to Nt
-  lmp->input->one(("reset_timestep " + to_string(Nt)).c_str());
+  // lmp->input->one(("reset_timestep " + to_string(Nt)).c_str());
 }
 
 
@@ -275,16 +275,13 @@ void LAMMPS_simulator::minimize_hard_FENE(thermo_dump_parameters t_d_p)
   lmp->input->one("include ${DNA_model_dir}/minimize_subroutines/subroutine.min_hard_FENE");
 
   // reset the number of timesteps to Nt
-  lmp->input->one(("reset_timestep " + to_string(Nt)).c_str());
+  // lmp->input->one(("reset_timestep " + to_string(Nt)).c_str());
 }
 
 
 // run with soft potentials and harmonic bonds
 void LAMMPS_simulator::run_soft_harmonic(unsigned long N_steps, thermo_dump_parameters t_d_p)
-{
-  // reset the number of timesteps to Nt
-  lmp->input->one(("reset_timestep " + to_string(Nt)).c_str());
-  
+{  
   // set thermo frequency
   lmp->input->one(("variable T_freq internal " + to_string(t_d_p.thermo_freq)).c_str());
 
@@ -323,9 +320,6 @@ void LAMMPS_simulator::run_soft_harmonic(unsigned long N_steps, thermo_dump_para
 // run with hard potentials and harmonic bonds
 void LAMMPS_simulator::run_hard_harmonic(unsigned long N_steps, thermo_dump_parameters t_d_p)
 {
-  // reset the number of timesteps to Nt
-  lmp->input->one(("reset_timestep " + to_string(Nt)).c_str());
-  
   // set thermo frequency
   lmp->input->one(("variable T_freq internal " + to_string(t_d_p.thermo_freq)).c_str());
 
@@ -364,9 +358,6 @@ void LAMMPS_simulator::run_hard_harmonic(unsigned long N_steps, thermo_dump_para
 // minimize with soft potentials and FENE bonds
 void LAMMPS_simulator::run_soft_FENE(unsigned long N_steps, thermo_dump_parameters t_d_p)
 {
-  // reset the number of timesteps to Nt
-  lmp->input->one(("reset_timestep " + to_string(Nt)).c_str());
-  
   // set thermo frequency
   lmp->input->one(("variable T_freq internal " + to_string(t_d_p.thermo_freq)).c_str());
 
@@ -404,10 +395,7 @@ void LAMMPS_simulator::run_soft_FENE(unsigned long N_steps, thermo_dump_paramete
 
 // minimize with hard potentials and FENE bonds
 void LAMMPS_simulator::run_hard_FENE(unsigned long N_steps, thermo_dump_parameters t_d_p)
-{
-  // reset the number of timesteps to Nt
-  lmp->input->one(("reset_timestep " + to_string(Nt)).c_str());
-  
+{  
   // set thermo frequency
   lmp->input->one(("variable T_freq internal " + to_string(t_d_p.thermo_freq)).c_str());
 
@@ -449,12 +437,16 @@ void LAMMPS_simulator::prepare_dump(thermo_dump_parameters &t_d_p)
   if (dumps_active.lammpstrj == true)
     {
       // undump the lammpstrj
-      lmp->input->one("undump lammpstrj");
+      lmp->input->one("undump dumplammpstrj");
+      dumps_active.lammpstrj = false;
     }
   else
     {
       dumps_active.lammpstrj = true;
     }
+
+  // reset the number of timesteps to Nt
+  lmp->input->one(("reset_timestep " + to_string(Nt)).c_str());
 
   // lmp->input->one(("variable skip_condition equal \"step > "+ to_string(Nt) + "\"").c_str());
   lmp->input->one(("variable D_delay equal "+ to_string(Nt + t_d_p.dump_freq)).c_str());

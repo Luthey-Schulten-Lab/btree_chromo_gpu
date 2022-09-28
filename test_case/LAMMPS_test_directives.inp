@@ -16,25 +16,25 @@ load_mono_coords:/home/ben/Data/sc_chains/1000mono_testcase_100ribos/x_chain_100
 #load_ribo_coords:/home/ben/Data/sc_chains/12mono_testcase_100ribos/x_obst_12mono_testcase_100ribos_rep00001.bin,row
 load_ribo_coords:/home/ben/Data/sc_chains/1000mono_testcase_100ribos/x_obst_1000mono_testcase_100ribos_rep00001.bin,row
 
-set_initial_state
+#set_initial_state
 
 #transform the current state and print
-transform:m_cw100_ccw100
+#transform:m_cw100_ccw100
 
-set_final_state
+#set_final_state
 
 write_mono_xyz:/home/ben/Workspace/btree_chromo/test_case/mono_before.xyz
 
-map_replication
+#map_replication
 
-set_initial_state
+#set_initial_state
 
-transform:m_cw50_ccw50
-transform:ml_cw75_ccw75
+#transform:m_cw50_ccw50
+#transform:ml_cw75_ccw75
 
-set_final_state
+#set_final_state
 
-map_replication
+#map_replication
 
 #write a LAMMPS data file
 write_LAMMPS_data:/home/ben/Workspace/btree_chromo/test_case/data.test_case
@@ -51,12 +51,11 @@ simulator_set_delta_t:1.0E+5
 simulator_read_data:/home/ben/Workspace/btree_chromo/test_case/data.test_case
 
 
-simulator_minimize_soft_harmonic:100
-simulator_minimize_hard_harmonic:100
-simulator_minimize_hard_FENE:100
+simulator_minimize_soft_harmonic:1000
+simulator_minimize_hard_harmonic:1000
+simulator_minimize_hard_FENE:1000
 
-simulator_run_hard_FENE:10000,1000,1000,noappend,first
-
+simulator_run_hard_FENE:10000,1000,500,noappend,first
 
 sync_simulator_and_system
 
@@ -65,8 +64,8 @@ clear_simulator
 set_initial_state
 
 transform:m_cw150_ccw150
-transform:ml_cw50_ccw50
-transform:mlr_cw50_ccw50
+#transform:ml_cw50_ccw50
+#transform:mlr_cw50_ccw50
 
 set_final_state
 
@@ -78,8 +77,9 @@ write_LAMMPS_data:/home/ben/Workspace/btree_chromo/test_case/data.test_case
 simulator_read_data:/home/ben/Workspace/btree_chromo/test_case/data.test_case
 
 
-simulator_minimize_soft_harmonic:100
-simulator_minimize_hard_harmonic:100
-simulator_minimize_hard_FENE:100
+simulator_minimize_soft_harmonic:1000
+simulator_run_soft_harmonic:20000,1000,500,noappend,first
+simulator_minimize_hard_harmonic:1000
+simulator_minimize_hard_FENE:1000
 
-simulator_run_hard_FENE:10000,1000,1000,append,skip_first
+simulator_run_hard_FENE:20000,1000,500,noappend,first
