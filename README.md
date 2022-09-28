@@ -77,7 +77,9 @@ Run with: **./program (some location)/directives.inp**
 Use the testcase for an example: **./program /home/ben/Workspace/btree_chromo/test_case/directives.inp**
 
 **Possible Directives (parameters are comma-separated and following ':' when needed)**
+
 Controlling Replication State
+
  - new_chromo:size - *initializes an unreplicated chromosome with given size*
  - input_state:input_file - *creates state from input_file*
  - output_state:output_file - *writes state to output_file*
@@ -89,14 +91,18 @@ Controlling Replication State
  - replicator_prng_seed:seed - *seeds the replicator's prng*
  - load_replication_model:rep_model_file - *loads the parameters and initial conditions for a replication model*
  - replicate:t - *replicates the current btree using loaded replication model for (t) seconds*
+ 
 Interrogating Replication State
+
  - update_topology - *solves bond topology of system*
  - dump_topology:topology_file,idx - *dumps topology to topology_file with selected indexing convention (idx)*
  - update_CG_map:f_CG - *update coarse-graining with selected factor (f_CG)*
  - dump_CG_map:CG_map_file,f_CG,idx - *dumps CG_map to CG_map_file with selected factor (f_CG) and indexing convention (idx)*
  - regions_file:regions_file,idx - *reads chromosome regions from regions_file with selected indexing convention (idx)*
  - dump_regions:regions_count_file - *updates regions counts given current state and dumps counts to regions_count_file*
+ 
 Spatial System
+
  - load_BD_lengths:BD_length_file - *reads lengths for Brownian dynamics simulation*
  - load_mono_coords:coords_file,order - *reads binary file with monomer coordinates (doubles) using data ordering convention (row/col)*
  - load_ribo_coords:coords_file,order - *reads binary file with ribosome coordinates (doubles) using data ordering convention (row/col)*
@@ -105,7 +111,9 @@ Spatial System
  - set_initial_state - *set the initial state of the mapper to the current replication state*
  - set_final_state - *set the final state of the mapper to the current replication state*
  - map_replication - *based on the difference in final and initial replication states, determine new monomer coordinates and add new monomers to the LAMMPS system*
+ 
 Simulator
+
  - prepare_simulator:log_file - *initialize MPI and a LAMMPS object that writes its output to log_file, all further commands with 'simulator' in their name will use this LAMMPS object*
  - simulator_include_file:inc_file - *executes the 'include' command to run the LAMMPS commands stored in inc_file*
  - sync_simulator_and_system - *copies the current simulation state to the LAMMPS_sys object used to control the topology*
