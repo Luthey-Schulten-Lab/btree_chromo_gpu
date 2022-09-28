@@ -456,7 +456,8 @@ void LAMMPS_simulator::prepare_dump(thermo_dump_parameters &t_d_p)
       dumps_active.lammpstrj = true;
     }
 
-  lmp->input->one(("variable skip_condition equal \"step > "+ to_string(Nt) + "\"").c_str());
+  // lmp->input->one(("variable skip_condition equal \"step > "+ to_string(Nt) + "\"").c_str());
+  lmp->input->one(("variable D_delay equal "+ to_string(Nt + t_d_p.dump_freq)).c_str());
   
   // include dump
   if (t_d_p.append == true)
