@@ -6,8 +6,6 @@ variable l_equil equal 2.0*${r_mono}
 variable k_bend equal (1.374E+1)*${kBT} #  [Kcal/mol]
 variable k_twist equal (1.344E+1)*${kBT} # [Kcal/mol]
 variable k_align equal 2*${k_twist} # [Kcal/mol]
-variable epsilon_soft equal 10.0*${kBT} # [Kcal/mol]
-variable epsilon_LJ equal 10.0*${kBT} # [Kcal/mol]
 
 print """
  -----------------------------------------------------
@@ -18,8 +16,6 @@ print """
   k_bend = ${k_bend} [Kcal/mol]
   k_twist = ${k_twist} [Kcal/mol]
   k_align = ${k_align} [Kcal/mol]
-  epsilon_soft = ${epsilon_soft} [Kcal/mol]
-  epsilon_LJ = ${epsilon_LJ} [Kcal/mol]
 """
 
 # bond potentials
@@ -33,4 +29,4 @@ angle_coeff   2 polytorsion/omp ${k_align} ${k_twist} # primary polymer chain tw
 angle_coeff   3 harmonic/omp ${k_bend} 120.0 # replication fork angles
 angle_coeff   4 polytorsion/omp ${k_align} ${k_twist} # replication fork twist
 
-#special_bonds angle yes
+special_bonds angle yes
