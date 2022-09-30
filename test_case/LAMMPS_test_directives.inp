@@ -52,34 +52,81 @@ simulator_read_data:/home/ben/Workspace/btree_chromo/test_case/data.test_case
 
 
 simulator_minimize_soft_harmonic:1000
+simulator_minimize_soft_FENE:1000
 simulator_minimize_hard_harmonic:1000
 simulator_minimize_hard_FENE:1000
 
-simulator_run_hard_FENE:10000,1000,500,noappend,first
+simulator_run_soft_FENE:1000,100,100,noappend,first
+simulator_run_soft_FENE:1000,100,0,noappend,first
+simulator_set_output_details:/home/ben/Workspace/btree_chromo/test_case/,test_case_new
+simulator_run_soft_FENE:1000,100,500,noappend,first
 
-sync_simulator_and_system
+# sync_simulator_and_system
 
-clear_simulator
+# clear_simulator
 
-set_initial_state
+# set_initial_state
 
-transform:m_cw150_ccw150
-#transform:ml_cw50_ccw50
-#transform:mlr_cw50_ccw50
+# transform:m_cw200_ccw200
 
-set_final_state
+# set_final_state
 
-map_replication
+# map_replication
 
-write_LAMMPS_data:/home/ben/Workspace/btree_chromo/test_case/data.test_case
+# write_LAMMPS_data:/home/ben/Workspace/btree_chromo/test_case/data.test_case
 
-#read the LAMMPS data file into the simulator
-simulator_read_data:/home/ben/Workspace/btree_chromo/test_case/data.test_case
+# #read the LAMMPS data file into the simulator
+# simulator_read_data:/home/ben/Workspace/btree_chromo/test_case/data.test_case
 
+# simulator_minimize_soft_harmonic:1000
+# simulator_minimize_soft_FENE:1000
+# simulator_minimize_hard_harmonic:1000
+# simulator_minimize_hard_FENE:1000
 
-simulator_minimize_soft_harmonic:1000
-simulator_run_soft_harmonic:20000,1000,500,noappend,first
-simulator_minimize_hard_harmonic:1000
-simulator_minimize_hard_FENE:1000
+# sync_simulator_and_system
 
-simulator_run_hard_FENE:20000,1000,500,noappend,first
+# clear_simulator
+
+# set_initial_state
+
+# transform:ml_cw100_ccw100
+
+# set_final_state
+
+# map_replication
+
+# write_LAMMPS_data:/home/ben/Workspace/btree_chromo/test_case/data.test_case
+
+# #read the LAMMPS data file into the simulator
+# simulator_read_data:/home/ben/Workspace/btree_chromo/test_case/data.test_case
+
+# simulator_minimize_soft_harmonic:1000
+# simulator_minimize_soft_FENE:1000
+# simulator_minimize_hard_harmonic:1000
+# simulator_minimize_hard_FENE:1000
+
+# simulator_run_soft_FENE:100000,10000,10000,noappend,first
+
+# sync_simulator_and_system
+
+# clear_simulator
+
+# set_initial_state
+
+# transform:mr_cw150_ccw150
+
+# set_final_state
+
+# map_replication
+
+# write_LAMMPS_data:/home/ben/Workspace/btree_chromo/test_case/data.test_case
+
+# #read the LAMMPS data file into the simulator
+# simulator_read_data:/home/ben/Workspace/btree_chromo/test_case/data.test_case
+
+# simulator_minimize_soft_harmonic:1000
+# simulator_minimize_soft_FENE:1000
+# simulator_minimize_hard_harmonic:1000
+# simulator_minimize_hard_FENE:1000
+
+# simulator_run_hard_FENE:100000,10000,1000,noappend,first

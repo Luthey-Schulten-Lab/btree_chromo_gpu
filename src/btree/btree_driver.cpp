@@ -1223,11 +1223,11 @@ int btree_driver::simulator_minimize(vector<string> &params, drctv_reqs &reqs)
     {
       if (HARMONIC_FENE == 0)
 	{
-	  driver_lmp_simulator.minimize_soft_harmonic(t_d_p);
+	  driver_lmp_simulator.minimize_hard_harmonic(t_d_p);
 	}
       else if (HARMONIC_FENE == 1)
 	{
-	  driver_lmp_simulator.minimize_soft_FENE(t_d_p);
+	  driver_lmp_simulator.minimize_hard_FENE(t_d_p);
 	}
     }
 
@@ -1280,11 +1280,11 @@ int btree_driver::simulator_run(vector<string> &params, drctv_reqs &reqs)
     {
       if (HARMONIC_FENE == 0)
 	{
-	  driver_lmp_simulator.run_soft_harmonic(stoul(params[0]),t_d_p);
+	  driver_lmp_simulator.run_hard_harmonic(stoul(params[0]),t_d_p);
 	}
       else if (HARMONIC_FENE == 1)
 	{
-	  driver_lmp_simulator.run_soft_FENE(stoul(params[0]),t_d_p);
+	  driver_lmp_simulator.run_hard_FENE(stoul(params[0]),t_d_p);
 	}
     }
 

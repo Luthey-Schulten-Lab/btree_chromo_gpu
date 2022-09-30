@@ -552,7 +552,7 @@ void LAMMPS_sys::apply_mono_mapping(vector<vector<array<int,3>>> map)
 		}
 
 	      t_q = vqm.v_to_q(t_r);
-	      t_q = vqm.q_mult(t_q,vqm.q_conj(vqm.q_norm(t_e.q)));
+	      t_q = vqm.q_mult(t_q,vqm.q_norm(vqm.q_conj(t_e.q)));
 	      t_q = vqm.q_mult(vqm.q_norm(t_e.q),t_q);
 	      t_r = vqm.q_to_v(t_q);
 

@@ -76,6 +76,7 @@ public:
   // simulation protocol
   void reset_protocol_variables();
   void global_setup();
+  void reset_Nt(int Nt);
 
   // read_data
   void read_data(string data_file);
@@ -96,6 +97,11 @@ private:
 
   void compute_trigger(string compute_label);
   void prepare_dump(thermo_dump_parameters &t_d_p);
+  void reset_timestep_to_Nt();
+  void set_T_freq(int T_freq);
+  void set_D_freq(int D_freq);
+
+  bool T_freq_specified, D_freq_specified;
 
   int sim_MPI_initialized, sim_MPI_finalized;
   int sim_MPI_size; // MPI size
