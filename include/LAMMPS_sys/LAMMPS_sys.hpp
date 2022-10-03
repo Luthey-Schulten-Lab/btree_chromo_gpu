@@ -18,15 +18,36 @@
 
 using namespace std;
 
+// structure defining bounding box for the system
 struct sys_bbox
 {
   vec r_min, r_max;
 };
 
+// structure containing lengths for spatial system
 struct BD_lengths
 {
   double r_sphere, r_bdry;
   vec mono_shape, ribo_shape;
+};
+
+// structure defining a binding region for a loop
+struct binding_region
+{
+  string leaf; // leaf that binding region belongs to
+  int ll, ul, size; // lower limit and upper limit of indices
+  bool completed;
+  bool ter_crossing;
+  int mid_ll, mid_ul;
+};
+
+// structure defining a loop
+struct loop
+{
+  int a, h; // indices of anchor and hinge
+  int d; // direction of loop extrusion
+  binding_region a_region; // region containing anchor
+  binding_region h_region; // region containing hinge
 };
 
 class LAMMPS_sys
@@ -36,6 +57,9 @@ public:
   // constructor and destructor
   LAMMPS_sys();
   ~LAMMPS_sys();
+
+  // prng seeding
+  void prng_seed(int s);
 
   // set the btree
   void set_btree(btree_state in_state);
@@ -71,6 +95,12 @@ public:
 
   // sync the subarrays
   void sync_subarrays();
+
+  // loop topology functions
+  void prepare_binding_regions();
+  void initialize_loop_topo(int N_loop);
+  void update_loop_topo();
+  vector<loop> get_loops();
   
 private:
 
@@ -104,7 +134,12 @@ private:
   btree internal_btree;
   boundary_surface b_surf;
 
+  // loop topology
+  vector<loop> loops;
+  vector<binding_region> regions;
+
   vec_quat_manipulator vqm;
+  mt19937 rand_eng;
 
 };
 

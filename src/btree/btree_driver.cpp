@@ -1084,7 +1084,8 @@ int btree_driver::simulator_set_prng_seed(vector<string> &params, drctv_reqs &re
       cout << "ERROR: missing simulator" << endl;
       return 1;
     }
-  driver_lmp_simulator.set_prng_seed(stoi(params[0]));  
+  driver_lmp_simulator.set_prng_seed(stoi(params[0]));
+  driver_lmp_sys.prng_seed(stoi(params[0]));
   return 0;
 }
 
