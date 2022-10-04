@@ -15,6 +15,7 @@
 #include <LAMMPS_sys/ellipsoid_array.hpp>
 #include <LAMMPS_sys/bond_array.hpp>
 #include <LAMMPS_sys/angle_array.hpp>
+#include <LAMMPS_sys/loop_topology.hpp>
 
 using namespace std;
 
@@ -31,24 +32,6 @@ struct BD_lengths
   vec mono_shape, ribo_shape;
 };
 
-// structure defining a binding region for a loop
-struct binding_region
-{
-  string leaf; // leaf that binding region belongs to
-  int ll, ul, size; // lower limit and upper limit of indices
-  bool completed;
-  bool ter_crossing;
-  int mid_ll, mid_ul;
-};
-
-// structure defining a loop
-struct loop
-{
-  int a, h; // indices of anchor and hinge
-  int d; // direction of loop extrusion
-  binding_region a_region; // region containing anchor
-  binding_region h_region; // region containing hinge
-};
 
 class LAMMPS_sys
 {
@@ -96,11 +79,10 @@ public:
   // sync the subarrays
   void sync_subarrays();
 
-  // loop topology functions
-  void prepare_binding_regions();
-  void initialize_loop_topo(int N_loop);
+  // loop topology
+  void initialize_loop_topo(int N_loops);
   void update_loop_topo();
-  vector<loop> get_loops();
+  vector<bond> get_loop_bonds();
   
 private:
 
@@ -134,12 +116,9 @@ private:
   btree internal_btree;
   boundary_surface b_surf;
 
-  // loop topology
-  vector<loop> loops;
-  vector<binding_region> regions;
+  loop_topology loop_topo;
 
   vec_quat_manipulator vqm;
-  mt19937 rand_eng;
 
 };
 

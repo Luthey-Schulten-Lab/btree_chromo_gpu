@@ -6,7 +6,7 @@ LAMMPS_sys::LAMMPS_sys()
   N_atom_types = 6; // 0 bdry, 1 ribo, 2 mono(m), 3 ori(o), 4 ter(t), 5 fork(f)
   N_angle_types = 4; // linear m-m/o/t-m, twist m-m/o/t-m, linear m-f-m, twist m-f-m
   N_bond_types = 1; // m/o/t-m/o/t
-  rand_eng.seed(0);
+  loop_topo.prng_seed(0);
 }
 
 
@@ -18,7 +18,7 @@ LAMMPS_sys::~LAMMPS_sys()
 
 void LAMMPS_sys::prng_seed(int s)
 {
-  rand_eng.seed(s);
+  loop_topo.prng_seed(s);
 }
 
 
@@ -732,14 +732,19 @@ void LAMMPS_sys::sync_subarrays()
 }
 
 
-// prepare the vector of binding regions
-void LAMMPS_sys::prepare_binding_regions()
+// initialize the loop topology
+void LAMMPS_sys::initialize_loop_topo(int N_loops)
 {
 
-  // get the type array
-  int *t, N;
+  vector<string> leaves = internal_btree.get_leaves();
+  vector<theta_topo> leaf_topos;
 
-  t = nullptr;
+  for (string leaf : leaves)
+    {
+      leaf_topos.push_back(internal_btree.get_leaf_topo(leaf));
+    }
+
+  int *t, N;
 
   N = get_N_mono();
   t = new int[N];
@@ -749,212 +754,40 @@ void LAMMPS_sys::prepare_binding_regions()
       t[i] = mono_atoms.get_atom(i).type;
     }
 
-  theta_topo leaf_topo;
-  binding_region region;
-  vector<int> partitions;
-  vector<string> leaves = internal_btree.get_leaves();
+  // prepare the possible binding regions
+  loop_topo.prepare_binding_regions(leaves,leaf_topos,t);
 
-  for (string leaf : leaves)
-    {
-
-      region.leaf = leaf;
-      
-      leaf_topo = internal_btree.get_leaf_topo(leaf);
-
-      // test if the leaf is a completed chromosome
-      if ((leaf_topo.start == leaf_topo.end_link) &&
-	  (leaf_topo.end == leaf_topo.start_link))
-	{
-
-	  // determine the partitions along the leaf
-	  partitions.clear();
-
-	  for (int i=(leaf_topo.start+1); i<leaf_topo.end; i++)
-	    {
-	      if (t[i] == 6)
-		{
-		  partitions.push_back(i);
-		}
-	    }
-
-	  // prepare a parititioning if forks are present
-	  if (partitions.size() > 0)
-	    {
-	    
-	      // create regions from the partitions
-	      for (size_t i=0; i<(partitions.size()-1); i++)
-		{
-		  if ((partitions[i+1] - partitions[i]) > 3)
-		    {
-		      region.ll = partitions[i] + 1;
-		      region.ul = partitions[i+1] - 1;
-		      region.size = region.ul - region.ll + 1;
-		      region.completed = false;
-		      region.ter_crossing = false;
-		      region.mid_ll = -1;
-		      region.mid_ul = -1;
-		      regions.push_back(region);
-		    }
-		}
-
-	      // test for crossing back over Ter
-	      int completed_gap = 0;
-
-	      completed_gap += (leaf_topo.end - partitions[partitions.size()-1]);
-	      completed_gap += (partitions[0] - leaf_topo.start);
-
-	      if (completed_gap > 1)
-		{
-		  region.ter_crossing = true;
-		  if (partitions[partitions.size()-1] < leaf_topo.end)
-		    {
-		      region.ul = partitions[partitions.size()-1] + 1;
-		      region.mid_ul = leaf_topo.end;
-		    }
-		  else
-		    {
-		      region.ter_crossing = false;
-		      region.ll = leaf_topo.start;
-		      region.ul = partitions[0] - 1;
-		    }
-		  if (partitions[0] > leaf_topo.start)
-		    {
-		      region.ll = partitions[0] - 1;
-		      region.mid_ll = leaf_topo.start;
-		    }
-		  else
-		    {
-		      region.ter_crossing = false;
-		      region.ul = leaf_topo.end;
-		      region.ll = partitions[partitions.size()-1] + 1;
-		    }
-		  region.completed = false;
-		  region.size = completed_gap;
-		  regions.push_back(region);
-		}
-	      
-	    }
-	  else // no forks are present
-	    {
-
-	      region.ll = leaf_topo.start;
-	      region.ul = leaf_topo.end;
-	      region.size = region.ul - region.ll + 1;
-	      region.completed = true;
-	      
-	    }
-	  
-	}
-      else
-	{
-
-	  // determine the partitions along the leaf
-	  partitions.clear();
-
-	  partitions.push_back(leaf_topo.start);
-	  
-	  for (int i=(leaf_topo.start+1); i<leaf_topo.end; i++)
-	    {
-	      if (t[i] == 6)
-		{
-		  partitions.push_back(i);
-		}
-	    }
-
-	  partitions.push_back(leaf_topo.end);
-
-	  // create regions from the partitions
-	  for (size_t i=0; i<(partitions.size()-1); i++)
-	    {
-	      if ((partitions[i+1] - partitions[i]) > 3)
-		{
-		  region.ll = partitions[i] + 1;
-		  region.ul = partitions[i+1] - 1;
-		  region.size = region.ul - region.ll + 1;
-		  region.completed = false;
-		  region.ter_crossing = false;
-		  region.mid_ll = -1;
-		  region.mid_ul = -1;
-		  regions.push_back(region);
-		}
-	    }
-	  
-	} // end conditinal for complete leaf test
-      
-    } // end loop over leaves
-
-  // delete the type array
   delete[] t;
   
+  loop_topo.initialize_loops(N_loops);
 }
 
 
-// prepare the vector of binding regions
-void LAMMPS_sys::initialize_loop_topo(int N_loops)
-{
-  // clear the loops and binding regions
-  loops.clear();
-  regions.clear();
-
-  // determine the possible binding regions
-  prepare_binding_regions();
-
-  int total_binding_region_size = 0;
-
-  for (binding_region region : regions)
-    {
-      total_binding_region_size += region.size;
-    }
-
-  uniform_int_distribution<int> unif_dist(1,total_binding_region_size);
-  vector<int> a_dist;
-  loop temp_l;
-
-  // loop over the number of loops
-  for (int i=0; i<N_loops; i++)
-    {
-      a_dist.push_back(unif_dist(rand_eng));
-    }
-
-  // select an anchor region
-  for (int i=0; i<N_loops; i++)
-    {
-      int accumulator = 0;
-      for (binding_region region : regions)
-	{
-	  accumulator += region.size;
-	  if (a_dist[i] <= accumulator)
-	    {
-	      temp_l.a = -1;
-	      temp_l.h = -1;
-	      temp_l.d = 0;
-	      temp_l.a_region = region;
-	      temp_l.h_region = region;
-	      loops.push_back(temp_l);
-	      break;
-	    }
-	}
-    }
-
-  // select an anchor
-
-  // select a compatible hinge
-}
-
-
-// prepare the vector of binding regions
+// update the loop topology
 void LAMMPS_sys::update_loop_topo()
 {
 
-  // loop over the loops
-
-  // select an updated hinge
+  loop_topo.update_loops();
   
 }
 
 
-// prepare the vector of binding regions
-vector<loop> LAMMPS_sys::get_loops()
+// get the loops and convert them into bonds
+vector<bond> LAMMPS_sys::get_loop_bonds()
 {
-  return loops;
+  bond loop_bond;
+  vector<bond> loop_bonds;
+  int id = bonds.get_N() + 1;
+  
+  vector<loop> loops = loop_topo.get_loops();
+
+  for (loop l : loops)
+    {
+      loop_bond.id = id;
+      loop_bond.type = 2;
+      loop_bond.i = l.get_a();
+      loop_bond.j = l.get_h();
+      loop_bonds.push_back(loop_bond);
+    }
+  return loop_bonds;
 }

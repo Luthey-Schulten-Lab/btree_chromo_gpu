@@ -1,0 +1,47 @@
+#ifndef INCLUDE_LOOP_HPP
+#define INCLUDE_LOOP_HPP
+
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <cstring>
+#include <vector>
+#include <memory>
+
+#include <LAMMPS_sys/vec_quat_manipulator.hpp>
+
+using namespace std;
+
+class loop
+{
+public:
+
+  // constructor and destructor
+  loop(int a_region, int h_region);
+  ~loop();
+
+  // setters
+  void set_a(int a);
+  void set_h(int h);
+  void set_d(int d);
+  void set_a_region(int a_region);
+  void set_h_region(int h_region);
+
+  // getters
+  int get_a();
+  int get_h();
+  int get_d();
+  int get_a_region();
+  int get_h_region();
+  
+private:
+
+  int a, h; // indices of anchor and hinge
+  int d; // direction of loop extrusion
+  int a_region; // index of region containing anchor
+  int h_region; // index of region containing hinge
+
+
+};
+
+#endif
