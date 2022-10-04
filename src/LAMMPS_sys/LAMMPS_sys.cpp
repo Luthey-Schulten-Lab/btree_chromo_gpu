@@ -205,6 +205,8 @@ void LAMMPS_sys::set_mono_types(int base_type)
 {
   int *t, N;
 
+  N = get_N_mono();
+
   t = nullptr;
 
   internal_btree.prepare_types(t,N,base_type);

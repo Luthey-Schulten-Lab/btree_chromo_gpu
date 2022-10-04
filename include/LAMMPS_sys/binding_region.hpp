@@ -22,8 +22,13 @@ public:
 		 bool ter_crossing, int mid_ll, int mid_ul);
   ~binding_region();
 
+  // getters
   int get_size();
   string get_leaf();
+
+  // randomly select an initial anchor within the region
+
+  // test if queried index is within the region
   bool within_region(int q);
 
 private:
