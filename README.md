@@ -11,9 +11,9 @@ Upon execution a **btree_driver** executes a series of directives stored in a fi
 The **btree_driver** contains the following objects.
 
 - btree - *a specialized binary tree class representing replicating circular dsDNA in nested theta structures that can only be manipulated using public member functions representing processes physically possible for circular dsDNA*
- 1) determines topology when system is represented as circular(/theta structure) polymers (for arbitrary replication states)
- 2) counts genome features at nucleotide resolution (for arbitrary replication states)
- 3) prepares coarse-graining into chromosomal loci for contact map calculations (for arbitrary replication states)
+  1) determines topology when system is represented as circular(/theta structure) polymers (for arbitrary replication states)
+  2) counts genome features at nucleotide resolution (for arbitrary replication states)
+  3) prepares coarse-graining into chromosomal loci for contact map calculations (for arbitrary replication states)
 
 - replicator - *a class containing a stochastic chemical kinetics model for DNA replication initiation due to DnaA, which then simulates trajectories in the space of replication states using the Gillespie method*
        
@@ -50,19 +50,21 @@ By combining a series of directives together a user could perform the following 
 
 ## Installation
 
+All dependencies can be installed within a conda virtual environment with the Anaconda python distribution, this is the easiest approach on a local desktop.
+
    1) Install **OpenMPI** - *I built v4.1.4 from source using GCC-v12.1.0*
    2) Install **fmt Library** - *I built v9.1.0 from source using GCC-v12.1.0*
-   3) Follow instructions in '/LAMMPS_src_additions' to make the additions to the LAMMPS source code
-   4) Build and install the modified version of **LAMMPS** - *I built the 2022/02/17 release using GCC-v12.1.0*
+   3) Follow instructions in '/LAMMPS_src_additions/installation.txt' to make the additions to the LAMMPS source code
+   4) Build and install the modified version of **LAMMPS** using cmake with the last command in 'LAMMPS_src_additions/cmake_command.txt' modified to match your build and installation locations (1. cmake command, 2. make, 3. make install) - *I built the 2022/02/17 release using GCC-v12.1.0*
    5) Edit the following variables in the Makefile to match your installations from the previous steps. - *I used environment variables to specify these local installations on my machine in a bash scripts, but you can type them in manually if you would prefer.*
-   - **OPENMPI_LDFLAGS**
-   - **FMT_LDFLAGS**
-   - **LAMMPS_LDFLAGS**
-   - **OPENMPI_INCLUDE**
-   - **FMT_INCLUDE**
-   - **LAMMPS_INCLUDE**
+      - **OPENMPI_LDFLAGS** - *OpenMPI library*
+      - **FMT_LDFLAGS** - *fmt library*
+      - **LAMMPS_LDFLAGS** - *LAMMPS library*
+      - **OPENMPI_INCLUDE** - *OpenMPI headers*
+      - **FMT_INCLUDE** - *fmt headers*
+      - **LAMMPS_INCLUDE** - *LAMMPS headers in source*
 
-   6) **make all**
+   6) make all
 
 The executable (*program*) will be in /build/apps.
 
@@ -78,7 +80,7 @@ Use the testcase for an example: **./program /home/ben/Workspace/btree_chromo/te
 
 **Possible Directives (parameters are comma-separated and following ':' when needed)**
 
-Controlling Replication State
+**Controlling Replication State**
 
  - new_chromo:size - *initializes an unreplicated chromosome with given size*
  - input_state:input_file - *creates state from input_file*
@@ -92,7 +94,7 @@ Controlling Replication State
  - load_replication_model:rep_model_file - *loads the parameters and initial conditions for a replication model*
  - replicate:t - *replicates the current btree using loaded replication model for (t) seconds*
  
-Interrogating Replication State
+**Querying Replication State**
 
  - update_topology - *solves bond topology of system*
  - dump_topology:topology_file,idx - *dumps topology to topology_file with selected indexing convention (idx)*
@@ -101,7 +103,7 @@ Interrogating Replication State
  - regions_file:regions_file,idx - *reads chromosome regions from regions_file with selected indexing convention (idx)*
  - dump_regions:regions_count_file - *updates regions counts given current state and dumps counts to regions_count_file*
  
-Spatial System
+**Spatial System for Simulations**
 
  - load_BD_lengths:BD_length_file - *reads lengths for Brownian dynamics simulation*
  - load_mono_coords:coords_file,order - *reads binary file with monomer coordinates (doubles) using data ordering convention (row/col)*
@@ -112,7 +114,7 @@ Spatial System
  - set_final_state - *set the final state of the mapper to the current replication state*
  - map_replication - *based on the difference in final and initial replication states, determine new monomer coordinates and add new monomers to the LAMMPS system*
  
-Simulator
+**Simulator**
 
  - prepare_simulator:log_file - *initialize MPI and a LAMMPS object that writes its output to log_file, all further commands with 'simulator' in their name will use this LAMMPS object*
  - simulator_include_file:inc_file - *executes the 'include' command to run the LAMMPS commands stored in inc_file*

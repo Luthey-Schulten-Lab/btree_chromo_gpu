@@ -7,6 +7,7 @@
 #include <cstring>
 #include <vector>
 #include <memory>
+#include <random>
 
 #include <btree/btree.hpp>
 #include <LAMMPS_sys/vec_quat_manipulator.hpp>
@@ -22,11 +23,17 @@ public:
 		 bool ter_crossing, int mid_ll, int mid_ul);
   ~binding_region();
 
+  // setters
+  void set_rand_eng(mt19937 &rand_eng);
+  
   // getters
   int get_size();
   string get_leaf();
 
-  // randomly select an initial anchor within the region
+  // randomly select a moomer within the region
+  int select_random_monomer();
+  int select_direction(int pos, int min_dist);
+  int get_relative_monomer_pos(int pos, int dist, int dir);
 
   // test if queried index is within the region
   bool within_region(int q);
@@ -38,6 +45,8 @@ private:
   bool completed;
   bool ter_crossing;
   int mid_ll, mid_ul;
+
+  mt19937 rand_eng;
   
 };
 

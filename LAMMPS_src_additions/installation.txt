@@ -7,8 +7,8 @@ This file provides an explanation of how to modify the LAMMPS source code to run
 
  - angle_polytorsion.cpp
  - angle_polytorsion.h
- - angle_polytorsion_end.cpp
- - angle_polytorsion_end.h
+ - angle_polytorsionend.cpp
+ - angle_polytorsionend.h
 
 
 ./lammps/src/OPENMP
@@ -32,7 +32,7 @@ This file provides an explanation of how to modify the LAMMPS source code to run
 
    Angle Styles:
     - polytorsion (Brackley et al. 2014)
-    - polytorsion_end (Brackley et al. 2014)
+    - polytorsionend (Brackley et al. 2014)
     - polytorsion_omp (new multi-threaded version of "polytorsion" from Brackley et al. 2014)
 
    Fixes:

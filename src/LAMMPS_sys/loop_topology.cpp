@@ -171,6 +171,7 @@ void loop_topology::prepare_binding_regions(vector<string> leaves, vector<theta_
 		  binding_region region(leaf,ll,ul,size,
 					completed,
 					ter_crossing,mid_ll,mid_ul);
+		  region.set_rand_eng(rand_eng);
 		  regions.push_back(region);
 		}
 	    }
@@ -225,9 +226,33 @@ void loop_topology::initialize_loops(int N_loops)
 	}
     }
 
-  // select an anchor
+
+  int a_region, h_region;
+  
+  // select an anchor for each loop
+  for (int i_loop=0; i_loop<N_loops; i_loop++)
+    {
+      a_region = loops[i_loop].get_a_region();
+      loops[i_loop].set_a(regions[a_region].select_random_monomer());
+    }
+
+  // based on the position of the anchor and a minimum distance between the anchor and hinge, select a direction for the hinge to travel
+  int min_a_d_dist = 1;
+  for (int i_loop=0; i_loop<N_loops; i_loop++)
+    {
+      h_region = loops[i_loop].get_h_region();
+      loops[i_loop].set_d(regions[h_region].select_direction(loops[i_loop].get_a(),
+							     min_a_d_dist));
+    }
 
   // select a compatible hinge
+  for (int i_loop=0; i_loop<N_loops; i_loop++)
+    {
+      h_region = loops[i_loop].get_h_region();
+      loops[i_loop].set_h(regions[h_region].get_relative_monomer_pos(loops[i_loop].get_a(),
+								     min_a_d_dist,
+								     loops[i_loop].get_d()));
+    }
 }
 
 

@@ -790,6 +790,7 @@ vector<bond> LAMMPS_sys::get_loop_bonds()
       loop_bond.i = l.get_a();
       loop_bond.j = l.get_h();
       loop_bonds.push_back(loop_bond);
+      id += 1;
     }
   return loop_bonds;
 }
