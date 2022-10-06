@@ -35,7 +35,7 @@ struct thermo_dump_parameters
 
 struct compute_tracker
 {
-  bool quats, ids, MSD;
+  bool quats, ids, types, MSD;
 };
 
 struct dump_tracker
@@ -54,13 +54,11 @@ public:
   void LAMMPS_initialize(string logfile);
   void LAMMPS_destroy();
 
-  void include_file(string filename);
-  void clear();
-
   void set_lmp_sys(LAMMPS_sys *lmp_sys);
 
   // sync the simulator to the system
   void sim_to_sys();
+  void sim_to_sys_atom_counts();
 
   // set nProc for simulator
   void set_nProc(int nProc);
@@ -76,7 +74,11 @@ public:
   // simulation protocol
   void reset_protocol_variables();
   void global_setup();
+  void standard_computes();
   void reset_Nt(int Nt);
+  void command(string command);
+  void include_file(string filename);
+  void clear();
 
   // read_data
   void read_data(string data_file);

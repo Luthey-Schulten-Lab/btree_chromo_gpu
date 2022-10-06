@@ -50,17 +50,28 @@ public:
   // read the Brownian dynamics lengths
   void read_BD_lengths(string lengths_filename);
 
-  // read the monomer coordinates
+  // read the monomer coordinates and quaternions
   int read_mono_coords(string coords_filename, string order);
-  // read the ribo coordinates
+  int read_mono_quats(string quats_filename, string order);
+  // read the ribo coordinates and quaternions
   int read_ribo_coords(string coords_filename, string order);
+  int read_ribo_quats(string quats_filename, string order);
   // read the bdry coordinates
   int read_bdry_coords(string coords_filename, string order);
+
+  // write the monomer coordinates and quaternions
+  int write_mono_coords(string coords_filename, string order);
+  int write_mono_quats(string quats_filename, string order);
+  // write the ribo coordinates and quaternions
+  int write_ribo_coords(string coords_filename, string order);
+  int write_ribo_quats(string quats_filename, string order);
+  // write the bdry coordinates
+  int write_bdry_coords(string coords_filename, string order);
 
   // apply a mapping to the monomers
   void apply_mono_mapping(vector<vector<array<int,3>>> map);
 
-  // read the monomer coordinates
+  // write the monomer coordinates to an xyz for quick visualization
   void write_mono_xyz(string data_filename);
 
   // write the data
@@ -71,6 +82,15 @@ public:
   int get_N_mono();
   int get_N_ribo();
   int get_N_bdry();
+
+  // setters for the subarrays
+  void set_N_total(int N);
+  void set_N_mono(int N_mono);
+  void set_N_ribo(int N_ribo);
+  void set_N_bdry(int N_bdry);
+  void set_N_total_ellipsoids(int N);
+  void set_N_mono_ellipsoids(int N_mono);
+  void set_N_ribo_ellipsoids(int N_ribo);
 
   // setters for the total system state
   void set_coords_arr_total(double *&x, string order);

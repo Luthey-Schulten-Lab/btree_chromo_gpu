@@ -50,6 +50,9 @@ simulator_set_delta_t:1.0E+5
 #read the LAMMPS data file into the simulator
 simulator_read_data:/home/ben/Workspace/btree_chromo/test_case/data.test_case
 
+print
+
+#write_LAMMPS_data:/home/ben/Workspace/btree_chromo/test_case/data.test_case
 
 simulator_minimize_soft_harmonic:1000
 simulator_minimize_soft_FENE:1000
@@ -60,6 +63,10 @@ simulator_run_soft_FENE:1000,100,100,noappend,first
 simulator_run_soft_FENE:1000,100,0,noappend,first
 simulator_set_output_details:/home/ben/Workspace/btree_chromo/test_case/,test_case_new
 simulator_run_soft_FENE:1000,100,500,noappend,first
+
+sync_simulator_and_system
+
+write_LAMMPS_data:/home/ben/Workspace/btree_chromo/test_case/data.test_case_out
 
 # sync_simulator_and_system
 

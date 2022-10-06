@@ -77,6 +77,13 @@ void LAMMPS_simulator::include_file(string filename)
 }
 
 
+// feed a single command to the LAMMPS simulation object
+void LAMMPS_simulator::command(string command)
+{
+  lmp->input->one(command.c_str());
+}
+
+
 // read data into LAMMPS simulation object
 void LAMMPS_simulator::read_data(string data_file)
 {
@@ -94,12 +101,27 @@ void LAMMPS_simulator::global_setup()
 
   computes_active.quats = false;
   computes_active.ids = false;
+  computes_active.types = false;
   computes_active.MSD = false;
   dumps_active.lammpstrj = false;
   T_freq_specified = false;
   D_freq_specified = false;
   
   lmp->input->one("include ${DNA_model_dir}/protocol_subroutines/subroutine.global_setup");
+}
+
+
+// initialize the standard computes
+void LAMMPS_simulator::standard_computes()
+{
+  // include compute for ids
+  compute_trigger("ids");
+
+  // include compute for types
+  compute_trigger("types");
+  
+  // include compute for quats
+  compute_trigger("quats");
 }
 
 
@@ -551,6 +573,14 @@ void LAMMPS_simulator::compute_trigger(string compute_label)
 	  computes_active.ids = true;
 	}
     }
+  else if (compute_label == "types")
+    {
+      if (computes_active.types == false)
+	{
+	  lmp->input->one("include ${DNA_model_dir}/compute_subroutines/subroutine.compute_types");
+	  computes_active.types = true;
+	}
+    }
   else if (compute_label == "quats")
     {
       if (computes_active.quats == false)
@@ -570,15 +600,88 @@ void LAMMPS_simulator::compute_trigger(string compute_label)
 }
 
 
+// get atom counts from the simulator and resize the system
+void LAMMPS_simulator::sim_to_sys_atom_counts()
+{
+  
+  double Nd = lammps_get_natoms(lmp);
+  int N = int(Nd);
+  cout << "Nd = " << Nd << endl;
+  cout << "N = " << N << endl;
+
+  // determine the sizes of the subarrays
+  // unsigned long int *types = new unsigned long int[N];
+
+  // 1 for per-atom type, 1 for size of data (t)
+  // lammps_gather_atoms(lmp, const_cast<char*>("type"), 1, 1, types);
+
+  // get the types to match up the quats
+  void *types_p;
+  // 1 for LMP_STYLE_ATOM, 1 for LMP_TYPE_VECTOR
+  types_p = lammps_extract_compute(lmp,const_cast<char*>("type_track"),1,1);
+  double *types{static_cast<double*>(types_p)};
+
+  int N_mono = 0;
+  int N_ribo = 0;
+  int N_bdry = 0;
+
+  int t;
+  for (int i=0; i<N; i++)
+    {
+      // t = static_cast<int>(types[i]);
+      t = int(types[i]);
+      if (i%50 == 0) cout << i << "\t" << t << endl;
+      if (t == 1)
+	{
+	  N_bdry += 1;
+	}
+      else if (t == 2)
+	{
+	  N_ribo += 1;
+	}
+      else
+	{
+	  N_mono += 1;
+	}
+    }
+
+  int N_mono_ribo = N_mono + N_ribo;
+  cout << "N_mono = " << N_mono << endl;
+  cout << "N_ribo = " << N_ribo << endl;
+  cout << "N_bdry = " << N_bdry << endl;
+  cout << "N_mono_ribo = " << N_mono_ribo << endl;
+
+  delete[] types;
+  cout << "past delete" << endl;
+
+  // resize the system state based on the simulator
+  lmp_sys->set_N_total(N);
+  lmp_sys->set_N_mono(N_mono);
+  lmp_sys->set_N_ribo(N_ribo);
+  lmp_sys->set_N_bdry(N_bdry);
+  lmp_sys->set_N_total_ellipsoids(N_mono_ribo);
+  lmp_sys->set_N_mono_ellipsoids(N_mono);
+  lmp_sys->set_N_ribo_ellipsoids(N_ribo);
+  
+}
+
+
 // dump the simulation state to the system state
 void LAMMPS_simulator::sim_to_sys()
 {
+  
+  // sim_to_sys_atom_counts();
+  
   int N = lmp_sys->get_N_total();
   int N_mono = lmp_sys->get_N_mono();
   int N_ribo = lmp_sys->get_N_ribo();
-  // int N_bdry = lmp_sys->get_N_bdry();
-
+  int N_bdry = lmp_sys->get_N_bdry();
   int N_mono_ribo = N_mono + N_ribo;
+
+  cout << "N_mono = " << N_mono << endl;
+  cout << "N_ribo = " << N_ribo << endl;
+  cout << "N_bdry = " << N_bdry << endl;
+  cout << "N_mono_ribo = " << N_mono_ribo << endl;
 
   if (N > 0)
     {

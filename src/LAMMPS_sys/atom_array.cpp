@@ -206,7 +206,7 @@ int atom_array::read_bin_coords(string data_filename, string order, bool force_r
     
   if (!data_file.is_open())
     {
-      cout << "ERROR: file not opened in write_data" << endl;
+      cout << "ERROR: file not opened in read_bin_coords" << endl;
       return 1;
     }
   else
@@ -221,17 +221,17 @@ int atom_array::read_bin_coords(string data_filename, string order, bool force_r
       char vals[sizeof(double)];
       int N_data = size/data_size;
       cout << "N_data = " << N_data << endl;
-      int N_bin_atoms = N_data/3;
-      cout << "N_bin_atoms = " << N_bin_atoms << endl;
+      int N_bin_coords = N_data/3;
+      cout << "N_bin_coords = " << N_bin_coords << endl;
 
       // test for resizing
       if (force_resize)
 	{
-	  set_N(N_bin_atoms);
+	  set_N(N_bin_coords);
 	}
       else
 	{
-	  if (N_bin_atoms != get_N())
+	  if (N_bin_coords != get_N())
 	    {
 	      cout << "ERROR: incorrect atom_array size" << endl;
 	      return 1;
@@ -290,7 +290,7 @@ void atom_array::write(fstream &data_file)
 
 
 // write the boundary coordinates to an xyz file
-void atom_array::write_xyz(string data_filename)
+int atom_array::write_xyz(string data_filename)
 {
 
   // begin writing data file
@@ -299,9 +299,10 @@ void atom_array::write_xyz(string data_filename)
 
   data_file.open(data_filename, ios::out);
 
-  if (!data_file)
+  if (!data_file.is_open())
     {
       cout << "ERROR: file not opened in write_xyz" << endl;
+      return 1;
     }
   else
     {
@@ -316,9 +317,66 @@ void atom_array::write_xyz(string data_filename)
 		    << atoms[i].r.y << "\t"
 		    << atoms[i].r.z << endl;
 	}
+
+      data_file.close();
+      return 0;
       
     }
-
-  data_file.close();
   
+}
+
+
+// write coordinates to a binary file
+int atom_array::write_bin(string data_filename, string order)
+{
+  fstream data_file;
+
+  data_file.open(data_filename, ios::out | ios::binary);
+
+  // int data_size = 4;
+    
+  if (!data_file.is_open())
+    {
+      cout << "ERROR: file not opened in write_bin" << endl;
+      return 1;
+    }
+  else if (N > 0)
+    {
+      double *x = new double[3*N];
+
+      if (order == "col")
+	{
+	  for (int i=0; i<N; i++)
+	    {
+	      x[i] = atoms[i].r.x;
+	      x[N+i] = atoms[i].r.y;
+	      x[2*N+i] = atoms[i].r.z;
+	    }
+	}
+      else if (order == "row")
+	{
+	  for (int i=0; i<N; i++)
+	    {
+	      x[3*i] = atoms[i].r.x;
+	      x[3*i+1] = atoms[i].r.y;
+	      x[3*i+2] = atoms[i].r.z;
+	    }
+	}
+
+      data_file.write(reinterpret_cast<const char*>(x),3*N*sizeof(double));
+      
+      delete[] x;
+      data_file.close();
+      return 0;
+    }
+  else
+    {
+      cout << "no coords to write" << endl;
+      data_file.close();
+      return 0;
+    }
+
+  return 0;
+
+
 }

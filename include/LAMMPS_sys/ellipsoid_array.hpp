@@ -2,7 +2,9 @@
 #define INCLUDE_ELLIPSOID_ARRAY_HPP
 
 #include <memory>
+#include <iostream>
 #include <fstream>
+#include <cstring>
 
 #include <LAMMPS_sys/vec_quat_manipulator.hpp>
 
@@ -39,8 +41,12 @@ public:
   void set_quat(int i, quat q);
   void normalize_quats();
 
+  // read quats from files
+  int read_bin_quats(string data_filename, string order, bool force_resize);
+
   // write atom data
   void write(fstream &data_file);
+  int write_bin(string data_filename, string order);
 
 private:
 

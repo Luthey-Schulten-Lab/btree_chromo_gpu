@@ -51,7 +51,8 @@ public:
 
   // write atom data
   void write(fstream &data_file);
-  void write_xyz(string data_filename);
+  int write_xyz(string data_filename);
+  int write_bin(string data_filename, string order);
 
 private:
 

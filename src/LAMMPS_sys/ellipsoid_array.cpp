@@ -154,13 +154,87 @@ void ellipsoid_array::set_quats_arr(double *&q, string order)
     {
       for (int i=0; i<N; i++)
 	{
-	  p.w = q[3*i];
-	  p.v.z = q[3*i+1];
-	  p.v.y = q[3*i+2];
-	  p.v.z = q[3*i+3];
+	  p.w = q[4*i];
+	  p.v.z = q[4*i+1];
+	  p.v.y = q[4*i+2];
+	  p.v.z = q[4*i+3];
 	  set_quat(i,p);
 	}
     }
+}
+
+
+// read coordinates from binary file
+int ellipsoid_array::read_bin_quats(string data_filename, string order, bool force_resize)
+{
+  fstream data_file;
+
+  data_file.open(data_filename, ios::in | ios::binary | ios::ate);
+
+  // int data_size = 4;
+    
+  if (!data_file.is_open())
+    {
+      cout << "ERROR: file not opened in read_bin_quats" << endl;
+      return 1;
+    }
+  else
+    {
+
+      // read in the binary file
+      streampos size = data_file.tellg();
+      char *memblock;
+      double *q;
+
+      int data_size = sizeof(double);
+      char vals[sizeof(double)];
+      int N_data = size/data_size;
+      cout << "N_data = " << N_data << endl;
+      int N_bin_quats = N_data/4;
+      cout << "N_bin_quats = " << N_bin_quats << endl;
+
+      // test for resizing
+      if (force_resize)
+	{
+	  set_N(N_bin_quats);
+	}
+      else
+	{
+	  if (N_bin_quats != get_N())
+	    {
+	      cout << "ERROR: incorrect ellipsoid_array size" << endl;
+	      return 1;
+	    }
+	}
+
+      memblock = new char[size];
+      
+      data_file.seekg(0, ios::beg);
+
+      data_file.read(memblock,size);
+
+      data_file.close();
+
+      q = new double[N_data];
+
+      for (int i=0; i<N_data; i++)
+	{
+	  for (int j=0; j<data_size; j++)
+	    {
+	      vals[j] = memblock[i*data_size+j];
+	    }
+	  memcpy(&q[i], vals, 8);
+	}
+
+      delete memblock;
+      
+      set_quats_arr(q,order);
+
+      delete q;
+      return 0;
+      
+    }
+    
 }
 
 
@@ -181,4 +255,62 @@ void ellipsoid_array::write(fstream &data_file)
 		<< ellipsoids[i].q.v.z << endl;
     }
   
+}
+
+
+// write quaternions to a binary file
+int ellipsoid_array::write_bin(string data_filename, string order)
+{
+  fstream data_file;
+
+  data_file.open(data_filename, ios::out | ios::binary);
+
+  // int data_size = 4;
+    
+  if (!data_file.is_open())
+    {
+      cout << "ERROR: file not opened in write_bin" << endl;
+      return 1;
+    }
+  else if (N > 0)
+    {
+      double *q = new double[4*N];
+
+      if (order == "col")
+	{
+	  for (int i=0; i<N; i++)
+	    {
+	      q[i] = ellipsoids[i].q.w;
+	      q[N+i] = ellipsoids[i].q.v.x;
+	      q[2*N+i] = ellipsoids[i].q.v.y;
+	      q[3*N+i] = ellipsoids[i].q.v.z;
+	    }
+	}
+      else if (order == "row")
+	{
+	  for (int i=0; i<N; i++)
+	    {
+	      q[4*i] = ellipsoids[i].q.w;
+	      q[4*i+1] = ellipsoids[i].q.v.x;
+	      q[4*i+2] = ellipsoids[i].q.v.y;
+	      q[4*i+3] = ellipsoids[i].q.v.z;
+	    }
+	}
+
+      data_file.write(reinterpret_cast<const char*>(q),4*N*sizeof(double));
+      
+      delete[] q;
+      data_file.close();
+      return 0;
+    }
+  else
+    {
+      cout << "no quats to write" << endl;
+      data_file.close();
+      return 0;
+    }
+
+  return 0;
+
+
 }

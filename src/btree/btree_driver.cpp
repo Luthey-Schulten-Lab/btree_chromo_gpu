@@ -284,17 +284,66 @@ int btree_driver::execute_directives()
 	}
 
 
-      // load file containing the monomer coordinates
+      // load file containing the monomer quaternions
+      else if (command == "load_mono_quats")
+	{
+	  error_code = load_mono_quats(params,reqs);
+	}
+
+
+      // load file containing the ribosome coordinates
       else if (command == "load_ribo_coords")
 	{
 	  error_code = load_ribo_coords(params,reqs);
 	}
 
 
-      // load file containing the monomer coordinates
+      // load file containing the ribosome quaternions
+      else if (command == "load_ribo_quats")
+	{
+	  error_code = load_ribo_quats(params,reqs);
+	}
+
+
+      // load file containing the boundary coordinates
       else if (command == "load_bdry_coords")
 	{
 	  error_code = load_bdry_coords(params,reqs);
+	}
+
+
+      // write file containing the monomer coordinates
+      else if (command == "write_mono_coords")
+	{
+	  error_code = write_mono_coords(params);
+	}
+
+
+      // write file containing the monomer quaternions
+      else if (command == "write_mono_quats")
+	{
+	  error_code = write_mono_quats(params);
+	}
+
+
+      // write file containing the ribosome coordinates
+      else if (command == "write_ribo_coords")
+	{
+	  error_code = write_ribo_coords(params);
+	}
+
+
+      // write file containing the ribosome quaternions
+      else if (command == "write_ribo_quats")
+	{
+	  error_code = write_ribo_quats(params);
+	}
+
+
+      // write file containing the boundary coordinates
+      else if (command == "write_bdry_coords")
+	{
+	  error_code = write_bdry_coords(params);
 	}
 
 
@@ -881,6 +930,24 @@ int btree_driver::load_mono_coords(vector<string> &params, drctv_reqs &reqs)
 }
 
 
+int btree_driver::load_mono_quats(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 2)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  if (reqs.btree_initialized == false)
+    {
+      cout << "ERROR: empty btree" << endl;
+      return 1;
+    }
+  driver_lmp_sys.set_btree(driver_bt.dump_state());
+  int e = driver_lmp_sys.read_mono_quats(params[0],params[1]);
+  return e;
+}
+
+
 int btree_driver::load_ribo_coords(vector<string> &params, drctv_reqs &reqs)
 {
   if (params.size() != 2)
@@ -898,6 +965,23 @@ int btree_driver::load_ribo_coords(vector<string> &params, drctv_reqs &reqs)
 }
 
 
+int btree_driver::load_ribo_quats(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 2)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  if (reqs.btree_initialized == false)
+    {
+      cout << "ERROR: empty btree" << endl;
+      return 1;
+    }
+  int e = driver_lmp_sys.read_ribo_quats(params[0],params[1]);
+  return e;
+}
+
+
 int btree_driver::load_bdry_coords(vector<string> &params, drctv_reqs &reqs)
 {
   if (params.size() != 2)
@@ -911,6 +995,66 @@ int btree_driver::load_bdry_coords(vector<string> &params, drctv_reqs &reqs)
       return 1;
     }
   int e = driver_lmp_sys.read_bdry_coords(params[0],params[1]);
+  return e;
+}
+
+
+int btree_driver::write_mono_coords(vector<string> &params)
+{
+  if (params.size() != 2)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  int e = driver_lmp_sys.write_mono_coords(params[0],params[1]);
+  return e;
+}
+
+
+int btree_driver::write_mono_quats(vector<string> &params)
+{
+  if (params.size() != 2)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  int e = driver_lmp_sys.write_mono_quats(params[0],params[1]);
+  return e;
+}
+
+
+int btree_driver::write_ribo_coords(vector<string> &params)
+{
+  if (params.size() != 2)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  int e = driver_lmp_sys.write_ribo_coords(params[0],params[1]);
+  return e;
+}
+
+
+int btree_driver::write_ribo_quats(vector<string> &params)
+{
+  if (params.size() != 2)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  int e = driver_lmp_sys.write_ribo_quats(params[0],params[1]);
+  return e;
+}
+
+
+int btree_driver::write_bdry_coords(vector<string> &params)
+{
+  if (params.size() != 2)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  int e = driver_lmp_sys.write_bdry_coords(params[0],params[1]);
   return e;
 }
 
@@ -1038,6 +1182,7 @@ int btree_driver::sync_simulator_and_system(drctv_reqs &reqs)
       cout << "ERROR: missing simulator" << endl;
       return 1;
     }
+  driver_lmp_sys.set_btree(driver_bt.dump_state());
   driver_lmp_simulator.sim_to_sys();
   return 0;
 }
@@ -1178,6 +1323,7 @@ int btree_driver::simulator_read_data(vector<string> &params, drctv_reqs &reqs)
   driver_lmp_simulator.reset_protocol_variables();
   driver_lmp_simulator.global_setup();
   driver_lmp_simulator.read_data(params[0]);
+  driver_lmp_simulator.standard_computes();
 
   reqs.lmp_data_present = true;
   

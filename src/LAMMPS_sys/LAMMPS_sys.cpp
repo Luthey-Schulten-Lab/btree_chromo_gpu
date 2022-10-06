@@ -27,7 +27,14 @@ void LAMMPS_sys::set_btree(btree_state in_state)
 {
   internal_btree.prepare_state(in_state);
   internal_btree.solve_topology();
-  mono_atoms.set_N(internal_btree.total_size());
+  if (mono_atoms.get_N() != internal_btree.total_size())
+    {
+      mono_atoms.set_N(internal_btree.total_size());
+    }
+  if (mono_ellipsoids.get_N() != internal_btree.total_size())
+    {
+      mono_ellipsoids.set_N(internal_btree.total_size());
+    }
 }
 
 
@@ -332,10 +339,12 @@ void LAMMPS_sys::finalize_system()
 {
 
   // prepare boundary atoms
-  b_surf.generate_sphere(BD_l.r_sphere,BD_l.r_bdry);
-  bdry_atoms.set_N(b_surf.get_N_verts());
-  bdry_atoms.set_coords(b_surf.get_coords());
-  // b_surf.write_xyz("/home/ben/Workspace/btree_chromo/test_case/test_b_surf.xyz");
+  if (bdry_atoms.get_N() == -1)
+    {
+      b_surf.generate_sphere(BD_l.r_sphere,BD_l.r_bdry);
+      bdry_atoms.set_N(b_surf.get_N_verts());
+      bdry_atoms.set_coords(b_surf.get_coords());
+    }
 
   // place the ribo and bdry atoms in individual molecules for convenience
   bdry_atoms.set_mol_id_all(1);
@@ -470,6 +479,13 @@ int LAMMPS_sys::read_mono_coords(string coords_filename, string order)
 }
 
 
+// read the monomer quaternions - disallow resizing
+int LAMMPS_sys::read_mono_quats(string quats_filename, string order)
+{
+  return mono_ellipsoids.read_bin_quats(quats_filename,order,false);
+}
+
+
 // read the ribosome coordinates - allow resizing
 int LAMMPS_sys::read_ribo_coords(string coords_filename, string order)
 {
@@ -477,10 +493,52 @@ int LAMMPS_sys::read_ribo_coords(string coords_filename, string order)
 }
 
 
+// read the ribosome quaternions - allow resizing
+int LAMMPS_sys::read_ribo_quats(string quats_filename, string order)
+{
+  return ribo_ellipsoids.read_bin_quats(quats_filename,order,true);
+}
+
+
 // read the boundary coordinates - allow resizing
 int LAMMPS_sys::read_bdry_coords(string coords_filename, string order)
 {
   return bdry_atoms.read_bin_coords(coords_filename,order,true);
+}
+
+
+// write the monomer coordinates
+int LAMMPS_sys::write_mono_coords(string coords_filename, string order)
+{
+  return mono_atoms.write_bin(coords_filename,order);
+}
+
+
+// write the monomer quaternions
+int LAMMPS_sys::write_mono_quats(string quats_filename, string order)
+{
+  return mono_ellipsoids.write_bin(quats_filename,order);
+}
+
+
+// write the ribosome coordinates
+int LAMMPS_sys::write_ribo_coords(string coords_filename, string order)
+{
+  return ribo_atoms.write_bin(coords_filename,order);
+}
+
+
+// write the ribosome quaternions
+int LAMMPS_sys::write_ribo_quats(string quats_filename, string order)
+{
+  return ribo_ellipsoids.write_bin(quats_filename,order);
+}
+
+
+// write the boundary coordinates
+int LAMMPS_sys::write_bdry_coords(string coords_filename, string order)
+{
+  return bdry_atoms.write_bin(coords_filename,order);
 }
 
 
@@ -653,7 +711,8 @@ void LAMMPS_sys::write_mono_xyz(string data_filename)
 // get the total number of atoms in the sytem
 int LAMMPS_sys::get_N_total()
 {
-  return atoms.get_N();
+  // return atoms.get_N();
+  return get_N_mono() + get_N_ribo() + get_N_bdry();
 }
 
 
@@ -664,17 +723,66 @@ int LAMMPS_sys::get_N_mono()
 }
 
 
-// get the number of mono atoms
+// get the number of ribo atoms
 int LAMMPS_sys::get_N_ribo()
 {
   return ribo_atoms.get_N();
 }
 
 
-// get the number of mono atoms
+// get the number of bdry atoms
 int LAMMPS_sys::get_N_bdry()
 {
   return bdry_atoms.get_N();
+}
+
+
+// set the total number of atoms
+void LAMMPS_sys::set_N_total(int N)
+{
+  atoms.set_N(N);
+}
+
+
+// set the number of mono atoms
+void LAMMPS_sys::set_N_mono(int N_mono)
+{
+  mono_atoms.set_N(N_mono);
+}
+
+
+// set the number of ribo atoms
+void LAMMPS_sys::set_N_ribo(int N_ribo)
+{
+  ribo_atoms.set_N(N_ribo);
+}
+
+
+// set the number of bdry atoms
+void LAMMPS_sys::set_N_bdry(int N_bdry)
+{
+  bdry_atoms.set_N(N_bdry);
+}
+
+
+// set the total number of ellipsoids
+void LAMMPS_sys::set_N_total_ellipsoids(int N)
+{
+  ellipsoids.set_N(N);
+}
+
+
+// set the number of mono ellipsoids
+void LAMMPS_sys::set_N_mono_ellipsoids(int N_mono)
+{
+  mono_ellipsoids.set_N(N_mono);
+}
+
+
+// set the number of ribo ellipsoids
+void LAMMPS_sys::set_N_ribo_ellipsoids(int N_ribo)
+{
+  ribo_ellipsoids.set_N(N_ribo);
 }
 
 
@@ -787,8 +895,8 @@ vector<bond> LAMMPS_sys::get_loop_bonds()
     {
       loop_bond.id = id;
       loop_bond.type = 2;
-      loop_bond.i = l.get_a();
-      loop_bond.j = l.get_h();
+      loop_bond.i = l.get_a() + 1;
+      loop_bond.j = l.get_h() + 1;
       loop_bonds.push_back(loop_bond);
       id += 1;
     }

@@ -84,12 +84,21 @@ private:
   int replicate(vector<string> &params, drctv_reqs &reqs);
 
   // LAMMPS system
+  // loading coordinates and quaternions
   int load_mono_coords(vector<string> &params, drctv_reqs &reqs);
   int load_mono_quats(vector<string> &params, drctv_reqs &reqs);
   int load_ribo_coords(vector<string> &params, drctv_reqs &reqs);
   int load_ribo_quats(vector<string> &params, drctv_reqs &reqs);
   int load_bdry_coords(vector<string> &params, drctv_reqs &reqs);
+  // writing coordinates and quaternions
+  int write_mono_coords(vector<string> &params);
+  int write_mono_quats(vector<string> &params);
+  int write_ribo_coords(vector<string> &params);
+  int write_ribo_quats(vector<string> &params);
+  int write_bdry_coords(vector<string> &params);
+  // loading BD lengths
   int load_BD_lengths(vector<string> &params, drctv_reqs &reqs);
+  // writing LAMMPS data file
   int write_LAMMPS_data(vector<string> &params, drctv_reqs &reqs);
   int write_mono_xyz(vector<string> &params, drctv_reqs &reqs);
 
