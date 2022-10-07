@@ -100,6 +100,7 @@ public:
   void sync_subarrays();
 
   // loop topology
+  void set_loop_sys_params(loop_sys_params &l_sys_p);
   void initialize_loop_topo(int N_loops);
   void update_loop_topo();
   vector<bond> get_loop_bonds();
@@ -133,6 +134,7 @@ private:
 
   sys_bbox bbox;
   BD_lengths BD_l;
+  loop_sys_params l_sys_p;
   btree internal_btree;
   boundary_surface b_surf;
 

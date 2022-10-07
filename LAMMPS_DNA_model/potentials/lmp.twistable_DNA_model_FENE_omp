@@ -27,8 +27,9 @@ print """
 """
 
 # bond potentials
-bond_style fene/omp
-bond_coeff 1 ${k_stretch_FENE} ${R0_FENE} ${epsilon_FENE} ${sigma_FENE}
+bond_style hybrid fene/omp harmonic/omp
+bond_coeff 1 fene/omp ${k_stretch_FENE} ${R0_FENE} ${epsilon_FENE} ${sigma_FENE}
+include ${DNA_model_dir}/potentials/lmp.loop_bond_hybrid
 
 # angle potentials
 angle_style   hybrid polytorsion/omp cosine/omp harmonic/omp

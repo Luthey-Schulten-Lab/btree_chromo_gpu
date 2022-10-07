@@ -20,7 +20,7 @@ void loop_topology::prng_seed(int s)
 
 
 // prepare the vector of binding regions
-void loop_topology::prepare_binding_regions(vector<string> leaves, vector<theta_topo> leaf_topos, int *t)
+void loop_topology::prepare_binding_regions(vector<string> leaves, vector<theta_topo> leaf_topos, int *&t)
 {
 
   regions.clear();
@@ -179,26 +179,28 @@ void loop_topology::prepare_binding_regions(vector<string> leaves, vector<theta_
 	} // end conditinal for complete leaf test
       
     } // end loop over leaves
-
-  // delete the type array
-  delete[] t;
   
 }
 
 
 // prepare the vector of binding regions
-void loop_topology::initialize_loops(int N_loops)
+void loop_topology::initialize_loops(int N_loops, int min_dist)
 {
   // clear the loops and binding regions
   loops.clear();
-
+  
   size_t N_regions = regions.size();
+
+  // only select binding regions that can contain a full loop (hinge and anchor) upon initialization
 
   int total_binding_region_size = 0;
 
   for (size_t i_region=0; i_region<N_regions; i_region++)
     {
-      total_binding_region_size += regions[i_region].get_size();
+      if (regions[i_region].get_size() > 2*min_dist)
+	{
+	  total_binding_region_size += regions[i_region].get_size();
+	}
     }
 
   uniform_int_distribution<int> unif_dist(1,total_binding_region_size);
@@ -216,7 +218,10 @@ void loop_topology::initialize_loops(int N_loops)
       int accumulator = 0;
       for (size_t i_region=0; i_region<N_regions; i_region++)
 	{
-	  accumulator += regions[i_region].get_size();
+	  if (regions[i_region].get_size() > 2*min_dist)
+	    {
+	      accumulator += regions[i_region].get_size();
+	    } 
 	  if (a_dist[i_loop] <= accumulator)
 	    {
 	      loop l(i_region,i_region);
@@ -237,12 +242,11 @@ void loop_topology::initialize_loops(int N_loops)
     }
 
   // based on the position of the anchor and a minimum distance between the anchor and hinge, select a direction for the hinge to travel
-  int min_a_d_dist = 1;
   for (int i_loop=0; i_loop<N_loops; i_loop++)
     {
       h_region = loops[i_loop].get_h_region();
       loops[i_loop].set_d(regions[h_region].select_direction(loops[i_loop].get_a(),
-							     min_a_d_dist));
+							     min_dist));
     }
 
   // select a compatible hinge
@@ -250,7 +254,7 @@ void loop_topology::initialize_loops(int N_loops)
     {
       h_region = loops[i_loop].get_h_region();
       loops[i_loop].set_h(regions[h_region].get_relative_monomer_pos(loops[i_loop].get_a(),
-								     min_a_d_dist,
+								     min_dist,
 								     loops[i_loop].get_d()));
     }
 }

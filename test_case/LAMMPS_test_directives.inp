@@ -3,18 +3,22 @@ btree_prng_seed:10
 replicator_prng_seed:10
 
 #create a new chromosome with 1000 units
-new_chromo:1000
+new_chromo:54338
 
 #load the BD lengths
 load_BD_lengths:/home/ben/Workspace/btree_chromo/test_case/in_BD_lengths_LAMMPS_test.txt
 
 #load the monomer coordinates
 #load_mono_coords:/home/ben/Data/sc_chains/12mono_testcase_100ribos/x_chain_12mono_testcase_100ribos_rep00001.bin,row
-load_mono_coords:/home/ben/Data/sc_chains/1000mono_testcase_100ribos/x_chain_1000mono_testcase_100ribos_rep00001.bin,row
+#load_mono_coords:/home/ben/Data/sc_chains/1000mono_testcase_100ribos/x_chain_1000mono_testcase_100ribos_rep00001.bin,row
+#load_mono_quats:/home/ben/Data/sc_chains/1000mono_testcase_100ribos/x_quat_1000mono_testcase_100ribos_rep00001.bin,row
+load_mono_coords:/home/ben/Data/sc_chains/1chromo_500ribos_200rad/x_chain_1chromo_500ribos_200rad_rep00001.bin,row
+load_mono_quats:/home/ben/Data/sc_chains/1chromo_500ribos_200rad/x_quat_1chromo_500ribos_200rad_rep00001.bin,row
 
 #load the ribosome coordinates
 #load_ribo_coords:/home/ben/Data/sc_chains/12mono_testcase_100ribos/x_obst_12mono_testcase_100ribos_rep00001.bin,row
-load_ribo_coords:/home/ben/Data/sc_chains/1000mono_testcase_100ribos/x_obst_1000mono_testcase_100ribos_rep00001.bin,row
+#load_ribo_coords:/home/ben/Data/sc_chains/1000mono_testcase_100ribos/x_obst_1000mono_testcase_100ribos_rep00001.bin,row
+load_ribo_coords:/home/ben/Data/sc_chains/1chromo_500ribos_200rad/x_obst_1chromo_500ribos_200rad_rep00001.bin,row
 
 #set_initial_state
 
@@ -44,46 +48,51 @@ prepare_simulator:log.test
 simulator_set_prng_seed:10
 simulator_set_nProc:20
 simulator_set_DNA_model:/home/ben/Workspace/btree_chromo/LAMMPS_DNA_model/
-simulator_set_output_details:/home/ben/Workspace/btree_chromo/test_case/,test_case
+simulator_set_output_details:/home/ben/Workspace/btree_chromo/test_case/,test_case_static
 simulator_set_delta_t:1.0E+5
 
 #read the LAMMPS data file into the simulator
 simulator_read_data:/home/ben/Workspace/btree_chromo/test_case/data.test_case
-
-print
-
-#write_LAMMPS_data:/home/ben/Workspace/btree_chromo/test_case/data.test_case
 
 simulator_minimize_soft_harmonic:1000
 simulator_minimize_soft_FENE:1000
 simulator_minimize_hard_harmonic:1000
 simulator_minimize_hard_FENE:1000
 
-simulator_run_soft_FENE:1000,100,100,noappend,first
-simulator_run_soft_FENE:1000,100,0,noappend,first
-simulator_set_output_details:/home/ben/Workspace/btree_chromo/test_case/,test_case_new
-simulator_run_soft_FENE:1000,100,500,noappend,first
+simulator_run_hard_harmonic:10000,1000,0,noappend,first
 
 sync_simulator_and_system
 
-write_LAMMPS_data:/home/ben/Workspace/btree_chromo/test_case/data.test_case_out
+write_LAMMPS_data:/home/ben/Workspace/btree_chromo/test_case/data.test_case
+
+sync_simulator_and_system
+
+clear_simulator
+
+set_initial_state
+
+transform:m_cw5000_ccw5000
+
+set_final_state
+
+map_replication
+
+write_LAMMPS_data:/home/ben/Workspace/btree_chromo/test_case/data.test_case
+
+simulator_read_data:/home/ben/Workspace/btree_chromo/test_case/data.test_case
+
+simulator_minimize_soft_harmonic:1000
+simulator_soft_harmonic:10000,1000,500,noappend,first
+
+simulator_minimize_hard_harmonic:1000
+simulator_run_hard_harmonic:10000,1000,0,noappend,first
+
+simulator_minimize_hard_FENE:1000
+simulator_run_hard_FENE:20000,1000,500,noappend,first
 
 # sync_simulator_and_system
 
-# clear_simulator
-
-# set_initial_state
-
-# transform:m_cw200_ccw200
-
-# set_final_state
-
-# map_replication
-
 # write_LAMMPS_data:/home/ben/Workspace/btree_chromo/test_case/data.test_case
-
-# #read the LAMMPS data file into the simulator
-# simulator_read_data:/home/ben/Workspace/btree_chromo/test_case/data.test_case
 
 # simulator_minimize_soft_harmonic:1000
 # simulator_minimize_soft_FENE:1000

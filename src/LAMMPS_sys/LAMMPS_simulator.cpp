@@ -739,3 +739,198 @@ void LAMMPS_simulator::sim_to_sys()
       
     }
 }
+
+
+// read the replication model
+int LAMMPS_simulator::read_loop_params(string loop_param_filename)
+{
+
+  fstream loop_param_file;
+
+  string param_delim, param, val;
+  int delim;
+  
+  string line;
+
+  loop_sim_params l_sim_p;
+  loop_sys_params l_sys_p;
+
+  param_delim = "=";
+
+  loop_param_file.open(loop_param_filename, ios::in);
+
+  if (!loop_param_file.is_open())
+    {
+      cout << "ERROR: file not opened in loop_param_file" << endl;
+      return 1;
+    }
+  else
+    {
+      while (1)
+	{
+	  loop_param_file >> line;
+	  if (loop_param_file.eof()) break;
+	  
+
+	  if ((line.length() > 0) &&
+	      (line.find("#") != 0))
+	    {
+
+	      delim = line.find(param_delim);
+
+	      if (delim != -1)
+		{
+
+		  param = line.substr(0,delim);
+		  val = line.substr(delim+1,line.length());
+
+		  // cout << param << "=" << val << endl;
+
+		  if (param == "min_dist")
+		    {
+		      l_sys_p.min_dist = stoi(val);
+		    }
+
+		  else if (param == "ext_avg")
+		    {
+		      l_sys_p.ext_avg = stoi(val);
+		    }
+
+		  else if (param == "ext_max")
+		    {
+		      l_sys_p.ext_max = stoi(val);
+		    }
+
+		  else if (param == "p_unbinding")
+		    {
+		      l_sys_p.p_unbinding = stod(val);
+		    }
+		  
+		  else if (param == "r_g")
+		    {
+		      l_sys_p.r_g = stod(val);
+		    }
+
+		  else if (param == "r_0")
+		    {
+		      l_sim_p.r_0 = stod(val);
+		    }
+
+		  else if (param == "k")
+		    {
+		      l_sim_p.k = stoi(val);
+		    }
+
+		  else if (param == "freq_loop")
+		    {
+		      l_sim_p.freq_loop = stoul(val);
+		    }
+
+		  else if (param == "freq_topo")
+		    {
+		      l_sim_p.freq_topo = stoul(val);
+		    }
+
+		  else if (param == "dNt_topo")
+		    {
+		      l_sim_p.dNt_topo = stoul(val);
+		    }
+
+		}
+	      	      
+	    }
+	      
+     	} // end while loop
+
+      loop_param_file.close();
+
+      set_loop_sim_params(l_sim_p);
+      lmp_sys->set_loop_sys_params(l_sys_p);
+
+      return 0;
+  
+    }
+
+}
+
+
+// set the loop sim parameters
+void LAMMPS_simulator::set_loop_sim_params(loop_sim_params &l_sim_p)
+{
+  this->l_sim_p = l_sim_p;
+}
+
+
+// update the loop bonds
+void LAMMPS_simulator::update_loop_bonds(vector<bond> loop_bonds, bool new_bonds)
+{
+  if (new_bonds == false)
+    {
+      lmp->input->one("delete_bonds DNA bond 2 remove");
+    }
+
+  string temp_bond_command = "create_bonds single/bond ";
+  string bond_command;
+  for (size_t i_loop=0; i_loop<loop_bonds.size(); i_loop++)
+    {
+      bond_command = temp_bond_command;
+      bond_command += (" " + to_string(loop_bonds[i_loop].type));
+      bond_command += (" " + to_string(loop_bonds[i_loop].i));
+      bond_command += (" " + to_string(loop_bonds[i_loop].j));
+      
+      lmp->input->one(bond_command);
+    }
+  
+}
+
+
+// run a system with loops
+void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump_parameters t_d_p)
+{
+
+  unsigned long step_counter = 0;
+  unsigned long step_increment;
+  thermo_dump_parameters t_d_p_iter = t_d_p;
+  // thermo_dump_parameters t_d_p_topo = t_d_p;
+  vector<bond> loop_bonds;
+  bool new_bonds = true;
+
+  sim_to_sys();
+  lmp_sys->initialize_loop_topo(N_loops);
+
+  t_d_p_iter.write_first = false;
+  t_d_p_iter.append = true;
+  // t_d_p_topo.dump_freq = 0;
+
+  // update the loop bonds
+  loop_bonds = lmp_sys->get_loop_bonds();
+  update_loop_bonds(loop_bonds,new_bonds);
+
+  // run the system with hard pairs and FENE bonds
+  step_increment = min(l_sim_p.freq_loop,N_steps-step_counter);
+  minimize_hard_harmonic(t_d_p);
+  run_hard_harmonic(step_increment,t_d_p);
+
+  new_bonds = false;
+
+  while (step_counter < N_steps)
+    {
+
+      // change the bonds
+      sim_to_sys();
+      lmp_sys->update_loop_topo();
+      
+      // update the loop bonds
+      vector<bond> loop_bonds = lmp_sys->get_loop_bonds();
+      update_loop_bonds(loop_bonds,new_bonds);
+      
+      // minimize
+      
+      // run for loop freq
+      step_increment = min(l_sim_p.freq_loop,N_steps-step_counter);
+      run_hard_harmonic(step_increment,t_d_p_iter);
+      step_counter += step_increment;
+      
+    }
+
+}

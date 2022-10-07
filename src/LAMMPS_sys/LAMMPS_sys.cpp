@@ -5,7 +5,7 @@ LAMMPS_sys::LAMMPS_sys()
 {
   N_atom_types = 6; // 0 bdry, 1 ribo, 2 mono(m), 3 ori(o), 4 ter(t), 5 fork(f)
   N_angle_types = 4; // linear m-m/o/t-m, twist m-m/o/t-m, linear m-f-m, twist m-f-m
-  N_bond_types = 1; // m/o/t-m/o/t
+  N_bond_types = 2; // m/o/t-m/o/t, loops
   loop_topo.prng_seed(0);
 }
 
@@ -869,7 +869,7 @@ void LAMMPS_sys::initialize_loop_topo(int N_loops)
 
   delete[] t;
   
-  loop_topo.initialize_loops(N_loops);
+  loop_topo.initialize_loops(N_loops,l_sys_p.min_dist);
 }
 
 
@@ -901,4 +901,11 @@ vector<bond> LAMMPS_sys::get_loop_bonds()
       id += 1;
     }
   return loop_bonds;
+}
+
+
+// set the loop sys parameters
+void LAMMPS_sys::set_loop_sys_params(loop_sys_params &l_sys_p)
+{
+  this->l_sys_p = l_sys_p;
 }

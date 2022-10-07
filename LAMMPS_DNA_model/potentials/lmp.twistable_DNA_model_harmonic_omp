@@ -21,6 +21,7 @@ print """
 # bond potentials
 bond_style harmonic/omp
 bond_coeff 1 ${k_stretch} ${l_equil}
+include ${DNA_model_dir}/potentials/lmp.loop_bond
 
 # angle potentials
 angle_style   hybrid polytorsion/omp cosine/omp harmonic/omp

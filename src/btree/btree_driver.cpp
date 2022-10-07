@@ -87,6 +87,7 @@ int btree_driver::execute_directives()
   reqs.output_details = false;
   reqs.delta_t = false;
   reqs.lmp_data_present = false;
+  reqs.loop_params_present = false;
 
   cout << "\n---BEGIN EXECUTING DIRECTIVES---\n" << endl;
 
@@ -517,6 +518,19 @@ int btree_driver::execute_directives()
       else if (command == "simulator_run_hard_FENE")
 	{
 	  error_code = simulator_run<1,1>(params,reqs);
+	}
+
+      // load file containing loop parameters
+      else if (command == "simulator_load_loop_params")
+	{
+	  error_code = simulator_load_loop_params(params,reqs);
+	}
+
+
+      // run a simulation with loops
+      else if (command == "simulator_run_loops")
+	{
+	  error_code = simulator_run_loops(params,reqs);
 	}
 
 
@@ -1434,6 +1448,66 @@ int btree_driver::simulator_run(vector<string> &params, drctv_reqs &reqs)
 	  driver_lmp_simulator.run_hard_FENE(stoul(params[0]),t_d_p);
 	}
     }
+
+  return 0;
+}
+
+
+int btree_driver::simulator_load_loop_params(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 1)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+
+  if (reqs.simulator_prepared == false)
+    {
+      cout << "ERROR: missing simulator" << endl;
+      return 1;
+    }
+
+  int e = driver_lmp_simulator.read_loop_params(params[0]);
+  reqs.loop_params_present = true;
+  return e;
+}
+
+
+int btree_driver::simulator_run_loops(vector<string> &params, drctv_reqs &reqs)
+{
+
+  if (params.size() != 6)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+
+  if (reqs.lmp_data_present == false)
+    {
+      cout << "ERROR: missing LAMMPS data for simulator" << endl;
+      return 1;
+    }
+
+  if (reqs.loop_params_present == false)
+    {
+      cout << "ERROR: missing loop parameters for loop run" << endl;
+      return 1;
+    }
+
+  thermo_dump_parameters t_d_p;
+
+  t_d_p.append = false;
+  t_d_p.write_first = true;
+  if (params[4] == "append")
+    {
+      t_d_p.append = true;
+      t_d_p.write_first = false;
+    }
+  if (params[5] == "skip_first") t_d_p.write_first = false;
+  t_d_p.dump_freq = stoi(params[3]);
+  t_d_p.thermo_freq = stoi(params[2]);
+
+  driver_lmp_simulator.run_loops(stoi(params[0]),stoul(params[1]),t_d_p);
 
   return 0;
 }

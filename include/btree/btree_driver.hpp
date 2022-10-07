@@ -24,6 +24,7 @@ struct drctv_reqs
   bool output_details;
   bool delta_t;
   bool lmp_data_present;
+  bool loop_params_present;
 };
 
 
@@ -126,6 +127,10 @@ private:
   // simulator run routines
   template <int SOFT_HARD, int HARMONIC_FENE>
   int simulator_run(vector<string> &params, drctv_reqs &reqs);
+
+  // simulator loop routines
+  int simulator_load_loop_params(vector<string> &params, drctv_reqs &reqs);
+  int simulator_run_loops(vector<string> &params, drctv_reqs &reqs);
   
 
   /////////////
