@@ -92,6 +92,9 @@ void LAMMPS_simulator::read_data(string data_file)
 
   // include the physical parameterization of the DNA polymer model
   lmp->input->one("include ${DNA_model_dir}/lmp.DNA_physical_params");
+
+  // fix the boundary particles in a static position
+  lmp->input->one("include ${DNA_model_dir}/potentials/lmp.bdry_static");
 }
 
 
