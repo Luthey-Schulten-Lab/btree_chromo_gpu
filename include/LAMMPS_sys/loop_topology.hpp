@@ -40,8 +40,9 @@ public:
   // loop topology functions
   void prepare_binding_regions(vector<string> leaves, vector<theta_topo> leaf_topos, int *&t);
   void initialize_loops(int N_loops, int min_dist);
-  void update_loops();
+  void update_loops(int ext_avg, int ext_max, double p_unbinding, double r_g);
   vector<loop> get_loops();
+  vector<binding_region> get_regions();
   
 private:
 

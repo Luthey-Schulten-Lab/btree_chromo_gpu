@@ -3,9 +3,9 @@
 // constructor
 LAMMPS_sys::LAMMPS_sys()
 {
-  N_atom_types = 6; // 0 bdry, 1 ribo, 2 mono(m), 3 ori(o), 4 ter(t), 5 fork(f)
+  N_atom_types = 8; // 0 bdry, 1 ribo, 2 mono(m), 3 ori(o), 4 ter(t), 5 fork(f), 6 anchor(a), 7 hinge(h)
   N_angle_types = 4; // linear m-m/o/t-m, twist m-m/o/t-m, linear m-f-m, twist m-f-m
-  N_bond_types = 2; // m/o/t-m/o/t, loops
+  N_bond_types = 2; // m/o/t-m/o/t, loops(a-h)
   loop_topo.prng_seed(0);
 }
 
@@ -222,6 +222,16 @@ void LAMMPS_sys::set_mono_types(int base_type)
   mono_atoms.set_types(t);
   
   delete[] t;
+}
+
+
+// get the mono types
+void LAMMPS_sys::get_types(int *&t)
+{
+  for (int i=0; i<get_N_total(); i++)
+    {
+      t[i] = atoms.get_atom(i).type;
+    }
 }
 
 
@@ -867,6 +877,14 @@ void LAMMPS_sys::initialize_loop_topo(int N_loops)
   // prepare the possible binding regions
   loop_topo.prepare_binding_regions(leaves,leaf_topos,t);
 
+  vector<binding_region> regions = loop_topo.get_regions();
+
+  cout << "BINDING REGIONS" << endl;
+  for (binding_region b_r : regions)
+    {
+      cout << b_r.get_leaf() << " " << b_r.get_size() << endl;
+    }
+
   delete[] t;
   
   loop_topo.initialize_loops(N_loops,l_sys_p.min_dist);
@@ -877,7 +895,10 @@ void LAMMPS_sys::initialize_loop_topo(int N_loops)
 void LAMMPS_sys::update_loop_topo()
 {
 
-  loop_topo.update_loops();
+  loop_topo.update_loops(l_sys_p.ext_avg,
+			 l_sys_p.ext_max,
+			 l_sys_p.p_unbinding,
+			 l_sys_p.r_g);
   
 }
 

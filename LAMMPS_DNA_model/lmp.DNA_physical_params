@@ -85,7 +85,7 @@ print """
  ----------------------------------
 """
 
-set type 3*6 density ${m_mono}
+set type 3*8 density ${m_mono}
 set type 2 density ${m_ribo}
 set type 1 density ${m_bdry}
 
@@ -102,5 +102,7 @@ group monos type 3
 group oris type 4
 group ters type 5
 group forks type 6
-group DNA union monos oris ters forks
+group anchors type 7
+group hinges type 8
+group DNA union monos oris ters forks anchors hinges
 group DNAribos union DNA ribos

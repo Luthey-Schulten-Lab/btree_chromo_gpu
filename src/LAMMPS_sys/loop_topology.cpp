@@ -261,19 +261,42 @@ void loop_topology::initialize_loops(int N_loops, int min_dist)
 
 
 // prepare the vector of binding regions
-void loop_topology::update_loops()
+void loop_topology::update_loops(int ext_avg, int ext_max, double p_unbinding, double r_g)
 {
 
-  // loop over the loops
+  uniform_real_distribution<> unif_dist(0.0, 1.0);
+  int new_h, h_reg;
 
-  // select an updated hinge
+  cout << ext_max << r_g << endl;
+  
+  // loop over the loops
+  for (size_t i_loop=0; i_loop<loops.size(); i_loop++ )
+    {
+
+      // select an updated hinge for cis interactions
+      if (unif_dist(rand_eng) > p_unbinding)
+	{
+	  new_h = loops[i_loop].get_h();
+	  h_reg = loops[i_loop].get_h_region();
+	  new_h = regions[h_reg].get_relative_monomer_pos(new_h,ext_avg,loops[i_loop].get_d());
+	  cout << "old hinge = " << loops[i_loop].get_h() <<", new hinge = "<< new_h << endl;
+	  loops[i_loop].set_h(new_h);
+	  cout << loops[i_loop].get_h() << endl;
+	}
+    }
   
 }
 
 
-// prepare the vector of binding regions
+// get the loops
 vector<loop> loop_topology::get_loops()
 {
   return loops;
+}
+
+// get the binding regions
+vector<binding_region> loop_topology::get_regions()
+{
+  return regions;
 }
 

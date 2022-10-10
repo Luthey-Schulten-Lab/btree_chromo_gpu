@@ -88,7 +88,7 @@ void LAMMPS_simulator::command(string command)
 void LAMMPS_simulator::read_data(string data_file)
 {
   // read the data
-  lmp->input->one(("read_data " + data_file).c_str());
+  lmp->input->one(("read_data " + data_file + " extra/bond/per/atom 1").c_str());
 
   // include the physical parameterization of the DNA polymer model
   lmp->input->one("include ${DNA_model_dir}/lmp.DNA_physical_params");
@@ -862,14 +862,37 @@ void LAMMPS_simulator::set_loop_sim_params(loop_sim_params &l_sim_p)
 
 
 // update the loop bonds
-void LAMMPS_simulator::update_loop_bonds(vector<bond> loop_bonds, bool new_bonds)
+void LAMMPS_simulator::update_loop_bonds(bool new_bonds)
 {
+
+  // delete the existing loop bonds
   if (new_bonds == false)
     {
       lmp->input->one("delete_bonds DNA bond 2 remove");
     }
 
-  string temp_bond_command = "create_bonds single/bond ";
+  // type array for scatter
+  int N = lmp_sys->get_N_total();
+  int *types = new int[N];
+
+  // 1 for per-atom type, 1 for size of data (t)
+  // lammps_gather_atoms(lmp, const_cast<char*>("type"), 1, 1, types);
+
+  lmp_sys->get_types(types);
+
+  if (new_bonds == false)
+    {
+      
+      lmp_sys->update_loop_topo();
+      
+    }
+
+
+  // get the loop bonds
+  vector<bond> loop_bonds = lmp_sys->get_loop_bonds();
+  
+  // add the updated loop bonds
+  string temp_bond_command = "create_bonds single/bond";
   string bond_command;
   for (size_t i_loop=0; i_loop<loop_bonds.size(); i_loop++)
     {
@@ -877,10 +900,29 @@ void LAMMPS_simulator::update_loop_bonds(vector<bond> loop_bonds, bool new_bonds
       bond_command += (" " + to_string(loop_bonds[i_loop].type));
       bond_command += (" " + to_string(loop_bonds[i_loop].i));
       bond_command += (" " + to_string(loop_bonds[i_loop].j));
+
+      if (i_loop == loop_bonds.size() - 1)
+	{
+	  bond_command += " special yes";
+	}
+      else
+	{
+	  bond_command += " special no";
+	}
+
+      cout << i_loop << " " << bond_command << endl;
       
       lmp->input->one(bond_command);
+
+      types[loop_bonds[i_loop].i-1] = 7; // anchor atom
+      types[loop_bonds[i_loop].j-1] = 8; // hinge atom
     }
+
+  // scatter the now modified atom types
+  // 0 for integer type, 1 for per-atom count
+  lammps_scatter_atoms(lmp, const_cast<char*>("type"), 0, 1, types);
   
+  delete[] types;
 }
 
 
@@ -891,24 +933,30 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
   unsigned long step_counter = 0;
   unsigned long step_increment;
   thermo_dump_parameters t_d_p_iter = t_d_p;
-  // thermo_dump_parameters t_d_p_topo = t_d_p;
-  vector<bond> loop_bonds;
-  bool new_bonds = true;
+  thermo_dump_parameters t_d_p_topo = t_d_p;
+  int Nt_pre_topo;
 
   sim_to_sys();
   lmp_sys->initialize_loop_topo(N_loops);
 
   t_d_p_iter.write_first = false;
   t_d_p_iter.append = true;
-  // t_d_p_topo.dump_freq = 0;
+  t_d_p_topo.dump_freq = 0;
 
-  // update the loop bonds
-  loop_bonds = lmp_sys->get_loop_bonds();
-  update_loop_bonds(loop_bonds,new_bonds);
+  bool new_bonds = true;
+  update_loop_bonds(new_bonds);
+
+  // minimize the system
+  minimize_hard_harmonic(t_d_p_topo);
+  minimize_hard_FENE(t_d_p_topo);
 
   // run the system with hard pairs and FENE bonds
   step_increment = min(l_sim_p.freq_loop,N_steps-step_counter);
-  minimize_hard_harmonic(t_d_p);
+
+  // Nt_pre_topo = Nt;
+  // run_hard_harmonic(step_increment/2,t_d_p_topo);
+  // reset_Nt(Nt_pre_topo);
+  
   run_hard_harmonic(step_increment,t_d_p);
 
   new_bonds = false;
@@ -918,17 +966,31 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
 
       // change the bonds
       sim_to_sys();
-      lmp_sys->update_loop_topo();
       
       // update the loop bonds
-      vector<bond> loop_bonds = lmp_sys->get_loop_bonds();
-      update_loop_bonds(loop_bonds,new_bonds);
+      update_loop_bonds(new_bonds);
       
       // minimize
+      minimize_hard_harmonic(t_d_p);
+      minimize_hard_FENE(t_d_p);
       
       // run for loop freq
       step_increment = min(l_sim_p.freq_loop,N_steps-step_counter);
-      run_hard_harmonic(step_increment,t_d_p_iter);
+
+      // Nt_pre_topo = Nt;
+      // run_hard_harmonic(step_increment/2,t_d_p_topo);
+      // reset_Nt(Nt_pre_topo);
+      
+      run_hard_FENE(step_increment,t_d_p_iter);
+
+      if (step_counter%l_sim_p.freq_topo == 0)
+	{
+	  Nt_pre_topo = Nt;
+	  minimize_soft_FENE(t_d_p_topo);
+	  run_soft_FENE(l_sim_p.dNt_topo,t_d_p_topo);
+	  reset_Nt(Nt_pre_topo);
+	}
+      
       step_counter += step_increment;
       
     }

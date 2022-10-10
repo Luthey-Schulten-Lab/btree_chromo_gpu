@@ -92,6 +92,9 @@ public:
   void set_N_mono_ellipsoids(int N_mono);
   void set_N_ribo_ellipsoids(int N_ribo);
 
+  // get the mono types
+  void get_types(int *&t);
+
   // setters for the total system state
   void set_coords_arr_total(double *&x, string order);
   void set_quats_arr_total(double *&q, string order);

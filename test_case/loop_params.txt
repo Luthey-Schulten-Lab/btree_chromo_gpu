@@ -1,10 +1,10 @@
 # system parameters
 
 # minimum distance separating anchor and hinge on strand - [# monomers]
-min_dist=5
+min_dist=6
 
 # average extrusion distance [# monomers]
-ext_avg=4
+ext_avg=2
 # max extrusion distance [# monomers]
 ext_max=8
 
@@ -21,12 +21,12 @@ r_0=3.4E+1
 k=1.0E+1
 
 # loop update frequency - [# timesteps]
-freq_loop=2000
+freq_loop=20000
 
 # topoisomerase relaxation (soft DNA-DNA pairs) frequency - [# timesteps]
-freq_topo=10000
+freq_topo=50000
 # topoisomerase relaxation (soft DNA-DNA pairs) interval - [# timesteps]
-dNt_topo=1000
+dNt_topo=20000
 
 
 
