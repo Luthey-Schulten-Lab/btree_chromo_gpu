@@ -12,6 +12,7 @@ LAMMPS_simulator::LAMMPS_simulator()
   nProc = 1;
   prng_seed = 0;
   Nt = 0;
+  stored_Nt = 0;
 }
 
 
@@ -212,14 +213,15 @@ void LAMMPS_simulator::reset_protocol_variables()
 }
 
 
-// minimize with soft potentials and harmonic bonds
-void LAMMPS_simulator::minimize_soft_harmonic(thermo_dump_parameters t_d_p)
+// setup for minimize routines
+void LAMMPS_simulator::setup_minimize(thermo_dump_parameters &t_d_p)
 {
 
-  // cout << "---[ minimizing SOFT_HARMONIC ]---" << endl;
-  
   // set thermo frequency
   set_T_freq(t_d_p.thermo_freq);
+
+  // set dump frequency
+  set_D_freq(t_d_p.dump_freq);
 
   // include compute for ids
   compute_trigger("ids");
@@ -229,6 +231,21 @@ void LAMMPS_simulator::minimize_soft_harmonic(thermo_dump_parameters t_d_p)
 
   // include default thermo
   lmp->input->one("include ${DNA_model_dir}/dump_subroutines/subroutine.default_thermo");
+
+  // include dump
+  prepare_dump(t_d_p);
+  
+}
+
+
+// minimize with soft potentials and harmonic bonds
+void LAMMPS_simulator::minimize_soft_harmonic(thermo_dump_parameters t_d_p)
+{
+
+  // cout << "---[ minimizing SOFT_HARMONIC ]---" << endl;
+
+  // setup the minimization
+  setup_minimize(t_d_p);
 
   // include minimization subroutine
   lmp->input->one("include ${DNA_model_dir}/minimize_subroutines/subroutine.min_soft_harmonic");
@@ -245,17 +262,8 @@ void LAMMPS_simulator::minimize_hard_harmonic(thermo_dump_parameters t_d_p)
 
   // cout << "---[ minimizing HARD_HARMONIC ]---" << endl;
   
-  // set thermo frequency
-  set_T_freq(t_d_p.thermo_freq);
-
-  // include compute for ids
-  compute_trigger("ids");
-
-  // include compute for quats
-  compute_trigger("quats");
-
-  // include default thermo
-  lmp->input->one("include ${DNA_model_dir}/dump_subroutines/subroutine.default_thermo");
+  // setup the minimization
+  setup_minimize(t_d_p);
 
   // include minimization subroutine
   lmp->input->one("include ${DNA_model_dir}/minimize_subroutines/subroutine.min_hard_harmonic");
@@ -272,17 +280,8 @@ void LAMMPS_simulator::minimize_soft_FENE(thermo_dump_parameters t_d_p)
 
   // cout << "---[ minimizing SOFT_FENE ]---" << endl;
   
-  // set thermo frequency
-  set_T_freq(t_d_p.thermo_freq);
-
-  // include compute for ids
-  compute_trigger("ids");
-
-  // include compute for quats
-  compute_trigger("quats");
-
-  // include default thermo
-  lmp->input->one("include ${DNA_model_dir}/dump_subroutines/subroutine.default_thermo");
+  // setup the minimization
+  setup_minimize(t_d_p);
 
   // include minimization subroutine
   lmp->input->one("include ${DNA_model_dir}/minimize_subroutines/subroutine.min_soft_FENE");
@@ -298,17 +297,8 @@ void LAMMPS_simulator::minimize_hard_FENE(thermo_dump_parameters t_d_p)
 
   // cout << "---[ minimizing HARD_FENE ]---" << endl;
   
-  // set thermo frequency
-  set_T_freq(t_d_p.thermo_freq);
-
-  // include compute for ids
-  compute_trigger("ids");
-
-  // include compute for quats
-  compute_trigger("quats");
-
-  // include default thermo
-  lmp->input->one("include ${DNA_model_dir}/dump_subroutines/subroutine.default_thermo");
+  // setup the minimization
+  setup_minimize(t_d_p);
 
   // include minimization subroutine
   lmp->input->one("include ${DNA_model_dir}/minimize_subroutines/subroutine.min_hard_FENE");
@@ -318,9 +308,9 @@ void LAMMPS_simulator::minimize_hard_FENE(thermo_dump_parameters t_d_p)
 }
 
 
-// run with soft potentials and harmonic bonds
-void LAMMPS_simulator::run_soft_harmonic(unsigned long N_steps, thermo_dump_parameters t_d_p)
-{  
+// setup for run routines
+void LAMMPS_simulator::setup_run(thermo_dump_parameters &t_d_p)
+{
   // set thermo frequency
   set_T_freq(t_d_p.thermo_freq);
 
@@ -341,6 +331,14 @@ void LAMMPS_simulator::run_soft_harmonic(unsigned long N_steps, thermo_dump_para
 
   // include dump
   prepare_dump(t_d_p);
+}
+
+
+// run with soft potentials and harmonic bonds
+void LAMMPS_simulator::run_soft_harmonic(unsigned long N_steps, thermo_dump_parameters t_d_p)
+{
+  // setup for run
+  setup_run(t_d_p);
 
   // include run subroutine
   lmp->input->one("include ${DNA_model_dir}/run_subroutines/subroutine.run_soft_harmonic");
@@ -359,26 +357,8 @@ void LAMMPS_simulator::run_soft_harmonic(unsigned long N_steps, thermo_dump_para
 // run with hard potentials and harmonic bonds
 void LAMMPS_simulator::run_hard_harmonic(unsigned long N_steps, thermo_dump_parameters t_d_p)
 {
-  // set thermo frequency
-  set_T_freq(t_d_p.thermo_freq);
-
-  // set dump frequency
-  set_D_freq(t_d_p.dump_freq);
-
-  // include compute for ids
-  compute_trigger("ids");
-
-  // include compute for quats
-  compute_trigger("quats");
-
-  // include compute for MSD
-  compute_trigger("MSD");
-
-  // include default thermo
-  lmp->input->one("include ${DNA_model_dir}/dump_subroutines/subroutine.MSD_thermo");
-
-  // include dump
-  prepare_dump(t_d_p);
+  // setup for run
+  setup_run(t_d_p);
 
   // include run subroutine
   lmp->input->one("include ${DNA_model_dir}/run_subroutines/subroutine.run_hard_harmonic");
@@ -397,26 +377,8 @@ void LAMMPS_simulator::run_hard_harmonic(unsigned long N_steps, thermo_dump_para
 // minimize with soft potentials and FENE bonds
 void LAMMPS_simulator::run_soft_FENE(unsigned long N_steps, thermo_dump_parameters t_d_p)
 {
-  // set thermo frequency
-  set_T_freq(t_d_p.thermo_freq);
-
-  // set dump frequency
-  set_D_freq(t_d_p.dump_freq);
-
-  // include compute for ids
-  compute_trigger("ids");
-
-  // include compute for quats
-  compute_trigger("quats");
-
-  // include compute for MSD
-  compute_trigger("MSD");
-
-  // include default thermo
-  lmp->input->one("include ${DNA_model_dir}/dump_subroutines/subroutine.MSD_thermo");
-
-  // include dump
-  prepare_dump(t_d_p);
+  // setup for run
+  setup_run(t_d_p);
 
   // include run subroutine
   lmp->input->one("include ${DNA_model_dir}/run_subroutines/subroutine.run_soft_FENE");
@@ -435,26 +397,8 @@ void LAMMPS_simulator::run_soft_FENE(unsigned long N_steps, thermo_dump_paramete
 // minimize with hard potentials and FENE bonds
 void LAMMPS_simulator::run_hard_FENE(unsigned long N_steps, thermo_dump_parameters t_d_p)
 {  
-  // set thermo frequency
-  set_T_freq(t_d_p.thermo_freq);
-  
-  // set dump frequency
-  set_D_freq(t_d_p.dump_freq);
-
-  // include compute for ids
-  compute_trigger("ids");
-
-  // include compute for quats
-  compute_trigger("quats");
-
-  // include compute for MSD
-  compute_trigger("MSD");
-
-  // include default thermo
-  lmp->input->one("include ${DNA_model_dir}/dump_subroutines/subroutine.MSD_thermo");
-
-  // include dump
-  prepare_dump(t_d_p);
+  // setup for run
+  setup_run(t_d_p);
 
   // set the timestep
   lmp->input->one("timestep ${delta_t}");
@@ -561,6 +505,21 @@ void LAMMPS_simulator::reset_timestep_to_Nt()
 void LAMMPS_simulator::reset_Nt(int Nt)
 {
   this->Nt = Nt;
+  reset_timestep_to_Nt();
+}
+
+
+// store the timestep counter, Nt
+void LAMMPS_simulator::store_Nt()
+{
+  stored_Nt = Nt;
+}
+
+
+// restore the timestep counter to the stored value, stored_Nt
+void LAMMPS_simulator::restore_Nt()
+{
+  Nt = stored_Nt;
   reset_timestep_to_Nt();
 }
 
@@ -914,8 +873,14 @@ void LAMMPS_simulator::update_loop_bonds(bool new_bonds)
       
       lmp->input->one(bond_command);
 
-      types[loop_bonds[i_loop].i-1] = 7; // anchor atom
-      types[loop_bonds[i_loop].j-1] = 8; // hinge atom
+      if ((types[loop_bonds[i_loop].i-1] != 4) && (types[loop_bonds[i_loop].i-1] != 5))
+	{
+	  types[loop_bonds[i_loop].i-1] = 7; // anchor atom
+	}
+      if ((types[loop_bonds[i_loop].j-1] != 4) && (types[loop_bonds[i_loop].j-1] != 5))
+	{
+	  types[loop_bonds[i_loop].j-1] = 8; // hinge atom
+	}
     }
 
   // scatter the now modified atom types
@@ -934,7 +899,7 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
   unsigned long step_increment;
   thermo_dump_parameters t_d_p_iter = t_d_p;
   thermo_dump_parameters t_d_p_topo = t_d_p;
-  int Nt_pre_topo;
+  int Nt_pre_topo, step_prev_topo;
 
   sim_to_sys();
   lmp_sys->initialize_loop_topo(N_loops);
@@ -943,6 +908,8 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
   t_d_p_iter.append = true;
   t_d_p_topo.dump_freq = 0;
 
+  step_prev_topo = step_counter;
+  
   bool new_bonds = true;
   update_loop_bonds(new_bonds);
 
@@ -971,8 +938,8 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
       update_loop_bonds(new_bonds);
       
       // minimize
-      minimize_hard_harmonic(t_d_p);
-      minimize_hard_FENE(t_d_p);
+      minimize_hard_harmonic(t_d_p_topo);
+      minimize_hard_FENE(t_d_p_topo);
       
       // run for loop freq
       step_increment = min(l_sim_p.freq_loop,N_steps-step_counter);
@@ -982,16 +949,19 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
       // reset_Nt(Nt_pre_topo);
       
       run_hard_FENE(step_increment,t_d_p_iter);
+      
+      step_counter += step_increment;
 
-      if (step_counter%l_sim_p.freq_topo == 0)
+      if (step_counter > l_sim_p.freq_topo + step_prev_topo)
 	{
 	  Nt_pre_topo = Nt;
 	  minimize_soft_FENE(t_d_p_topo);
 	  run_soft_FENE(l_sim_p.dNt_topo,t_d_p_topo);
+	  minimize_hard_harmonic(t_d_p_topo);
+	  minimize_hard_FENE(t_d_p_topo);
 	  reset_Nt(Nt_pre_topo);
+	  step_prev_topo = step_counter;
 	}
-      
-      step_counter += step_increment;
       
     }
 

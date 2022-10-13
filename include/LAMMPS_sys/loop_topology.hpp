@@ -49,6 +49,7 @@ private:
   // loop topology
   vector<loop> loops;
   vector<binding_region> regions;
+  vector<vec> coords;
 
   vec_quat_manipulator vqm;
   mt19937 rand_eng;

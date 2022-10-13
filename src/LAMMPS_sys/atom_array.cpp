@@ -380,3 +380,17 @@ int atom_array::write_bin(string data_filename, string order)
 
 
 }
+
+
+// get coordinates
+vector<vec> atom_array::get_coords()
+{
+  vector<vec> coords;
+
+  for (int i=0; i<N; i++)
+    {
+      coords.push_back(get_atom(i).r);
+    }
+
+  return coords;
+}

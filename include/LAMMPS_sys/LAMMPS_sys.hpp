@@ -83,6 +83,9 @@ public:
   int get_N_ribo();
   int get_N_bdry();
 
+  // getters for vectors of properties
+  vector<vec> get_mono_coords();
+
   // setters for the subarrays
   void set_N_total(int N);
   void set_N_mono(int N_mono);

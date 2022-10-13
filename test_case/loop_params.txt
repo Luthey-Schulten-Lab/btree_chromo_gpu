@@ -26,7 +26,7 @@ freq_loop=20000
 # topoisomerase relaxation (soft DNA-DNA pairs) frequency - [# timesteps]
 freq_topo=50000
 # topoisomerase relaxation (soft DNA-DNA pairs) interval - [# timesteps]
-dNt_topo=20000
+dNt_topo=50000
 
 
 

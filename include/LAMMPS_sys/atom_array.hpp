@@ -45,6 +45,9 @@ public:
   // read coordinates from files
   int read_bin_coords(string data_filename, string order, bool force_resize);
 
+  // getter for coordinates
+  vector<vec> get_coords();
+
   // setter and getter for elements
   void set_atom(int i, atom a);
   atom get_atom(int i);

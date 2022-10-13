@@ -119,6 +119,8 @@ private:
   int simulator_set_DNA_model(vector<string> &params, drctv_reqs &reqs);
   int simulator_set_output_details(vector<string> &params, drctv_reqs &reqs);
   int simulator_set_delta_t(vector<string> &params, drctv_reqs &reqs);
+  int simulator_store_timestep(drctv_reqs &reqs);
+  int simulator_restore_timestep(drctv_reqs &reqs);
   
   // simulator minimization routines
   template <int SOFT_HARD, int HARMONIC_FENE>

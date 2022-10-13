@@ -1,6 +1,6 @@
 # soft pair potentials
 
-variable epsilon_soft equal 5.0*${kBT} # [Kcal/mol]
+variable epsilon_soft equal 1.0*${kBT} # [Kcal/mol]
 variable epsilon_LJ equal 1.0*${kBT} # [Kcal/mol]
 
 print """

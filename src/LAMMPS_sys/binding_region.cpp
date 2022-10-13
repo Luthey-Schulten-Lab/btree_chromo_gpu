@@ -147,11 +147,11 @@ int binding_region::get_relative_monomer_pos(int pos, int dist, int dir)
     {
       if (ter_crossing == true)
 	{
-	  if (r > ll)
+	  if ((pos < ll) && (r > ll))
 	    {
 	      r = ll;
 	    }
-	  else if (r < ul)
+	  else if ((pos > ul) && (r < ul))
 	    {
 	      r = ul;
 	    }

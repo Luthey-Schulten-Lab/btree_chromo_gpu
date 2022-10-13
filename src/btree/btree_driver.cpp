@@ -465,6 +465,20 @@ int btree_driver::execute_directives()
 	}
 
 
+      // store the simulator's timestep
+      else if (command == "simulator_store_timestep")
+	{
+	  error_code = simulator_store_timestep(reqs);
+	}
+
+
+      // restore the simulator's timestep from the stored value
+      else if (command == "simulator_restore_timestep")
+	{
+	  error_code = simulator_restore_timestep(reqs);
+	}
+
+
       // minimize with soft potentials and harmonic bonds
       else if (command == "simulator_minimize_soft_harmonic")
 	{
@@ -1509,6 +1523,34 @@ int btree_driver::simulator_run_loops(vector<string> &params, drctv_reqs &reqs)
 
   driver_lmp_simulator.run_loops(stoi(params[0]),stoul(params[1]),t_d_p);
 
+  return 0;
+}
+
+
+int btree_driver::simulator_store_timestep(drctv_reqs &reqs)
+{
+
+  if (reqs.simulator_prepared == false)
+    {
+      cout << "ERROR: missing simulator" << endl;
+      return 1;
+    }
+
+  driver_lmp_simulator.store_Nt();
+  return 0;
+}
+
+
+int btree_driver::simulator_restore_timestep(drctv_reqs &reqs)
+{
+
+  if (reqs.simulator_prepared == false)
+    {
+      cout << "ERROR: missing simulator" << endl;
+      return 1;
+    }
+
+  driver_lmp_simulator.restore_Nt();
   return 0;
 }
 
