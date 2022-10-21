@@ -13,12 +13,55 @@ binding_region::binding_region(string leaf, int ll, int ul, int size,
   this->ter_crossing = ter_crossing;
   this->mid_ll = mid_ll;
   this->mid_ul = mid_ul;
+
+  proximities = new int[size];
+
+  reset_proximities();
+  
+  mono_idx = new int[size];
+
+  if (ter_crossing == true)
+    {
+      int i = 0;
+      for (int j=ul; j<(mid_ul+1); j++)
+	{
+	  mono_idx[i] = j;
+	  reg_idx[j] = i;
+	  i += 1;
+	}
+      for (int j=mid_ll; j<(mid_ll+1); j++)
+	{
+	  mono_idx[i] = j;
+	  reg_idx[j] = i;
+	  i += 1;
+	}
+    }
+  else
+    {
+      for (int i=0; i<size; i++)
+	{
+	  mono_idx[i] = ll + i;
+	  reg_idx[ll+i] = i;
+	}
+    }
+  
 }
 
 
 // destructor
 binding_region::~binding_region()
 {
+  if (mono_idx != nullptr)
+    {
+      delete[] mono_idx;
+      mono_idx = nullptr;
+    }
+  if (proximities != nullptr)
+    {
+      delete[] proximities;
+      proximities = nullptr;
+    }
+  reg_idx.clear();
 }
 
 
@@ -43,6 +86,20 @@ string binding_region::get_leaf()
 }
 
 
+// getter for region position from monomer position
+int binding_region::get_reg_pos(int mono_pos)
+{
+  return reg_idx[mono_pos];
+}
+
+
+// getter for monomer position from region position
+int binding_region::get_mono_pos(int reg_pos)
+{
+  return mono_idx[reg_pos];
+}
+
+
 // select a random monomer within the region to serve as the anchor
 int binding_region::select_random_monomer()
 {
@@ -50,34 +107,12 @@ int binding_region::select_random_monomer()
   uniform_int_distribution<int> unif_dist(0,size-1);
   int r = unif_dist(rand_eng);
   
-  if (completed == true)
-    {
-      r = r + ll;
-    }
-  else
-    {
-      if (ter_crossing == true)
-	{
-	  if (r <= (ll - mid_ll + 1))
-	    {
-	      r = r + mid_ll;
-	    }
-	  else
-	    {
-	      r = (r - (ll - mid_ll + 1)) + ul;
-	    }
-	}
-      else
-	{
-	  r = r + ll;
-	}
-    }
-  return r;
+  return get_mono_pos(r);
 }
 
 
 // based on the position of the anchor and a minimum distance between the anchor and hinge, select a direction for the hinge to travel
-int binding_region::select_direction(int pos, int min_dist)
+int binding_region::select_direction(int mono_pos, int min_dist)
 {
   // randomly sample a point within the entire region
   uniform_real_distribution<> unif_dist(0.0, 1.0);
@@ -90,37 +125,20 @@ int binding_region::select_direction(int pos, int min_dist)
     }
   else
     {
-      if (ter_crossing == true)
+      int reg_pos = get_reg_pos(mono_pos);
+
+      if (reg_pos < min_dist)
 	{
-	  if ((pos + min_dist) > ll) // no space for hinge at lower-limit
-	    {
-	      d = -1;
-	    }
-	  else if ((pos - min_dist) < ul) // no space for hinge at upper-limit
-	    {
-	      d = 1;
-	    }
-	  else // space for hinge in either direction
-	    {
-	      d = 1;
-	      if (unif_dist(rand_eng) < 0.5) d = -1;
-	    }
+	  d = 1;
+	}
+      else if (reg_pos >= (size - min_dist))
+	{
+	  d = -1;
 	}
       else
 	{
-	  if ((pos - min_dist) < ll) // no space for hinge at lower-limit
-	    {
-	      d = 1;
-	    }
-	  else if ((pos + min_dist) > ul) // no space for hinge at upper-limit
-	    {
-	      d = -1;
-	    }
-	  else // space for hinge in either direction
-	    {
-	      d = 1;
-	      if (unif_dist(rand_eng) < 0.5) d = -1;
-	    }
+	  d = 1;
+	  if (unif_dist(rand_eng) < 0.5) d = -1;
 	}
     }
   return d;
@@ -128,69 +146,154 @@ int binding_region::select_direction(int pos, int min_dist)
 
 
 // determine a new relative pos based on the current position, distance, and direction
-int binding_region::get_relative_monomer_pos(int pos, int dist, int dir)
+int binding_region::get_relative_monomer_pos(int mono_pos, int dist, int dir)
 {
-  int r = pos + dir*dist;
+  int reg_pos = get_reg_pos(mono_pos) + dir*dist;
   
   if (completed == true)
     {
-      if (r < ll)
+      if (reg_pos < 0)
 	{
-	  r = ul - (ll - r - 1);
+	  reg_pos = size + reg_pos;
 	}
-      else if (r > ul)
+      else if (reg_pos >= size)
 	{
-	  r = ll + (r - ul - 1);
+	  reg_pos = reg_pos - size;
 	}
     }
   else
     {
-      if (ter_crossing == true)
+      if (reg_pos < 0)
 	{
-	  if ((pos < ll) && (r > ll))
-	    {
-	      r = ll;
-	    }
-	  else if ((pos > ul) && (r < ul))
-	    {
-	      r = ul;
-	    }
-	  else if (r < mid_ll)
-	    {
-	      r = mid_ul - (mid_ll - r - 1);
-	    }
-	  else if (r > mid_ul)
-	    {
-	      r = mid_ll + (r - mid_ul - 1);
-	    }
-
+	  reg_pos = 0;
 	}
-      else
+      else if (reg_pos >= size)
 	{
-	  if (r < ll)
-	    {
-	      r = ll;
-	    }
-	  else if (r > ul)
-	    {
-	      r = ul;
-	    }
+	  reg_pos = size - 1;
 	}
     }
-  return r;
+  return get_mono_pos(reg_pos);
 }
 
 
-// test if queried index is within region
-bool binding_region::within_region(int q)
+// get the distance between two monomer positions in a region
+int binding_region::get_dist(int mono_pos_i, int mono_pos_j)
 {
+  int reg_pos_i = get_reg_pos(mono_pos_i);
+  int reg_pos_j = get_reg_pos(mono_pos_j);
+  int d;
 
-  bool within = false;
-  
-  if (q > 0)
+  if (completed == true)
     {
-      within = true;
+      if (reg_pos_i > reg_pos_j)
+	{
+	  d = min(reg_pos_i-reg_pos_j,size-reg_pos_i+reg_pos_j);
+	}
+      else if (reg_pos_j > reg_pos_i)
+	{
+	  d = min(reg_pos_j-reg_pos_i,size-reg_pos_j+reg_pos_i);
+	}
+      else
+	{
+	  d = 0;
+	}
     }
+  else
+    {
+      d = abs(reg_pos_i - reg_pos_j);
+    }
+  return d;
+}
 
-  return within;
+
+// reset the proximities
+void binding_region::reset_proximities()
+{
+  for (int i=0; i<size; i++)
+    {
+      proximities[i] = 0;
+    }
+}
+
+
+// update the proximities given a grab radius and coordinate
+void binding_region::update_proximities(double r_g, vec a_coord, vector<vec> &coords)
+{
+  double r_g_2 = pow(r_g,2.0);
+  double test_dist_L2;
+  
+  for (int i=0; i<size; i++)
+    {
+      test_dist_L2 = vqm.v_L2(vqm.v_xpy(a_coord,vqm.v_inv(coords[get_mono_pos(i)])));
+      if (test_dist_L2 < r_g_2)
+	{
+	  proximities[i] = 1;
+	}
+    }
+}
+
+
+// filter the proximites too close to the anchor
+void binding_region::filter_intra_proximities_near_a(int min_dist, int a_mono_pos)
+{
+  int a_reg_pos = get_reg_pos(a_mono_pos);
+  
+  for (int i=max(a_reg_pos-min_dist,0); i<min(a_reg_pos+min_dist+1,size); i++)
+    {
+      proximities[i] = 0;
+    }
+}
+
+
+// get the intra candidates and remove them from the set of proximities
+vector<int> binding_region::get_and_filter_intra_candidates(int ext_max, int h_mono_pos, int dir)
+{
+  vector<int> intra_candidates;
+
+  int h_reg_pos = get_reg_pos(h_mono_pos);
+
+  if (dir == 1)
+    {
+      for (int i=h_reg_pos+1; i<min(h_reg_pos+ext_max+1,size); i++)
+	{
+	  if (proximities[i] == 1)
+	    {
+	      intra_candidates.push_back(get_mono_pos(i));
+	      proximities[i] = 0;
+	    }
+	  else
+	    {
+	      break;
+	    }
+	}
+    }
+  else if (dir == -1)
+    {
+      for (int i=max(h_reg_pos-ext_max,0); i<h_reg_pos; i++)
+	{
+	  if (proximities[i] == 1)
+	    {
+	      intra_candidates.push_back(get_mono_pos(i));
+	      proximities[i] = 0;
+	    }
+	  else
+	    {
+	      break;
+	    }
+	}
+    }
+  return intra_candidates;
+}
+
+// get the inter candidates
+vector<int> binding_region::get_inter_candidates()
+{
+  vector<int> inter_candidates;
+
+  for (int i=0; i<size; i++)
+    {
+      if (proximities[i] == 1) inter_candidates.push_back(get_mono_pos(i));
+    }
+  
+  return inter_candidates;
 }

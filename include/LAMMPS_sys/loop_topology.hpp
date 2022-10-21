@@ -37,10 +37,13 @@ public:
   // prng seeding
   void prng_seed(int s);
 
+  // set the coords
+  void set_coords(vector<vec> coords);
+
   // loop topology functions
   void prepare_binding_regions(vector<string> leaves, vector<theta_topo> leaf_topos, int *&t);
   void initialize_loops(int N_loops, int min_dist);
-  void update_loops(int ext_avg, int ext_max, double p_unbinding, double r_g);
+  void update_loops(int ext_avg, int ext_max, int min_dist, double p_unbinding, double r_g);
   vector<loop> get_loops();
   vector<binding_region> get_regions();
   
@@ -51,7 +54,7 @@ private:
   vector<binding_region> regions;
   vector<vec> coords;
 
-  vec_quat_manipulator vqm;
+  // vec_quat_manipulator vqm;
   mt19937 rand_eng;
 
 };

@@ -897,6 +897,7 @@ void LAMMPS_sys::update_loop_topo()
 
   loop_topo.update_loops(l_sys_p.ext_avg,
 			 l_sys_p.ext_max,
+			 l_sys_p.min_dist,
 			 l_sys_p.p_unbinding,
 			 l_sys_p.r_g);
   
@@ -929,4 +930,11 @@ vector<bond> LAMMPS_sys::get_loop_bonds()
 void LAMMPS_sys::set_loop_sys_params(loop_sys_params &l_sys_p)
 {
   this->l_sys_p = l_sys_p;
+}
+
+
+// getter for monomer coordinates
+vector<vec> LAMMPS_sys::get_mono_coords()
+{
+  return mono_atoms.get_coords();
 }

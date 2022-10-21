@@ -19,6 +19,12 @@ void loop_topology::prng_seed(int s)
 }
 
 
+void loop_topology::set_coords(vector<vec> coords)
+{
+  this->coords = coords;
+}
+
+
 // prepare the vector of binding regions
 void loop_topology::prepare_binding_regions(vector<string> leaves, vector<theta_topo> leaf_topos, int *&t)
 {
@@ -261,28 +267,82 @@ void loop_topology::initialize_loops(int N_loops, int min_dist)
 
 
 // prepare the vector of binding regions
-void loop_topology::update_loops(int ext_avg, int ext_max, double p_unbinding, double r_g)
+void loop_topology::update_loops(int ext_avg, int ext_max, int min_dist, double p_unbinding, double r_g)
 {
 
   uniform_real_distribution<> unif_dist(0.0, 1.0);
-  int new_h, h_reg;
+  vector<int> intra_updates;
+  vector<vector<int>> inter_updates;
+  int a_mono, a_reg, h_mono, h_reg, d;
+  vec a_coord;
 
-  cout << ext_max << r_g << endl;
+  cout << ext_avg << endl;
   
   // loop over the loops
   for (size_t i_loop=0; i_loop<loops.size(); i_loop++ )
     {
 
-      // select an updated hinge for cis interactions
+      // get the anchor, anchor region, and anchor coordinate
+      a_mono = loops[i_loop].get_a();
+      a_reg = loops[i_loop].get_a_region();
+      a_coord = coords[a_mono];
+
+      // get the hinge and hinge region
+      h_mono = loops[i_loop].get_h();
+      h_reg = loops[i_loop].get_h_region();
+
+      // get the direction
+      d = loops[i_loop].get_d();
+
+      // update the proximities in the hinge region
+      regions[h_reg].update_proximities(r_g,a_coord,coords);
+
+      // get the intra updates
+      intra_updates = regions[h_reg].get_and_filter_intra_candidates(ext_max,h_mono,d);
+
       if (unif_dist(rand_eng) > p_unbinding)
 	{
-	  new_h = loops[i_loop].get_h();
-	  h_reg = loops[i_loop].get_h_region();
-	  new_h = regions[h_reg].get_relative_monomer_pos(new_h,ext_avg,loops[i_loop].get_d());
-	  cout << "old hinge = " << loops[i_loop].get_h() <<", new hinge = "<< new_h << endl;
-	  loops[i_loop].set_h(new_h);
-	  cout << loops[i_loop].get_h() << endl;
+	  
+	  // select an updated hinge for 1D motion along strand
+	  
+	  
 	}
+      else
+	{
+	  
+	  // select an updated hinge for 3D motion between strands
+
+	  size_t N_inter_total = 0;
+
+	  // determine the candidate inter-strand hinge updates for all the regions
+	  for (size_t i_reg=0; i_reg<regions.size(); i_reg++)
+	    {
+	      // update proximities not in the hinge region
+	      if (i_reg != h_reg)
+		{
+		  regions[i_reg].update_proximities(r_g,a_coord,coords);
+		}
+
+	      // filter proximities violating minimum distance within anchor region
+	      if (i_reg == a_reg)
+		{
+		  regions[i_reg].filter_intra_proximities_near_a(min_dist,a_mono);
+		}
+
+	      // add the region's candidates to the total set of possible inter updates
+	      inter_updates.push_back(regions[i_reg].get_inter_candidates());
+
+	      N_inter_total += inter_updates[i_reg].size();
+	      
+	    }
+
+	  uniform_int_distribution<int> unif_dist(1,N_inter_total);
+	  int accumulator;
+
+	  
+
+	}
+      
     }
   
 }
