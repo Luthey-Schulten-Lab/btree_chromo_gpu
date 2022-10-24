@@ -291,37 +291,105 @@ void loop_topology::update_loops(int ext_avg, int ext_max, int min_dist, double 
       h_mono = loops[i_loop].get_h();
       h_reg = loops[i_loop].get_h_region();
 
-      // get the direction
-      d = loops[i_loop].get_d();
-
-      // update the proximities in the hinge region
-      regions[h_reg].update_proximities(r_g,a_coord,coords);
-
-      // get the intra updates
-      intra_updates = regions[h_reg].get_and_filter_intra_candidates(ext_max,h_mono,d);
-
-      if (unif_dist(rand_eng) > p_unbinding)
+      // hinge is already bound
+      if ((h_mono != -1) && (h_reg != -1))
 	{
+
+	  // get the direction
+	  d = loops[i_loop].get_d();
+
+	  // update the proximities in the hinge region
+	  regions[h_reg].update_proximities(r_g,a_coord,coords);
+
+	  // get the intra updates
+	  intra_updates = regions[h_reg].get_and_filter_intra_candidates(ext_max,h_mono,d);
+
+	  if (unif_dist(rand_eng) > p_unbinding)
+	    {
 	  
-	  // select an updated hinge for 1D motion along strand
+	      // select an updated hinge for 1D motion along strand
+	      
 	  
+	    }
+	  else
+	    {
+	  
+	      // select an updated hinge for 3D motion between strands
+
+	      int N_inter_total = 0;
+
+	      // determine the candidate inter-strand hinge updates for all the regions
+	      for (size_t i_reg=0; i_reg<regions.size(); i_reg++)
+		{
+		  // update proximities not in the hinge region
+		  if (i_reg != h_reg)
+		    {
+		      regions[i_reg].update_proximities(r_g,a_coord,coords);
+		    }
+
+		  // filter proximities violating minimum distance within anchor region
+		  if (i_reg == a_reg)
+		    {
+		      regions[i_reg].filter_intra_proximities_near_a(min_dist,a_mono);
+		    }
+
+		  // add the region's candidates to the total set of possible inter updates
+		  inter_updates.push_back(regions[i_reg].get_inter_candidates());
+
+		  N_inter_total += inter_updates[i_reg].size();
+	      
+		} // end loop to determine inter candidates
+
+	      if (N_inter_total > 0)
+		{
+		  uniform_int_distribution<int> unif_dist(1,N_inter_total);
+		  int accumulator;
+
+		  int h_inter = unif_dist(rand_eng);
+
+		  // determine the candidate inter-strand hinge updates for all the regions
+		  for (size_t i_reg=0; i_reg<regions.size(); i_reg++)
+		    {
+
+		      if ((accumulator + inter_updates[i_reg].size()) >= h_inter)
+			{
+			  h_inter -= accumulator;
+			  loops[i_loop].set_h(regions[i_reg].get_mono_pos(h_inter));
+			  loops[i_loop].set_h_region(i_reg);
+			}
+		      else
+			{
+			  accumulator += inter_updates[i_reg].size();
+			}
+	      
+		    }
+		  
+		  
+		}
+	      else
+		{
+
+		  // make the hinge unbound
+		  loops[i_loop].set_h(-1);
+		  loops[i_loop].set_h_region(-1);
+		  loops[i_loop].set_d(0);
+		  
+		}
+
+	    }
 	  
 	}
-      else
+      else // hinge is unbound
 	{
-	  
-	  // select an updated hinge for 3D motion between strands
 
-	  size_t N_inter_total = 0;
+	  // select an updated hinge for 3D motion between strands
+	  int N_inter_total = 0;
 
 	  // determine the candidate inter-strand hinge updates for all the regions
 	  for (size_t i_reg=0; i_reg<regions.size(); i_reg++)
 	    {
-	      // update proximities not in the hinge region
-	      if (i_reg != h_reg)
-		{
-		  regions[i_reg].update_proximities(r_g,a_coord,coords);
-		}
+	      // update proximities for all regions
+	      regions[i_reg].update_proximities(r_g,a_coord,coords);
 
 	      // filter proximities violating minimum distance within anchor region
 	      if (i_reg == a_reg)
@@ -334,16 +402,37 @@ void loop_topology::update_loops(int ext_avg, int ext_max, int min_dist, double 
 
 	      N_inter_total += inter_updates[i_reg].size();
 	      
-	    }
+	    } // end loop over regions
 
-	  uniform_int_distribution<int> unif_dist(1,N_inter_total);
-	  int accumulator;
+	  if (N_inter_total > 0)
+	    {
+	      uniform_int_distribution<int> unif_dist(1,N_inter_total);
+	      int accumulator;
 
+	      int h_inter = unif_dist(rand_eng);
+
+	      // determine the candidate inter-strand hinge updates for all the regions
+	      for (size_t i_reg=0; i_reg<regions.size(); i_reg++)
+		{
+
+		  if ((accumulator + inter_updates[i_reg].size()) >= h_inter)
+		    {
+		      h_inter -= accumulator;
+		      loops[i_loop].set_h(regions[i_reg].get_mono_pos(h_inter));
+		      loops[i_loop].set_h_region(i_reg);
+		    }
+		  else
+		    {
+		      accumulator += inter_updates[i_reg].size();
+		    }
+	      
+		}
+	      
+	    } // end conditional for nonzero inter candidates
 	  
-
-	}
+	} // end conditional for bound/unbound hinges
       
-    }
+    } // end loop over loops
   
 }
 
