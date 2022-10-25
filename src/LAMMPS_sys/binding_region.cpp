@@ -17,8 +17,42 @@ binding_region::binding_region(string leaf, int ll, int ul, int size,
   proximities = new int[size];
 
   reset_proximities();
+
+  prepare_idx();
+  
+  
+}
+
+
+// destructor
+binding_region::~binding_region()
+{
+  if (mono_idx != nullptr)
+    {
+      delete[] mono_idx;
+      mono_idx = nullptr;
+    }
+  if (proximities != nullptr)
+    {
+      delete[] proximities;
+      proximities = nullptr;
+    }
+  reg_idx.clear();
+}
+
+
+// prepare the array and map for monomer and region indices
+void binding_region::prepare_idx()
+{
+  if (mono_idx != nullptr)
+    {
+      delete[] mono_idx;
+      mono_idx = nullptr;
+    }
   
   mono_idx = new int[size];
+
+  reg_idx.clear();
 
   if (ter_crossing == true)
     {
@@ -44,24 +78,13 @@ binding_region::binding_region(string leaf, int ll, int ul, int size,
 	  reg_idx[ll+i] = i;
 	}
     }
-  
-}
 
-
-// destructor
-binding_region::~binding_region()
-{
-  if (mono_idx != nullptr)
+  int j;
+  for (int i=0; i<size; i++)
     {
-      delete[] mono_idx;
-      mono_idx = nullptr;
+      j = get_mono_pos(i);
+      cout << i << "," << j << "," << get_reg_pos(j) << endl;
     }
-  if (proximities != nullptr)
-    {
-      delete[] proximities;
-      proximities = nullptr;
-    }
-  reg_idx.clear();
 }
 
 
