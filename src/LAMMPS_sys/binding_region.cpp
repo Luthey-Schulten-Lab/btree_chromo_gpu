@@ -65,13 +65,6 @@ binding_region::~binding_region()
 }
 
 
-// set the PRNG
-void binding_region::set_rand_eng(mt19937 &rand_eng)
-{
-  this->rand_eng = rand_eng;
-}
-
-
 // getter for size
 int binding_region::get_size()
 {
@@ -100,28 +93,16 @@ int binding_region::get_mono_pos(int reg_pos)
 }
 
 
-// select a random monomer within the region to serve as the anchor
-int binding_region::select_random_monomer()
-{
-  // randomly sample a point within the entire region
-  uniform_int_distribution<int> unif_dist(0,size-1);
-  int r = unif_dist(rand_eng);
-  
-  return get_mono_pos(r);
-}
-
-
 // based on the position of the anchor and a minimum distance between the anchor and hinge, select a direction for the hinge to travel
-int binding_region::select_direction(int mono_pos, int min_dist)
+int binding_region::select_direction(int mono_pos, int min_dist, double r_d)
 {
   // randomly sample a point within the entire region
-  uniform_real_distribution<> unif_dist(0.0, 1.0);
   int d;
   
   if (completed == true)
     {
       d = 1;
-      if (unif_dist(rand_eng) < 0.5) d = -1;
+      if (r_d < 0.5) d = -1;
     }
   else
     {
@@ -138,7 +119,7 @@ int binding_region::select_direction(int mono_pos, int min_dist)
       else
 	{
 	  d = 1;
-	  if (unif_dist(rand_eng) < 0.5) d = -1;
+	  if (r_d < 0.5) d = -1;
 	}
     }
   return d;
@@ -224,10 +205,16 @@ void binding_region::update_proximities(double r_g, vec a_coord, vector<vec> &co
   
   for (int i=0; i<size; i++)
     {
+      cout << "i = " << i << endl;
+      cout << "m_i = " << get_mono_pos(i) << endl;
       test_dist_L2 = vqm.v_L2(vqm.v_xpy(a_coord,vqm.v_inv(coords[get_mono_pos(i)])));
       if (test_dist_L2 < r_g_2)
 	{
 	  proximities[i] = 1;
+	}
+      else
+	{
+	  proximities[i] = 0;
 	}
     }
 }
@@ -249,6 +236,7 @@ void binding_region::filter_intra_proximities_near_a(int min_dist, int a_mono_po
 vector<int> binding_region::get_and_filter_intra_candidates(int ext_max, int h_mono_pos, int dir)
 {
   vector<int> intra_candidates;
+  intra_candidates.push_back(h_mono_pos);
 
   int h_reg_pos = get_reg_pos(h_mono_pos);
 

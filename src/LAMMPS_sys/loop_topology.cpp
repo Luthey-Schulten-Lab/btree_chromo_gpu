@@ -19,6 +19,19 @@ void loop_topology::prng_seed(int s)
 }
 
 
+void loop_topology::set_step_dist(string family, double l, int k_max)
+{
+  if (family == "poisson")
+    {
+      step_dist.poisson_dist(l,k_max);
+    }
+  else if (family == "uniform")
+    {
+      step_dist.uniform_dist(k_max);
+    }
+}
+
+
 void loop_topology::set_coords(vector<vec> coords)
 {
   this->coords = coords;
@@ -177,7 +190,6 @@ void loop_topology::prepare_binding_regions(vector<string> leaves, vector<theta_
 		  binding_region region(leaf,ll,ul,size,
 					completed,
 					ter_crossing,mid_ll,mid_ul);
-		  region.set_rand_eng(rand_eng);
 		  regions.push_back(region);
 		}
 	    }
@@ -189,7 +201,7 @@ void loop_topology::prepare_binding_regions(vector<string> leaves, vector<theta_
 }
 
 
-// prepare the vector of binding regions
+// initialize the loops based on the set of binding regions
 void loop_topology::initialize_loops(int N_loops, int min_dist)
 {
   // clear the loops and binding regions
@@ -239,6 +251,10 @@ void loop_topology::initialize_loops(int N_loops, int min_dist)
 
 
   int a_region, h_region;
+
+  uniform_real_distribution<double> dir_dist(0.0, 1.0);
+  double r_d;
+  int d, r_mono;
   
   // select an anchor for each loop
   for (int i_loop=0; i_loop<N_loops; i_loop++)
@@ -247,7 +263,9 @@ void loop_topology::initialize_loops(int N_loops, int min_dist)
       a_region = loops[i_loop].get_a_region();
 
       // select a random monomer for the anchor
-      loops[i_loop].set_a(regions[a_region].select_random_monomer());
+      uniform_int_distribution<int> unif_dist(0,regions[a_region].get_size()-1);
+      r_mono = unif_dist(rand_eng);
+      loops[i_loop].set_a(regions[a_region].get_mono_pos(r_mono));
       
       // bind the anchor
       loops[i_loop].set_a_bound(true);
@@ -256,8 +274,11 @@ void loop_topology::initialize_loops(int N_loops, int min_dist)
       h_region = loops[i_loop].get_h_region();
 
       // based on the position of the anchor and a minimum distance between the anchor and hinge, select a direction for the hinge to travel
-      loops[i_loop].set_d(regions[h_region].select_direction(loops[i_loop].get_a(),
-							     min_dist));
+      r_d = dir_dist(rand_eng);
+      d = regions[h_region].select_direction(loops[i_loop].get_a(),
+					     min_dist,
+					     r_d);
+      loops[i_loop].set_d(d);
 
       // select a hinge based on the anchor position and direction
       loops[i_loop].set_h(regions[h_region].get_relative_monomer_pos(loops[i_loop].get_a(),
@@ -271,30 +292,31 @@ void loop_topology::initialize_loops(int N_loops, int min_dist)
 
 
 // prepare the vector of binding regions
-void loop_topology::update_loops(int ext_avg, int ext_max, int min_dist, double p_unbinding, double r_g)
+void loop_topology::update_loops(int ext_max, int min_dist, double p_unbinding, double r_g)
 {
 
-  uniform_real_distribution<> unif_dist(0.0, 1.0);
+  uniform_real_distribution<double> unif_dist(0.0, 1.0);
   vector<int> intra_updates;
   vector<vector<int>> inter_updates;
-  int a_mono, a_reg, h_mono, h_reg, d;
+  int a_mono, h_mono, d;
+  size_t a_reg, h_reg;
   vec a_coord;
   bool h_bound;
-
-  cout << ext_avg << endl;
+  double r_intra;
+  int h_intra;
   
   // loop over the loops
-  for (size_t i_loop=0; i_loop<loops.size(); i_loop++ )
+  for (size_t i_loop=0; i_loop<loops.size(); i_loop++)
     {
 
       // get the anchor, anchor region, and anchor coordinate
       a_mono = loops[i_loop].get_a();
-      a_reg = loops[i_loop].get_a_region();
+      a_reg = static_cast<size_t>(loops[i_loop].get_a_region());
       a_coord = coords[a_mono];
 
       // get the hinge, hinge region, and hinge binding state
       h_mono = loops[i_loop].get_h();
-      h_reg = loops[i_loop].get_h_region();
+      h_reg = static_cast<size_t>(loops[i_loop].get_h_region());
       h_bound = loops[i_loop].get_h_bound();
 
       // hinge is already bound
@@ -314,7 +336,10 @@ void loop_topology::update_loops(int ext_avg, int ext_max, int min_dist, double 
 	    {
 	  
 	      // select an updated hinge for 1D motion along strand
-	      
+	      r_intra = unif_dist(rand_eng);
+	      h_intra = step_dist.get_k(r_intra,intra_updates.size());
+
+	      loops[i_loop].set_h(regions[h_reg].get_mono_pos(h_intra));
 	  
 	    }
 	  else
@@ -357,9 +382,9 @@ void loop_topology::update_loops(int ext_avg, int ext_max, int min_dist, double 
 		  for (size_t i_reg=0; i_reg<regions.size(); i_reg++)
 		    {
 
-		      if ((accumulator + inter_updates[i_reg].size()) >= h_inter)
+		      if ((accumulator + inter_updates[i_reg].size()) >= static_cast<size_t>(h_inter))
 			{
-			  h_inter -= accumulator;
+			  h_inter -= static_cast<int>(accumulator);
 			  loops[i_loop].set_h(regions[i_reg].get_mono_pos(h_inter));
 			  loops[i_loop].set_h_region(i_reg);
 			}
@@ -419,9 +444,9 @@ void loop_topology::update_loops(int ext_avg, int ext_max, int min_dist, double 
 	      for (size_t i_reg=0; i_reg<regions.size(); i_reg++)
 		{
 
-		  if ((accumulator + inter_updates[i_reg].size()) >= h_inter)
+		  if ((accumulator + inter_updates[i_reg].size()) >= static_cast<size_t>(h_inter))
 		    {
-		      h_inter -= accumulator;
+		      h_inter -= static_cast<int>(accumulator);
 		      // set the hinge
 		      loops[i_loop].set_h(regions[i_reg].get_mono_pos(h_inter));
 		      // set the hinge region

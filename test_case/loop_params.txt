@@ -3,8 +3,10 @@
 # minimum distance separating anchor and hinge on strand - [# monomers]
 min_dist=6
 
+# distribution family for steps
+family=poisson
 # average extrusion distance [# monomers]
-ext_avg=2
+ext_avg=2.5
 # max extrusion distance [# monomers]
 ext_max=8
 

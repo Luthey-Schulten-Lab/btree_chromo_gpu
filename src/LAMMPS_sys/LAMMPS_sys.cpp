@@ -877,13 +877,13 @@ void LAMMPS_sys::initialize_loop_topo(int N_loops)
   // prepare the possible binding regions
   loop_topo.prepare_binding_regions(leaves,leaf_topos,t);
 
-  vector<binding_region> regions = loop_topo.get_regions();
+  // vector<binding_region> regions = loop_topo.get_regions();
 
-  cout << "BINDING REGIONS" << endl;
-  for (binding_region b_r : regions)
-    {
-      cout << b_r.get_leaf() << " " << b_r.get_size() << endl;
-    }
+  // cout << "BINDING REGIONS" << endl;
+  // for (binding_region b_r : regions)
+  //   {
+  //     cout << b_r.get_leaf() << " " << b_r.get_size() << endl;
+  //   }
 
   delete[] t;
   
@@ -895,8 +895,9 @@ void LAMMPS_sys::initialize_loop_topo(int N_loops)
 void LAMMPS_sys::update_loop_topo()
 {
 
-  loop_topo.update_loops(l_sys_p.ext_avg,
-			 l_sys_p.ext_max,
+  loop_topo.set_coords(get_mono_coords());
+
+  loop_topo.update_loops(l_sys_p.ext_max,
 			 l_sys_p.min_dist,
 			 l_sys_p.p_unbinding,
 			 l_sys_p.r_g);
@@ -930,6 +931,7 @@ vector<bond> LAMMPS_sys::get_loop_bonds()
 void LAMMPS_sys::set_loop_sys_params(loop_sys_params &l_sys_p)
 {
   this->l_sys_p = l_sys_p;
+  loop_topo.set_step_dist(l_sys_p.family,l_sys_p.ext_avg,l_sys_p.ext_max);
 }
 
 

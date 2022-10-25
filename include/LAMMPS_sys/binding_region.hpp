@@ -23,9 +23,6 @@ public:
 		 bool completed,
 		 bool ter_crossing, int mid_ll, int mid_ul);
   ~binding_region();
-
-  // setters
-  void set_rand_eng(mt19937 &rand_eng);
   
   // get the region size
   int get_size();
@@ -40,10 +37,8 @@ public:
   // get the monomer position from the region position
   int get_mono_pos(int reg_pos);
 
-  // randomly select a monomer within the region
-  int select_random_monomer();
   // randomly select a direction within the region based on the current position
-  int select_direction(int mono_pos, int min_dist);
+  int select_direction(int mono_pos, int min_dist, double r_d);
 
   // reset the proximities
   void reset_proximities();
@@ -67,8 +62,6 @@ private:
   int *mono_idx = nullptr; // array of monomer indices indexed by region indices
   unordered_map<int,int> reg_idx; // map of monomer indices back to region indices
   
-
-  mt19937 rand_eng;
   vec_quat_manipulator vqm;
   
 };

@@ -750,9 +750,14 @@ int LAMMPS_simulator::read_loop_params(string loop_param_filename)
 		      l_sys_p.min_dist = stoi(val);
 		    }
 
+		  else if (param == "family")
+		    {
+		      l_sys_p.family = val;
+		    }
+
 		  else if (param == "ext_avg")
 		    {
-		      l_sys_p.ext_avg = stoi(val);
+		      l_sys_p.ext_avg = stod(val);
 		    }
 
 		  else if (param == "ext_max")
