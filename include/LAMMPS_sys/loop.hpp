@@ -21,6 +21,8 @@ public:
   ~loop();
 
   // setters
+  void set_a_bound(bool a_bound);
+  void set_h_bound(bool h_bound);
   void set_a(int a);
   void set_h(int h);
   void set_d(int d);
@@ -28,6 +30,8 @@ public:
   void set_h_region(int h_region);
 
   // getters
+  bool get_a_bound();
+  bool get_h_bound();
   int get_a();
   int get_h();
   int get_d();
@@ -36,6 +40,7 @@ public:
   
 private:
 
+  bool a_bound, h_bound; // binding state of anchor and hinge
   int a, h; // indices of anchor and hinge
   int d; // direction of loop extrusion
   int a_region; // index of region containing anchor
