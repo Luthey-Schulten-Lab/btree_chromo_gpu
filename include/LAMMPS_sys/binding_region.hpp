@@ -41,17 +41,18 @@ public:
   int select_direction(int mono_pos, int min_dist, double r_d);
 
   void update_proximities(double r_g, vec a_coord, vector<vec> &coords);
-  void filter_intra_proximities_near_a(int min_dist, int a_mono_pos);
+  void filter_proximities_near_a(int min_dist, int a_mono_pos);
   vector<int> get_and_filter_intra_candidates(int ext_max, int h_mono_pos, int dir);
   vector<int> get_inter_candidates();
 
+  // add an unordered_map and an array of indices, then use these in all functions
+  void prepare_idx();
+  void print_region_map();
+  
 private:
 
   // reset the proximities
   void reset_proximities();
-
-  // add an unordered_map and an array of indices, then use these in all functions
-  void prepare_idx();
 
   string leaf; // leaf that binding region belongs to
   int ll, ul, size; // lower limit and upper limit of indices

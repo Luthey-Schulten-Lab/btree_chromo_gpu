@@ -1,6 +1,7 @@
 #ifndef INCLUDE_INTRA_STEP_DISTRIBUTION_HPP
 #define INCLUDE_INTRA_STEP_DISTRIBUTION_HPP
 
+#include <iostream>
 #include <cmath>
 
 using namespace std;
@@ -15,6 +16,8 @@ public:
 
   // sample a step k
   int get_k(double r, int k_max);
+
+  void print_distribution();
 
   // prepare a Poisson distribution truncated at k_max and with intensity l
   void poisson_dist(double l, int k_max);

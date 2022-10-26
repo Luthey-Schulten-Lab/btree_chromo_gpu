@@ -23,12 +23,12 @@ r_0=3.4E+1
 k=1.0E+1
 
 # loop update frequency - [# timesteps]
-freq_loop=10000
+freq_loop=5000
 
 # topoisomerase relaxation (soft DNA-DNA pairs) frequency - [# timesteps]
-freq_topo=20000
+freq_topo=50000
 # topoisomerase relaxation (soft DNA-DNA pairs) interval - [# timesteps]
-dNt_topo=20000
+dNt_topo=50000
 
 
 

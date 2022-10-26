@@ -13,13 +13,6 @@ binding_region::binding_region(string leaf, int ll, int ul, int size,
   this->ter_crossing = ter_crossing;
   this->mid_ll = mid_ll;
   this->mid_ul = mid_ul;
-
-  proximities = new int[size];
-
-  reset_proximities();
-
-  prepare_idx();
-  
   
 }
 
@@ -63,7 +56,7 @@ void binding_region::prepare_idx()
 	  reg_idx[j] = i;
 	  i += 1;
 	}
-      for (int j=mid_ll; j<(mid_ll+1); j++)
+      for (int j=mid_ll; j<(ll+1); j++)
 	{
 	  mono_idx[i] = j;
 	  reg_idx[j] = i;
@@ -79,6 +72,21 @@ void binding_region::prepare_idx()
 	}
     }
 
+  if (proximities != nullptr)
+    {
+      delete[] proximities;
+      proximities = nullptr;
+    }
+
+  proximities = new int[size];
+
+  reset_proximities();
+}
+
+
+void binding_region::print_region_map()
+{
+  cout << "size = " << size << endl;
   int j;
   for (int i=0; i<size; i++)
     {
@@ -152,6 +160,9 @@ int binding_region::select_direction(int mono_pos, int min_dist, double r_d)
 // determine a new relative pos based on the current position, distance, and direction
 int binding_region::get_relative_monomer_pos(int mono_pos, int dist, int dir)
 {
+
+  if (dist == 0) return mono_pos;
+  
   int reg_pos = get_reg_pos(mono_pos) + dir*dist;
   
   if (completed == true)
@@ -228,8 +239,8 @@ void binding_region::update_proximities(double r_g, vec a_coord, vector<vec> &co
   
   for (int i=0; i<size; i++)
     {
-      cout << "i = " << i << endl;
-      cout << "m_i = " << get_mono_pos(i) << endl;
+      // cout << "i = " << i << endl;
+      // cout << "m_i = " << get_mono_pos(i) << endl;
       test_dist_L2 = vqm.v_L2(vqm.v_xpy(a_coord,vqm.v_inv(coords[get_mono_pos(i)])));
       if (test_dist_L2 < r_g_2)
 	{
@@ -244,13 +255,20 @@ void binding_region::update_proximities(double r_g, vec a_coord, vector<vec> &co
 
 
 // filter the proximites too close to the anchor
-void binding_region::filter_intra_proximities_near_a(int min_dist, int a_mono_pos)
+void binding_region::filter_proximities_near_a(int min_dist, int a_mono_pos)
 {
-  int a_reg_pos = get_reg_pos(a_mono_pos);
-  
-  for (int i=max(a_reg_pos-min_dist,0); i<min(a_reg_pos+min_dist+1,size); i++)
+  int i_reg_pos;
+  i_reg_pos = get_reg_pos(a_mono_pos);
+  proximities[i_reg_pos] = 0;
+
+  for (int i=1; i<(min_dist+1); i++)
     {
-      proximities[i] = 0;
+      // reverse direction
+      i_reg_pos = get_reg_pos(get_relative_monomer_pos(a_mono_pos,i,-1));
+      proximities[i_reg_pos] = 0;
+      // forward direction
+      i_reg_pos = get_reg_pos(get_relative_monomer_pos(a_mono_pos,i,1));
+      proximities[i_reg_pos] = 0;
     }
 }
 
@@ -260,39 +278,29 @@ vector<int> binding_region::get_and_filter_intra_candidates(int ext_max, int h_m
 {
   vector<int> intra_candidates;
   intra_candidates.push_back(h_mono_pos);
+  proximities[get_reg_pos(h_mono_pos)] = 0;
 
-  int h_reg_pos = get_reg_pos(h_mono_pos);
+  int i_reg_pos, i_mono_pos;
+  int prev_mono_pos = h_mono_pos;
 
-  if (dir == 1)
+
+  for (int i=1; i<(ext_max+1); i++)
     {
-      for (int i=h_reg_pos+1; i<min(h_reg_pos+ext_max+1,size); i++)
+      i_mono_pos = get_relative_monomer_pos(h_mono_pos,i,dir);
+      i_reg_pos = get_reg_pos(i_mono_pos);
+
+      if ((proximities[i_reg_pos] == 1) && (i_mono_pos != prev_mono_pos))
 	{
-	  if (proximities[i] == 1)
-	    {
-	      intra_candidates.push_back(get_mono_pos(i));
-	      proximities[i] = 0;
-	    }
-	  else
-	    {
-	      break;
-	    }
+	  intra_candidates.push_back(i_mono_pos);
+	  prev_mono_pos = i_mono_pos;
+	  proximities[i_reg_pos] = 0;
+	}
+      else
+	{
+	  break;
 	}
     }
-  else if (dir == -1)
-    {
-      for (int i=max(h_reg_pos-ext_max,0); i<h_reg_pos; i++)
-	{
-	  if (proximities[i] == 1)
-	    {
-	      intra_candidates.push_back(get_mono_pos(i));
-	      proximities[i] = 0;
-	    }
-	  else
-	    {
-	      break;
-	    }
-	}
-    }
+      
   return intra_candidates;
 }
 
