@@ -32,6 +32,14 @@ struct BD_lengths
   vec mono_shape, ribo_shape;
 };
 
+// structure defining topology switches
+struct topo_switches
+{
+  bool bond;
+  bool bending_angle;
+  bool twisting_angle;
+};
+
 
 class LAMMPS_sys
 {
@@ -49,6 +57,9 @@ public:
 
   // read the Brownian dynamics lengths
   void read_BD_lengths(string lengths_filename);
+
+  // generate a spherical boundary
+  void generate_spherical_bdry(double r, double x0, double y0, double z0);
 
   // read the monomer coordinates and quaternions
   int read_mono_coords(string coords_filename, string order);
@@ -110,6 +121,11 @@ public:
   void initialize_loop_topo(int N_loops);
   void update_loop_topo();
   vector<bond> get_loop_bonds();
+
+  // switches for the topology
+  void switch_bonds(bool s);
+  void switch_bending_angles(bool s);
+  void switch_twisting_angles(bool s);
   
 private:
 
@@ -124,6 +140,10 @@ private:
   void set_bonds();
   void set_angles();
   void set_mono_types(int base_type);
+
+  // filters for the topology
+  void filter_bonds(int t);
+  void filter_angles(int t);
 
   // prepare the system prior to output
   void finalize_system();
@@ -140,6 +160,7 @@ private:
 
   sys_bbox bbox;
   BD_lengths BD_l;
+  topo_switches t_s;
   loop_sys_params l_sys_p;
   btree internal_btree;
   boundary_surface b_surf;

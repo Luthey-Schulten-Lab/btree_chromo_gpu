@@ -70,6 +70,13 @@ void bond_array::set_bond(int i, bond b)
 }
 
 
+// get bond element
+bond bond_array::get_bond(int i)
+{
+  return bonds[i];
+}
+
+
 // write to stream
 void bond_array::write(fstream &data_file)
 {

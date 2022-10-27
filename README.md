@@ -113,6 +113,9 @@ Use the testcase for an example: **./program /home/ben/Workspace/btree_chromo/te
 **Spatial System for Simulations**
 
  - load_BD_lengths:BD_length_file - *reads lengths for Brownian dynamics simulation*
+
+ - spherical_bdry:R,x0,y0,z0 - *generates bdry particles forming a sphere of radius R centered at (x0,y0,z0)*
+
  - load_mono_coords:coords_file,order - *reads binary file with monomer coordinates (doubles) using data ordering convention (row/col)*
  - load_mono_quats:quats_file,order - *reads binary file with monomer quaternions (doubles) using data ordering convention (row/col)*
  - load_ribo_coords:coords_file,order - *reads binary file with ribosome coordinates (doubles) using data ordering convention (row/col)*
@@ -124,6 +127,10 @@ Use the testcase for an example: **./program /home/ben/Workspace/btree_chromo/te
  - write_ribo_coords:coords_file,order - *write binary file with ribosome coordinates (doubles) using data ordering convention (row/col)*
  - write_ribo_quats:quats_file,order - *write binary file with ribosome quaternions (doubles) using data ordering convention (row/col)*
  - write_bdry_coords:coords_file,order - *write binary file with boundary coordinates (doubles) using data ordering convention (row/col)*
+
+ - switch_bonds:(T/F) - *enable/disable bonds between DNA monomers*
+ - switch_bending_angles:(T/F) - *enable/disable bending angles between DNA monomers*
+ - switch_twisting_angles:(T/F) - *enable/disable twisting angles between DNA monomers*
  
  - write_LAMMPS_data:LAMMPS_data_file - *write a LAMMPS file (data.-) using the current mono, ribo, and bdry coordinates, and the current replication state for the bond/angle topology*
  - write_mono_xyz:mono_file_xyz - *write the current monomer coordinates as an .xyz file to load into VMD*

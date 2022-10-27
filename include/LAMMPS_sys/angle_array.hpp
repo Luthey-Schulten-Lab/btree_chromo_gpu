@@ -28,6 +28,9 @@ public:
   // setter for elements
   void set_angle(int i, angle a);
 
+  // getter for elements
+  angle get_angle(int i);
+
   // write angle data
   void write(fstream &data_file);
 

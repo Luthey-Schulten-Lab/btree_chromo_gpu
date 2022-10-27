@@ -71,6 +71,13 @@ void angle_array::set_angle(int i, angle a)
 }
 
 
+// get angle element
+angle angle_array::get_angle(int i)
+{
+  return angles[i];
+}
+
+
 // write to stream
 void angle_array::write(fstream &data_file)
 {

@@ -97,8 +97,14 @@ private:
   int write_ribo_coords(vector<string> &params);
   int write_ribo_quats(vector<string> &params);
   int write_bdry_coords(vector<string> &params);
+  // manual boundary specification
+  int spherical_bdry(vector<string> &params, drctv_reqs &reqs);
   // loading BD lengths
   int load_BD_lengths(vector<string> &params, drctv_reqs &reqs);
+  // manipulate system interactions
+  int switch_bonds(vector<string> &params);
+  int switch_bending_angles(vector<string> &params);
+  int switch_twisting_angles(vector<string> &params);
   // writing LAMMPS data file
   int write_LAMMPS_data(vector<string> &params, drctv_reqs &reqs);
   int write_mono_xyz(vector<string> &params, drctv_reqs &reqs);

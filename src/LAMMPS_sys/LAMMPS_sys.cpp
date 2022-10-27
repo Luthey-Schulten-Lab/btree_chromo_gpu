@@ -6,7 +6,12 @@ LAMMPS_sys::LAMMPS_sys()
   N_atom_types = 8; // 0 bdry, 1 ribo, 2 mono(m), 3 ori(o), 4 ter(t), 5 fork(f), 6 anchor(a), 7 hinge(h)
   N_angle_types = 4; // linear m-m/o/t-m, twist m-m/o/t-m, linear m-f-m, twist m-f-m
   N_bond_types = 2; // m/o/t-m/o/t, loops(a-h)
+  
   loop_topo.prng_seed(0);
+
+  t_s.bond = true;
+  t_s.bending_angle = true;
+  t_s.twisting_angle = true;
 }
 
 
@@ -207,6 +212,117 @@ void LAMMPS_sys::set_angles()
 }
 
 
+// switch the bonds
+void LAMMPS_sys::switch_bonds(bool s)
+{
+  t_s.bond = s;
+}
+
+
+// switch the bonds
+void LAMMPS_sys::switch_bending_angles(bool s)
+{
+  t_s.bending_angle = s;
+}
+
+
+// switch the twisting angles
+void LAMMPS_sys::switch_twisting_angles(bool s)
+{
+  t_s.twisting_angle = s;
+}
+
+
+// filter the bonds
+void LAMMPS_sys::filter_bonds(int t)
+{
+  bond_array temp_bonds;
+  bond t_b;
+
+  int c;
+
+  // count the number of remaining bonds
+  c = 0;
+  for (int i=0; i<bonds.get_N(); i++)
+    {
+      t_b = bonds.get_bond(i);
+      if (t_b.type != t)
+	{
+	  c += 1;
+	}
+    }
+
+  // size the temporary array
+  temp_bonds.set_N(c);
+
+  // fill the temporary array with the remaining bonds
+  c = 0;
+  for (int i=0; i<bonds.get_N(); i++)
+    {
+      t_b = bonds.get_bond(i);
+      if (t_b.type != t)
+	{
+	  temp_bonds.set_bond(c,t_b);
+	  c += 1;
+	}
+    }
+
+  // resize the bond array
+  bonds.set_N(temp_bonds.get_N());
+
+  // copy the contents of the temporary array to the bond array
+  for (int i=0; i<temp_bonds.get_N(); i++)
+    {
+      bonds.set_bond(i,temp_bonds.get_bond(i));
+    }
+}
+
+
+// filter the angless
+void LAMMPS_sys::filter_angles(int t)
+{
+  angle_array temp_angles;
+  angle t_a;
+
+  int c;
+
+  // count the number of remaining angles
+  c = 0;
+  for (int i=0; i<angles.get_N(); i++)
+    {
+      t_a = angles.get_angle(i);
+      if (t_a.type != t)
+	{
+	  c += 1;
+	}
+    }
+
+  // size the temporary array
+  temp_angles.set_N(c);
+
+  // fill the temporary array with the remaining angles
+  c = 0;
+  for (int i=0; i<angles.get_N(); i++)
+    {
+      t_a = angles.get_angle(i);
+      if (t_a.type != t)
+	{
+	  temp_angles.set_angle(c,t_a);
+	  c += 1;
+	}
+    }
+
+  // resize the angle array
+  angles.set_N(temp_angles.get_N());
+
+  // copy the contents of the temporary array to the angle array
+  for (int i=0; i<temp_angles.get_N(); i++)
+    {
+      angles.set_angle(i,temp_angles.get_angle(i));
+    }
+}
+
+
 // set the types
 void LAMMPS_sys::set_mono_types(int base_type)
 {
@@ -238,8 +354,31 @@ void LAMMPS_sys::get_types(int *&t)
 // prepare the topology
 void LAMMPS_sys::prepare_topology()
 {
+  // set the bond topology
   set_bonds();
+
+  // filter the bonds
+  if (t_s.bond == false)
+    {
+      filter_bonds(1);
+    }
+
+  // set the angle topology
   set_angles();
+
+  // filter the bending angles
+  if (t_s.bending_angle == false)
+    {
+      filter_angles(1);
+      filter_angles(3);
+    }
+
+  // filter the twisting angles
+  if (t_s.twisting_angle == false)
+    {
+      filter_angles(2);
+      filter_angles(4);
+    }
 }
 
 
@@ -260,6 +399,30 @@ void LAMMPS_sys::prepare_test_data()
   angles.set_N(10);
   
   
+}
+
+
+// generate a spherical boundary
+void LAMMPS_sys::generate_spherical_bdry(double r, double x0, double y0, double z0)
+{
+  // generate a spherical boundary from an interpolated set of triangulated mesh
+  b_surf.generate_sphere(r,BD_l.r_bdry);
+
+  // size the bdry_atoms
+  bdry_atoms.set_N(b_surf.get_N_verts());
+
+  vector<vec> bdry_coords = b_surf.get_coords();
+
+  vec r0 = vqm.v_new(x0,y0,z0);
+
+  // translate the boundary
+  for (size_t i=0; i<bdry_coords.size(); i++)
+    {
+      bdry_coords[i] = vqm.v_xpy(bdry_coords[i],r0);
+    }
+
+  // set the bdry_atoms to the coordinates
+  bdry_atoms.set_coords(bdry_coords);
 }
 
 
@@ -351,9 +514,7 @@ void LAMMPS_sys::finalize_system()
   // prepare boundary atoms
   if (bdry_atoms.get_N() == -1)
     {
-      b_surf.generate_sphere(BD_l.r_sphere,BD_l.r_bdry);
-      bdry_atoms.set_N(b_surf.get_N_verts());
-      bdry_atoms.set_coords(b_surf.get_coords());
+      generate_spherical_bdry(BD_l.r_sphere,0.0,0.0,0.0);
     }
 
   // place the ribo and bdry atoms in individual molecules for convenience

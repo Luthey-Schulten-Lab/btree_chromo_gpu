@@ -348,10 +348,38 @@ int btree_driver::execute_directives()
 	}
 
 
+      // write file containing the boundary coordinates
+      else if (command == "spherical_bdry")
+	{
+	  error_code = spherical_bdry(params,reqs);
+	}
+
+
       // load file containing length-scales for BD simulations
       else if (command == "load_BD_lengths")
 	{
 	  error_code = load_BD_lengths(params,reqs);
+	}
+
+
+      // switch bonds on/off
+      else if (command == "switch_bonds")
+	{
+	  error_code = switch_bonds(params);
+	}
+
+
+      // switch bending angles on/off
+      else if (command == "switch_bending_angles")
+	{
+	  error_code = switch_bending_angles(params);
+	}
+
+
+      // switch twisting angles on/off
+      else if (command == "switch_twisting_angles")
+	{
+	  error_code = switch_twisting_angles(params);
 	}
 
 
@@ -1106,6 +1134,101 @@ int btree_driver::write_LAMMPS_data(vector<string> &params, drctv_reqs &reqs)
     }
   driver_lmp_sys.set_btree(driver_bt.dump_state());
   driver_lmp_sys.write_data(params[0]);
+  return 0;
+}
+
+
+int btree_driver::spherical_bdry(vector<string> &params, drctv_reqs &reqs)
+{
+  if (params.size() != 4)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+  if (reqs.BD_lengths_present == false)
+    {
+      cout << "ERROR: missing BD lengths" << endl;
+      return 1;
+    }
+  driver_lmp_sys.generate_spherical_bdry(stod(params[0]),
+					 stod(params[1]),
+					 stod(params[2]),
+					 stod(params[3]));
+  return 0;
+}
+
+
+int btree_driver::switch_bonds(vector<string> &params)
+{
+  if (params.size() != 1)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+
+  if (params[0] == "T")
+    {
+      driver_lmp_sys.switch_bonds(true);
+    }
+  else if (params[0] == "F")
+    {
+      driver_lmp_sys.switch_bonds(false);
+    }
+  else
+    {
+      cout << "ERROR: invalid switch" << endl;
+      return 1;
+    }
+  return 0;
+}
+
+
+int btree_driver::switch_bending_angles(vector<string> &params)
+{
+  if (params.size() != 1)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+
+  if (params[0] == "T")
+    {
+      driver_lmp_sys.switch_bending_angles(true);
+    }
+  else if (params[0] == "F")
+    {
+      driver_lmp_sys.switch_bending_angles(false);
+    }
+  else
+    {
+      cout << "ERROR: invalid switch" << endl;
+      return 1;
+    }
+  return 0;
+}
+
+
+int btree_driver::switch_twisting_angles(vector<string> &params)
+{
+  if (params.size() != 1)
+    {
+      cout << "ERROR: wrong number of parameters, correct input file" << endl;
+      return 1;
+    }
+
+  if (params[0] == "T")
+    {
+      driver_lmp_sys.switch_twisting_angles(true);
+    }
+  else if (params[0] == "F")
+    {
+      driver_lmp_sys.switch_twisting_angles(false);
+    }
+  else
+    {
+      cout << "ERROR: invalid switch" << endl;
+      return 1;
+    }
   return 0;
 }
 

@@ -28,6 +28,9 @@ public:
   // setter for elements
   void set_bond(int i, bond b);
 
+  // getter for elements
+  bond get_bond(int i);
+
   // write bond data
   void write(fstream &data_file);
 
