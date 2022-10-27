@@ -928,8 +928,13 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
   // Nt_pre_topo = Nt;
   // run_hard_harmonic(step_increment/2,t_d_p_topo);
   // reset_Nt(Nt_pre_topo);
+
+  // cout << "\n\nstep_counter = " << step_counter << endl;
+  // cout << "step_increment = " << step_increment << "\n\n" << endl;
   
-  run_hard_harmonic(step_increment,t_d_p);
+  run_hard_FENE(step_increment,t_d_p);
+
+  step_counter += step_increment;
 
   new_bonds = false;
 
@@ -952,12 +957,13 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
       // Nt_pre_topo = Nt;
       // run_hard_harmonic(step_increment/2,t_d_p_topo);
       // reset_Nt(Nt_pre_topo);
+
+      // cout << "\n\nstep_counter = " << step_counter << endl;
+      // cout << "step_increment = " << step_increment << "\n\n" << endl;
       
       run_hard_FENE(step_increment,t_d_p_iter);
-      
-      step_counter += step_increment;
 
-      if (step_counter > l_sim_p.freq_topo + step_prev_topo)
+      if (step_counter >= (l_sim_p.freq_topo + step_prev_topo))
 	{
 	  Nt_pre_topo = Nt;
 	  minimize_soft_FENE(t_d_p_topo);
@@ -967,6 +973,8 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
 	  reset_Nt(Nt_pre_topo);
 	  step_prev_topo = step_counter;
 	}
+
+      step_counter += step_increment;
       
     }
 

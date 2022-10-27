@@ -302,8 +302,8 @@ void loop_topology::initialize_loops(int N_loops, int min_dist)
 						       d);
       loops[i_loop].set_h(h_mono);
 
-      cout << "a=" << a_mono << ", h=" << h_mono << ", d=" << d << endl;
-      regions[a_reg].print_region_map();
+      // cout << "a=" << a_mono << ", h=" << h_mono << ", d=" << d << endl;
+      // regions[a_reg].print_region_map();
       
       // bind the hinge
       loops[i_loop].set_h_bound(true);
@@ -410,15 +410,18 @@ void loop_topology::update_loops(int ext_max, int min_dist, double p_unbinding, 
 		  int accumulator = 0;
 
 		  int h_inter = unif_dist(rand_eng);
+		  cout << "h_inter = " << h_inter  << ", N_inter_total = " << N_inter_total << endl;
 
 		  // determine the candidate inter-strand hinge updates for all the regions
 		  for (size_t i_reg=0; i_reg<regions.size(); i_reg++)
 		    {
 
-		      if ((accumulator + inter_updates[i_reg].size()) >= static_cast<size_t>(h_inter))
+		      if ((accumulator + inter_updates[i_reg].size()) > static_cast<size_t>(h_inter))
 			{
 			  h_inter -= static_cast<int>(accumulator);
 			  // set the hinge
+			  cout << "accumulator = " << accumulator  << ", i_reg = " << i_reg << endl;
+			  cout << "size = " << inter_updates[i_reg].size()  << ", h_inter = " << h_inter << endl;
 			  loops[i_loop].set_h(inter_updates[i_reg][h_inter]);
 			  // set the hinge region
 			  loops[i_loop].set_h_region(i_reg);
