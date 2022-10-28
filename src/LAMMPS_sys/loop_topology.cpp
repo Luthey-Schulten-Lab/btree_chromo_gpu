@@ -323,8 +323,9 @@ void loop_topology::update_loops(int ext_max, int min_dist, double p_unbinding, 
   size_t a_reg, h_reg;
   vec a_coord;
   bool h_bound;
-  double r_intra;
-  int h_intra;
+  double r_intra, r_d;
+  size_t r_inter, accumulator;
+  int h_intra, h_inter;
   
   // loop over the loops
   for (size_t i_loop=0; i_loop<loops.size(); i_loop++)
@@ -406,19 +407,19 @@ void loop_topology::update_loops(int ext_max, int min_dist, double p_unbinding, 
 
 	      if (N_inter_total > 0)
 		{
-		  uniform_int_distribution<int> unif_dist(0,N_inter_total);
-		  int accumulator = 0;
+		  uniform_int_distribution<size_t> unif_dist(0,N_inter_total);
 
-		  int h_inter = unif_dist(rand_eng);
-		  cout << "h_inter = " << h_inter  << ", N_inter_total = " << N_inter_total << endl;
+		  accumulator = 0;
+		  r_inter = unif_dist(rand_eng);
+		  cout << "r_inter = " << r_inter  << ", N_inter_total = " << N_inter_total << endl;
 
 		  // determine the candidate inter-strand hinge updates for all the regions
 		  for (size_t i_reg=0; i_reg<regions.size(); i_reg++)
 		    {
 
-		      if ((accumulator + inter_updates[i_reg].size()) > static_cast<size_t>(h_inter))
+		      if ((accumulator + inter_updates[i_reg].size()) > r_inter)
 			{
-			  h_inter -= static_cast<int>(accumulator);
+			  h_inter = static_cast<int>(r_inter-accumulator);
 			  // set the hinge
 			  cout << "accumulator = " << accumulator  << ", i_reg = " << i_reg << endl;
 			  cout << "size = " << inter_updates[i_reg].size()  << ", h_inter = " << h_inter << endl;
@@ -427,6 +428,11 @@ void loop_topology::update_loops(int ext_max, int min_dist, double p_unbinding, 
 			  loops[i_loop].set_h_region(i_reg);
 			  // bind the hinge
 			  loops[i_loop].set_h_bound(true);
+			  // set the direction
+			  d = 1;
+			  r_d = unif_dist(rand_eng);
+			  if (r_d < 0.5) d = -1;
+			  loops[i_loop].set_d(d);
 			}
 		      else
 			{
@@ -476,23 +482,28 @@ void loop_topology::update_loops(int ext_max, int min_dist, double p_unbinding, 
 	  if (N_inter_total > 0)
 	    {
 	      uniform_int_distribution<int> unif_dist(0,N_inter_total);
-	      int accumulator = 0;
 
-	      int h_inter = unif_dist(rand_eng);
+	      accumulator = 0;
+	      r_inter = unif_dist(rand_eng);
 
 	      // determine the candidate inter-strand hinge updates for all the regions
 	      for (size_t i_reg=0; i_reg<regions.size(); i_reg++)
 		{
 
-		  if ((accumulator + inter_updates[i_reg].size()) >= static_cast<size_t>(h_inter))
+		  if ((accumulator + inter_updates[i_reg].size()) >= r_inter)
 		    {
-		      h_inter -= static_cast<int>(accumulator);
+		      h_inter = static_cast<int>(r_inter-accumulator);
 		      // set the hinge
 		      loops[i_loop].set_h(inter_updates[i_reg][h_inter]);
 		      // set the hinge region
 		      loops[i_loop].set_h_region(i_reg);
 		      // bind the hinge
 		      loops[i_loop].set_h_bound(true);
+		      // set the direction
+		      d = 1;
+		      r_d = unif_dist(rand_eng);
+		      if (r_d < 0.5) d = -1;
+		      loops[i_loop].set_d(d);
 		    }
 		  else
 		    {

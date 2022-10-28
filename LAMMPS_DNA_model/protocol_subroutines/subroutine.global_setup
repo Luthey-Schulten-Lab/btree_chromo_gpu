@@ -10,6 +10,6 @@ units real
 # atom style
 atom_style hybrid angle ellipsoid
 # periodic boundaries
-boundary p p p
+boundary f f f
 # atom map
 atom_modify id yes map hash
