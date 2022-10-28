@@ -88,14 +88,18 @@ public:
   // minimization routines
   void minimize_soft_harmonic(thermo_dump_parameters t_d_p);
   void minimize_hard_harmonic(thermo_dump_parameters t_d_p);
+  void minimize_topoDNA_harmonic(thermo_dump_parameters t_d_p);
   void minimize_soft_FENE(thermo_dump_parameters t_d_p);
   void minimize_hard_FENE(thermo_dump_parameters t_d_p);
+  void minimize_topoDNA_FENE(thermo_dump_parameters t_d_p);
 
   // run routines
   void run_soft_harmonic(unsigned long N_steps, thermo_dump_parameters t_d_p);
   void run_hard_harmonic(unsigned long N_steps, thermo_dump_parameters t_d_p);
+  void run_topoDNA_harmonic(unsigned long N_steps, thermo_dump_parameters t_d_p);
   void run_soft_FENE(unsigned long N_steps, thermo_dump_parameters t_d_p);
   void run_hard_FENE(unsigned long N_steps, thermo_dump_parameters t_d_p);
+  void run_topoDNA_FENE(unsigned long N_steps, thermo_dump_parameters t_d_p);
 
   // loop system
   int read_loop_params(string loop_param_filename);

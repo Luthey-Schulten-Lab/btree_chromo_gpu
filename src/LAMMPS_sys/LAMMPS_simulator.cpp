@@ -273,6 +273,22 @@ void LAMMPS_simulator::minimize_hard_harmonic(thermo_dump_parameters t_d_p)
 }
 
 
+// minimize with soft (topoisomerase) potentials and harmonic bonds
+void LAMMPS_simulator::minimize_topoDNA_harmonic(thermo_dump_parameters t_d_p)
+{
+
+  // cout << "---[ minimizing topoDNA_HARMONIC ]---" << endl;
+  
+  // setup the minimization
+  setup_minimize(t_d_p);
+
+  // include minimization subroutine
+  lmp->input->one("include ${DNA_model_dir}/minimize_subroutines/subroutine.min_topoDNA_harmonic");
+
+  // reset the number of timesteps to Nt
+  reset_timestep_to_Nt();
+}
+
  
 // minimize with soft potentials and FENE bonds
 void LAMMPS_simulator::minimize_soft_FENE(thermo_dump_parameters t_d_p)
@@ -302,6 +318,23 @@ void LAMMPS_simulator::minimize_hard_FENE(thermo_dump_parameters t_d_p)
 
   // include minimization subroutine
   lmp->input->one("include ${DNA_model_dir}/minimize_subroutines/subroutine.min_hard_FENE");
+
+  // reset the number of timesteps to Nt
+  reset_timestep_to_Nt();
+}
+
+
+// minimize with soft (topoisomerase) potentials and FENE bonds
+void LAMMPS_simulator::minimize_topoDNA_FENE(thermo_dump_parameters t_d_p)
+{
+
+  // cout << "---[ minimizing topoDNA_FENE ]---" << endl;
+  
+  // setup the minimization
+  setup_minimize(t_d_p);
+
+  // include minimization subroutine
+  lmp->input->one("include ${DNA_model_dir}/minimize_subroutines/subroutine.min_topoDNA_FENE");
 
   // reset the number of timesteps to Nt
   reset_timestep_to_Nt();
@@ -374,7 +407,27 @@ void LAMMPS_simulator::run_hard_harmonic(unsigned long N_steps, thermo_dump_para
 }
 
 
-// minimize with soft potentials and FENE bonds
+// run with soft (topoisomerase) potentials and harmonic bonds
+void LAMMPS_simulator::run_topoDNA_harmonic(unsigned long N_steps, thermo_dump_parameters t_d_p)
+{
+  // setup for run
+  setup_run(t_d_p);
+
+  // include run subroutine
+  lmp->input->one("include ${DNA_model_dir}/run_subroutines/subroutine.run_topoDNA_harmonic");
+
+  // set the timestep
+  lmp->input->one("timestep ${delta_t}");
+
+  // run for N_steps
+  lmp->input->one(("run " + to_string(N_steps)).c_str());
+
+  // increment Nt
+  Nt += N_steps;
+}
+
+
+// run with soft potentials and FENE bonds
 void LAMMPS_simulator::run_soft_FENE(unsigned long N_steps, thermo_dump_parameters t_d_p)
 {
   // setup for run
@@ -394,7 +447,7 @@ void LAMMPS_simulator::run_soft_FENE(unsigned long N_steps, thermo_dump_paramete
 }
 
 
-// minimize with hard potentials and FENE bonds
+// run with hard potentials and FENE bonds
 void LAMMPS_simulator::run_hard_FENE(unsigned long N_steps, thermo_dump_parameters t_d_p)
 {  
   // setup for run
@@ -405,6 +458,26 @@ void LAMMPS_simulator::run_hard_FENE(unsigned long N_steps, thermo_dump_paramete
 
   // include run subroutine
   lmp->input->one("include ${DNA_model_dir}/run_subroutines/subroutine.run_hard_FENE");
+
+  // run for N_steps
+  lmp->input->one(("run " + to_string(N_steps)).c_str());
+
+  // increment Nt
+  Nt += N_steps;
+}
+
+
+// run with soft (topoisomerase) potentials and FENE bonds
+void LAMMPS_simulator::run_topoDNA_FENE(unsigned long N_steps, thermo_dump_parameters t_d_p)
+{  
+  // setup for run
+  setup_run(t_d_p);
+
+  // set the timestep
+  lmp->input->one("timestep ${delta_t}");
+
+  // include run subroutine
+  lmp->input->one("include ${DNA_model_dir}/run_subroutines/subroutine.run_topoDNA_FENE");
 
   // run for N_steps
   lmp->input->one(("run " + to_string(N_steps)).c_str());
@@ -946,34 +1019,47 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
       
       // update the loop bonds
       update_loop_bonds(new_bonds);
-      
-      // minimize
-      minimize_hard_harmonic(t_d_p_topo);
-      minimize_hard_FENE(t_d_p_topo);
+
+      // simulate topoisomerase action
+      if (step_counter >= (l_sim_p.freq_topo + step_prev_topo))
+	{
+	  // store the timestep
+	  Nt_pre_topo = Nt;
+	  
+	  // minimize with topoisomerase pair potentials
+	  minimize_topoDNA_harmonic(t_d_p_topo);
+	  minimize_topoDNA_FENE(t_d_p_topo);
+	  run_topoDNA_FENE(l_sim_p.dNt_topo,t_d_p_topo);
+
+	  // step the pair potentials back to full strength of hard pairs
+	  minimize_soft_harmonic(t_d_p_topo);
+	  minimize_soft_FENE(t_d_p_topo);
+	  minimize_hard_harmonic(t_d_p_topo);
+	  minimize_hard_FENE(t_d_p_topo);
+
+	  // reset the timestep
+	  reset_Nt(Nt_pre_topo);
+
+	  // reset the previous topo step
+	  step_prev_topo = step_counter;
+	}
+      else
+	{
+	  // minimize with hard pair potentials
+	  minimize_hard_harmonic(t_d_p_topo);
+	  minimize_hard_FENE(t_d_p_topo);
+	}
       
       // run for loop freq
       step_increment = min(l_sim_p.freq_loop,N_steps-step_counter);
 
-      // Nt_pre_topo = Nt;
-      // run_hard_harmonic(step_increment/2,t_d_p_topo);
-      // reset_Nt(Nt_pre_topo);
-
       // cout << "\n\nstep_counter = " << step_counter << endl;
       // cout << "step_increment = " << step_increment << "\n\n" << endl;
-      
+
+      // run the system
       run_hard_FENE(step_increment,t_d_p_iter);
 
-      if (step_counter >= (l_sim_p.freq_topo + step_prev_topo))
-	{
-	  Nt_pre_topo = Nt;
-	  minimize_soft_FENE(t_d_p_topo);
-	  run_soft_FENE(l_sim_p.dNt_topo,t_d_p_topo);
-	  minimize_hard_harmonic(t_d_p_topo);
-	  minimize_hard_FENE(t_d_p_topo);
-	  reset_Nt(Nt_pre_topo);
-	  step_prev_topo = step_counter;
-	}
-
+      // advance the step counter
       step_counter += step_increment;
       
     }
