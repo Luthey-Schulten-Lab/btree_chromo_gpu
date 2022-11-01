@@ -89,7 +89,7 @@ void LAMMPS_simulator::command(string command)
 void LAMMPS_simulator::read_data(string data_file)
 {
   // read the data
-  lmp->input->one(("read_data " + data_file + " extra/bond/per/atom 1").c_str());
+  lmp->input->one(("read_data " + data_file + " extra/bond/per/atom 2").c_str());
 
   // include the physical parameterization of the DNA polymer model
   lmp->input->one("include ${DNA_model_dir}/lmp.DNA_physical_params");

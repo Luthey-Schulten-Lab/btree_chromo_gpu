@@ -5,7 +5,7 @@ variable kBT equal ${kBoltz}*${T} # [Kcal/mol]
 
 # variables describing lengths
 variable r_mono internal 17.0 # radius of monomer [A]
-variable r_ribo internal 200.0 # radius of ribosome [A]
+variable r_ribo internal 100.0 # radius of ribosome [A]
 variable r_sphere internal 2500.0 # radius of cell membrane [A]
 variable r_bdry equal 2.5*${r_mono} # radius of boundary particles
 variable sigma_mono_mono equal 2*${r_mono}
