@@ -1,6 +1,8 @@
 #ifndef INCLUDE_BTREE_DRIVER_HPP
 #define INCLUDE_BTREE_DRIVER_HPP
 
+#include <unordered_map>
+
 #include <btree/btree.hpp>
 #include <btree/mapper.hpp>
 #include <rep_kinetics/replicator.hpp>
@@ -9,22 +11,10 @@
 
 using namespace std;
 
-struct drctv_reqs
+struct lock
 {
-  bool btree_initialized;
-  bool topo_update;
-  bool CG_update;
-  bool regions_present;
-  bool rep_model_present;
-  bool BD_lengths_present;
-  bool map_initial_present;
-  bool map_final_present;
-  bool simulator_prepared;
-  bool DNA_model;
-  bool output_details;
-  bool delta_t;
-  bool lmp_data_present;
-  bool loop_params_present;
+  string key;
+  bool s;
 };
 
 
@@ -47,9 +37,30 @@ public:
 
 private:
 
-  ////////////////
-  // directives // 
-  ////////////////
+  // parse a single directive
+  void parse_single_directive(string drctv, string &command, vector<string> &params);
+
+  // compose any metadirectives, loops etc.
+  void compose_metacommands();
+  
+  // execute a single directive
+  int execute_single_directive(string drctv);
+
+  // reset the command locks and updates
+  void reset_command_locks_and_updates();
+  // set the command requirements
+  void prepare_command_requirements();
+  lock new_lock(string key, bool s);
+
+  // validate the command sequence
+  int validate_command_sequence();
+  int validate_command_sequence_parameters();
+  
+
+  //////////////
+  // commands // 
+  //////////////
+  
 
   // create a new chromosome
   int new_chromo(vector<string> &params, drctv_reqs &reqs);
@@ -136,7 +147,7 @@ private:
   template <int SOFT_HARD, int HARMONIC_FENE>
   int simulator_run(vector<string> &params, drctv_reqs &reqs);
 
-  // simulator loop routines
+  // simulator looped DNA routines
   int simulator_load_loop_params(vector<string> &params, drctv_reqs &reqs);
   int simulator_run_loops(vector<string> &params, drctv_reqs &reqs);
   
@@ -145,19 +156,29 @@ private:
   // objects //
   /////////////
 
-  // classes
+  // internal classes for directive execution
   replicator driver_replicator;
   btree driver_bt;
   mapper driver_mapper;
   LAMMPS_sys driver_lmp_sys;
   LAMMPS_simulator driver_lmp_simulator;
 
-  // structs
+  // internal variables for directive execution
   btree_state driver_st; // state structure
   btree_transforms driver_tr; // transform structure
   vector<chromo_region> driver_rg; // vector of chromo_regions
-  vector<string> drctvs; // set of directives
   CG_map driver_CG; // coarse-graining map
+
+  // directives, commands, and parameters
+  vector<string> drctvs; // set of directives
+  vector<string> commands; // vector of commands as strings
+  vector<vector<string>> command_params; // vector command parameters as vectors of strings
+
+  // variables to hold requirements for directives
+  unordered_map<string,bool> lock_state; // locks for the command sequence
+  unordered_map<string,vector<lock>> lock_tests; // lock requirements for command execution
+  unordered_map<string,vector<lock>> lock_updates; // lock updates given successful command execution
+  unordered_map<string,size_t> N_param_reqs; // requirements for the number of parameters
 
 };
 

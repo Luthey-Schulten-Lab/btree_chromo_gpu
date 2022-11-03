@@ -21,6 +21,9 @@ int main(int argc, char *argv[])
   // print the directives to be executed
   driver.print_directives();
 
+  // parse the directives
+  
+  
   // execute the directives
   error_code = driver.execute_directives();
 

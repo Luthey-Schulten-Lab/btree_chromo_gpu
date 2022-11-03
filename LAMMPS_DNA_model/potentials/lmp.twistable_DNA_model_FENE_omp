@@ -1,10 +1,9 @@
 # variables describing energetic parameters
-variable k_stretch equal 3000*${kBT}/(${sigma_mono_mono}^2) # [Kcal/(mol*A^2)]
-variable l_equil equal 2.0*${r_mono}-2.0
+variable l_equil equal 2.0*${r_mono}
 variable k_bend equal ${kBT}*(45.0/(${sigma_mono_mono})) #  [Kcal/mol]
 variable k_twist equal ${kBT}*(85.0/(${sigma_mono_mono})) # [Kcal/mol]
 variable k_align equal 2*${k_twist} # [Kcal/mol]
-variable k_stretch_FENE equal 30*${kBT}/(${sigma_mono_mono}^2) # [Kcal/(mol*A^2)]
+variable k_stretch_FENE equal 100*${kBT}/(${sigma_mono_mono}^2) # [Kcal/(mol*A^2)]
 variable R0_FENE equal 1.5*${sigma_mono_mono} # [A]
 variable epsilon_FENE equal ${kBT} # [Kcal/mol]
 variable sigma_FENE equal ${sigma_mono_mono} # [A]

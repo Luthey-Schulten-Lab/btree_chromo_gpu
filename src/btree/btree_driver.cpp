@@ -52,6 +52,7 @@ void btree_driver::read_directives(string drctvs_filename)
   
 }
 
+
 // function print all directives
 void btree_driver::print_directives()
 {
@@ -62,6 +63,303 @@ void btree_driver::print_directives()
     }
   cout << "\n------------------------\n" << endl;
 }
+
+
+// reset the command requirements
+void btree_driver::reset_command_locks_and_updates()
+{
+
+  // locks
+  lock_state["btree_initialized"] = false;
+  lock_state["regions_present"] = false;
+  lock_state["rep_model_present"] = false;
+  lock_state["BD_lengths_present"] = false;
+  lock_state["simulator_prepared"] = false;
+  lock_state["DNA_model"] = false;
+  lock_state["output_details"] = false;
+  lock_state["delta_t"] = false;
+  lock_state["lmp_data_present"] = false;
+  lock_state["loop_params_present"] = false;
+
+  // updates
+  lock_state["topo_update"] = true;
+  lock_state["CG_update"] = true;
+  
+}
+
+
+// test the validity of the command given the lock state
+int btree_driver::test_command_parameter_validity(string &command, vector<string> &params)
+{
+  
+  // test the number of parameters
+  if (N_param_reqs[command] != params.size())
+    {
+      cout << "ERROR: wrong number of parameters for (" << command << ")" << endl;
+      cout << "\t" << params.size() << " were given but " << N_param_reqs[command] << " are required" << endl;
+      return 1;
+    }
+
+  return 0;
+}
+
+
+// test the validity of the command given the lock state
+int btree_driver::test_command_lock_validity(string &command)
+{
+
+  // test the lock state for compatability
+  string key;
+  bool s;
+  for (size_t i_lock=0; i_lock<lock_tests[command].size(); i_lock++)
+    {
+      key = lock_tests[command][i_lock].key;
+      s = lock_tests[command][i_lock].s;
+
+      if (lock_state[key] != s)
+	{
+	  cout << "ERROR: incompatible lock state for (" << command << ")" << endl;
+	  cout << "\t" << key << " = " << lock_state[key] << endl;
+	  e += 1;
+	}
+    }
+
+  // return the number of errors
+  return e;
+  
+}
+
+
+// update the locks after the completion of a command
+void btree_driver::update_lock_state_post_command(string &command)
+{
+  // update the lock state given the command
+  string key;
+  bool s;
+  for (size_t i_lock=0; i_lock<lock_updates[command].size(); i_lock++)
+    {
+      key = lock_updates[command][i_lock].key;
+      s = lock_updates[command][i_lock].s;
+      lock_state[key] = s;
+    }
+}
+
+
+// create a new lock
+lock btree_driver::new_lock(string key, bool s)
+{
+  lock l;
+  l.key = key;
+  l.s = s;
+  return l;
+}
+
+
+// validate the command sequence lock states
+int btree_driver::validate_command_sequence()
+{
+  int e = 0;
+
+  size_t i = 0;
+
+  while ((i < commands.size()) && (e == 0))
+    {
+      e += test_command_lock_validity(commands[i]);
+      update_lock_state_post_command(commands[i]);
+    }
+
+  return e;
+}
+
+
+// validate the parameters in the command sequence
+int btree_driver::validate_command_sequence_parameters()
+{
+  int e = 0;
+
+  size_t i = 0;
+
+  while ((i < commands.size()) && (e == 0))
+    {
+      e += test_command_lock_validity(commands[i],command_params[i]);
+    }
+
+  return e;
+}
+
+
+// prepare the set of lock tests
+void btree_driver::prepare_command_requirements()
+{
+  lock t_l;
+  vector<lock> t_ls;
+
+  ////////////////////////////////
+  // btree command requirements //
+  ////////////////////////////////
+
+  // new_chromo
+  // number of required parameters
+  N_param_reqs["new_chromo"] = 1;
+  // lock tests
+  t_ls.clear();
+  lock_tests["new_chromo"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  t_ls.push_back(new_lock("btree_initialized",true));
+  t_ls.push_back(new_lock("topo_update",true));
+  t_ls.push_back(new_lock("CG_update",true));
+  lock_updates["new_chromo"] = t_ls;
+
+  // input_state
+  // number of required parameters
+  N_param_reqs["input_state"] = 1;
+  // lock tests
+  t_ls.clear();
+  lock_tests["input_state"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  t_ls.push_back(new_lock("btree_initialized",true));
+  t_ls.push_back(new_lock("topo_update",true));
+  t_ls.push_back(new_lock("CG_update",true));
+  lock_updates["input_state"] = t_ls;
+
+  // output_state
+  // number of required parameters
+  N_param_reqs["output_state"] = 1;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("btree_initialized",true));
+  lock_tests["output_state"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["output_state"] = t_ls;
+
+  // transforms_file
+  // number of required parameters
+  N_param_reqs["transforms_file"] = 1;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("btree_initialized",true));
+  lock_tests["transforms_file"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  t_ls.push_back(new_lock("topo_update",true));
+  t_ls.push_back(new_lock("CG_update",true));
+  lock_updates["transforms_file"] = t_ls;
+
+  // transform
+  // number of required parameters
+  N_param_reqs["transform"] = 1;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("btree_initialized",true));
+  lock_tests["transform"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  t_ls.push_back(new_lock("topo_update",true));
+  t_ls.push_back(new_lock("CG_update",true));
+  lock_updates["transform"] = t_ls;
+
+  // random_transforms
+  // number of required parameters
+  N_param_reqs["random_transforms"] = 1;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("btree_initialized",true));
+  lock_tests["random_transforms"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  t_ls.push_back(new_lock("topo_update",true));
+  t_ls.push_back(new_lock("CG_update",true));
+  lock_updates["random_transforms"] = t_ls;
+
+  // regions_file
+  // number of required parameters
+  N_param_reqs["regions_file"] = 2;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("btree_initialized",true));
+  lock_tests["regions_file"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  t_ls.push_back(new_lock("regions_present",true));
+  lock_updates["regions_file"] = t_ls;
+
+  // dump_regions
+  // number of required parameters
+  N_param_reqs["dump_regions"] = 2;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("btree_initialized",true));
+  t_ls.push_back(new_lock("regions_present",true));
+  lock_tests["dump_regions"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["regions_file"] = t_ls;
+
+  // dump_topology
+  // number of required parameters
+  N_param_reqs["dump_topology"] = 2;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("btree_initialized",true));
+  lock_tests["dump_topology"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["dump_topology"] = t_ls;
+
+  // update_topology
+  // number of required parameters
+  N_param_reqs["update_topology"] = 0;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("btree_initialized",true));
+  lock_tests["update_topology"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["update_topology"] = t_ls;
+
+  // update_CG_map
+  // number of required parameters
+  N_param_reqs["update_CG_map"] = 1;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("btree_initialized",true));
+  lock_tests["update_CG_map"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["update_CG_map"] = t_ls;
+
+  // dump_CG_map
+  // number of required parameters
+  N_param_reqs["dump_CG_map"] = 3;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("btree_initialized",true));
+  lock_tests["dump_CG_map"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["dump_CG_map"] = t_ls;
+
+  
+  /////////////////////////////////////
+  // replicator command requirements //
+  /////////////////////////////////////
+
+  // load_rep_model
+  // number of required parameters
+  N_param_reqs["load_rep_model"] = 1;
+  // lock tests
+  t_ls.clear();
+  lock_tests["load_rep_model"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  t_ls.push_back(new_lock("rep_model_present",true));
+  lock_updates["load_rep_model"] = t_ls;
+  
+}
+
 
 // function to execute directives
 int btree_driver::execute_directives()
@@ -76,18 +374,7 @@ int btree_driver::execute_directives()
 
   drctv_reqs reqs;
 
-  reqs.btree_initialized = false;
-  reqs.topo_update = true;
-  reqs.CG_update = true;
-  reqs.regions_present = false;
-  reqs.rep_model_present = false;
-  reqs.BD_lengths_present = false;
-  reqs.simulator_prepared = false;
-  reqs.DNA_model = false;
-  reqs.output_details = false;
-  reqs.delta_t = false;
-  reqs.lmp_data_present = false;
-  reqs.loop_params_present = false;
+
 
   cout << "\n---BEGIN EXECUTING DIRECTIVES---\n" << endl;
 
@@ -118,7 +405,7 @@ int btree_driver::execute_directives()
 	  params.push_back(temp_params);
 
 	  cout << "\nCOMMAND: " << command << endl;
-	  for (long unsigned int i=0; i<params.size(); i++)
+	  for (size_t i=0; i<params.size(); i++)
 	    {
 	      cout << "\tparam_" << i
 		   << ": " << params[i]
@@ -640,6 +927,7 @@ int btree_driver::output_state(vector<string> &params)
   driver_bt.write_state(params[0],driver_bt.dump_state());
   return 0;
 }
+
 
 int btree_driver::transforms_file(vector<string> &params, drctv_reqs &reqs)
 {
