@@ -21,15 +21,44 @@ int main(int argc, char *argv[])
   // print the directives to be executed
   driver.print_directives();
 
-  // parse the directives
+  // parse the directives into commands and parameters
+  driver.parse_directives();
   
-  
-  // execute the directives
-  error_code = driver.execute_directives();
+  // expand the metacommands
 
+
+  // validate the numbers of parameters
+  error_code = driver.validate_command_sequence_parameters();
   if (error_code != 0)
     {
-      cout << "error during directive execution" << endl;
+      cout << "error during parameter validation" << endl;
+      return 1;
+    }
+  else
+    {
+      cout << "\n--- VALID COMMAND PARAMETERS ---\n" << endl;
+    }
+
+  // validate the command sequence
+  error_code = driver.validate_command_sequence();
+  if (error_code != 0)
+    {
+      cout << "error during sequence validation" << endl;
+      return 1;
+    }
+  else
+    {
+      cout << "\n--- VALID COMMAND SEQUENCE ---\n" << endl;
+    }
+
+  // print the set of commands
+  driver.print_commands();
+    
+  // execute the commands
+  error_code = driver.execute_commands();
+  if (error_code != 0)
+    {
+      cout << "error during command execution" << endl;
     } 
 
   return 0;
