@@ -164,6 +164,7 @@ private:
   int simulator_set_delta_t(vector<string> &params);
   int simulator_store_timestep();
   int simulator_restore_timestep();
+  int simulator_reset_timestep(vector<string> &params);
   
   // simulator minimization routines
   template <int SOFT_HARD, int HARMONIC_FENE>

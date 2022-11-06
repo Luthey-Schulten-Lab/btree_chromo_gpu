@@ -575,7 +575,7 @@ void LAMMPS_simulator::reset_timestep_to_Nt()
 
 
 // reset the timestep counter, Nt
-void LAMMPS_simulator::reset_Nt(int Nt)
+void LAMMPS_simulator::reset_Nt(unsigned long Nt)
 {
   this->Nt = Nt;
   reset_timestep_to_Nt();
@@ -977,7 +977,7 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
   unsigned long step_increment;
   thermo_dump_parameters t_d_p_iter = t_d_p;
   thermo_dump_parameters t_d_p_topo = t_d_p;
-  int Nt_pre_topo, step_prev_topo;
+  unsigned long Nt_pre_topo, step_prev_topo;
 
   sim_to_sys();
   lmp_sys->initialize_loop_topo(N_loops);

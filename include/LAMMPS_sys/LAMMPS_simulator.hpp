@@ -75,7 +75,7 @@ public:
   void reset_protocol_variables();
   void global_setup();
   void standard_computes();
-  void reset_Nt(int Nt);
+  void reset_Nt(unsigned long Nt);
   void command(string command);
   void include_file(string filename);
   void clear();

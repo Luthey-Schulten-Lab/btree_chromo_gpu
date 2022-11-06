@@ -25,59 +25,27 @@ int main(int argc, char *argv[])
   driver.parse_directives();
 
   // validate the numbers of parameters
-  cout << "\n--- BEGIN COMMAND PARAMETER VALIDATION ---\n" << endl;
   error_code = driver.validate_command_sequence_parameters();
-  if (error_code != 0)
-    {
-      cout << "\terror in command parameters" << endl;
-      cout << "\n--- END COMMAND PARAMETER VALIDATION ---\n" << endl;
-      return 1;
-    }
-  else
-    {
-      cout << "\tvalid command sequence" << endl;
-      cout << "\n--- END COMMAND PARAMETER VALIDATION ---\n" << endl;
-    }
+  if (error_code != 0) return 1;
   
   // expand the metacommands
-  cout << "\n--- BEGIN METACOMMAND EXPANSION ---\n" << endl;
   error_code = driver.expand_metacommands();
-  if (error_code != 0)
-    {
-      cout << "\terror during metacommand expansion" << endl;
-      cout << "\n--- END METACOMMAND EXPANSION ---\n" << endl;
-      return 1;
-    }
-  else
-    {
-      cout << "\tsuccessful metacommand expansion" << endl;
-      cout << "\n--- END METACOMMAND EXPANSION ---\n" << endl;
-    }
+  if (error_code != 0) return 1;
 
   // validate the command sequence
-  cout << "\n--- BEGIN COMMAND SEQUENCE VALIDATION ---\n" << endl;
   error_code = driver.validate_command_sequence();
-  if (error_code != 0)
-    {
-      cout << "\terror in command sequence" << endl;
-      cout << "\n--- END COMMAND SEQUENCE VALIDATION ---\n" << endl;
-      return 1;
-    }
-  else
-    {
-      cout << "\tvalid command sequence" << endl;
-      cout << "\n--- END COMMAND SEQUENCE VALIDATION ---\n" << endl;
-    }
+  if (error_code != 0) return 1;
 
   // print the set of commands
   driver.print_commands();
     
   // execute the commands
-  // error_code = driver.execute_commands();
-  // if (error_code != 0)
-  //   {
-  //     cout << "error during command execution" << endl;
-  //   } 
+  error_code = driver.execute_commands();
+  if (error_code != 0)
+    {
+      cout << "error during command execution" << endl;
+      return 1;
+    } 
 
   return 0;
   

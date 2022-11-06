@@ -57,12 +57,12 @@ void btree_driver::read_directives(string drctvs_filename)
 // function print all directives
 void btree_driver::print_directives()
 {
-  cout << "\n---PROGRAM DIRECTIVES---\n" << endl;
+  cout << "\n--- PROGRAM DIRECTIVES ---\n" << endl;
   for (string drctv: drctvs)
     {
       cout << drctv << endl;
     }
-  cout << "\n------------------------\n" << endl;
+  cout << "\n--------------------------\n" << endl;
 }
 
 
@@ -110,6 +110,8 @@ int btree_driver::test_command_parameter_validity(string &command, vector<string
 // validate the parameters in the sequence of commands
 int btree_driver::validate_command_sequence_parameters()
 {
+  cout << "\n--- BEGIN COMMAND PARAMETER VALIDATION ---\n" << endl;
+  
   int e = 0;
 
   for (size_t i_c=0; i_c<commands.size(); i_c++)
@@ -119,6 +121,16 @@ int btree_driver::validate_command_sequence_parameters()
       if (e > 0) break;
     }
 
+  if (e > 0)
+    {
+      cout << "\terror in command parameters" << endl;
+    }
+  else
+    {
+      cout << "\tvalid command parameters" << endl;
+    }
+
+  cout << "\n--- END COMMAND PARAMETER VALIDATION ---\n" << endl;
   return e;
 }
 
@@ -180,6 +192,8 @@ lock btree_driver::new_lock(string key, bool s)
 int btree_driver::validate_command_sequence()
 {
 
+  cout << "\n--- BEGIN COMMAND SEQUENCE VALIDATION ---\n" << endl;
+
   reset_command_locks_and_updates();
   
   int e = 0;
@@ -191,7 +205,19 @@ int btree_driver::validate_command_sequence()
       if (e > 0) break;
     }
 
+  if (e > 0)
+    {
+      cout << "\terror in command sequence" << endl;
+    }
+  else
+    {
+      cout << "\tvalid command sequence" << endl;
+    }
+
   reset_command_locks_and_updates();
+
+  cout << "\n--- END COMMAND SEQUENCE VALIDATION ---\n" << endl;
+  
   return e;
 }
 
@@ -256,7 +282,9 @@ void btree_driver::parse_single_directive(string drctv,
 // print the set of commands
 void btree_driver::print_commands()
 {
-  cout << "\n---COMMANDS---\n" << endl;
+  cout << "\n----------------" << endl;
+  cout << "--- COMMANDS ---" << endl;
+  cout << "----------------\n" << endl;
   for (size_t i_c=0; i_c<commands.size(); i_c++)
     {
       cout << "\nCOMMAND: " << commands[i_c] << endl;
@@ -275,17 +303,27 @@ void btree_driver::print_commands()
 int btree_driver::expand_metacommands()
 {
 
+  cout << "\n--- BEGIN METACOMMAND EXPANSION ---\n" << endl;
+
   int e = 0;
 
   // test the paired metacommands
   e += test_paired_metacommands("repeat");
   e += test_paired_metacommands("repeat_replicates");
 
-  if (e > 0) return e;
+  if (e > 0)
+    {
+      cout << "\terror during metacommand expansion" << endl;
+    }
+  else
+    {
+      expand_repeat_metacommands();
+      expand_repeat_replicates_metacommands();
+      cout << "\tsuccessful metacommand expansion" << endl;
+    }
 
-  expand_repeat_metacommands();
-  expand_repeat_replicates_metacommands();
-
+  cout << "\n--- END METACOMMAND EXPANSION ---\n" << endl;
+  
   return e;
 }
 
@@ -491,7 +529,6 @@ void btree_driver::expand_repeat_replicates_metacommands()
 	      string rep_mod = to_string(min_rep + i_rep);
 	      rep_mod = string(padding-min<size_t>(padding,rep_mod.length()),'0') + rep_mod;
 	      rep_mod = "_rep" + rep_mod;
-	      cout << "rep_mod = " << rep_mod << endl;
 	      for (size_t i_c=0; i_c<repeated_commands.size(); i_c++)
 		{
 		  temp_commands.push_back(repeated_commands[i_c]);
@@ -1192,6 +1229,39 @@ void btree_driver::prepare_command_requirements()
   t_ls.push_back(new_lock("delta_t",true));
   lock_updates["simulator_set_delta_t"] = t_ls;
 
+  // simulator_store_timestep
+  // number of required parameters
+  N_param_reqs["simulator_store_timestep"] = 0;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("simulator_prepared",true));
+  lock_tests["simulator_store_timestep"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["simulator_store_timestep"] = t_ls;
+
+  // simulator_restore_timestep
+  // number of required parameters
+  N_param_reqs["simulator_restore_timestep"] = 0;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("simulator_prepared",true));
+  lock_tests["simulator_restore_timestep"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["simulator_restore_timestep"] = t_ls;
+
+  // simulator_reset_timestep
+  // number of required parameters
+  N_param_reqs["simulator_reset_timestep"] = 1;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("simulator_prepared",true));
+  lock_tests["simulator_reset_timestep"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["simulator_reset_timestep"] = t_ls;
+
   // simulator_read_data
   // number of required parameters
   N_param_reqs["simulator_read_data"] = 1;
@@ -1774,6 +1844,13 @@ int btree_driver::execute_single_command(string &command,
   else if (command == "simulator_restore_timestep")
     {
       error_code = simulator_restore_timestep();
+    }
+
+
+  // reset the simulator's timestep to the specified value
+  else if (command == "simulator_reset_timestep")
+    {
+      error_code = simulator_reset_timestep(params);
     }
 
 
@@ -2495,6 +2572,13 @@ int btree_driver::simulator_store_timestep()
 int btree_driver::simulator_restore_timestep()
 {
   driver_lmp_simulator.restore_Nt();
+  return 0;
+}
+
+
+int btree_driver::simulator_reset_timestep(vector<string> &params)
+{
+  driver_lmp_simulator.reset_Nt(stoul(params[0]));
   return 0;
 }
 
