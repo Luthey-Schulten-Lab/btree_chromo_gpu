@@ -41,6 +41,9 @@ public:
   // validate the command sequence
   int validate_command_sequence();
 
+  // expand the metacommands
+  int expand_metacommands();
+
   // print the command sequence
   void print_commands();
   
@@ -52,8 +55,16 @@ private:
   // parse a single directive
   void parse_single_directive(string drctv, string &command, vector<string> &params);
 
+  // test if metacommands are properly paired
+  int test_paired_metacommands(string paired_command);
   // compose any metacommands, loops etc.
   void compose_metacommands();
+  // expand repeat metacommands
+  void expand_repeat_metacommands();
+  void expand_repeat_replicates_metacommands();
+  void update_replicate_modified_params(string &rep_mod, string &command, vector<string> &params);
+  void append_replicate_modifier(string &rep_mod, string &mod_param);
+  void insert_replicate_modifier(string &rep_mod, string &mod_param);
   
   // execute a single command
   int execute_single_command(string &command, vector<string> &params);

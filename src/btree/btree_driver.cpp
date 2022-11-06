@@ -271,6 +271,370 @@ void btree_driver::print_commands()
 }
 
 
+// expand the metacommands
+int btree_driver::expand_metacommands()
+{
+
+  int e = 0;
+
+  // test the paired metacommands
+  e += test_paired_metacommands("repeat");
+  e += test_paired_metacommands("repeat_replicates");
+
+  if (e > 0) return e;
+
+  expand_repeat_metacommands();
+  expand_repeat_replicates_metacommands();
+
+  return e;
+}
+
+
+// test paired metacommands
+int btree_driver::test_paired_metacommands(string paired_command)
+{
+  int c = 0;
+
+  for (size_t i_c=0; i_c<commands.size(); i_c++)
+    {
+      if (commands[i_c] == paired_command)
+	{
+	  c += 1;
+	}
+      else if (commands[i_c] == ("end_" + paired_command))
+	{
+	  c -= 1;
+	}
+      if (c < 0)
+	{
+	  break;
+	}
+    }
+
+  if (c != 0)
+    {
+      return 1;
+    }
+
+  return 0;
+}
+
+
+// expand repeat metacommands
+void btree_driver::expand_repeat_metacommands()
+{
+  int N_repeats;
+  size_t i_start, i_end;
+  vector<string> temp_commands, repeated_commands;
+  vector<vector<string>> temp_command_params, repeated_command_params;
+
+  bool repeats_present, start_found, end_found;
+
+  repeats_present = true;
+
+  // loop to find the repeats
+  while (repeats_present == true)
+    {
+      
+      // initialize variables for repeat expansion
+      start_found = false;
+      end_found = false;
+      temp_commands.clear();
+      temp_command_params.clear();
+      repeated_commands.clear();
+      repeated_command_params.clear();
+
+      // loop over the commands
+      for (size_t i_c=0; i_c<commands.size(); i_c++)
+	{
+	  if (commands[i_c] == "repeat")
+	    {
+	      i_start = i_c;
+	      start_found = true;
+	    }
+
+	  if (commands[i_c] == "end_repeat")
+	    {
+	      i_end = i_c;
+	      end_found = true;
+	      break;
+	    }
+	}
+      
+      // expand repeats if they are found
+      if ((start_found == true) && (end_found == true))
+	{
+
+	  // get the number of repeats from the params
+	  N_repeats = stoi(command_params[i_start][0]);
+
+	  // add the pre-repeat commands and params
+	  for (size_t i_c=0; i_c<i_start; i_c++)
+	    {
+	      temp_commands.push_back(commands[i_c]);
+	      temp_command_params.push_back(command_params[i_c]);
+	    }
+
+	  // create the set of repeated commands and params
+	  for (size_t i_c=(i_start+1); i_c<i_end; i_c++)
+	    {
+	      repeated_commands.push_back(commands[i_c]);
+	      repeated_command_params.push_back(command_params[i_c]);
+	    }
+
+	  // add the repeated commands and params
+	  for (int i_rep=0; i_rep<N_repeats; i_rep++)
+	    {
+	      for (size_t i_c=0; i_c<repeated_commands.size(); i_c++)
+		{
+		  temp_commands.push_back(repeated_commands[i_c]);
+		  temp_command_params.push_back(repeated_command_params[i_c]);
+		}
+	    }
+
+	  // add the post-repeat commands and params
+	  for (size_t i_c=(i_end+1); i_c<commands.size(); i_c++)
+	    {
+	      temp_commands.push_back(commands[i_c]);
+	      temp_command_params.push_back(command_params[i_c]);
+	    }
+
+	  // clear the existing commands and params
+	  commands.clear();
+	  command_params.clear();
+
+	  // copy the temp commands and params
+	  commands = temp_commands;
+	  command_params = temp_command_params;
+	  
+	}
+      else
+	{
+	  repeats_present = false;
+	}
+      
+    } // end loop to find repeats
+}
+
+
+// expand repeat metacommands
+void btree_driver::expand_repeat_replicates_metacommands()
+{
+  int min_rep, max_rep, N_reps, padding;
+  size_t i_start, i_end;
+  vector<string> temp_commands, repeated_commands;
+  vector<vector<string>> temp_command_params, repeated_command_params;
+  vector<string> replicate_modified_params;
+
+  bool repeats_present, start_found, end_found;
+
+  repeats_present = true;
+
+  // loop to find the repeats
+  while (repeats_present == true)
+    {
+      
+      // initialize variables for repeat expansion
+      start_found = false;
+      end_found = false;
+      temp_commands.clear();
+      temp_command_params.clear();
+      repeated_commands.clear();
+      repeated_command_params.clear();
+
+      // loop over the commands
+      for (size_t i_c=0; i_c<commands.size(); i_c++)
+	{
+	  if (commands[i_c] == "repeat_replicates")
+	    {
+	      i_start = i_c;
+	      start_found = true;
+	    }
+
+	  if (commands[i_c] == "end_repeat_replicates")
+	    {
+	      i_end = i_c;
+	      end_found = true;
+	      break;
+	    }
+	}
+      
+      // expand repeats if they are found
+      if ((start_found == true) && (end_found == true))
+	{
+
+	  // get the minimum, maximum, and padding from the params
+	  min_rep = stoi(command_params[i_start][0]);
+	  max_rep = stoi(command_params[i_start][1]);
+	  padding = stoul(command_params[i_start][2]);
+
+	  // calculate the total number of replicates
+	  N_reps = max_rep - min_rep + 1;
+
+	  // add the pre-repeat commands and params
+	  for (size_t i_c=0; i_c<i_start; i_c++)
+	    {
+	      temp_commands.push_back(commands[i_c]);
+	      temp_command_params.push_back(command_params[i_c]);
+	    }
+
+	  // create the set of repeated commands and params
+	  for (size_t i_c=(i_start+1); i_c<i_end; i_c++)
+	    {
+	      repeated_commands.push_back(commands[i_c]);
+	      repeated_command_params.push_back(command_params[i_c]);
+	    }
+
+	  // add the repeated commands and params
+	  for (int i_rep=0; i_rep<N_reps; i_rep++)
+	    {
+	      string rep_mod = to_string(min_rep + i_rep);
+	      rep_mod = string(padding-min<size_t>(padding,rep_mod.length()),'0') + rep_mod;
+	      rep_mod = "_rep" + rep_mod;
+	      cout << "rep_mod = " << rep_mod << endl;
+	      for (size_t i_c=0; i_c<repeated_commands.size(); i_c++)
+		{
+		  temp_commands.push_back(repeated_commands[i_c]);
+		  replicate_modified_params = repeated_command_params[i_c];
+		  update_replicate_modified_params(rep_mod,
+						   repeated_commands[i_c],
+						   replicate_modified_params);
+		  temp_command_params.push_back(replicate_modified_params);
+		}
+	    }
+
+	  // add the post-repeat commands and params
+	  for (size_t i_c=(i_end+1); i_c<commands.size(); i_c++)
+	    {
+	      temp_commands.push_back(commands[i_c]);
+	      temp_command_params.push_back(command_params[i_c]);
+	    }
+
+	  // clear the existing commands and params
+	  commands.clear();
+	  command_params.clear();
+
+	  // copy the temp commands and params
+	  commands = temp_commands;
+	  command_params = temp_command_params;
+	  
+	}
+      else
+	{
+	  repeats_present = false;
+	}
+      
+    } // end loop to find repeats
+}
+
+
+// update the parameters for commands modified by a replicate number
+void btree_driver::update_replicate_modified_params(string &rep_mod, string &command, vector<string> &params)
+{
+  
+  if (command == "input_state")
+    {
+      insert_replicate_modifier(rep_mod,params[0]);
+    }
+  else if (command == "output_state")
+    {
+      insert_replicate_modifier(rep_mod,params[0]);
+    }
+  else if (command == "dump_topology")
+    {
+      insert_replicate_modifier(rep_mod,params[0]);
+    }
+  else if (command == "dump_CG_map")
+    {
+      insert_replicate_modifier(rep_mod,params[0]);
+    }
+  else if (command == "dump_regions")
+    {
+      insert_replicate_modifier(rep_mod,params[0]);
+    }
+  else if (command == "load_mono_coords")
+    {
+      insert_replicate_modifier(rep_mod,params[0]);
+    }
+  else if (command == "load_mono_quats")
+    {
+      insert_replicate_modifier(rep_mod,params[0]);
+    }
+  else if (command == "load_ribo_coords")
+    {
+      insert_replicate_modifier(rep_mod,params[0]);
+    }
+  else if (command == "load_ribo_quats")
+    {
+      insert_replicate_modifier(rep_mod,params[0]);
+    }
+  else if (command == "load_bdry_coords")
+    {
+      insert_replicate_modifier(rep_mod,params[0]);
+    }
+  else if (command == "write_mono_coords")
+    {
+      insert_replicate_modifier(rep_mod,params[0]);
+    }
+  else if (command == "write_mono_quats")
+    {
+      insert_replicate_modifier(rep_mod,params[0]);
+    }
+  else if (command == "write_ribo_coords")
+    {
+      insert_replicate_modifier(rep_mod,params[0]);
+    }
+  else if (command == "write_ribo_quats")
+    {
+      insert_replicate_modifier(rep_mod,params[0]);
+    }
+  else if (command == "write_bdry_coords")
+    {
+      insert_replicate_modifier(rep_mod,params[0]);
+    }
+  else if (command == "write_LAMMPS_data")
+    {
+      append_replicate_modifier(rep_mod,params[0]);
+    }
+  else if (command == "write_mono_xyz")
+    {
+      insert_replicate_modifier(rep_mod,params[0]);
+    }
+  else if (command == "simulator_set_output_details")
+    {
+      append_replicate_modifier(rep_mod,params[1]);
+    }
+  else if (command == "simulator_read_data")
+    {
+      append_replicate_modifier(rep_mod,params[0]);
+    }
+  
+}
+
+
+// append the replicate modifier
+void btree_driver::append_replicate_modifier(string &rep_mod, string &mod_param)
+{
+  mod_param = mod_param + rep_mod;
+}
+
+
+// insert the replicate modifier
+void btree_driver::insert_replicate_modifier(string &rep_mod, string &mod_param)
+{
+  int delim;
+  string file, file_ext;
+  string file_ext_delim = ".";
+
+  delim = mod_param.find(file_ext_delim);
+  file = mod_param.substr(0,delim);
+  file_ext = mod_param.substr(delim,mod_param.length());
+
+  mod_param = file + rep_mod + file_ext;
+  
+}
+
+
 // prepare the set of lock tests
 void btree_driver::prepare_command_requirements()
 {
@@ -964,6 +1328,50 @@ void btree_driver::prepare_command_requirements()
   // lock updates
   t_ls.clear();
   lock_updates["simulator_run_loops"] = t_ls;
+
+  //////////////////////////////
+  // metacommand requirements //
+  //////////////////////////////
+  
+  // repeat
+  // number of required parameters
+  N_param_reqs["repeat"] = 1;
+  // lock tests
+  t_ls.clear();
+  lock_tests["repeat"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["repeat"] = t_ls;
+
+  // end_repeat
+  // number of required parameters
+  N_param_reqs["end_repeat"] = 0;
+  // lock tests
+  t_ls.clear();
+  lock_tests["end_repeat"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["end_repeat"] = t_ls;
+
+  // repeat_replicates
+  // number of required parameters
+  N_param_reqs["repeat_replicates"] = 3;
+  // lock tests
+  t_ls.clear();
+  lock_tests["repeat_replicates"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["repeat_replicates"] = t_ls;
+
+  // end_repeat_replicates
+  // number of required parameters
+  N_param_reqs["end_repeat_replicates"] = 0;
+  // lock tests
+  t_ls.clear();
+  lock_tests["end_repeat_replicates"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["end_repeat_replicates"] = t_ls;
   
 }
 

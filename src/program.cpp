@@ -23,43 +23,62 @@ int main(int argc, char *argv[])
 
   // parse the directives into commands and parameters
   driver.parse_directives();
-  
-  // expand the metacommands
-
 
   // validate the numbers of parameters
+  cout << "\n--- BEGIN COMMAND PARAMETER VALIDATION ---\n" << endl;
   error_code = driver.validate_command_sequence_parameters();
   if (error_code != 0)
     {
-      cout << "error during parameter validation" << endl;
+      cout << "\terror in command parameters" << endl;
+      cout << "\n--- END COMMAND PARAMETER VALIDATION ---\n" << endl;
       return 1;
     }
   else
     {
-      cout << "\n--- VALID COMMAND PARAMETERS ---\n" << endl;
+      cout << "\tvalid command sequence" << endl;
+      cout << "\n--- END COMMAND PARAMETER VALIDATION ---\n" << endl;
+    }
+  
+  // expand the metacommands
+  cout << "\n--- BEGIN METACOMMAND EXPANSION ---\n" << endl;
+  error_code = driver.expand_metacommands();
+  if (error_code != 0)
+    {
+      cout << "\terror during metacommand expansion" << endl;
+      cout << "\n--- END METACOMMAND EXPANSION ---\n" << endl;
+      return 1;
+    }
+  else
+    {
+      cout << "\tsuccessful metacommand expansion" << endl;
+      cout << "\n--- END METACOMMAND EXPANSION ---\n" << endl;
     }
 
   // validate the command sequence
+  cout << "\n--- BEGIN COMMAND SEQUENCE VALIDATION ---\n" << endl;
   error_code = driver.validate_command_sequence();
   if (error_code != 0)
     {
-      cout << "error during sequence validation" << endl;
+      cout << "\terror in command sequence" << endl;
+      cout << "\n--- END COMMAND SEQUENCE VALIDATION ---\n" << endl;
       return 1;
     }
   else
     {
-      cout << "\n--- VALID COMMAND SEQUENCE ---\n" << endl;
+      cout << "\tvalid command sequence" << endl;
+      cout << "\n--- END COMMAND SEQUENCE VALIDATION ---\n" << endl;
     }
 
   // print the set of commands
   driver.print_commands();
     
   // execute the commands
-  error_code = driver.execute_commands();
-  if (error_code != 0)
-    {
-      cout << "error during command execution" << endl;
-    } 
+  // error_code = driver.execute_commands();
+  // if (error_code != 0)
+  //   {
+  //     cout << "error during command execution" << endl;
+  //   } 
 
   return 0;
+  
 }
