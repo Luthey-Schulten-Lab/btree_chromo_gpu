@@ -81,15 +81,19 @@ angle angle_array::get_angle(int i)
 // write to stream
 void angle_array::write(fstream &data_file)
 {
-  data_file << "\nAngles # angle-ID angle-type i j k\n" << endl;
 
-  for (int i=0; i<N; i++)
+  if (N > 0)
     {
-      data_file << angles[i].id << "\t"
-		<< angles[i].type << "\t"
-		<< angles[i].i << "\t"
-		<< angles[i].j << "\t"
-		<< angles[i].k << endl;
+      data_file << "\nAngles # angle-ID angle-type i j k\n" << endl;
+
+      for (int i=0; i<N; i++)
+	{
+	  data_file << angles[i].id << "\t"
+		    << angles[i].type << "\t"
+		    << angles[i].i << "\t"
+		    << angles[i].j << "\t"
+		    << angles[i].k << endl;
+	}
     }
   
 }

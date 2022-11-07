@@ -241,18 +241,22 @@ int ellipsoid_array::read_bin_quats(string data_filename, string order, bool for
 // write to stream
 void ellipsoid_array::write(fstream &data_file)
 {
-  data_file << "\nEllipsoids # atom-ID shapex shapey shapez quatw quati quatj quatk\n" << endl;
 
-  for (int i=0; i<N; i++)
-    {        
-      data_file << ellipsoids[i].id << "\t"
-		<< ellipsoids[i].s.x << "\t"
-		<< ellipsoids[i].s.y << "\t"
-		<< ellipsoids[i].s.z << "\t"
-		<< ellipsoids[i].q.w << "\t"
-		<< ellipsoids[i].q.v.x << "\t"
-		<< ellipsoids[i].q.v.y << "\t"
-		<< ellipsoids[i].q.v.z << endl;
+  if (N > 0)
+    {
+      data_file << "\nEllipsoids # atom-ID shapex shapey shapez quatw quati quatj quatk\n" << endl;
+
+      for (int i=0; i<N; i++)
+	{        
+	  data_file << ellipsoids[i].id << "\t"
+		    << ellipsoids[i].s.x << "\t"
+		    << ellipsoids[i].s.y << "\t"
+		    << ellipsoids[i].s.z << "\t"
+		    << ellipsoids[i].q.w << "\t"
+		    << ellipsoids[i].q.v.x << "\t"
+		    << ellipsoids[i].q.v.y << "\t"
+		    << ellipsoids[i].q.v.z << endl;
+	}
     }
   
 }

@@ -1476,6 +1476,15 @@ int btree_driver::execute_single_command(string &command,
 					 vector<string> &params)
 {
 
+  cout << "\nCOMMAND: " << command << endl;
+  for (size_t i_p=0; i_p<params.size(); i_p++)
+    {
+      cout << "\tparam_" << i_p
+	   << ": " << params[i_p]
+	   << endl;
+    }
+  cout << "\n" << endl;
+
 
   int error_code = 0;
   

@@ -13,6 +13,14 @@ LAMMPS_simulator::LAMMPS_simulator()
   prng_seed = 0;
   Nt = 0;
   stored_Nt = 0;
+
+  computes_active.quats = false;
+  computes_active.ids = false;
+  computes_active.types = false;
+  computes_active.MSD = false;
+  dumps_active.lammpstrj = false;
+  T_freq_specified = false;
+  D_freq_specified = false;
 }
 
 
@@ -103,13 +111,50 @@ void LAMMPS_simulator::read_data(string data_file)
 void LAMMPS_simulator::global_setup()
 {
 
-  computes_active.quats = false;
-  computes_active.ids = false;
-  computes_active.types = false;
-  computes_active.MSD = false;
-  dumps_active.lammpstrj = false;
-  T_freq_specified = false;
-  D_freq_specified = false;
+  // reset any computes
+  if (computes_active.quats == true)
+    {
+      // lmp->input->one("uncompute quat");
+      computes_active.quats = false;
+    }
+  if (computes_active.ids == true)
+    {
+      // lmp->input->one("uncompute id_track");
+      computes_active.ids = false;
+    }
+  if (computes_active.types == true)
+    {
+      // lmp->input->one("uncompute type_track");
+      computes_active.types = false;
+    }
+  if (computes_active.MSD == true)
+    {
+      // lmp->input->one("uncompute dnaMSD");
+      // lmp->input->one("uncompute ribosMSD");
+      // lmp->input->one("uncompute orisMSD");
+      // lmp->input->one("uncompute tersMSD");
+      // lmp->input->one("uncompute forksMSD");
+      computes_active.MSD = false;
+    }
+
+  // reset any dumps
+  if (dumps_active.lammpstrj == true)
+    {
+      // lmp->input->one("undump dumplammpstrj");
+      dumps_active.lammpstrj = false;
+    }
+
+  // reset dump and thermo variables
+  if (T_freq_specified == true)
+    {
+      lmp->input->one("variable T_freq delete");
+      T_freq_specified = false;
+    }
+  if (D_freq_specified == true)
+    {
+      lmp->input->one("variable D_freq delete");
+      D_freq_specified = false;
+    }
   
   lmp->input->one("include ${DNA_model_dir}/protocol_subroutines/subroutine.global_setup");
 }

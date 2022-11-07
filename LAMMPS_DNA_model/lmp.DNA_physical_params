@@ -32,7 +32,7 @@ variable rho_ribo equal ${m_ribo}/((4.0/3.0)*PI*${r_ribo}^3) # density of riboso
 
 # variable describing damping coefficients
 # variable eta equal 1.6840E+5 # dynamic viscosity of cytoplasm [Kcal*fs/(mol*A^3)]
-variable eta internal 7.4574E+1 # dynamic viscosity of cytoplasm [(g/mol)/(fs*A)]
+variable eta internal 7.0434E+1 # dynamic viscosity of cytoplasm [(g/mol)/(fs*A)]
 #variable gamma_t_mono equal 6*PI*${eta}*${r_mono}/${m_mono} # [Kcal*fs/(g*A^2)]
 variable gamma_t_mono equal 6*PI*${eta}*${r_mono} # [(g/mol)/fs]
 variable gamma_r_mono equal ${gamma_t_mono}*(${sigma_mono_mono}^2)/3
