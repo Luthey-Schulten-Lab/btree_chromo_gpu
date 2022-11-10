@@ -1,0 +1,11 @@
+variable k_loop equal 1.0*${kBT} # [(Kcal/mol)/A^2]
+variable r_loop equal 4.0*${r_mono} # [A]
+
+print """
+ -------------------------------------
+ ---[ Loops, Energetic Parameters ]---
+ -------------------------------------
+  kBT = ${kBT} [Kcal/mol]
+  k_loop = ${k_loop} [Kcal/(mol*A^2)]
+  r_loop = ${r_loop} [A]
+"""
