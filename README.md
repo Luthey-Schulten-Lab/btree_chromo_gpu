@@ -70,15 +70,27 @@ The executable (*program*) will be in /build/apps.
 
 ## Usage
 
+### Getting Started
 Prepare a *directives.inp* file containing the directives to be executed by the binary tree program. Lines beginning with '#' are ignored.
 
 Prepare any input files needed for the chosen directives.
 
-Run with: **./program (some location)/directives.inp**
+Run with: **./program (some location)/directives.inp**.
 
 Use the testcase for an example: **./program /home/ben/Workspace/btree_chromo/test_case/directives.inp**
 
-**Possible Directives (parameters are comma-separated and following ':' when needed)**
+### Program Execution
+
+1) Read the directives
+2) Print the directives
+3) Parse the directives into commands and parameters
+4) Test the validity of the provided parameters
+5) Expand any metacommands parsed from metadirectives
+6) Use a finite state machine to test the validity of the command sequence
+7) Print the final sequence of commands and parameters
+8) Execute the command sequence
+
+### Possible Directives (parameters are comma-separated and following ':' when needed)
 
 **Controlling Replication State**
 
@@ -128,9 +140,9 @@ Use the testcase for an example: **./program /home/ben/Workspace/btree_chromo/te
  - write_ribo_quats:quats_file,order - *write binary file with ribosome quaternions (doubles) using data ordering convention (row/col)*
  - write_bdry_coords:coords_file,order - *write binary file with boundary coordinates (doubles) using data ordering convention (row/col)*
 
- - switch_bonds:(T/F) - *enable/disable bonds between DNA monomers*
- - switch_bending_angles:(T/F) - *enable/disable bending angles between DNA monomers*
- - switch_twisting_angles:(T/F) - *enable/disable twisting angles between DNA monomers*
+ - switch_bonds:(T/F) - *enable/disable bonds between DNA monomers, must be used prior to 'write_LAMMPS_data_file' to take effect*
+ - switch_bending_angles:(T/F) - *enable/disable bending angles between DNA monomers, must be used prior to 'write_LAMMPS_data_file' to take effect*
+ - switch_twisting_angles:(T/F) - *enable/disable twisting angles between DNA monomers, must be used prior to 'write_LAMMPS_data_file' to take effect*
  
  - write_LAMMPS_data:LAMMPS_data_file - *write a LAMMPS file (data.-) using the current mono, ribo, and bdry coordinates, and the current replication state for the bond/angle topology*
  - write_mono_xyz:mono_file_xyz - *write the current monomer coordinates as an .xyz file to load into VMD*
@@ -164,6 +176,13 @@ Use the testcase for an example: **./program /home/ben/Workspace/btree_chromo/te
 
  - simulator_load_loop_params:loop_params_file - *read a file (loop_params_file) containing the parameters for the looping interactions*
  - simulator_run_loops:Nloops,Nsteps,Tfreq,Dfreq,append_option,skip_option - *run Brownian dynamics with the hard/FENE potential for Nsteps with Nloops randomly placed, while printing thermodynamic information every Tfreq steps and dumping every Dfreq steps - append_option = noappend/append and skip_option = first/skip_first*
+
+**Metadirectives**
+
+ - repeat:N - *begin a region of directives that will be repeated (N) times*
+ - end_repeat - *must follow a 'repeat' and terminates the region of directives that will be repeated*
+ - repeat_replicates:min_rep,max_rep,label_padding - *begin a region of directives that will be repeated for replicates ranging inclusively from (min_rep) to (max_rep), all I/O directives within the region will be modified to include a replicate label of the form '_rep0000X', where (label_padding) specifies the number of zeros*
+ - end_repeat_replicates - *must follow a 'repeat_replicates' and terminates the region of directives that will be repeated with replicate identifiers*
 
 ## Support
 brg4@illinois.edu

@@ -487,8 +487,8 @@ def plot_shell_MSD_reps(fig_file,shell_MSD,dt,lims,species_select):
 
     ax = plt.gca()
 
-    ax.set_xlabel(r'${\tau}$ - Time [ns]', fontsize=8)
-    ax.set_ylabel(r'$\langle|\mathbf{x}(t+{\tau})-\mathbf{x}(t)|^2\rangle$ - MSD [\AA$^2$]', fontsize=8)
+    ax.set_xlabel(r'${\tau}$ - Time [ns]', fontsize=12)
+    ax.set_ylabel(r'$\langle|\mathbf{x}(t+{\tau})-\mathbf{x}(t)|^2\rangle$ - MSD [\AA$^2$]', fontsize=12)
     #ax.set_title(r'MSD of 10~bp DNA monomers',fontsize=10)
 
     temp_marker_style = dict(marker='.', markersize=6,fillstyle='none')
@@ -518,8 +518,8 @@ def plot_shell_MSD_reps(fig_file,shell_MSD,dt,lims,species_select):
 
     # multi_fits_linear(ax,lims,t,MSD)
 
-    ax.tick_params(axis='x',labelsize=8)
-    ax.tick_params(axis='y',labelsize=8)
+    ax.tick_params(axis='x',labelsize=9)
+    ax.tick_params(axis='y',labelsize=9)
 
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
@@ -546,7 +546,8 @@ def plot_shell_MSD_reps(fig_file,shell_MSD,dt,lims,species_select):
                                                                          shell_MSD['shell_lims'][i_shell,1]//10)
         # temp_label += '$D=${:.3E}\pm${:.3E} [$\mu$m$^2$/s]'.format((mean_beta[1]*ns_to_s)/(6.0*(A_to_micro**2.0)),
         #                                                            (stddev_beta[1]*ns_to_s)/(6.0*(A_to_micro**2.0)))
-        temp_label += '$D=$ {:.3E} [$\mu$m$^2$/s]'.format((mean_beta[1]*ns_to_s)/(6.0*(A_to_micro**2.0)))
+        #temp_label += '$D=$ {:.3E} [$\mu$m$^2$/s]'.format((mean_beta[1]*ns_to_s)/(6.0*(A_to_micro**2.0)))
+        temp_label += '$D=$ {:.3E}'.format((mean_beta[1]*ns_to_s)/(6.0*(A_to_micro**2.0)))
 
         x_fit = shell_MSD['fit_range']
         y_fit = mean_beta[1]*shell_MSD['fit_range']+mean_beta[0]
@@ -569,7 +570,8 @@ def plot_shell_MSD_reps(fig_file,shell_MSD,dt,lims,species_select):
         #                               lw=2.0))
 
     #ax.legend(handles=legend_elements,fontsize=6)
-    ax.legend(fontsize=6)
+    #ax.legend(fontsize=6)
+    ax.legend(title=r'Diffusion Constant, $D$ - [$\mu$m$^2$/s]',title_fontsize=9,fontsize=8)
 
     plt.tight_layout()
 
@@ -596,8 +598,8 @@ def plot_shell_law_reps(fig_file,shell_MSD,dt,lims,species_select):
 
     ax = plt.gca()
 
-    ax.set_xlabel(r'$\log[(t+{\tau})/t]$', fontsize=8)
-    ax.set_ylabel(r'$\log\big[$MSD$(t+{\tau})/$MSD$(t)\big]$', fontsize=8)
+    ax.set_xlabel(r'$\log[(t+{\tau})/t]$', fontsize=12)
+    ax.set_ylabel(r'$\log\big[$MSD$(t+{\tau})/$MSD$(t)\big]$', fontsize=12)
     #ax.set_title(r'MSD of 10~bp DNA monomers',fontsize=10)
 
     temp_marker_style = dict(marker='.', markersize=6,fillstyle='none')
@@ -627,8 +629,8 @@ def plot_shell_law_reps(fig_file,shell_MSD,dt,lims,species_select):
 
     # multi_fits_linear(ax,lims,t,MSD)
 
-    ax.tick_params(axis='x',labelsize=8)
-    ax.tick_params(axis='y',labelsize=8)
+    ax.tick_params(axis='x',labelsize=9)
+    ax.tick_params(axis='y',labelsize=9)
 
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
@@ -659,7 +661,8 @@ def plot_shell_law_reps(fig_file,shell_MSD,dt,lims,species_select):
         # temp_label += '$D=${:.3E}\pm${:.3E} [$\mu$m$^2$/s]'.format((mean_beta[1]*ns_to_s)/(6.0*(A_to_micro**2.0)),
         #                                                            (stddev_beta[1]*ns_to_s)/(6.0*(A_to_micro**2.0)))
         #temp_label += '${\alpha}$ {:.3E}'.format(mean_beta[1])
-        temp_label += ' {:.3E}'.format(mean_beta[1])
+        #temp_label += ' {:.3E}'.format(mean_beta[1])
+        temp_label += '$\\alpha=$ {:.3E}'.format(mean_beta[1])
 
         x_fit = shell_MSD['fit_range_law']
         y_fit = np.exp(mean_beta[1]*np.log(shell_MSD['fit_range_law'])+mean_beta[0])
@@ -682,7 +685,7 @@ def plot_shell_law_reps(fig_file,shell_MSD,dt,lims,species_select):
         #                               lw=2.0))
 
     #ax.legend(handles=legend_elements,fontsize=6)
-    ax.legend(title=r'$\frac{MSD(t+{\tau})}{MSD(t)}\propto\big(\frac{t+{\tau}}{t}\big)^{\alpha}$',title_fontsize=7,fontsize=6)
+    ax.legend(title=r'$\frac{MSD(t+{\tau})}{MSD(t)}\propto\big(\frac{t+{\tau}}{t}\big)^{\alpha}$',title_fontsize=9,fontsize=8)
 
     plt.tight_layout()
 
@@ -709,8 +712,8 @@ def plot_shell_diff_vs_density_reps(fig_file,shell_MSD,species_select):
 
     ax = plt.gca()
 
-    ax.set_xlabel(r'$n_{DNA}$ - DNA Number Density [\#/$\mu$m$^3$]', fontsize=8)
-    ax.set_ylabel(r'$D$ - Brownian Diffusion Constant [$\mu$m$^2$/s]', fontsize=8)
+    ax.set_xlabel(r'$n_{DNA}$ - Density [\#/$\mu$m$^3$]', fontsize=12)
+    ax.set_ylabel(r'$D$ - Brownian Diffusion Constant [$\mu$m$^2$/s]', fontsize=12)
     #ax.set_title(r'MSD of 10~bp DNA monomers',fontsize=10)
 
     temp_marker_style = dict(marker='.', markersize=6,fillstyle='none')
@@ -724,8 +727,8 @@ def plot_shell_diff_vs_density_reps(fig_file,shell_MSD,species_select):
         counts = shell_MSD['ribo_counts']
         BrownianDiff = shell_MSD['ribo_BrownianDiff']
 
-    ax.tick_params(axis='x',labelsize=8)
-    ax.tick_params(axis='y',labelsize=8)
+    ax.tick_params(axis='x',labelsize=9)
+    ax.tick_params(axis='y',labelsize=9)
 
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
@@ -772,7 +775,7 @@ def plot_shell_diff_vs_density_reps(fig_file,shell_MSD,species_select):
 
 
     #ax.legend(handles=legend_elements,fontsize=6)
-    ax.legend(fontsize=6)
+    ax.legend(fontsize=8)
 
     plt.tight_layout()
 
@@ -799,8 +802,8 @@ def plot_shell_law_vs_density_reps(fig_file,shell_MSD,species_select):
 
     ax = plt.gca()
 
-    ax.set_xlabel(r'$n_{DNA}$ - DNA Number Density [\#/$\mu$m$^3$]', fontsize=8)
-    ax.set_ylabel(r'$\alpha$ - Anomalous Diffusion Law', fontsize=8)
+    ax.set_xlabel(r'$n_{DNA}$ - Density [\#/$\mu$m$^3$]', fontsize=12)
+    ax.set_ylabel(r'$\alpha$ - Anomalous Diffusion Law', fontsize=12)
     #ax.set_title(r'MSD of 10~bp DNA monomers',fontsize=10)
 
     temp_marker_style = dict(marker='.', markersize=6,fillstyle='none')
@@ -814,8 +817,8 @@ def plot_shell_law_vs_density_reps(fig_file,shell_MSD,species_select):
         counts = shell_MSD['ribo_counts']
         AnomalousDiff = shell_MSD['ribo_AnomalousDiff']
 
-    ax.tick_params(axis='x',labelsize=8)
-    ax.tick_params(axis='y',labelsize=8)
+    ax.tick_params(axis='x',labelsize=9)
+    ax.tick_params(axis='y',labelsize=9)
 
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
@@ -859,7 +862,7 @@ def plot_shell_law_vs_density_reps(fig_file,shell_MSD,species_select):
                    alpha=0.75,zorder=1)
 
     #ax.legend(handles=legend_elements,fontsize=6)
-    ax.legend(fontsize=6)
+    ax.legend(fontsize=8)
 
     plt.tight_layout()
 
@@ -886,8 +889,8 @@ def plot_shell_diff_vs_diff_reps(fig_file,shell_MSD):
 
     ax = plt.gca()
 
-    ax.set_xlabel(r'$D_{{DNA}}$ - Brownian Diffusion Constant [$\mu$m$^2$/s]', fontsize=8)
-    ax.set_ylabel(r'$D_{{ribo}}$ - Brownian Diffusion Constant [$\mu$m$^2$/s]', fontsize=8)
+    ax.set_xlabel(r'$D_{{DNA}}$ - Diffusion Constant [$\mu$m$^2$/s]', fontsize=12)
+    ax.set_ylabel(r'$D_{{ribo}}$ - Diffusion Constant [$\mu$m$^2$/s]', fontsize=12)
     #ax.set_title(r'MSD of 10~bp DNA monomers',fontsize=10)
 
     temp_marker_style = dict(marker='.', markersize=6,fillstyle='none')
@@ -898,8 +901,8 @@ def plot_shell_diff_vs_diff_reps(fig_file,shell_MSD):
     ribo_counts = shell_MSD['ribo_counts']
     ribo_BrownianDiff = shell_MSD['ribo_BrownianDiff']
 
-    ax.tick_params(axis='x',labelsize=8)
-    ax.tick_params(axis='y',labelsize=8)
+    ax.tick_params(axis='x',labelsize=9)
+    ax.tick_params(axis='y',labelsize=9)
 
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
@@ -944,7 +947,7 @@ def plot_shell_diff_vs_diff_reps(fig_file,shell_MSD):
                    alpha=0.75,zorder=1)
 
     #ax.legend(handles=legend_elements,fontsize=6)
-    ax.legend(fontsize=6)
+    ax.legend(fontsize=8)
 
     plt.tight_layout()
 
@@ -968,8 +971,8 @@ def plot_shell_law_vs_law_reps(fig_file,shell_MSD):
 
     ax = plt.gca()
 
-    ax.set_xlabel(r'$\alpha_{{DNA}}$ - Anomalous Diffusion Law', fontsize=8)
-    ax.set_ylabel(r'$\alpha_{{ribo}}$ - Anomalous Diffusion Law', fontsize=8)
+    ax.set_xlabel(r'$\alpha_{{DNA}}$ - Anomalous Diffusion Law', fontsize=12)
+    ax.set_ylabel(r'$\alpha_{{ribo}}$ - Anomalous Diffusion Law', fontsize=12)
     #ax.set_title(r'MSD of 10~bp DNA monomers',fontsize=10)
 
     temp_marker_style = dict(marker='.', markersize=6,fillstyle='none')
@@ -980,8 +983,8 @@ def plot_shell_law_vs_law_reps(fig_file,shell_MSD):
     ribo_counts = shell_MSD['ribo_counts']
     ribo_AnomalousDiff = shell_MSD['ribo_AnomalousDiff']
 
-    ax.tick_params(axis='x',labelsize=8)
-    ax.tick_params(axis='y',labelsize=8)
+    ax.tick_params(axis='x',labelsize=9)
+    ax.tick_params(axis='y',labelsize=9)
 
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
@@ -1026,7 +1029,7 @@ def plot_shell_law_vs_law_reps(fig_file,shell_MSD):
                    alpha=0.75,zorder=1)
 
     #ax.legend(handles=legend_elements,fontsize=6)
-    ax.legend(fontsize=6)
+    ax.legend(fontsize=8)
 
     plt.tight_layout()
 

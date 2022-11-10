@@ -18,17 +18,13 @@ sys.path.insert(1,'./diffusion_calculations')
 import diffusion_plotting as d_plot
 imp.reload(d_plot)
 
-# in_dir = '/home/ben/Data/LAMMPS/5000mono_testcase/5000mono_init/'
-# in_label = '5000mono_init'
-in_dir = '/home/ben/Data/LAMMPS/s1c15_503ribos/s1c15_503ribos_init/'
-in_label = 's1c15_503ribos_init'
+in_dir = '/home/ben/Data/btree_chromo/diffusion_testing/'
+in_label = 'diffusion_bond_bending_twisting'
 min_rep = 1
-max_rep = 50
+max_rep = 20
 
-# out_dir = '/home/ben/Data/LAMMPS/5000mono_testcase/5000mono_init/'
-# out_label = '5000mono_init'
-out_dir = '/home/ben/Data/LAMMPS/s1c15_503ribos/s1c15_503ribos_init/'
-out_label = 's1c15_503ribos_init'
+out_dir = '/home/ben/Documents/svn/Minimal_Cell_Chromosome_Organization_2022/tex_figures/diffusion/raw_plots/'
+out_label = 'diffusion_bond_bending_twisting'
 
 timestep_options = ['Last','FirstLast','Slices','All']
 timestep_select = timestep_options[3]
@@ -37,12 +33,15 @@ slices = [0,50000,100000,150000,200000,250000]
 write_shell_diff = True
 read_shell_diff = False
 
-if not os.path.isdir(out_dir) and write_flag:
+if not os.path.isdir(out_dir) and write_shell_diff:
     os.makedirs(out_dir)
 
 shell_diff_file = out_dir + out_label + '_shell_diff.pickle'
 
-radii = np.array([500,1000,1500,2000],dtype=np.int32)
+dt = 0.1 # timestep - [ns]
+
+# radii of shells - [A]
+radii = np.array([1000,2000],dtype=np.int32)
 
 if write_shell_diff == True:
 
@@ -73,35 +72,39 @@ if read_shell_diff == True:
 
     shell_MSD = d_plot.read_shell_diff(shell_diff_file)
 
-shell_MSD = d_plot.shell_MSD_calc_diffusion(shell_MSD,0.1,[25000,51000])
+else:
+
+    quit()
+
+shell_MSD = d_plot.shell_MSD_calc_diffusion(shell_MSD,dt,[50000,100000])
     
 
 shell_MSD_fig_file = out_dir + out_label + '_shellMSD.pdf'
 
 d_plot.plot_shell_MSD_reps(shell_MSD_fig_file,
                            shell_MSD,
-                           0.1,
-                           [500,1000],
+                           dt,
+                           [50,100],
                            'DNA')
 
 d_plot.plot_shell_MSD_reps(shell_MSD_fig_file,
                            shell_MSD,
-                           0.1,
-                           [500,1000],
+                           dt,
+                           [50,100],
                            'ribo')
 
 shell_law_fig_file = out_dir + out_label + '_law.pdf'
 
 d_plot.plot_shell_law_reps(shell_law_fig_file,
                            shell_MSD,
-                           0.1,
-                           [500,1000],
+                           dt,
+                           [50,100],
                            'DNA')
 
 d_plot.plot_shell_law_reps(shell_law_fig_file,
                            shell_MSD,
-                           0.1,
-                           [500,1000],
+                           dt,
+                           [50,100],
                            'ribo')
 
 shell_diff_vs_density_fig_file = out_dir + out_label + '_DiffvDensity.pdf'
