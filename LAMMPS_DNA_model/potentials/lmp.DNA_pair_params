@@ -1,0 +1,7 @@
+variable epsilon_soft equal 1.0*${kBT} # [Kcal/mol]
+variable epsilon_LJ equal 1.0*${kBT} # [Kcal/mol]
+variable epsilon_soft_topo equal 0.01*${kBT} # [Kcal/mol]
+variable D_morse equal 10.0*${kBT} # [Kcal/mol]
+variable a_morse equal 1.0/(0.5*${sigma_mono_mono}) # [1/A]
+variable r_morse equal 1.5*${sigma_mono_bdry} # [A]
+variable rcut_morse equal 3.0*${sigma_mono_bdry} # [A]
