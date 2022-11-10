@@ -1,9 +1,8 @@
 # variables describing energetic parameters
 variable k_stretch equal 2000*${kBT}/(${sigma_mono_mono}^2) # [Kcal/(mol*A^2)]
 variable l_equil equal 2.0*${r_mono}-6.0
-variable k_bend equal ${kBT}*(45.0/(${sigma_mono_mono})) #  [Kcal/mol]
-variable k_twist equal ${kBT}*(85.0/(${sigma_mono_mono})) # [Kcal/mol]
-variable k_align equal 2*${k_twist} # [Kcal/mol]
+
+include ${DNA_model_dir}/potentials/lmp.DNA_bend_twist_align_params
 
 print """
  -----------------------------------------------------
