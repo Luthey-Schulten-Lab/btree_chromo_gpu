@@ -13,6 +13,7 @@ LAMMPS_simulator::LAMMPS_simulator()
   prng_seed = 0;
   Nt = 0;
   stored_Nt = 0;
+  prev_dump_Nt = 0;
 
   computes_active.quats = false;
   computes_active.ids = false;
@@ -278,7 +279,7 @@ void LAMMPS_simulator::setup_minimize(thermo_dump_parameters &t_d_p)
   lmp->input->one("include ${DNA_model_dir}/dump_subroutines/subroutine.default_thermo");
 
   // include dump
-  prepare_dump(t_d_p);
+  prepare_dump(0,t_d_p);
   
 }
 
@@ -387,7 +388,7 @@ void LAMMPS_simulator::minimize_topoDNA_FENE(thermo_dump_parameters t_d_p)
 
 
 // setup for run routines
-void LAMMPS_simulator::setup_run(thermo_dump_parameters &t_d_p)
+void LAMMPS_simulator::setup_run(unsigned long N_steps, thermo_dump_parameters &t_d_p)
 {
   // set thermo frequency
   set_T_freq(t_d_p.thermo_freq);
@@ -408,7 +409,7 @@ void LAMMPS_simulator::setup_run(thermo_dump_parameters &t_d_p)
   lmp->input->one("include ${DNA_model_dir}/dump_subroutines/subroutine.MSD_thermo");
 
   // include dump
-  prepare_dump(t_d_p);
+  prepare_dump(N_steps,t_d_p);
 }
 
 
@@ -416,7 +417,7 @@ void LAMMPS_simulator::setup_run(thermo_dump_parameters &t_d_p)
 void LAMMPS_simulator::run_soft_harmonic(unsigned long N_steps, thermo_dump_parameters t_d_p)
 {
   // setup for run
-  setup_run(t_d_p);
+  setup_run(N_steps,t_d_p);
 
   // include run subroutine
   lmp->input->one("include ${DNA_model_dir}/run_subroutines/subroutine.run_soft_harmonic");
@@ -436,7 +437,7 @@ void LAMMPS_simulator::run_soft_harmonic(unsigned long N_steps, thermo_dump_para
 void LAMMPS_simulator::run_hard_harmonic(unsigned long N_steps, thermo_dump_parameters t_d_p)
 {
   // setup for run
-  setup_run(t_d_p);
+  setup_run(N_steps,t_d_p);
 
   // include run subroutine
   lmp->input->one("include ${DNA_model_dir}/run_subroutines/subroutine.run_hard_harmonic");
@@ -456,7 +457,7 @@ void LAMMPS_simulator::run_hard_harmonic(unsigned long N_steps, thermo_dump_para
 void LAMMPS_simulator::run_topoDNA_harmonic(unsigned long N_steps, thermo_dump_parameters t_d_p)
 {
   // setup for run
-  setup_run(t_d_p);
+  setup_run(N_steps,t_d_p);
 
   // include run subroutine
   lmp->input->one("include ${DNA_model_dir}/run_subroutines/subroutine.run_topoDNA_harmonic");
@@ -476,7 +477,7 @@ void LAMMPS_simulator::run_topoDNA_harmonic(unsigned long N_steps, thermo_dump_p
 void LAMMPS_simulator::run_soft_FENE(unsigned long N_steps, thermo_dump_parameters t_d_p)
 {
   // setup for run
-  setup_run(t_d_p);
+  setup_run(N_steps,t_d_p);
 
   // include run subroutine
   lmp->input->one("include ${DNA_model_dir}/run_subroutines/subroutine.run_soft_FENE");
@@ -496,7 +497,7 @@ void LAMMPS_simulator::run_soft_FENE(unsigned long N_steps, thermo_dump_paramete
 void LAMMPS_simulator::run_hard_FENE(unsigned long N_steps, thermo_dump_parameters t_d_p)
 {  
   // setup for run
-  setup_run(t_d_p);
+  setup_run(N_steps,t_d_p);
 
   // set the timestep
   lmp->input->one("timestep ${delta_t}");
@@ -516,7 +517,7 @@ void LAMMPS_simulator::run_hard_FENE(unsigned long N_steps, thermo_dump_paramete
 void LAMMPS_simulator::run_topoDNA_FENE(unsigned long N_steps, thermo_dump_parameters t_d_p)
 {  
   // setup for run
-  setup_run(t_d_p);
+  setup_run(N_steps,t_d_p);
 
   // set the timestep
   lmp->input->one("timestep ${delta_t}");
@@ -533,8 +534,9 @@ void LAMMPS_simulator::run_topoDNA_FENE(unsigned long N_steps, thermo_dump_param
 
 
 // prepare the dump
-void LAMMPS_simulator::prepare_dump(thermo_dump_parameters &t_d_p)
+void LAMMPS_simulator::prepare_dump(unsigned long N_steps, thermo_dump_parameters &t_d_p)
 {
+  
   if (dumps_active.lammpstrj == true)
     {
       // undump the lammpstrj
@@ -551,7 +553,9 @@ void LAMMPS_simulator::prepare_dump(thermo_dump_parameters &t_d_p)
       lmp->input->one(("reset_timestep " + to_string(Nt)).c_str());
 
       // lmp->input->one(("variable skip_condition equal \"step > "+ to_string(Nt) + "\"").c_str());
-      lmp->input->one(("variable D_delay equal "+ to_string(Nt + t_d_p.dump_freq)).c_str());
+
+      // delay by an amount corresponding to when the previous dump occurred
+      lmp->input->one(("variable D_delay equal "+ to_string(prev_dump_Nt + t_d_p.dump_freq)).c_str());
   
       // include dump
       if (t_d_p.append == true)
@@ -570,6 +574,13 @@ void LAMMPS_simulator::prepare_dump(thermo_dump_parameters &t_d_p)
 	    }
 	}
 
+      // determine how many dumps will occur during the run
+      unsigned long N_scheduled_dumps;
+      N_scheduled_dumps = (N_steps + Nt - prev_dump_Nt)/t_d_p.dump_freq;
+      // update the timestep of the most recent dump
+      prev_dump_Nt += N_scheduled_dumps*t_d_p.dump_freq;
+
+      // trigger that dumps are now active
       dumps_active.lammpstrj = true;
     }
 }

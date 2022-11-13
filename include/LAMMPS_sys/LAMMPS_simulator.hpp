@@ -110,8 +110,8 @@ public:
 private:
 
   void compute_trigger(string compute_label);
-  void prepare_dump(thermo_dump_parameters &t_d_p);
-  void setup_run(thermo_dump_parameters &t_d_p);
+  void prepare_dump(unsigned long N_steps, thermo_dump_parameters &t_d_p);
+  void setup_run(unsigned long N_steps, thermo_dump_parameters &t_d_p);
   void setup_minimize(thermo_dump_parameters &t_d_p);
   void reset_timestep_to_Nt();
   void set_T_freq(int T_freq);
@@ -124,6 +124,7 @@ private:
   int sim_MPI_rank; // current MPI rank
 
   unsigned long stored_Nt;
+  unsigned long prev_dump_Nt;
   unsigned long Nt;
   int nProc; // number of processors for OpenMP
   int prng_seed; // seed for PRNG within LAMMPS object
