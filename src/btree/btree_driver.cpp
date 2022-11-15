@@ -1262,6 +1262,17 @@ void btree_driver::prepare_command_requirements()
   t_ls.clear();
   lock_updates["simulator_reset_timestep"] = t_ls;
 
+  // simulator_reset_prev_dump_timestep
+  // number of required parameters
+  N_param_reqs["simulator_reset_prev_dump_timestep"] = 1;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("simulator_prepared",true));
+  lock_tests["simulator_reset_prev_dump_timestep"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["simulator_reset_prev_dump_timestep"] = t_ls;
+
   // simulator_read_data
   // number of required parameters
   N_param_reqs["simulator_read_data"] = 1;
@@ -1860,6 +1871,13 @@ int btree_driver::execute_single_command(string &command,
   else if (command == "simulator_reset_timestep")
     {
       error_code = simulator_reset_timestep(params);
+    }
+
+
+  // reset the simulator's previous dump timestep
+  else if (command == "simulator_reset_prev_dump_timestep")
+    {
+      error_code = simulator_reset_prev_dump_timestep(params);
     }
 
 
@@ -2588,6 +2606,13 @@ int btree_driver::simulator_restore_timestep()
 int btree_driver::simulator_reset_timestep(vector<string> &params)
 {
   driver_lmp_simulator.reset_Nt(stoul(params[0]));
+  return 0;
+}
+
+
+int btree_driver::simulator_reset_prev_dump_timestep(vector<string> &params)
+{
+  driver_lmp_simulator.reset_prev_dump_Nt(stoul(params[0]));
   return 0;
 }
 

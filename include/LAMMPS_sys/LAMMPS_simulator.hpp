@@ -76,6 +76,7 @@ public:
   void global_setup();
   void standard_computes();
   void reset_Nt(unsigned long Nt);
+  void reset_prev_dump_Nt(unsigned long prev_dump_Nt);
   void command(string command);
   void include_file(string filename);
   void clear();

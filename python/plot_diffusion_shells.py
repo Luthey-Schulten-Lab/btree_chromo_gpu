@@ -19,18 +19,14 @@ import diffusion_plotting as d_plot
 imp.reload(d_plot)
 
 in_dir = '/home/ben/Data/btree_chromo/diffusion_testing/'
-in_label = 'diffusion_no_interactions'
+in_label = 'diffusion_bond_bending_twisting'
 min_rep = 1
-max_rep = 20
+max_rep = 50
 
 out_dir = '/home/ben/Documents/svn/Minimal_Cell_Chromosome_Organization_2022/tex_figures/diffusion/raw_plots/'
-out_label = 'diffusion_no_interactions'
+out_label = 'diffusion_bond_bending_twisting'
 
-timestep_options = ['Last','FirstLast','Slices','All']
-timestep_select = timestep_options[3]
-slices = [0,50000,100000,150000,200000,250000]
-
-write_shell_diff = False
+write_shell_diff = True
 read_shell_diff = True
 
 if not os.path.isdir(out_dir) and write_shell_diff:
@@ -49,11 +45,11 @@ if write_shell_diff == True:
 
     for rep in range(min_rep,max_rep+1):
 
-        in_file = in_dir + in_label + '_rep'+str(rep).zfill(5) + '.lammpstrj'
+        in_file = in_dir + in_label + '_rep'+str(rep).zfill(5) + '.pkl_traj'
 
         print('LAMMPS trajectory: '+str(in_file))
 
-        traj = r_L_D.read_traj(in_file,in_timesteps=timestep_select,slices=slices)
+        traj = r_L_D.read_pickle_traj(in_file)
 
         if rep == min_rep:
 
@@ -64,18 +60,13 @@ if write_shell_diff == True:
 
         shell_MSD = d_plot.fill_reps_shell_MSDs(shell_MSD,traj,rep-min_rep)
 
-    #print(shell_MSD)
-
     d_plot.write_shell_diff(shell_diff_file,shell_MSD)
 
 if read_shell_diff == True:
 
     shell_MSD = d_plot.read_shell_diff(shell_diff_file)
 
-else:
-
-    quit()
-
+    
 shell_MSD = d_plot.shell_MSD_calc_diffusion(shell_MSD,dt,[50000,100000])
     
 

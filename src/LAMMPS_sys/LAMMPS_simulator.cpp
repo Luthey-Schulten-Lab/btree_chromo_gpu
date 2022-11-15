@@ -638,6 +638,13 @@ void LAMMPS_simulator::reset_Nt(unsigned long Nt)
 }
 
 
+// reset the previous dump timestep counter, prev_dump_Nt
+void LAMMPS_simulator::reset_prev_dump_Nt(unsigned long prev_dump_Nt)
+{
+  this->prev_dump_Nt = prev_dump_Nt;
+}
+
+
 // store the timestep counter, Nt
 void LAMMPS_simulator::store_Nt()
 {
@@ -1060,7 +1067,8 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
 
   // cout << "\n\nstep_counter = " << step_counter << endl;
   // cout << "step_increment = " << step_increment << "\n\n" << endl;
-  
+
+  // run the looped system
   run_hard_FENE(step_increment,t_d_p);
 
   step_counter += step_increment;
@@ -1085,13 +1093,13 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
 	  // minimize with topoisomerase pair potentials
 	  minimize_topoDNA_harmonic(t_d_p_topo);
 	  minimize_topoDNA_FENE(t_d_p_topo);
+
+	  // run the system while allowing strand crossings
 	  run_topoDNA_FENE(l_sim_p.dNt_topo,t_d_p_topo);
 
 	  // step the pair potentials back to full strength of hard pairs
 	  minimize_soft_harmonic(t_d_p_topo);
 	  minimize_soft_FENE(t_d_p_topo);
-	  minimize_hard_harmonic(t_d_p_topo);
-	  minimize_hard_FENE(t_d_p_topo);
 
 	  // reset the timestep
 	  reset_Nt(Nt_pre_topo);
@@ -1099,18 +1107,13 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
 	  // reset the previous topo step
 	  step_prev_topo = step_counter;
 	}
-      else
-	{
-	  // minimize with hard pair potentials
-	  minimize_hard_harmonic(t_d_p_topo);
-	  minimize_hard_FENE(t_d_p_topo);
-	}
+
+      // minimize with hard pair potentials
+      minimize_hard_harmonic(t_d_p_topo);
+      minimize_hard_FENE(t_d_p_topo);
       
       // run for loop freq
       step_increment = min(l_sim_p.freq_loop,N_steps-step_counter);
-
-      // cout << "\n\nstep_counter = " << step_counter << endl;
-      // cout << "step_increment = " << step_increment << "\n\n" << endl;
 
       // run the system
       run_hard_FENE(step_increment,t_d_p_iter);

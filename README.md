@@ -168,6 +168,7 @@ Use the testcase for an example: **./program /home/ben/Workspace/btree_chromo/te
  - simulator_store_timestep - *stores the current timestep of the simulator*
  - simulator_restore_timestep - *restores the simulator timestep based on the stored timestep*
  - simulator_reset_timestep:t - *resets the timestep to (t)*
+ - simulator_reset_prev_dump_timestep:t - *resets the timestep of the previous dump to (t)*
  
  - simulator_read_data:LAMMPS_data_file - *read a LAMMPS file (data.-) into the simulator*
  

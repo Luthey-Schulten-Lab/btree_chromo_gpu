@@ -1,4 +1,5 @@
 import numpy as np
+import pickle
 
 def read_traj(filename,in_timesteps=None,slices=None):
 
@@ -164,5 +165,22 @@ def read_traj(filename,in_timesteps=None,slices=None):
                 traj[t]['bdry']['x'][offset_bdry_id[i],:] = \
                     temp_x[bdry_idx[i],:]
 
+
+    return traj
+
+
+def write_pickle_traj(filename,traj):
+
+    with open(filename,'wb') as f:
+
+        pickle.dump(traj,f,-1)
+
+    return
+
+def read_pickle_traj(filename):
+
+    with open(filename,'rb') as f:
+
+        traj = pickle.load(f)
 
     return traj
