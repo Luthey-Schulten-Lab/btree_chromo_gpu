@@ -1,5 +1,5 @@
-variable k_loop equal 4.0*${kBT}/(${sigma_mono_mono}^2) # [(Kcal/mol)/A^2]
 variable r_loop equal 4.0*${r_mono} # [A]
+variable k_loop equal 4.0*${kBT}/(3*50.0/4.0-${sigma_mono_mono})^2 # [(Kcal/mol)/A^2]
 
 print """
  -------------------------------------

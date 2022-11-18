@@ -53,7 +53,9 @@ void LAMMPS_sys::cat_atom_array(atom_array &in_atoms, atom_array &cat_atoms)
   // get the array sizes
   int N_old = in_atoms.get_N();
   int N_cat = cat_atoms.get_N();
-  int N_new = N_old + N_cat;
+  int N_new = 0;
+  if (N_old > 0) N_new += N_old;
+  if (N_cat > 0) N_new += N_cat;
 
   // store the current contents of the array
   if (N_old > 0)
@@ -104,7 +106,9 @@ void LAMMPS_sys::cat_ellipsoid_array(ellipsoid_array &in_ellipsoids, ellipsoid_a
   // get the array sizes
   int N_old = in_ellipsoids.get_N();
   int N_cat = cat_ellipsoids.get_N();
-  int N_new = N_old + N_cat;
+  int N_new = 0;
+  if (N_old > 0) N_new += N_old;
+  if (N_cat > 0) N_new += N_cat;
 
   // store the current contents of the array
   if (N_old > 0)

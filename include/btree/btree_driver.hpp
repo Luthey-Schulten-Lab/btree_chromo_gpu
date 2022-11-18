@@ -168,11 +168,11 @@ private:
   int simulator_reset_timestep(vector<string> &params);
   
   // simulator minimization routines
-  template <int SOFT_HARD, int HARMONIC_FENE>
+  template <int SOFT_HARD_TOPO, int HARMONIC_FENE>
   int simulator_minimize(vector<string> &params);
   
   // simulator run routines
-  template <int SOFT_HARD, int HARMONIC_FENE>
+  template <int SOFT_HARD_TOPO, int HARMONIC_FENE>
   int simulator_run(vector<string> &params);
 
   // simulator looped DNA routines

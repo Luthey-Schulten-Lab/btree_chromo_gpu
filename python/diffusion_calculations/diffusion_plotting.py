@@ -908,6 +908,7 @@ def plot_shell_diff_vs_diff_reps(fig_file,shell_MSD):
     ax.spines['top'].set_visible(False)
 
     #temp_marker_style = dict(marker='.', markersize=8,fillstyle='none')
+    cov_ellipses = []
 
     for i_shell in range(shell_MSD['N_shells']):
 
@@ -935,9 +936,32 @@ def plot_shell_diff_vs_diff_reps(fig_file,shell_MSD):
         xm = np.mean(x_temp)
         ym = np.mean(y_temp)
 
-        cov_ellipse = patches.Ellipse((xm,ym),2*np.sqrt(w[0]),2*np.sqrt(w[1]),angle=theta,color=temp_color,alpha=0.25,zorder=0)
+        cov_ellipse = patches.Ellipse((xm,ym),
+                                      2*np.sqrt(w[0]),
+                                      2*np.sqrt(w[1]),
+                                      angle=theta,
+                                      facecolor=None,
+                                      edgecolor='white',
+                                      fill=False,
+                                      alpha=0.95,
+                                      linewidth=2.25,
+                                      zorder=2)
 
-        ax.add_patch(cov_ellipse)
+        cov_ellipses.append(cov_ellipse)
+        
+        cov_ellipse = patches.Ellipse((xm,ym),
+                                      2*np.sqrt(w[0]),
+                                      2*np.sqrt(w[1]),
+                                      angle=theta,
+                                      facecolor=None,
+                                      edgecolor=temp_color,
+                                      fill=False,
+                                      alpha=0.95,
+                                      linewidth=1.25,
+                                      linestyle='-',
+                                      zorder=3)
+
+        cov_ellipses.append(cov_ellipse)
 
         temp_label += r'$r_{{x,y}}=$ {:.1E}'.format(cov[0,1]/np.sqrt(cov[0,0]*cov[1,1]))
         
@@ -945,6 +969,9 @@ def plot_shell_diff_vs_diff_reps(fig_file,shell_MSD):
                    label=temp_label,
                    color=temp_color,
                    alpha=0.75,zorder=1)
+
+    for i in range(len(cov_ellipses)):
+        ax.add_patch(cov_ellipses[i])
 
     #ax.legend(handles=legend_elements,fontsize=6)
     ax.legend(fontsize=8)
@@ -990,6 +1017,7 @@ def plot_shell_law_vs_law_reps(fig_file,shell_MSD):
     ax.spines['top'].set_visible(False)
 
     #temp_marker_style = dict(marker='.', markersize=8,fillstyle='none')
+    cov_ellipses = []
 
     for i_shell in range(shell_MSD['N_shells']):
 
@@ -1017,9 +1045,33 @@ def plot_shell_law_vs_law_reps(fig_file,shell_MSD):
         xm = np.mean(x_temp)
         ym = np.mean(y_temp)
 
-        cov_ellipse = patches.Ellipse((xm,ym),2*np.sqrt(w[0]),2*np.sqrt(w[1]),angle=theta,color=temp_color,alpha=0.25,zorder=0)
+        cov_ellipse = patches.Ellipse((xm,ym),
+                                      2*np.sqrt(w[0]),
+                                      2*np.sqrt(w[1]),
+                                      angle=theta,
+                                      facecolor=None,
+                                      edgecolor='white',
+                                      fill=False,
+                                      alpha=0.95,
+                                      linewidth=2.25,
+                                      zorder=2)
 
-        ax.add_patch(cov_ellipse)
+        cov_ellipses.append(cov_ellipse)
+        
+        cov_ellipse = patches.Ellipse((xm,ym),
+                                      2*np.sqrt(w[0]),
+                                      2*np.sqrt(w[1]),
+                                      angle=theta,
+                                      facecolor=None,
+                                      edgecolor=temp_color,
+                                      fill=False,
+                                      alpha=0.95,
+                                      linewidth=1.25,
+                                      linestyle='-',
+                                      zorder=3)
+
+        cov_ellipses.append(cov_ellipse)
+        
 
         temp_label += r'$r_{{x,y}}=$ {:.1E}'.format(cov[0,1]/np.sqrt(cov[0,0]*cov[1,1]))
         
@@ -1027,6 +1079,9 @@ def plot_shell_law_vs_law_reps(fig_file,shell_MSD):
                    label=temp_label,
                    color=temp_color,
                    alpha=0.75,zorder=1)
+
+    for i in range(len(cov_ellipses)):
+        ax.add_patch(cov_ellipses[i])
 
     #ax.legend(handles=legend_elements,fontsize=6)
     ax.legend(fontsize=8)

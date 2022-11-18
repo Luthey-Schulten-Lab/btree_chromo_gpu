@@ -37,6 +37,7 @@ void atom_array::initialize_atoms()
   if (N > 0)
     {
 
+      cout << "N = " << N << endl;
       atoms = new atom[N];
 
       for (int i=0; i<N; i++)

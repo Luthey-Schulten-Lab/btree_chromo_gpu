@@ -22,9 +22,13 @@ in_dir = '/home/ben/Data/btree_chromo/diffusion_testing/'
 in_label = 'diffusion_bond_bending_twisting'
 min_rep = 1
 max_rep = 5
+N_reps = max_rep - min_rep + 1
 
 out_dir = '/home/ben/Documents/svn/Minimal_Cell_Chromosome_Organization_2022/tex_figures/DNA_mechanical_properties/raw_plots/'
 out_label = 'persistence_lengths'
+
+s_min = 1
+s_max = 10
 
 if not os.path.isdir(out_dir):
     os.makedirs(out_dir)
@@ -37,3 +41,16 @@ for rep in range(min_rep,max_rep+1):
     print('LAMMPS trajectory: '+str(in_file))
 
     traj = r_L_D.read_pickle_traj(in_file)
+    
+    if (rep == min_rep):
+        
+        disp_corr = pl_plot.new_polymer_correlations(s_min,
+                                                     s_max,
+                                                     N_reps,
+                                                     traj['timesteps'].shape[0])
+
+    pl_plot.fill_displacement_correlations_circular(disp_corr,
+                                                    traj,
+                                                    rep-min_rep)
+
+    print(disp_corr['corr'][:,0,0])

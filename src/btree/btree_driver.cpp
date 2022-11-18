@@ -840,7 +840,7 @@ void btree_driver::prepare_command_requirements()
 
   // print
   // number of required parameters
-  N_param_reqs["print"] = 1;
+  N_param_reqs["print"] = 0;
   // lock tests
   t_ls.clear();
   t_ls.push_back(new_lock("btree_initialized",true));
@@ -1312,6 +1312,18 @@ void btree_driver::prepare_command_requirements()
   t_ls.clear();
   lock_updates["simulator_minimize_hard_harmonic"] = t_ls;
 
+  // simulator_minimize_topoDNA_harmonic
+  // number of required parameters
+  N_param_reqs["simulator_minimize_topoDNA_harmonic"] = 1;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("simulator_prepared",true));
+  t_ls.push_back(new_lock("lmp_data_present",true));
+  lock_tests["simulator_minimize_topoDNA_harmonic"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["simulator_minimize_topoDNA_harmonic"] = t_ls;
+
   // simulator_minimize_soft_FENE
   // number of required parameters
   N_param_reqs["simulator_minimize_soft_FENE"] = 1;
@@ -1335,6 +1347,18 @@ void btree_driver::prepare_command_requirements()
   // lock updates
   t_ls.clear();
   lock_updates["simulator_minimize_hard_FENE"] = t_ls;
+
+  // simulator_minimize_topoDNA_FENE
+  // number of required parameters
+  N_param_reqs["simulator_minimize_topoDNA_FENE"] = 1;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("simulator_prepared",true));
+  t_ls.push_back(new_lock("lmp_data_present",true));
+  lock_tests["simulator_minimize_topoDNA_FENE"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["simulator_minimize_topoDNA_FENE"] = t_ls;
 
   // simulator_run_soft_harmonic
   // number of required parameters
@@ -1360,6 +1384,18 @@ void btree_driver::prepare_command_requirements()
   t_ls.clear();
   lock_updates["simulator_run_hard_harmonic"] = t_ls;
 
+  // simulator_run_topoDNA_harmonic
+  // number of required parameters
+  N_param_reqs["simulator_run_topoDNA_harmonic"] = 5;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("simulator_prepared",true));
+  t_ls.push_back(new_lock("lmp_data_present",true));
+  lock_tests["simulator_run_topoDNA_harmonic"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["simulator_run_topoDNA_harmonic"] = t_ls;
+
   // simulator_run_soft_FENE
   // number of required parameters
   N_param_reqs["simulator_run_soft_FENE"] = 5;
@@ -1383,6 +1419,18 @@ void btree_driver::prepare_command_requirements()
   // lock updates
   t_ls.clear();
   lock_updates["simulator_run_hard_FENE"] = t_ls;
+
+  // simulator_run_topoDNA_FENE
+  // number of required parameters
+  N_param_reqs["simulator_run_topoDNA_FENE"] = 5;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("simulator_prepared",true));
+  t_ls.push_back(new_lock("lmp_data_present",true));
+  lock_tests["simulator_run_topoDNA_FENE"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["simulator_run_topoDNA_FENE"] = t_ls;
 
   // simulator_load_loop_params
   // number of required parameters
@@ -1895,6 +1943,13 @@ int btree_driver::execute_single_command(string &command,
     }
 
 
+  // minimize with topoDNA potentials and harmonic bonds
+  else if (command == "simulator_minimize_topoDNA_harmonic")
+    {
+      error_code = simulator_minimize<2,0>(params);
+    }
+
+
   // minimize with soft potentials and FENE bonds
   else if (command == "simulator_minimize_soft_FENE")
     {
@@ -1906,6 +1961,13 @@ int btree_driver::execute_single_command(string &command,
   else if (command == "simulator_minimize_hard_FENE")
     {
       error_code = simulator_minimize<1,1>(params);
+    }
+
+
+  // minimize with topoDNA potentials and FENE bonds
+  else if (command == "simulator_minimize_topoDNA_FENE")
+    {
+      error_code = simulator_minimize<2,1>(params);
     }
 
 
@@ -1923,6 +1985,13 @@ int btree_driver::execute_single_command(string &command,
     }
 
 
+  // run with topoDNA potentials and harmonic bonds
+  else if (command == "simulator_run_topoDNA_harmonic")
+    {
+      error_code = simulator_run<2,0>(params);
+    }
+
+
   // run with soft potentials and FENE bonds
   else if (command == "simulator_run_soft_FENE")
     {
@@ -1934,6 +2003,13 @@ int btree_driver::execute_single_command(string &command,
   else if (command == "simulator_run_hard_FENE")
     {
       error_code = simulator_run<1,1>(params);
+    }
+
+
+  // run with topoDNA potentials and FENE bonds
+  else if (command == "simulator_run_topoDNA_FENE")
+    {
+      error_code = simulator_run<2,1>(params);
     }
 
       
@@ -2477,7 +2553,7 @@ int btree_driver::simulator_read_data(vector<string> &params)
 }
 
 
-template<int SOFT_HARD, int HARMONIC_FENE>
+template<int SOFT_HARD_TOPO, int HARMONIC_FENE>
 int btree_driver::simulator_minimize(vector<string> &params)
 {
   thermo_dump_parameters t_d_p;
@@ -2488,34 +2564,43 @@ int btree_driver::simulator_minimize(vector<string> &params)
   t_d_p.thermo_freq = stoi(params[0]);
 
   // run the minimization
-  if (SOFT_HARD == 0)
+  if (HARMONIC_FENE == 0)
     {
-      if (HARMONIC_FENE == 0)
+      if (SOFT_HARD_TOPO == 0)
 	{
 	  driver_lmp_simulator.minimize_soft_harmonic(t_d_p);
 	}
-      else if (HARMONIC_FENE == 1)
-	{
-	  driver_lmp_simulator.minimize_soft_FENE(t_d_p);
-	}
-    }
-  else if (SOFT_HARD == 1)
-    {
-      if (HARMONIC_FENE == 0)
+      else if (SOFT_HARD_TOPO == 1)
 	{
 	  driver_lmp_simulator.minimize_hard_harmonic(t_d_p);
 	}
-      else if (HARMONIC_FENE == 1)
+      else if (SOFT_HARD_TOPO == 2)
+	{
+	  driver_lmp_simulator.minimize_topoDNA_harmonic(t_d_p);
+	}
+    }
+  else if (HARMONIC_FENE == 1)
+    {
+      if (SOFT_HARD_TOPO == 0)
+	{
+	  driver_lmp_simulator.minimize_soft_FENE(t_d_p);
+	}
+      else if (SOFT_HARD_TOPO == 1)
 	{
 	  driver_lmp_simulator.minimize_hard_FENE(t_d_p);
 	}
+      else if (SOFT_HARD_TOPO == 2)
+	{
+	  driver_lmp_simulator.minimize_topoDNA_FENE(t_d_p);
+	}
     }
+
 
   return 0;
 }
 
 
-template<int SOFT_HARD, int HARMONIC_FENE>
+template<int SOFT_HARD_TOPO, int HARMONIC_FENE>
 int btree_driver::simulator_run(vector<string> &params)
 {
   thermo_dump_parameters t_d_p;
@@ -2532,26 +2617,34 @@ int btree_driver::simulator_run(vector<string> &params)
   t_d_p.thermo_freq = stoi(params[1]);
 
   // run the Brownian dynamics
-  if (SOFT_HARD == 0)
+  if (HARMONIC_FENE == 0)
     {
-      if (HARMONIC_FENE == 0)
+      if (SOFT_HARD_TOPO == 0)
 	{
 	  driver_lmp_simulator.run_soft_harmonic(stoul(params[0]),t_d_p);
 	}
-      else if (HARMONIC_FENE == 1)
-	{
-	  driver_lmp_simulator.run_soft_FENE(stoul(params[0]),t_d_p);
-	}
-    }
-  else if (SOFT_HARD == 1)
-    {
-      if (HARMONIC_FENE == 0)
+      else if (SOFT_HARD_TOPO == 1)
 	{
 	  driver_lmp_simulator.run_hard_harmonic(stoul(params[0]),t_d_p);
 	}
-      else if (HARMONIC_FENE == 1)
+      else if (SOFT_HARD_TOPO == 2)
+	{
+	  driver_lmp_simulator.run_topoDNA_harmonic(stoul(params[0]),t_d_p);
+	}
+    }
+  else if (HARMONIC_FENE == 1)
+    {
+      if (SOFT_HARD_TOPO == 0)
+	{
+	  driver_lmp_simulator.run_soft_FENE(stoul(params[0]),t_d_p);
+	}
+      else if (SOFT_HARD_TOPO == 1)
 	{
 	  driver_lmp_simulator.run_hard_FENE(stoul(params[0]),t_d_p);
+	}
+      else if (SOFT_HARD_TOPO == 2)
+	{
+	  driver_lmp_simulator.run_topoDNA_FENE(stoul(params[0]),t_d_p);
 	}
     }
 

@@ -43,18 +43,26 @@ def fill_displacement_correlations_circular(poly_corr,traj,i_rep):
 
     for i_t in range(poly_corr['N_t']):
 
-        t = traj['t'][i_t]
+        t = str(traj['timesteps'][i_t])
         x = traj[t]['DNA']['x']
 
         dx = x - np.roll(x,1,axis=0)
 
-        udx = dx/np.sqrt(np.sum(np.power(dx,2.0),axis=1))
+        udx = dx*np.tile(np.reciprocal(np.sqrt(np.sum(np.power(dx,2.0),axis=1))),(3,1)).T
 
         for i_s in range(poly_corr['N_s']):
 
             s = poly_corr['s'][i_s]
 
-            poly_corr['corr'][i_s,i_rep,i_t] = np.dot(udx.T,np.roll(udx,s,axis=0))
+            s_udx = np.roll(udx,s,axis=0)
+
+            y = np.zeros(udx.shape[0],dtype=np.double)
+
+            for i in range(udx.shape[0]):
+
+                y[i] = np.dot(udx[i],s_udx[i])
+
+            poly_corr['corr'][i_s,i_rep,i_t] = np.mean(y)
     
     return poly_corr
 

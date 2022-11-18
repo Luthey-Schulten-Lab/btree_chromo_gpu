@@ -25,17 +25,17 @@ variable WCA_mono_mono_ex equal ${s_expand}*${WCA_mono_mono}
 
 pair_style hybrid &
 lj/cut/omp 2.5 &
-morse/omp 2.5 #&
-#harmonic/cut/omp
+morse/omp 2.5 &
+harmonic/cut/omp
 
 pair_modify shift yes
 
 # DNA
-pair_coeff 3*8 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
-# pair_coeff 3 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
-# pair_coeff 4 4 harmonic/cut/omp ${epsilon_ori} ${r_ori_equil}
-# pair_coeff 4 5*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
-# pair_coeff 5*8 5*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+# pair_coeff 3*8 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+pair_coeff 3 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+pair_coeff 4 4 harmonic/cut/omp ${epsilon_ori} ${r_ori_equil}
+pair_coeff 4 5*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+pair_coeff 5*8 5*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
 # ribosomes
 pair_coeff 2 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_ribo} ${WCA_mono_ribo}
 pair_coeff 2 2 lj/cut/omp ${epsilon_LJ} ${sigma_ribo_ribo} ${WCA_ribo_ribo}
