@@ -179,6 +179,15 @@ void LAMMPS_simulator::standard_computes()
 void LAMMPS_simulator::clear()
 {
   lmp->input->one("clear");
+
+  // reset all of the flags
+  computes_active.quats = false;
+  computes_active.ids = false;
+  computes_active.types = false;
+  computes_active.MSD = false;
+  dumps_active.lammpstrj = false;
+  T_freq_specified = false;
+  D_freq_specified = false;
 }
 
 
