@@ -393,8 +393,11 @@ def shell_MSD_calc_diffusion(shell_MSD,dt,lims):
 
     x = shell_MSD['t']*dt
     
-    i_ll = np.argwhere(x>=lims[0])[0][0]
-    i_ul = np.argwhere(x<lims[1])[-1][0]
+    # i_ll = np.argwhere(x>=lims[0])[0][0]
+    # i_ul = np.argwhere(x<lims[1])[-1][0]
+
+    i_ll = lims[0]
+    i_ul = lims[1]
         
     ll = x[i_ll]
     ul = x[i_ul]
@@ -433,15 +436,17 @@ def shell_MSD_calc_diffusion(shell_MSD,dt,lims):
     x0 = x[0]
     print(x0)
     
-    i_ll = np.argwhere(x>=lims[0])[0][0]
-    i_ul = np.argwhere(x<lims[1])[-1][0]
+    # i_ll = np.argwhere(x>=lims[0])[0][0]
+    # i_ul = np.argwhere(x<lims[1])[-1][0]
         
-    ll = x[i_ll]
-    ul = x[i_ul]
+    # ll = x[i_ll]
+    # ul = x[i_ul]
         
-    x_temp = x[i_ll:i_ul+1]/x0
+    x_temp = x[(i_ll-1):i_ul]/x0
     shell_MSD['fit_range_law'] = x_temp
     x_temp = np.log(x_temp)
+
+    print(x_temp.shape)
 
     for i_shell in range(shell_MSD['N_shells']):
 
@@ -451,6 +456,9 @@ def shell_MSD_calc_diffusion(shell_MSD,dt,lims):
 
                 y_temp = shell_MSD['DNA_MSDs_reps'][i_shell,i_rep,i_ll:i_ul+1]/shell_MSD['DNA_MSDs_reps'][i_shell,i_rep,1]
                 y_temp = np.log(y_temp)
+                print(i_ll)
+                print(i_ul)
+                print(y_temp.shape)
 
                 X = np.ones((x_temp.shape[0],2),dtype=np.float32)
                 X[:,1] = x_temp

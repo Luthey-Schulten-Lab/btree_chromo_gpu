@@ -18,7 +18,7 @@ importlib.reload(r_L_D)
 
 in_dir = '/home/ben/Data/btree_chromo/diffusion_testing/'
 in_label = 'diffusion_no_interactions'
-min_rep = 45
+min_rep = 1
 max_rep = 50
 
 out_dir = '/home/ben/Data/btree_chromo/diffusion_testing/'

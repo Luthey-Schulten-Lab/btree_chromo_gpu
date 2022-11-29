@@ -8,6 +8,7 @@
 #include <cstring>
 #include <vector>
 #include <memory>
+#include <unordered_map>
 
 // OpenMPI include files
 #include <mpi.h>
@@ -31,16 +32,6 @@ struct thermo_dump_parameters
   bool append, write_first; // append to dump file, write first timestep
   // int rep, rep_padding; // replicate number, padding for replicate label
   int dump_freq, thermo_freq; // dump frequency and thermo frequency
-};
-
-struct compute_tracker
-{
-  bool quats, ids, types, MSD;
-};
-
-struct dump_tracker
-{
-  bool lammpstrj;
 };
 
 class LAMMPS_simulator
@@ -110,15 +101,34 @@ public:
   
 private:
 
+  // reset all computes
+  void initialize_computes();
+  // trigger the state of a compute
   void compute_trigger(string compute_label);
+  void uncompute(string compute_label);
+
+  // reset all dumps
+  void initialize_dumps();
+  // prepare a .lammpstrj dump
   void prepare_dump(unsigned long N_steps, thermo_dump_parameters &t_d_p);
+  void undump(string dump_label);
+
+  // setups for runs and minimizes
   void setup_run(unsigned long N_steps, thermo_dump_parameters &t_d_p);
   void setup_minimize(thermo_dump_parameters &t_d_p);
-  void reset_timestep_to_Nt();
-  void set_T_freq(int T_freq);
-  void set_D_freq(int D_freq);
+  
+  // reset all simulation variables
+  void initialize_sim_vars();
+  // set a simulation variable to an integer value
+  void set_sim_var_int(string sim_var, int val);
+  void delete_sim_var(string sim_var);
 
-  bool T_freq_specified, D_freq_specified;
+  // reset the timestep
+  void reset_timestep_to_Nt();
+
+  unordered_map<string,bool> sim_vars; // map storing state of sim_vars
+  unordered_map<string,bool> computes; // map storing state of computes
+  unordered_map<string,bool> dumps; // map storing state of dumps
 
   int sim_MPI_initialized, sim_MPI_finalized;
   int sim_MPI_size; // MPI size
@@ -135,8 +145,6 @@ private:
   // objects
 
   loop_sim_params l_sim_p;
-  compute_tracker computes_active;
-  dump_tracker dumps_active;
   
   LAMMPS_NS::LAMMPS *lmp;
   LAMMPS_sys *lmp_sys;

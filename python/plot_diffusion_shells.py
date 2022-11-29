@@ -19,14 +19,14 @@ import diffusion_plotting as d_plot
 imp.reload(d_plot)
 
 in_dir = '/home/ben/Data/btree_chromo/diffusion_testing/'
-in_label = 'diffusion_bond_bending_twisting'
+in_label = 'diffusion_no_interactions'
 min_rep = 1
-max_rep = 50
+max_rep = 5
 
 out_dir = '/home/ben/Documents/svn/Minimal_Cell_Chromosome_Organization_2022/tex_figures/diffusion/raw_plots/'
-out_label = 'diffusion_bond_bending_twisting'
+out_label = 'diffusion_no_interactions'
 
-write_shell_diff = False
+write_shell_diff = True
 read_shell_diff = True
 
 if not os.path.isdir(out_dir) and write_shell_diff:
@@ -67,7 +67,7 @@ if read_shell_diff == True:
     shell_MSD = d_plot.read_shell_diff(shell_diff_file)
 
     
-shell_MSD = d_plot.shell_MSD_calc_diffusion(shell_MSD,dt,[50000,100000])
+shell_MSD = d_plot.shell_MSD_calc_diffusion(shell_MSD,dt,[100,200])
     
 
 shell_MSD_fig_file = out_dir + out_label + '_shellMSD.pdf'
