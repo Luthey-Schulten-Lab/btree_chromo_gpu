@@ -669,6 +669,7 @@ void LAMMPS_simulator::sim_to_sys()
   int N_bdry = lmp_sys->get_N_bdry();
   int N_mono_ribo = N_mono + N_ribo;
 
+  cout << "N = " << N << endl;
   cout << "N_mono = " << N_mono << endl;
   cout << "N_ribo = " << N_ribo << endl;
   cout << "N_bdry = " << N_bdry << endl;
@@ -679,14 +680,20 @@ void LAMMPS_simulator::sim_to_sys()
 
       // copy the coordinates to the system state
       
-      double *coords = new double[3*N];
+      double *coords = nullptr;
+      if (coords == nullptr) coords = new double[3*N];
 
       // 1 for per-atom type, 3 for size of data (x_i,x_j,x_k)
       lammps_gather_atoms(lmp, const_cast<char*>("x"), 1, 3, coords);
 
       lmp_sys->set_coords_arr_total(coords,"row");
 
-      delete[] coords;
+      // free the coordinate array
+      if (coords != nullptr)
+	{
+	  delete[] coords;
+	  coords = nullptr;
+	}
 
       // copy the quaternions to the system state
 
@@ -702,7 +709,8 @@ void LAMMPS_simulator::sim_to_sys()
       ids_p = lammps_extract_compute(lmp,const_cast<char*>("id_track"),1,1);
       double *ids{static_cast<double*>(ids_p)};
 
-      double *quats = new double[4*N_mono_ribo];
+      double *quats = nullptr;
+      if (quats == nullptr) quats = new double[4*N_mono_ribo];
 
       int id;
       for (int i=0; i<N; i++)
@@ -719,7 +727,12 @@ void LAMMPS_simulator::sim_to_sys()
 
       lmp_sys->set_quats_arr_total(quats,"row");
 
-      delete[] quats;
+      // free the quaternion array
+      if (quats != nullptr)
+	{
+	  delete[] quats;
+	  quats = nullptr;
+	}
 
       // sync the subarrays with the total array
       
@@ -1037,15 +1050,15 @@ void LAMMPS_simulator::uncompute(string compute_label)
     {
       if (compute_label == "ids")
 	{
-	  lmp->input->one("uncompute quat");
+	  lmp->input->one("uncompute id_track");
 	}
       else if (compute_label == "types")
 	{
-	  lmp->input->one("uncompute id_track");
+	  lmp->input->one("uncompute type_track");
 	}
       else if (compute_label == "quats")
 	{
-	  lmp->input->one("uncompute type_track");
+	  lmp->input->one("uncompute quat");
 	}
       else if (compute_label == "MSD")
 	{

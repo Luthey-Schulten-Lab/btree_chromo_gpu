@@ -258,11 +258,11 @@ int atom_array::read_bin_coords(string data_filename, string order, bool force_r
 	  memcpy(&x[i], vals, 8);
 	}
 
-      delete memblock;
+      delete[] memblock;
       
       set_coords_arr(x,order);
 
-      delete x;
+      delete[] x;
       return 0;
       
     }

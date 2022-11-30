@@ -226,11 +226,11 @@ int ellipsoid_array::read_bin_quats(string data_filename, string order, bool for
 	  memcpy(&q[i], vals, 8);
 	}
 
-      delete memblock;
+      delete[] memblock;
       
       set_quats_arr(q,order);
 
-      delete q;
+      delete[] q;
       return 0;
       
     }

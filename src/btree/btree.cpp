@@ -1577,7 +1577,7 @@ void btree::prepare_bonds(int **&c, int *&t, int &N, int idx)
   // apply indexing convention
   for (int i=0; i<N; i++)
     {
-      for (int j=0; j<3; j++)
+      for (int j=0; j<2; j++)
 	{
 	  c[i][j] += idx;
 	}
