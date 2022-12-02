@@ -1143,3 +1143,9 @@ void LAMMPS_simulator::delete_sim_var(string sim_var)
       lmp->input->one(("variable " + sim_var + " delete").c_str());
     }
 }
+
+
+unsigned long LAMMPS_simulator::get_timestep()
+{
+  return Nt;
+}

@@ -17,12 +17,12 @@ import LAMMPS_helpers.read_LAMMPS_DNA as r_L_D
 importlib.reload(r_L_D)
 
 in_dir = '/home/ben/Data/btree_chromo/diffusion_testing/'
-in_label = 'diffusion_no_interactions'
-min_rep = 1
-max_rep = 50
+in_label = 'diffusion_bond_bending_twisting'
+min_rep = 21
+max_rep = 26
 
 out_dir = '/home/ben/Data/btree_chromo/diffusion_testing/'
-out_label = 'diffusion_no_interactions'
+out_label = 'diffusion_bond_bending_twisting'
 
 timestep_options = ['Last','FirstLast','Slices','All']
 timestep_select = timestep_options[3]

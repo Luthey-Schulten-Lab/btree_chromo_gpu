@@ -98,6 +98,8 @@ public:
   void set_loop_sim_params(loop_sim_params &l_sim_p);
   void update_loop_bonds(bool new_bonds);
   void run_loops(int N_loops, unsigned long N_steps, thermo_dump_parameters t_d_p);
+
+  unsigned long get_timestep();
   
 private:
 

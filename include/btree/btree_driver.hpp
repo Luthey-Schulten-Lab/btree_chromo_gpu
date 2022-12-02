@@ -63,8 +63,12 @@ private:
   void expand_repeat_metacommands();
   void expand_repeat_replicates_metacommands();
   void update_replicate_modified_params(string &rep_mod, string &command, vector<string> &params);
+
+  // parameter modifiers
   void append_replicate_modifier(string &rep_mod, string &mod_param);
   void insert_replicate_modifier(string &rep_mod, string &mod_param);
+  string get_timestep_modifier();
+  void insert_timestep_modifier(string &ts_mod, string &mod_param);
   
   // execute a single command
   int execute_single_command(string &command, vector<string> &params);
@@ -105,12 +109,14 @@ private:
   int dump_regions(vector<string> &params);
 
   // topology
-  int dump_topology(vector<string> &params);
   int update_topology();
+  int dump_topology(vector<string> &params);
+  int dump_topology_at_timestep(vector<string> &params);
 
   // coarse-graining
   int update_CG_map(vector<string> &params);
   int dump_CG_map(vector<string> &params);
+  int dump_CG_map_at_timestep(vector<string> &params);
 
   // miscellaneous
   int btree_prng_seed(vector<string> &params);
@@ -178,6 +184,10 @@ private:
   // simulator looped DNA routines
   int simulator_load_loop_params(vector<string> &params);
   int simulator_run_loops(vector<string> &params);
+
+  // fused commands
+  int sys_write_sim_read_LAMMPS_data(vector<string> &params);
+  int simulator_relax_progressive(vector<string> &params);
   
 
   /////////////

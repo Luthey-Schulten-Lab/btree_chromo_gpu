@@ -115,6 +115,7 @@ Use the testcase for an example: **./program /home/ben/Workspace/btree_chromo/te
 
  - update_topology - *solves bond topology of system*
  - dump_topology:topology_file,idx - *dumps topology to topology_file with selected indexing convention (idx)*
+ - dump_topology_at_timestep:topology_file,idx - *execute dump_topology, but append a modifier to the topology_file with the current timestep of the simulator*
  
  - update_CG_map:f_CG - *update coarse-graining with selected factor (f_CG)*
  - dump_CG_map:CG_map_file,f_CG,idx - *dumps CG_map to CG_map_file with selected factor (f_CG) and indexing convention (idx)*
@@ -172,11 +173,16 @@ Use the testcase for an example: **./program /home/ben/Workspace/btree_chromo/te
  
  - simulator_read_data:LAMMPS_data_file - *read a LAMMPS file (data.-) into the simulator*
  
- - simulator_minimize_(soft/hard)_(harmonic/FENE):Tfreq - *run a minimization with the dictated potential while printing thermodynamic information every Tfreq steps*
- - simulator_run_(soft/hard)_(harmonic/FENE):Nsteps,Tfreq,Dfreq,append_option,skip_option - *run Brownian dynamics with the dictated potential for Nsteps, while printing thermodynamic information every Tfreq steps and dumping every Dfreq steps - append_option = noappend/append and skip_option = first/skip_first*
+ - simulator_minimize_(soft/hard/topoDNA)_(harmonic/FENE):Tfreq - *run a minimization with the dictated potential while printing thermodynamic information every Tfreq steps*
+ - simulator_run_(soft/hard/topoDNA)_(harmonic/FENE):Nsteps,Tfreq,Dfreq,append_option,skip_option - *run Brownian dynamics with the dictated potential for Nsteps, while printing thermodynamic information every Tfreq steps and dumping every Dfreq steps - append_option = noappend/append and skip_option = first/skip_first*
 
  - simulator_load_loop_params:loop_params_file - *read a file (loop_params_file) containing the parameters for the looping interactions*
  - simulator_run_loops:Nloops,Nsteps,Tfreq,Dfreq,append_option,skip_option - *run Brownian dynamics with the hard/FENE potential for Nsteps with Nloops randomly placed, while printing thermodynamic information every Tfreq steps and dumping every Dfreq steps - append_option = noappend/append and skip_option = first/skip_first*
+
+**Fused Directives**
+
+ - sys_write_sim_read_LAMMPS_data:LAMMPS_data_file - *write a LAMMPS file (data.-) with the system, then read the same data file into the simulator*
+ - simulator_relax_progressive:Nsteps,Tfreq - *run a protocol of 1) minimize_soft_harmonic, 2) run_soft_harmonic, 3) minimize_hard_harmonic, 4) run_hard_harmonic, 5) minimize_soft_FENE to relax the system, where all runs are for Nsteps and thermodynamic information is printed every Tfreq steps*
 
 **Metadirectives**
 
