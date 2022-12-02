@@ -88,6 +88,58 @@ def initialize_ring(r, R, compaction, ntwists, a, b):
 
     return n, positions, oris
 
+# function to generate a circular ring of monomers in a plane
+def initialize_toroid(r, R, compaction, ntwists, a, b, toroid_R, toroid_ntwists):
+
+    # r - radius of monomers
+    # R - circle radius
+    # compaction - factor for compaction of monomers in circle from equilibrium distance
+    # ntwists - number of twists around ring
+
+    # number of monomers
+    n = int(compaction*np.floor(2*np.pi*R/(2*r)))
+
+    theta = np.arange(n)*(2*np.pi/n)
+
+    if ntwists <= -1:
+        ntwists = np.rint(n*(10.8-10.0)/10.8)
+
+    positions = np.zeros((n, 3), dtype=np.double)
+    positions[:, 0] = (a*R+toroid_R*np.cos(toroid_ntwists*theta))*np.cos(theta)
+    positions[:, 1] = (b*R+toroid_R*np.cos(toroid_ntwists*theta))*np.sin(theta)
+    positions[:, 2] = toroid_R*np.sin(toroid_ntwists*theta)
+
+    I = np.eye(3, dtype=np.double)
+    ex = I[0, :]
+    ey = I[1, :]
+    ez = I[2, :]
+
+    q1 = genQset(n, 1, np.pi/2, ez[np.newaxis, :])
+
+    q1C = -np.copy(q1)
+    q1C[:, 0] = -1*q1C[:, 0]
+
+    u = np.zeros((n, 4), dtype=np.double)
+
+    u[:, 1:] = ex[np.newaxis, :]
+
+    for i in range(n):
+
+        u[i, :] = qMult(u[i, :], q1C[i, :])
+        u[i, :] = qMult(q1[i, :], u[i, :])
+
+    u = u[:, 1:]
+
+    q2 = genQset(n, ntwists, 0.0, u)
+
+    oris = np.zeros((n, 4), dtype=np.double)
+
+    for i in range(n):
+
+        oris[i, :] = qMult(q2[i, :], q1[i, :])
+
+    return n, positions, oris
+
 def initialize_linked_rings(r, c_s, compaction, ntwists, a, b):
 
     # r - radius of monomers

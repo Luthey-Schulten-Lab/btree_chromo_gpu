@@ -667,7 +667,9 @@ void LAMMPS_simulator::sim_to_sys()
   int N_mono = lmp_sys->get_N_mono();
   int N_ribo = lmp_sys->get_N_ribo();
   int N_bdry = lmp_sys->get_N_bdry();
-  int N_mono_ribo = N_mono + N_ribo;
+  int N_mono_ribo = 0;
+  if (N_mono > 0) N_mono_ribo += N_mono;
+  if (N_ribo > 0) N_mono_ribo += N_ribo;
 
   cout << "N = " << N << endl;
   cout << "N_mono = " << N_mono << endl;

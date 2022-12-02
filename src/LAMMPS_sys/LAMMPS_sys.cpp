@@ -886,8 +886,16 @@ void LAMMPS_sys::write_mono_xyz(string data_filename)
 // get the total number of atoms in the sytem
 int LAMMPS_sys::get_N_total()
 {
-  // return atoms.get_N();
-  return get_N_mono() + get_N_ribo() + get_N_bdry();
+  int N_total = 0;
+  int N_mono = get_N_mono();
+  int N_ribo = get_N_ribo();
+  int N_bdry = get_N_bdry();
+
+  if (N_mono > 0) N_total += N_mono;
+  if (N_ribo > 0) N_total += N_ribo;
+  if (N_bdry > 0) N_total += N_bdry;
+  
+  return N_total;
 }
 
 

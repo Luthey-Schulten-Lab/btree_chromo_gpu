@@ -21,7 +21,7 @@ imp.reload(d_plot)
 in_dir = '/home/ben/Data/btree_chromo/diffusion_testing/'
 in_label = 'diffusion_bond_bending_twisting'
 min_rep = 1
-max_rep = 26
+max_rep = 35
 
 out_dir = '/home/ben/Documents/svn/Minimal_Cell_Chromosome_Organization_2022/tex_figures/diffusion/raw_plots/'
 out_label = 'diffusion_bond_bending_twisting'

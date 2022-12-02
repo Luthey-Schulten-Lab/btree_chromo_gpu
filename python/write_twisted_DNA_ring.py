@@ -19,10 +19,11 @@ out_dir = '/home/ben/Data/btree_chromo/persistence_length_testing/'
 out_label = 'test'
 
 r = 17.0
-R = 1000.0
-c = 1.8
+R = 300.0
+c = 14.0
 
-n, x, q = D_r.initialize_ring(r,R,c,20,1.0,1.0)
+#n, x, q = D_r.initialize_ring(r,R,c,10,1.0,1.0)
+n, x, q = D_r.initialize_toroid(r,R,c,0,1.0,1.0,100.0,40)
 
 print(x.shape)
 
