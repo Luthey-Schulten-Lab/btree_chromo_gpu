@@ -18,8 +18,8 @@ importlib.reload(r_L_D)
 
 in_dir = '/home/ben/Data/btree_chromo/diffusion_testing/'
 in_label = 'diffusion_bond_bending_twisting'
-min_rep = 27
-max_rep = 29
+min_rep = 36
+max_rep = 50
 
 out_dir = '/home/ben/Data/btree_chromo/diffusion_testing/'
 out_label = 'diffusion_bond_bending_twisting'
