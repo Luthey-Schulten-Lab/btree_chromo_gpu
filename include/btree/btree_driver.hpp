@@ -90,7 +90,9 @@ private:
   //////////////
   // commands // 
   //////////////
-  
+
+  // terminate the directive execution
+  int terminate();
 
   // create a new chromosome
   int new_chromo(vector<string> &params);

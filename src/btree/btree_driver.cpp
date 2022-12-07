@@ -702,6 +702,17 @@ void btree_driver::prepare_command_requirements()
 {
   lock t_l;
   vector<lock> t_ls;
+
+
+  // terminate
+  // number of required parameters
+  N_param_reqs["terminate"] = 0;
+  // lock tests
+  t_ls.clear();
+  lock_tests["terminate"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["terminate"] = t_ls;
   
 
   ////////////////////////////////
@@ -1626,13 +1637,19 @@ int btree_driver::execute_single_command(string &command,
   //////////////////
 
 
+  if (command == "terminate")
+    {
+      error_code = terminate();
+    }      
+
+
   //////////////////////////
   // Binary Tree Commands //
   //////////////////////////
 
 
   // seed the PRNG for the btree
-  if (command == "btree_prng_seed")
+  else if (command == "btree_prng_seed")
     {
       error_code = btree_prng_seed(params);
     }      
@@ -2134,6 +2151,12 @@ int btree_driver::execute_single_command(string &command,
 //////////////////////////////////////////
 // set of functions to perform commands //
 //////////////////////////////////////////
+
+
+int btree_driver::terminate()
+{
+  return 1;
+}
 
 
 int btree_driver::new_chromo(vector<string> &params)
