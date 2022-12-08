@@ -19,15 +19,15 @@ import RDF_plotting as rdf_plot
 imp.reload(rdf_plot)
 
 in_dir = '/home/ben/Data/btree_chromo/diffusion_testing/'
-in_label = 'diffusion_bond_bending_twisting'
+in_label = 'diffusion_no_interactions'
 min_rep = 1
-max_rep = 4
+max_rep = 5
 
 out_dir = '/home/ben/Documents/svn/Minimal_Cell_Chromosome_Organization_2022/tex_figures/RDF/raw_plots/'
-out_label = 'RDF_bond_bending_twisting'
+out_label = 'no_interactions'
 
 write_shell_RDF = True
-read_shell_RDF = False
+read_shell_RDF = True
 
 if not os.path.isdir(out_dir) and write_shell_diff:
     os.makedirs(out_dir)
@@ -37,15 +37,17 @@ shell_RDF_file = out_dir + out_label + '_shell_RDF.pickle'
 dt = 0.1 # timestep - [ns]
 
 # number of modes
-N_modes = 20
-Rc = 5000.0
+N_modes = 100
+Rc = 500.0
 
 # radii of shells - [A]
 radii = np.array([1500,2000],dtype=np.int32)
 
 # timesteps for RDF
+#dts = 10000
+#ts_RDF = np.arange(1010000,2000000,dts,dtype=np.int32)
 dts = 10000
-ts_RDF = np.arange(1010000,2000000,dts,dtype=np.int32)
+ts_RDF = np.arange(1990000,2000000+dts,dts,dtype=np.int32)
 
 if write_shell_RDF == True:
 
@@ -68,12 +70,16 @@ if write_shell_RDF == True:
                                                ts_RDF.shape[0],
                                                ts_RDF)
 
-        shell_RDF = rdf_plot.fill_reps_shell_RDFs(shell_MSD,traj,rep-min_rep)
+        shell_RDF = rdf_plot.fill_reps_shell_RDFs(shell_RDF,traj,rep-min_rep)
 
-    rdf_plot.write_shell_diff(shell_diff_file,shell_RDF)
+    rdf_plot.write_shell_RDF(shell_RDF_file,shell_RDF)
 
-if read_shell_diff == True:
+if read_shell_RDF == True:
 
     shell_RDF = rdf_plot.read_shell_RDF(shell_RDF_file)
+
+shell_RDFs_file = out_dir + out_label + '_shell_RDFs.pdf'
+
+rdf_plot.plot_shell_RDFs(shell_RDFs_file,shell_RDF,1000)
 
     
