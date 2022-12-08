@@ -58,6 +58,7 @@ def new_shell_RDF(N_modes,Rc,radii,N_reps,N_t,t):
 
     shell_RDF['N_modes'] = N_modes
     shell_RDF['Rc'] = Rc
+    shell_RDF['local_volume'] = (4.0/3.0)*np.pi*np.power(Rc,3.0)
 
     shell_RDF['N_reps'] = N_reps
     shell_RDF['N_t'] = N_t
@@ -92,6 +93,8 @@ def new_shell_RDF(N_modes,Rc,radii,N_reps,N_t,t):
     shell_RDF['ribo_counts'] = np.zeros((N_shells,N_reps),dtype=np.int32)
 
     shell_RDF['coeffs'] = np.zeros((N_shells,N_reps,N_t,N_modes),dtype=np.double)
+    shell_RDF['total_densities'] = np.zeros((N_reps,N_t),dtype=np.double)
+    shell_RDF['local_densities'] = np.zeros((N_shells,N_reps,N_t),dtype=np.double)
 
     return shell_RDF
 
@@ -124,6 +127,8 @@ def fill_reps_shell_RDFs(shell_RDF,traj,i_rep):
 
         rho = traj[t_temp]['DNA']['N']/shell_RDF['total_volume']
 
+        shell_RDF['total_densities'][i_rep,i_t] = rho
+
         print('rho = '+str(rho))
 
         for i_shell in range(shell_RDF['N_shells']):
@@ -152,10 +157,9 @@ def fill_reps_shell_RDFs(shell_RDF,traj,i_rep):
                     Rc_filter = np.argwhere(r < shell_RDF['Rc'])
 
                     r = r[Rc_filter]
-                    rsqrd = rsqrd[Rc_filter]
-                    inv_rsqrd = np.reciprocal(rsqrd)
 
                     z = (2*r - shell_RDF['Rc'])/(shell_RDF['Rc'])
+                    z_denom = np.power(1.0+z,-2.0)
 
                     w = np.reciprocal(np.sqrt(1.0-np.power(z,2.0)))
 
@@ -169,7 +173,7 @@ def fill_reps_shell_RDFs(shell_RDF,traj,i_rep):
 
                         c = w[i_DNA]*c
 
-                        c = inv_rsqrd[i_DNA]*c
+                        c = z_denom[i_DNA]*c
 
                         temp_coeffs_DNA += c
 
@@ -180,11 +184,14 @@ def fill_reps_shell_RDFs(shell_RDF,traj,i_rep):
                     N_DNA_per_ribo += i_N_DNA_per_ribo
 
                 N_DNA_per_ribo = N_DNA_per_ribo/N_ribo_per_shell
-                print('N_DNA_per_ribo = '+str(N_DNA_per_ribo))
                 temp_coeffs_ribo = temp_coeffs_ribo/N_ribo_per_shell
 
-                a = 4*np.pi*rho
-                a = N_DNA_per_ribo/a
+                local_rho = N_DNA_per_ribo/shell_RDF['local_volume']
+                print('local_rho = '+str(local_rho))
+                shell_RDF['local_densities'][i_shell,i_rep,i_t] = local_rho
+
+                a = 8.0/3.0
+                a = a*(local_rho/rho)
                 temp_coeffs_ribo = a*temp_coeffs_ribo
                 temp_coeffs_ribo = np.divide(temp_coeffs_ribo,W)
 
