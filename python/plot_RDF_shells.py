@@ -19,14 +19,14 @@ import RDF_plotting as rdf_plot
 imp.reload(rdf_plot)
 
 in_dir = '/home/ben/Data/btree_chromo/diffusion_testing/'
-in_label = 'diffusion_bond_bending_twisting'
+in_label = 'diffusion_no_interactions'
 min_rep = 1
 max_rep = 50
 
 out_dir = '/home/ben/Documents/svn/Minimal_Cell_Chromosome_Organization_2022/tex_figures/RDF/raw_plots/'
-out_label = 'bond_bending_twisting'
+out_label = 'no_interactions'
 
-write_shell_RDF = True
+write_shell_RDF = False
 read_shell_RDF = True
 
 if not os.path.isdir(out_dir) and write_shell_diff:
@@ -80,6 +80,6 @@ if read_shell_RDF == True:
 
 shell_RDFs_file = out_dir + out_label + '_shell_RDFs.pdf'
 
-rdf_plot.plot_shell_RDFs(shell_RDFs_file,shell_RDF,10000)
+rdf_plot.plot_shell_RDFs(shell_RDFs_file,shell_RDF,1000)
 
     

@@ -229,15 +229,17 @@ def plot_shell_RDFs(fig_file,shell_RDF,res):
 
     print(shell_RDF['total_volume'])
     
-    fig_size = [87,87]
+    #fig_size = [87,87]
     #fig_size = [174,174]
+    fig_size = [174,87]
 
     fig = plt.figure(figsize=(fig_size[0]*mm,fig_size[1]*mm))
 
     ax = plt.gca()
+    sigma = 134
 
     ax.set_xlabel(r'$r$ - radial distance [\AA]', fontsize=12)
-    ax.set_ylabel(r'$g(r)$ - radial distribution function', fontsize=12)
+    ax.set_ylabel(r'$g_{ribo-DNA}(r)$ - R.D.F.', fontsize=12)
 
 
     ax.tick_params(axis='x',labelsize=9)
@@ -246,6 +248,9 @@ def plot_shell_RDFs(fig_file,shell_RDF,res):
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
 
+    ax.set_xlim(xmin=0.0,xmax=shell_RDF['Rc'])
+    ax.set_ylim(ymin=0.0,ymax=1.1)
+    
     for i_shell in range(shell_RDF['N_shells']):
 
         temp_color = cmap(i_shell%shell_RDF['N_shells'])
@@ -259,17 +264,34 @@ def plot_shell_RDFs(fig_file,shell_RDF,res):
 
         print(a.shape)
 
+
         y = eval_cheb_RDF(shell_RDF['Rc'],a,x)
+        sigma_val = eval_cheb_RDF(shell_RDF['Rc'],a,sigma)
 
         ax.plot(x,y,
-                lw=1.5,
+                lw=2.0,
                 alpha=1.0,
                 ls='-',
                 c=temp_color,
                 label=temp_label)
 
+        x_sigma = np.array([sigma,sigma,0.0],dtype=np.double)
+        y_sigma = np.array([0.0,sigma_val,sigma_val],dtype=np.double)
         
-    ax.legend(fontsize=8)
+        ax.plot(x_sigma,y_sigma,
+                lw=1.5,
+                alpha=0.75,
+                ls='--',
+                c=temp_color,
+                zorder=-1)
+
+
+    sigma_text = r'$\sigma_{ribo-DNA}=$'+'${:d}$ \AA'.format(sigma)
+    ax.annotate(sigma_text,
+                xy=(sigma+10.0,0.1),
+                fontsize=12)
+    ax.legend(fontsize=8,
+              loc='lower right')
 
     plt.tight_layout()
 

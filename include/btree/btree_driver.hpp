@@ -109,6 +109,7 @@ private:
   // regions
   int regions_file(vector<string> &params);
   int dump_regions(vector<string> &params);
+  int dump_regions_at_timestep(vector<string> &params);
 
   // topology
   int update_topology();

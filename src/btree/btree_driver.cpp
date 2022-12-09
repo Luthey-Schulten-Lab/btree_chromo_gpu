@@ -589,7 +589,15 @@ void btree_driver::update_replicate_modified_params(string &rep_mod, string &com
     {
       insert_replicate_modifier(rep_mod,params[0]);
     }
+  else if (command == "dump_CG_map_at_timestep")
+    {
+      insert_replicate_modifier(rep_mod,params[0]);
+    }
   else if (command == "dump_regions")
+    {
+      insert_replicate_modifier(rep_mod,params[0]);
+    }
+  else if (command == "dump_regions_at_timestep")
     {
       insert_replicate_modifier(rep_mod,params[0]);
     }
@@ -818,7 +826,20 @@ void btree_driver::prepare_command_requirements()
   lock_tests["dump_regions"] = t_ls;
   // lock updates
   t_ls.clear();
-  lock_updates["regions_file"] = t_ls;
+  lock_updates["dump_regions"] = t_ls;
+
+  // dump_regions_at_timestep
+  // number of required parameters
+  N_param_reqs["dump_regions_at_timestep"] = 2;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("btree_initialized",true));
+  t_ls.push_back(new_lock("regions_present",true));
+  t_ls.push_back(new_lock("simulator_prepared",true));
+  lock_tests["dump_regions_at_timestep"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["dump_regions_at_timestep"] = t_ls;
 
   // update_topology
   // number of required parameters
@@ -875,6 +896,18 @@ void btree_driver::prepare_command_requirements()
   // lock updates
   t_ls.clear();
   lock_updates["dump_CG_map"] = t_ls;
+
+  // dump_CG_map_at_timestep
+  // number of required parameters
+  N_param_reqs["dump_CG_map_at_timestep"] = 3;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("btree_initialized",true));
+  t_ls.push_back(new_lock("simulator_prepared",true));
+  lock_tests["dump_CG_map_at_timestep"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["dump_CG_map_at_timestep"] = t_ls;
 
   // btree_prng_seed
   // number of required parameters
@@ -1704,10 +1737,17 @@ int btree_driver::execute_single_command(string &command,
     }
 
       
-  // apply state transformations from a file
+  // write the region counts to an output file
   else if (command == "dump_regions")
     {
       error_code = dump_regions(params);
+    }
+
+
+  // write the region counts to an output file at the current timestep
+  else if (command == "dump_regions_at_timestep")
+    {
+      error_code = dump_regions_at_timestep(params);
     }
 
       
@@ -1743,6 +1783,13 @@ int btree_driver::execute_single_command(string &command,
   else if (command == "dump_CG_map")
     {
       error_code = dump_CG_map(params);
+    }
+
+
+  // dump the CG map at the current timestep
+  else if (command == "dump_CG_map_at_timestep")
+    {
+      error_code = dump_CG_map_at_timestep(params);
     }
 
 
@@ -2143,6 +2190,14 @@ int btree_driver::execute_single_command(string &command,
       error_code = simulator_relax_progressive(params);
     }
 
+
+  // the command is unrecognized
+  else
+    {
+      cout << "command is unrecognized!" << endl;
+      error_code = 1;
+    }
+
   return error_code;
   
 }
@@ -2227,6 +2282,25 @@ int btree_driver::dump_regions(vector<string> &params)
 }
 
 
+int btree_driver::dump_regions_at_timestep(vector<string> &params)
+{
+  int e;
+  string ts_mod = get_timestep_modifier();
+  vector<string> params_w_ts;
+
+  for (string param : params)
+    {
+      params_w_ts.push_back(param);
+    }
+
+  insert_timestep_modifier(ts_mod,params_w_ts[0]);
+  
+  e = dump_regions(params_w_ts);
+  
+  return e;
+}
+
+
 int btree_driver::dump_topology(vector<string> &params)
 {
   // update topology before dumping
@@ -2297,6 +2371,25 @@ int btree_driver::dump_CG_map(vector<string> &params)
     }
   driver_bt.dump_CG_map(params[0],stoi(params[2]),driver_CG);
   return 0;
+}
+
+
+int btree_driver::dump_CG_map_at_timestep(vector<string> &params)
+{
+  int e;
+  string ts_mod = get_timestep_modifier();
+  vector<string> params_w_ts;
+
+  for (string param : params)
+    {
+      params_w_ts.push_back(param);
+    }
+
+  insert_timestep_modifier(ts_mod,params_w_ts[0]);
+  
+  e = dump_CG_map(params_w_ts);
+  
+  return e;
 }
 
 

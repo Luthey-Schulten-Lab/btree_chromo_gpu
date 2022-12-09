@@ -119,9 +119,11 @@ Use the testcase for an example: **./program /home/ben/Workspace/btree_chromo/te
  
  - update_CG_map:f_CG - *update coarse-graining with selected factor (f_CG)*
  - dump_CG_map:CG_map_file,f_CG,idx - *dumps CG_map to CG_map_file with selected factor (f_CG) and indexing convention (idx)*
+ - dump_CG_map_at_timeste:CG_map_file,f_CG,idx - *execute dump_CG_map, but append a modifier to the CG_map_file with the current timestep of the simulator*
  
  - regions_file:regions_file,idx - *reads chromosome regions from regions_file with selected indexing convention (idx)*
  - dump_regions:regions_count_file - *updates regions counts given current state and dumps counts to regions_count_file*
+ - dump_regions_at_timestep:regions_count_file - *execute dump_regions, but append a modifier to the regions_count_file with the current timestep of the simulator*
  
 **Spatial System for Simulations**
 
