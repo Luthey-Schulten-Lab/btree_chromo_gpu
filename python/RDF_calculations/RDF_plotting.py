@@ -236,19 +236,27 @@ def plot_shell_RDFs(fig_file,shell_RDF,res):
     fig = plt.figure(figsize=(fig_size[0]*mm,fig_size[1]*mm))
 
     ax = plt.gca()
-    sigma = 134
+    sigma = np.power(2.0,1/6.0)*11.7
 
-    ax.set_xlabel(r'$r$ - radial distance [\AA]', fontsize=12)
+    ax.set_xlabel(r'$r$ - radial distance [nm]', fontsize=12)
     ax.set_ylabel(r'$g_{ribo-DNA}(r)$ - R.D.F.', fontsize=12)
 
 
-    ax.tick_params(axis='x',labelsize=9)
-    ax.tick_params(axis='y',labelsize=9)
+    tick_length = 4.0
+    tick_width = 2.0
+    ax.tick_params(axis='x',labelsize=9,
+                   length=tick_length,
+                   width=tick_width)
+    ax.tick_params(axis='y',labelsize=9,
+                   length=tick_length,
+                   width=tick_width)
 
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
+    ax.spines['left'].set_linewidth(2.0)
+    ax.spines['bottom'].set_linewidth(2.0)
 
-    ax.set_xlim(xmin=0.0,xmax=shell_RDF['Rc'])
+    ax.set_xlim(xmin=0.0,xmax=shell_RDF['Rc']//10)
     ax.set_ylim(ymin=0.0,ymax=1.1)
     
     for i_shell in range(shell_RDF['N_shells']):
@@ -266,9 +274,9 @@ def plot_shell_RDFs(fig_file,shell_RDF,res):
 
 
         y = eval_cheb_RDF(shell_RDF['Rc'],a,x)
-        sigma_val = eval_cheb_RDF(shell_RDF['Rc'],a,sigma)
+        sigma_val = eval_cheb_RDF(shell_RDF['Rc'],a,10.0*sigma)
 
-        ax.plot(x,y,
+        ax.plot(x/10,y,
                 lw=2.0,
                 alpha=1.0,
                 ls='-',
@@ -286,9 +294,9 @@ def plot_shell_RDFs(fig_file,shell_RDF,res):
                 zorder=-1)
 
 
-    sigma_text = r'$\sigma_{ribo-DNA}=$'+'${:d}$ \AA'.format(sigma)
+    sigma_text = r'$2^{1/6}\sigma_{DNA-ribo}=$'+'${:.1f}$ nm'.format(sigma)
     ax.annotate(sigma_text,
-                xy=(sigma+10.0,0.1),
+                xy=(sigma+1.0,0.1),
                 fontsize=12)
     ax.legend(fontsize=8,
               loc='lower right')

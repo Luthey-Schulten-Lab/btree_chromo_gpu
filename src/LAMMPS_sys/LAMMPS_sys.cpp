@@ -988,9 +988,9 @@ void LAMMPS_sys::sync_subarrays()
 {
   int N_mono, N_ribo, N_bdry;
 
-  N_mono = mono_atoms.get_N();
-  N_ribo = ribo_atoms.get_N();
-  N_bdry = bdry_atoms.get_N();
+  N_mono = max(0,mono_atoms.get_N());
+  N_ribo = max(0,ribo_atoms.get_N());
+  N_bdry = max(0,bdry_atoms.get_N());
   
   // copy to mono_atoms
   for (int i=0; i<N_mono; i++)

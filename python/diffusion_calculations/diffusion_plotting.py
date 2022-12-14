@@ -526,11 +526,19 @@ def plot_shell_MSD_reps(fig_file,shell_MSD,dt,lims,species_select):
 
     # multi_fits_linear(ax,lims,t,MSD)
 
-    ax.tick_params(axis='x',labelsize=9)
-    ax.tick_params(axis='y',labelsize=9)
+    tick_length = 4.0
+    tick_width = 2.0
+    ax.tick_params(axis='x',labelsize=9,
+                   length=tick_length,
+                   width=tick_width)
+    ax.tick_params(axis='y',labelsize=9,
+                   length=tick_length,
+                   width=tick_width)
 
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
+    ax.spines['left'].set_linewidth(2.0)
+    ax.spines['bottom'].set_linewidth(2.0)
 
     legend_elements = []
 
@@ -637,11 +645,27 @@ def plot_shell_law_reps(fig_file,shell_MSD,dt,lims,species_select):
 
     # multi_fits_linear(ax,lims,t,MSD)
 
-    ax.tick_params(axis='x',labelsize=9)
-    ax.tick_params(axis='y',labelsize=9)
+    tick_length = 4.0
+    tick_width = 2.0
+    ax.tick_params(which='major',axis='x',labelsize=9,
+                   length=tick_length,
+                   width=tick_width)
+    ax.tick_params(which='major',axis='y',labelsize=9,
+                   length=tick_length,
+                   width=tick_width)
+
+    tick_scaling = 0.75
+    ax.tick_params(which='minor',axis='x',
+                   length=tick_length*tick_scaling,
+                   width=tick_width*tick_scaling)
+    ax.tick_params(which='minor',axis='y',
+                   length=tick_length*tick_scaling,
+                   width=tick_width*tick_scaling)
 
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
+    ax.spines['left'].set_linewidth(2.0)
+    ax.spines['bottom'].set_linewidth(2.0)
 
     ax.set_xscale('log')
     ax.set_yscale('log')
@@ -909,11 +933,19 @@ def plot_shell_diff_vs_diff_reps(fig_file,shell_MSD):
     ribo_counts = shell_MSD['ribo_counts']
     ribo_BrownianDiff = shell_MSD['ribo_BrownianDiff']
 
-    ax.tick_params(axis='x',labelsize=9)
-    ax.tick_params(axis='y',labelsize=9)
+    tick_length = 4.0
+    tick_width = 2.0
+    ax.tick_params(axis='x',labelsize=9,
+                   length=tick_length,
+                   width=tick_width)
+    ax.tick_params(axis='y',labelsize=9,
+                   length=tick_length,
+                   width=tick_width)
 
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
+    ax.spines['left'].set_linewidth(2.0)
+    ax.spines['bottom'].set_linewidth(2.0)
 
     #temp_marker_style = dict(marker='.', markersize=8,fillstyle='none')
     cov_ellipses = []
@@ -1018,11 +1050,19 @@ def plot_shell_law_vs_law_reps(fig_file,shell_MSD):
     ribo_counts = shell_MSD['ribo_counts']
     ribo_AnomalousDiff = shell_MSD['ribo_AnomalousDiff']
 
-    ax.tick_params(axis='x',labelsize=9)
-    ax.tick_params(axis='y',labelsize=9)
+    tick_length = 4.0
+    tick_width = 2.0
+    ax.tick_params(axis='x',labelsize=9,
+                   length=tick_length,
+                   width=tick_width)
+    ax.tick_params(axis='y',labelsize=9,
+                   length=tick_length,
+                   width=tick_width)
 
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
+    ax.spines['left'].set_linewidth(2.0)
+    ax.spines['bottom'].set_linewidth(2.0)
 
     #temp_marker_style = dict(marker='.', markersize=8,fillstyle='none')
     cov_ellipses = []
