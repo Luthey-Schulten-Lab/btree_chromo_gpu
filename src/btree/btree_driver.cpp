@@ -1538,6 +1538,26 @@ void btree_driver::prepare_command_requirements()
   // lock updates
   t_ls.clear();
   lock_updates["simulator_run_loops"] = t_ls;
+
+  // switch_Ori_bdry_attraction
+  // number of required parameters
+  N_param_reqs["switch_Ori_bdry_attraction"] = 1;
+  // lock tests
+  t_ls.clear();
+  lock_tests["switch_Ori_bdry_attraction"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["switch_Ori_bdry_attraction"] = t_ls;
+
+  // switch_Ori_pair_repulsion
+  // number of required parameters
+  N_param_reqs["switch_Ori_pair_repulsion"] = 1;
+  // lock tests
+  t_ls.clear();
+  lock_tests["switch_Ori_pair_repulsion"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["switch_Ori_pair_repulsion"] = t_ls;
   
 
   /////////////////////////////////
@@ -2172,6 +2192,20 @@ int btree_driver::execute_single_command(string &command,
     }
 
 
+  // switch on the Ori bdry attraction
+  else if (command == "switch_Ori_bdry_attraction")
+    {
+      error_code = switch_Ori_bdry_attraction(params);
+    }
+
+
+  // switch on the Ori pair_repulsion
+  else if (command == "switch_Ori_pair_repulsion")
+    {
+      error_code = switch_Ori_pair_repulsion(params);
+    }
+
+
   ////////////////////
   // Fused Commands //
   ////////////////////
@@ -2680,6 +2714,39 @@ int btree_driver::switch_twisting_angles(vector<string> &params)
       return 1;
     }
   return 0;
+}
+
+
+int btree_driver::switch_extra_potential(string extra_pot, string s)
+{
+  if (s == "T")
+    {
+      driver_lmp_simulator.switch_extra_potential(extra_pot,true);
+    }
+  else if (s == "F")
+    {
+      driver_lmp_simulator.switch_extra_potential(extra_pot,false);
+    }
+  else
+    {
+      cout << "ERROR: invalid switch" << endl;
+      return 1;
+    }
+  return 0;
+}
+
+
+int btree_driver::switch_Ori_bdry_attraction(vector<string> &params)
+{
+  int e = switch_extra_potential("Ori_bdry_attraction",params[0]);
+  return e;
+}
+
+
+int btree_driver::switch_Ori_pair_repulsion(vector<string> &params)
+{
+  int e = switch_extra_potential("Ori_pair_repulsion",params[0]);
+  return e;
 }
 
 

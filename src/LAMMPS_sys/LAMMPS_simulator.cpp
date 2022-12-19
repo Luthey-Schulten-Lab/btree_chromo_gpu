@@ -17,6 +17,7 @@ LAMMPS_simulator::LAMMPS_simulator()
 
   initialize_computes();
   initialize_dumps();
+  initialize_extra_potentials();
   initialize_sim_vars();
 
 
@@ -226,11 +227,17 @@ void LAMMPS_simulator::setup_minimize(thermo_dump_parameters &t_d_p)
   // set dump frequency
   set_sim_var_int("D_freq",t_d_p.dump_freq);
 
-  // include compute for ids
-  compute_trigger("ids");
+  // set simulator variables based on extra potentials
+  extra_pots_to_sim_vars();
 
-  // include compute for quats
-  compute_trigger("quats");
+  // // include compute for ids
+  // compute_trigger("ids");
+
+  // // include compute for quats
+  // compute_trigger("quats");
+
+  // include the standard computes
+  standard_computes();
 
   // include default thermo
   lmp->input->one("include ${DNA_model_dir}/dump_subroutines/subroutine.default_thermo");
@@ -353,11 +360,17 @@ void LAMMPS_simulator::setup_run(unsigned long N_steps, thermo_dump_parameters &
   // set dump frequency
   set_sim_var_int("D_freq",t_d_p.dump_freq);
 
-  // include compute for ids
-  compute_trigger("ids");
+  // set simulator variables based on extra potentials
+  extra_pots_to_sim_vars();
 
-  // include compute for quats
-  compute_trigger("quats");
+  // // include compute for ids
+  // compute_trigger("ids");
+
+  // // include compute for quats
+  // compute_trigger("quats");
+
+  // include the standard computes
+  standard_computes();
 
   // include compute for MSD
   compute_trigger("MSD");
@@ -1117,6 +1130,14 @@ void LAMMPS_simulator::initialize_sim_vars()
   // initialize simulator internal variables
   sim_vars["T_freq"] = false;
   sim_vars["D_freq"] = false;
+
+  // initialize internal variables for extra potentials
+  string p;
+  for (auto extra_pot=extra_pots.begin(); extra_pot!=extra_pots.end(); ++extra_pot)
+    {
+      p = extra_pot->first;
+      sim_vars[p] = false;
+    }
 }
 
 
@@ -1143,6 +1164,43 @@ void LAMMPS_simulator::delete_sim_var(string sim_var)
   if (sim_vars[sim_var] == true)
     {
       lmp->input->one(("variable " + sim_var + " delete").c_str());
+      sim_vars[sim_var] = false;
+    }
+}
+
+
+void LAMMPS_simulator::initialize_extra_potentials()
+{
+  extra_pots["Ori_bdry_attraction"] = false;
+  extra_pots["Ori_pair_repulsion"] = false;
+}
+
+
+void LAMMPS_simulator::switch_extra_potential(string p, bool s)
+{
+  extra_pots[p] = s;
+}
+
+
+void LAMMPS_simulator::extra_pots_to_sim_vars()
+{
+  string p;
+  bool v;
+
+  // iterate over the set of extra potentials and set sim_vars accordingly
+  for (auto extra_pot=extra_pots.begin(); extra_pot!=extra_pots.end(); ++extra_pot)
+    {
+      p = extra_pot->first;
+      v = extra_pot->second;
+
+      if (v == true)
+	{
+	  set_sim_var_int(p,1);
+	}
+      else
+	{
+	  set_sim_var_int(p,0);
+	}
     }
 }
 

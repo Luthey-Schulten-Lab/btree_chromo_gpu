@@ -99,6 +99,9 @@ public:
   void update_loop_bonds(bool new_bonds);
   void run_loops(int N_loops, unsigned long N_steps, thermo_dump_parameters t_d_p);
 
+  // switch an extra potential on or off
+  void switch_extra_potential(string p, bool s);
+
   unsigned long get_timestep();
   
 private:
@@ -125,12 +128,17 @@ private:
   void set_sim_var_int(string sim_var, int val);
   void delete_sim_var(string sim_var);
 
+  // reset the extra potentials for the simulation
+  void initialize_extra_potentials();
+  void extra_pots_to_sim_vars();
+
   // reset the timestep
   void reset_timestep_to_Nt();
 
   unordered_map<string,bool> sim_vars; // map storing state of sim_vars
   unordered_map<string,bool> computes; // map storing state of computes
   unordered_map<string,bool> dumps; // map storing state of dumps
+  unordered_map<string,bool> extra_pots; // map storing state of extra potentials
 
   int sim_MPI_initialized, sim_MPI_finalized;
   int sim_MPI_size; // MPI size

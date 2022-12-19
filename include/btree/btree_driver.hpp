@@ -151,6 +151,9 @@ private:
   int switch_bonds(vector<string> &params);
   int switch_bending_angles(vector<string> &params);
   int switch_twisting_angles(vector<string> &params);
+  int switch_extra_potential(string extra_pot, string s);
+  int switch_Ori_bdry_attraction(vector<string> &params);
+  int switch_Ori_pair_repulsion(vector<string> &params);
   // writing LAMMPS data file
   int write_LAMMPS_data(vector<string> &params);
   int write_mono_xyz(vector<string> &params);
