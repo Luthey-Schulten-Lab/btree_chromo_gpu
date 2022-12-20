@@ -195,6 +195,36 @@ Use the testcase for an example: **./program /home/ben/Workspace/btree_chromo/te
  - repeat_replicates:min_rep,max_rep,label_padding - *begin a region of directives that will be repeated for replicates ranging inclusively from (min_rep) to (max_rep), all I/O directives within the region will be modified to include a replicate label of the form '_rep0000X', where (label_padding) specifies the number of zeros*
  - end_repeat_replicates - *must follow a 'repeat_replicates' and terminates the region of directives that will be repeated with replicate identifiers*
 
+## Visualization
+
+### Atom Types
+
+ 1 - boundary atoms (bdry)
+ 2 - ribosomes (ribo)
+ 3 - DNA monomers (DNA or mono)
+ 4 - Ori monomers (ori)
+ 5 - Ter monomers (ter)
+ 6 - replication fork monomers (fork)
+ 7 - anchor monomers (anchor)
+ 8 - hinge monomers (hinge)
+
+### VMD Instructions
+
+Visualizing the trajectories using VMD requires some extra work to account for the varying atom numbers and atom types.
+
+ 1) install LAMMPS plugin for VMD
+ 2) open TkConsole in VMD
+ 3) run "set env(LAMMPSDUMMYPOS) {xd,yd,zd}" in the TkConsole, where {xd.yd.zd} is a tuple of the x,y,z coordinates of dummy atoms for systems with varying atom numbers
+ 4) run "set env(LAMMPSMAXATOMS) Nmax" in the TkConsole, where Nmax is the maximum number of atoms appearing in any frame of the trajectory
+ 5) run "set env(LAMMPSREMAPFIELDS) {vx=c_id_track,vy=c_type_track}" in the TkConsole, this will remap the fields of "c_id_track" and "c_type_track" to the x and y velocity, respectively, for every frame of the trajectory
+ 6) Load the trajectory file
+
+The x-velocity (vx) now stores the frame-dependent atom indices and the y-velocity (vy) now stores the frame-dependent atom types for the entire course of the trajectory. Use these fields rather than the default indices and types (which are defined only using the first frame of the trajectory) when making atom selections.
+
+### Ovito Instructions
+
+ Ovito automatically interprets all fields to be frame-dependent.
+
 ## Support
 brg4@illinois.edu
 
