@@ -44,11 +44,6 @@ struct btree_state
   btree_transforms transforms;
 };
 
-// struct btree_transforms
-// {
-//   vector<fork_rho> fork_rhos;
-// };
-
 struct chromo_region
 {
   string name;
@@ -75,6 +70,20 @@ struct CG_map
   vector<CG_locus> loci;
   vector<CG_leaf> CG_leaves;
 };
+
+struct mono_range
+{
+  bool complete;
+  int ll, ul, mid_ll, mid_ul;
+};
+
+struct fork_partition
+{
+  string fork;
+  vector<mono_range> left_monos, right_monos;
+};
+
+typedef vector<fork_partition> fork_partitions;
 
 class btree
 {

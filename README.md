@@ -11,6 +11,9 @@ Upon execution a **btree_driver** executes a series of directives stored in a fi
 The **btree_driver** contains the following objects.
 
 - btree - *a specialized binary tree class representing replicating circular dsDNA in nested theta structures that can only be manipulated using public member functions representing processes physically possible for circular dsDNA*
+
+  	To understand the terminology that will be used to describe replication of circular dsDNA within the program, visualize an analog clock - the *Ori* is at 6 and the *Ter* is at 12; two replication forks travel in the clockwise (cw) and counter-clockwise (ccw) from the *Ori* towards the *Ter* until they collide. Newly created dsDNA is indexed in ascending order beginning from the end linked to the ccw replication fork to the opposite end of the strand linked to the cw replication fork.
+
   1) determines topology when system is represented as circular(/theta structure) polymers (for arbitrary replication states)
   2) counts genome features at nucleotide resolution (for arbitrary replication states)
   3) prepares coarse-graining into chromosomal loci for contact map calculations (for arbitrary replication states)

@@ -1062,7 +1062,7 @@ void btree::solve_topology()
 		  else
 		    {
 		      free_branch->topo.end_link = (link_branch->topo.start) +
-			((mid + query_branch->rho_cw) - link_branch->topo.end);
+			((mid + query_branch->rho_cw) - link_branch->topo.end) - 1; // BRG - caution
 		    }
 		}
 	      else
@@ -1089,7 +1089,7 @@ void btree::solve_topology()
 		  else
 		    {
 		      free_branch->topo.end_link = (link_branch->topo.start) +
-			((mid + query_branch->rho_cw) - link_branch->topo.end);
+			((mid + query_branch->rho_cw) - link_branch->topo.end) - 1; // BRG - caution
 		    }
 		}
 
