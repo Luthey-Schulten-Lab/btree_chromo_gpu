@@ -12,7 +12,7 @@ The **btree_driver** contains the following objects.
 
 - btree - *a specialized binary tree class representing replicating circular dsDNA in nested theta structures that can only be manipulated using public member functions representing processes physically possible for circular dsDNA*
 
-  	To understand the terminology that will be used to describe replication of circular dsDNA within the program, visualize an analog clock - the *Ori* is at 6 and the *Ter* is at 12; two replication forks travel in the clockwise (cw) and counter-clockwise (ccw) from the *Ori* towards the *Ter* until they collide. Newly created dsDNA is indexed in ascending order beginning from the end linked to the ccw replication fork to the opposite end of the strand linked to the cw replication fork.
+  	To understand the terminology that will be used to describe replication of circular dsDNA within the program, visualize an analog clock mirrored over the horizontal axis - the *Ori* is at 6 (top) and the *Ter* is at 12 (bottom), monomers are indexed in ascending order (1 -> 12) in the clockwise direction; two replication forks travel in the clockwise (cw) and counter-clockwise (ccw) from the *Ori* towards the *Ter* until they collide. Newly created dsDNA is indexed in ascending order beginning from the end linked to the ccw replication fork to the opposite end of the strand linked to the cw replication fork.
 
   1) determines topology when system is represented as circular(/theta structure) polymers (for arbitrary replication states)
   2) counts genome features at nucleotide resolution (for arbitrary replication states)
@@ -202,14 +202,7 @@ Use the testcase for an example: **./program /home/ben/Workspace/btree_chromo/te
 
 ### Atom Types
 
- 1 - boundary atoms (bdry)
- 2 - ribosomes (ribo)
- 3 - DNA monomers (DNA or mono)
- 4 - Ori monomers (ori)
- 5 - Ter monomers (ter)
- 6 - replication fork monomers (fork)
- 7 - anchor monomers (anchor)
- 8 - hinge monomers (hinge)
+ 1 - boundary atoms (bdry), 2 - ribosomes (ribo), 3 - DNA monomers (DNA or mono), 4 - Ori monomers (ori), 5 - Ter monomers (ter), 6 - replication fork monomers (fork), 7 - anchor monomers (anchor), 8 - hinge monomers (hinge)
 
 ### VMD Instructions
 
@@ -217,7 +210,7 @@ Visualizing the trajectories using VMD requires some extra work to account for t
 
  1) install LAMMPS plugin for VMD
  2) open TkConsole in VMD
- 3) run "set env(LAMMPSDUMMYPOS) {xd,yd,zd}" in the TkConsole, where {xd.yd.zd} is a tuple of the x,y,z coordinates of dummy atoms for systems with varying atom numbers
+ 3) run "set env(LAMMPSDUMMYPOS) {xd,yd,zd}" in the TkConsole, where {xd,yd,zd} is a tuple of the x,y,z coordinates of dummy atoms for systems with varying atom numbers
  4) run "set env(LAMMPSMAXATOMS) Nmax" in the TkConsole, where Nmax is the maximum number of atoms appearing in any frame of the trajectory
  5) run "set env(LAMMPSREMAPFIELDS) {vx=c_id_track,vy=c_type_track}" in the TkConsole, this will remap the fields of "c_id_track" and "c_type_track" to the x and y velocity, respectively, for every frame of the trajectory
  6) Load the trajectory file

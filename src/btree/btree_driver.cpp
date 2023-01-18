@@ -585,6 +585,14 @@ void btree_driver::update_replicate_modified_params(string &rep_mod, string &com
     {
       insert_replicate_modifier(rep_mod,params[0]);
     }
+  else if (command == "dump_fork_partitions")
+    {
+      insert_replicate_modifier(rep_mod,params[0]);
+    }
+  else if (command == "dump_fork_partitions_at_timestep")
+    {
+      insert_replicate_modifier(rep_mod,params[0]);
+    }
   else if (command == "dump_CG_map")
     {
       insert_replicate_modifier(rep_mod,params[0]);
@@ -874,6 +882,29 @@ void btree_driver::prepare_command_requirements()
   // lock updates
   t_ls.clear();
   lock_updates["dump_topology_at_timestep"] = t_ls;
+
+  // dump_fork_partitions
+  // number of required parameters
+  N_param_reqs["dump_fork_partitions"] = 2;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("btree_initialized",true));
+  lock_tests["dump_fork_partitions"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["dump_fork_partitions"] = t_ls;
+
+  // dump_fork_partitions_at_timestep
+  // number of required parameters
+  N_param_reqs["dump_fork_partitions_at_timestep"] = 2;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("btree_initialized",true));
+  t_ls.push_back(new_lock("simulator_prepared",true));
+  lock_tests["dump_fork_partitions_at_timestep"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["dump_fork_partitions_at_timestep"] = t_ls;
 
   // update_CG_map
   // number of required parameters
@@ -1791,6 +1822,20 @@ int btree_driver::execute_single_command(string &command,
       error_code = dump_topology_at_timestep(params);
     }
 
+
+  // write the topology to an output file
+  else if (command == "dump_fork_partitions")
+    {
+      error_code = dump_fork_partitions(params);
+    }
+
+
+  // write the topology to an output file at the current timestep
+  else if (command == "dump_fork_partitions_at_timestep")
+    {
+      error_code = dump_fork_partitions_at_timestep(params);
+    }
+
       
   // update the CG map
   else if (command == "update_CG_map")
@@ -2362,6 +2407,38 @@ int btree_driver::dump_topology_at_timestep(vector<string> &params)
   insert_timestep_modifier(ts_mod,params_w_ts[0]);
   
   e = dump_topology(params_w_ts);
+  
+  return e;
+}
+
+
+int btree_driver::dump_fork_partitions(vector<string> &params)
+{
+  // update topology before dumping
+  if (lock_state["topo_update"] == true)
+    {
+      driver_bt.solve_topology();
+      lock_state["topo_update"] = false;
+    }
+  driver_bt.dump_fork_partitions(params[0],stoi(params[1]));
+  return 0;
+}
+
+
+int btree_driver::dump_fork_partitions_at_timestep(vector<string> &params)
+{
+  int e;
+  string ts_mod = get_timestep_modifier();
+  vector<string> params_w_ts;
+
+  for (string param : params)
+    {
+      params_w_ts.push_back(param);
+    }
+
+  insert_timestep_modifier(ts_mod,params_w_ts[0]);
+  
+  e = dump_fork_partitions(params_w_ts);
   
   return e;
 }

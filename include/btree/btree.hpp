@@ -73,7 +73,7 @@ struct CG_map
 
 struct mono_range
 {
-  bool complete;
+  bool wrapped;
   int ll, ul, mid_ll, mid_ul;
 };
 
@@ -82,8 +82,6 @@ struct fork_partition
   string fork;
   vector<mono_range> left_monos, right_monos;
 };
-
-typedef vector<fork_partition> fork_partitions;
 
 class btree
 {
@@ -138,6 +136,7 @@ public:
   void solve_topology();
   void dump_topology(string topo_filename, int idx);
   theta_topo get_leaf_topo(string loc);
+  void dump_fork_partitions(string fork_partitions_filename, int idx);
 
   // update the coarse-graining map based on the current state
   CG_map update_CG_map(int f_CG);
@@ -185,6 +184,10 @@ private:
   int get_max_growth_cw(node *branch);
   int get_max_growth_ccw(node *branch);
   array<int,2> partition_growths_sym(node *branch, int proposed_r_cw, int proposed_r_ccw);
+
+  // get the fork partitions about a fork
+  vector<fork_partition> get_all_fork_partitions();
+  fork_partition get_fork_partition(string loc);
 
   // create centered CG maps per branch
   void centered_CG_map(vector<CG_locus> &loci, node *branch, int f_CG);

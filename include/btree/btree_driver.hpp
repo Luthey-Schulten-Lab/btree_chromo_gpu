@@ -115,6 +115,8 @@ private:
   int update_topology();
   int dump_topology(vector<string> &params);
   int dump_topology_at_timestep(vector<string> &params);
+  int dump_fork_partitions(vector<string> &params);
+  int dump_fork_partitions_at_timestep(vector<string> &params);
 
   // coarse-graining
   int update_CG_map(vector<string> &params);

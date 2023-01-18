@@ -1160,6 +1160,175 @@ theta_topo btree::get_leaf_topo(string loc)
 }
 
 
+// function used to dump the fork partitions to a file
+void btree::dump_fork_partitions(string fork_partitions_filename, int idx)
+{
+
+  vector<fork_partition> f_ps = get_all_fork_partitions();
+  
+  fstream f_ps_file;
+  
+  f_ps_file.open(fork_partitions_filename, ios::out);
+
+  if (!f_ps_file.is_open())
+    {
+      cout << "ERROR: file not opened in dump_fork_partitions" << endl;
+    }
+  else
+    {
+
+      f_ps_file << "N_forks=" << f_ps.size() << endl;
+      f_ps_file << "idx=" << idx << endl;
+
+      for (fork_partition f_p : f_ps)
+	{
+	  f_ps_file << f_p.fork << ","
+		    << f_p.left_monos.size() << ","
+		    << f_p.right_monos.size() << endl;
+
+	  for (size_t i=0; i<f_p.left_monos.size(); i++)
+	    {
+	      f_ps_file << f_p.left_monos[i].ll << ","
+			<< f_p.left_monos[i].ul << endl;
+	    }
+
+	  for (size_t i=0; i<f_p.right_monos.size(); i++)
+	    {
+	      f_ps_file << f_p.right_monos[i].ll << ","
+			<< f_p.right_monos[i].ul << endl;
+	    }
+	}
+
+      f_ps_file.close();
+      
+    }
+}
+
+
+// get all fork partitions
+vector<fork_partition> btree::get_all_fork_partitions()
+{
+  vector<fork_partition> f_ps;
+  fork_partition f_p;
+
+  // get the total set of forks (completed and active)
+  
+  vector<string> total_forks;
+  
+  for (string fork : get_completed_forks())
+    {
+      total_forks.push_back(fork);
+    }
+  for (string fork : get_active_forks())
+    {
+      total_forks.push_back(fork);
+    }
+
+
+  // iterate over the forks and get the partition for each
+  for (string fork : total_forks)
+    {
+      f_p = get_fork_partition(fork);
+      f_ps.push_back(f_p);
+    }
+
+  return f_ps;
+  
+}
+
+
+// get the partition about a fork
+fork_partition btree::get_fork_partition(string loc)
+{
+
+  fork_partition f_p;
+
+  node *forked_branch = get_branch(loc);
+  f_p.fork = loc;
+
+  // determine the leaves belonging to the left and right branches
+  string l_loc, r_loc;
+  l_loc = loc + 'l';
+  r_loc = loc + 'r';
+  vector<string> l_leaves, r_leaves;
+  l_leaves.push_back(l_loc);
+  l_leaves = traverse_leaves(l_leaves,get_branch(l_loc));
+  r_leaves.push_back(r_loc);
+  r_leaves = traverse_leaves(r_leaves,get_branch(r_loc));
+
+  cout << loc << endl;
+  for (string leaf : l_leaves)
+    {
+      cout << leaf << endl;
+    }
+
+  for (string leaf : r_leaves)
+    {
+      cout << leaf << endl;
+    }
+
+  // prepare the monomer ranges
+  theta_topo temp_topo;
+  mono_range temp_m_r;
+  string leaf;
+
+  // add the monomer ranges for the left leaves
+  for (size_t i_leaf=0; i_leaf<l_leaves.size(); i_leaf++)
+    {
+      
+      // initialize the mono_range
+      temp_m_r.wrapped = false;
+      temp_m_r.mid_ll = -1;
+      temp_m_r.mid_ul = -1;
+
+      // get the topology of the leaf
+      leaf = l_leaves[i_leaf];
+      temp_topo = get_leaf_topo(leaf);
+
+      cout << "i_leaf = " << i_leaf << ", "
+	   << "leaf = " << leaf << endl;
+
+      // add the monomer range
+      temp_m_r.ll = temp_topo.start;
+      temp_m_r.ul = temp_topo.end;
+      f_p.left_monos.push_back(temp_m_r);
+
+    }
+
+  // add the monomer ranges for the right leaves
+  for (size_t i_leaf=0; i_leaf<r_leaves.size(); i_leaf++)
+    {
+      
+      // initialize the mono_range
+      temp_m_r.wrapped = false;
+      temp_m_r.mid_ll = -1;
+      temp_m_r.mid_ul = -1;
+
+      // get the topology of the leaf
+      leaf = r_leaves[i_leaf];
+      temp_topo = get_leaf_topo(leaf);
+
+      cout << "i_leaf = " << i_leaf << ", "
+	   << "leaf = " << leaf << endl;
+
+      // add the monomer range
+      temp_m_r.ll = temp_topo.start;
+      temp_m_r.ul = temp_topo.end;
+      f_p.right_monos.push_back(temp_m_r);
+
+    }
+
+
+  // perform the correction for the overcounting on the left side
+  if (forked_branch->complete == false)
+    {
+      temp_topo = get_leaf_topo(r_leaves[0]);
+    }
+
+  return f_p;
+}
+
+
 // function to read chromosome regions from file
 vector<chromo_region> btree::read_regions(string rg_filename, int idx)
 {
