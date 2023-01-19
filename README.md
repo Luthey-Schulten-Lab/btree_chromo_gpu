@@ -119,6 +119,9 @@ Use the testcase for an example: **./program /home/ben/Workspace/btree_chromo/te
  - update_topology - *solves bond topology of system*
  - dump_topology:topology_file,idx - *dumps topology to topology_file with selected indexing convention (idx)*
  - dump_topology_at_timestep:topology_file,idx - *execute dump_topology, but append a modifier to the topology_file with the current timestep of the simulator*
+
+ - dump_fork_partitions:fork_partition_file,idx - *dumps monomer partitioning about forks to fork_partition_file with selected indexing convention (idx)*
+ - dump_fork_partitions_at_timestep:fork_partition_file,idx - execute dump_fork_partitions, but append a modifier to the fork_partition_file with the current timestep of the simulator*
  
  - update_CG_map:f_CG - *update coarse-graining with selected factor (f_CG)*
  - dump_CG_map:CG_map_file,f_CG,idx - *dumps CG_map to CG_map_file with selected factor (f_CG) and indexing convention (idx)*

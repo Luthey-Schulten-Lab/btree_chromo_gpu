@@ -74,7 +74,7 @@ struct CG_map
 struct mono_range
 {
   bool wrapped;
-  int ll, ul, mid_ll, mid_ul;
+  int N, ll, ul, mid_ll, mid_ul;
 };
 
 struct fork_partition

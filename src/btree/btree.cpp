@@ -1167,6 +1167,8 @@ void btree::dump_fork_partitions(string fork_partitions_filename, int idx)
   vector<fork_partition> f_ps = get_all_fork_partitions();
   
   fstream f_ps_file;
+  string temp_line;
+  int N_total;
   
   f_ps_file.open(fork_partitions_filename, ios::out);
 
@@ -1177,25 +1179,73 @@ void btree::dump_fork_partitions(string fork_partitions_filename, int idx)
   else
     {
 
+      // write the total number of forks that were partitioned about
       f_ps_file << "N_forks=" << f_ps.size() << endl;
+      // write the indexing convention
       f_ps_file << "idx=" << idx << endl;
 
       for (fork_partition f_p : f_ps)
 	{
-	  f_ps_file << f_p.fork << ","
-		    << f_p.left_monos.size() << ","
-		    << f_p.right_monos.size() << endl;
+
+	  temp_line = f_p.fork + ",";
+	  temp_line += to_string(f_p.left_monos.size()) + ",";
+
+	  N_total = 0;
+	  for (size_t i=0; i<f_p.left_monos.size(); i++)
+	    N_total += f_p.left_monos[i].N;
+	  temp_line += to_string(N_total) + ",";
+	  
+	  temp_line += to_string(f_p.right_monos.size()) + ",";
+
+	  N_total = 0;
+	  for (size_t i=0; i<f_p.right_monos.size(); i++)
+	    N_total += f_p.right_monos[i].N;
+	  temp_line += to_string(N_total);
+	  
+	  f_ps_file << temp_line << endl;
 
 	  for (size_t i=0; i<f_p.left_monos.size(); i++)
 	    {
-	      f_ps_file << f_p.left_monos[i].ll << ","
-			<< f_p.left_monos[i].ul << endl;
+
+	      if (f_p.left_monos[i].wrapped == false)
+		{
+		  temp_line = "\tnw,";
+		}
+	      else
+		{
+		  temp_line = "\tw,";
+		}
+
+	      temp_line += to_string(f_p.left_monos[i].N) + ",";
+	      temp_line += to_string(f_p.left_monos[i].ll) + ",";
+	      temp_line += to_string(f_p.left_monos[i].mid_ll) + ",";
+	      temp_line += to_string(f_p.left_monos[i].mid_ul) + ",";
+	      temp_line += to_string(f_p.left_monos[i].ul);
+
+	      f_ps_file << temp_line << endl;
+	      
 	    }
 
 	  for (size_t i=0; i<f_p.right_monos.size(); i++)
 	    {
-	      f_ps_file << f_p.right_monos[i].ll << ","
-			<< f_p.right_monos[i].ul << endl;
+
+	      if (f_p.right_monos[i].wrapped == false)
+		{
+		  temp_line = "\tnw,";
+		}
+	      else
+		{
+		  temp_line = "\tw,";
+		}
+
+	      temp_line += to_string(f_p.right_monos[i].N) + ",";
+	      temp_line += to_string(f_p.right_monos[i].ll) + ",";
+	      temp_line += to_string(f_p.right_monos[i].mid_ll) + ",";
+	      temp_line += to_string(f_p.right_monos[i].mid_ul) + ",";
+	      temp_line += to_string(f_p.right_monos[i].ul);
+
+	      f_ps_file << temp_line << endl;
+	      
 	    }
 	}
 
@@ -1291,6 +1341,7 @@ fork_partition btree::get_fork_partition(string loc)
       // add the monomer range
       temp_m_r.ll = temp_topo.start;
       temp_m_r.ul = temp_topo.end;
+      temp_m_r.N = temp_m_r.ul - temp_m_r.ll + 1;
       f_p.left_monos.push_back(temp_m_r);
 
     }
@@ -1314,15 +1365,74 @@ fork_partition btree::get_fork_partition(string loc)
       // add the monomer range
       temp_m_r.ll = temp_topo.start;
       temp_m_r.ul = temp_topo.end;
+      temp_m_r.N = temp_m_r.ul - temp_m_r.ll + 1;
       f_p.right_monos.push_back(temp_m_r);
 
     }
 
+  int N;
 
   // perform the correction for the overcounting on the left side
   if (forked_branch->complete == false)
     {
+      
       temp_topo = get_leaf_topo(r_leaves[0]);
+
+      // replication has proceeded past Ter but forks have not met
+      if (temp_topo.start_link >= temp_topo.end_link)
+	{
+	  
+	  f_p.left_monos[0].wrapped = true;
+	  // extended past Ter in ccw direction
+	  if (forked_branch->rho_cw < forked_branch->rho_ccw)
+	    {
+	      f_p.left_monos[0].mid_ll = temp_topo.end_link - 1;
+	      if (temp_topo.start_link < f_p.left_monos[0].ul)
+		{
+		  f_p.left_monos[0].mid_ul = temp_topo.start_link + 1;
+		}
+	      else
+		{
+		  f_p.left_monos[0].ul = -2;
+		  f_p.left_monos[0].mid_ul = -1;
+		}
+	    }
+	  // extended past Ter in cw direction
+	  else
+	    {
+	      f_p.left_monos[0].mid_ul = temp_topo.start_link + 1;
+	      if (temp_topo.end_link > f_p.left_monos[0].ll)
+		{
+		  f_p.left_monos[0].mid_ll = temp_topo.end_link - 1;
+		}
+	      else
+		{
+		  f_p.left_monos[0].ll = -1;
+		  f_p.left_monos[0].mid_ll = -2;
+		}
+	    }
+
+	  // count the number of monomers in the new ranges
+	  N = 0;
+	  for (int i=f_p.left_monos[0].ll; i<(f_p.left_monos[0].mid_ll+1); i++)
+	    {
+	      N += 1;
+	    }
+	  for (int i=f_p.left_monos[0].mid_ul; i<(f_p.left_monos[0].ul+1); i++)
+	    {
+	      N += 1;
+	    }
+	  f_p.left_monos[0].N = N;
+	  
+	}
+      // replication has not proceeded past the Ter
+      else
+	{
+	  f_p.left_monos[0].ll = temp_topo.start_link + 1;
+	  f_p.left_monos[0].ul = temp_topo.end_link - 1;
+	  f_p.left_monos[0].N = f_p.left_monos[0].ul - f_p.left_monos[0].ll + 1;
+	}
+
     }
 
   return f_p;
