@@ -1306,17 +1306,6 @@ fork_partition btree::get_fork_partition(string loc)
   r_leaves.push_back(r_loc);
   r_leaves = traverse_leaves(r_leaves,get_branch(r_loc));
 
-  cout << loc << endl;
-  for (string leaf : l_leaves)
-    {
-      cout << leaf << endl;
-    }
-
-  for (string leaf : r_leaves)
-    {
-      cout << leaf << endl;
-    }
-
   // prepare the monomer ranges
   theta_topo temp_topo;
   mono_range temp_m_r;
@@ -1334,9 +1323,6 @@ fork_partition btree::get_fork_partition(string loc)
       // get the topology of the leaf
       leaf = l_leaves[i_leaf];
       temp_topo = get_leaf_topo(leaf);
-
-      cout << "i_leaf = " << i_leaf << ", "
-	   << "leaf = " << leaf << endl;
 
       // add the monomer range
       temp_m_r.ll = temp_topo.start;
@@ -1358,9 +1344,6 @@ fork_partition btree::get_fork_partition(string loc)
       // get the topology of the leaf
       leaf = r_leaves[i_leaf];
       temp_topo = get_leaf_topo(leaf);
-
-      cout << "i_leaf = " << i_leaf << ", "
-	   << "leaf = " << leaf << endl;
 
       // add the monomer range
       temp_m_r.ll = temp_topo.start;
