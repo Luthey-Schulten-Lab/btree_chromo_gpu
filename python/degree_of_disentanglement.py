@@ -10,28 +10,25 @@ import os
 
 import importlib
 import sys
-import glob
 
 #sys.path.insert(1,'./LAMMPS_helpers')
 #sys.path.append('./LAMMPS_helpers/')
 import LAMMPS_helpers.read_LAMMPS_DNA as r_L_D
 importlib.reload(r_L_D)
-import LAMMPS_helpers.fork_partitions as f_p
-importlib.reload(f_p)
-import segregation_calculations.disentanglement_plotting as de_p
-importlib.reload(de_p)
+import segregation_calculations.disentanglement_plotting as de_plot
+importlib.reload(de_plot)
 
 in_dir = '/home/ben/Data/btree_chromo/partition_testing/'
-in_label = 'partition_noloops_test'
-f_p_label = 'test_noloops_f_p'
+in_label = 'partition_test'
+f_p_label = 'test_f_p'
 min_rep = 1
-max_rep = 2
+max_rep = 3
 
-out_dir = '/home/ben/Data/btree_chromo/partition_testing/'
-out_label = 'partition_test'
+out_dir = '/home/ben/Documents/svn/Minimal_Cell_Chromosome_Organization_2022/tex_figures/disentanglement/raw_plots/'
+out_label = 'loops'
 
-write_DoD = True
-read_DoD = False
+write_DoD = False
+read_DoD = True
 
 if not os.path.isdir(out_dir):
     os.makedirs(out_dir)
@@ -62,10 +59,31 @@ if write_DoD:
 
         f_p_files = in_dir + f_p_label + rep_label + '_*.dat'
       
+        if rep == min_rep:
 
+            DoD = de_plot.new_DoD(R,
+                                  max_rep-min_rep+1,
+                                  ts_DoD.shape[0],
+                                  ts_DoD)
+
+        DoD = de_plot.fill_reps_DoD(DoD,
+                                    traj,
+                                    f_p_files,
+                                    rep-min_rep)
         
-            
+    DoD['d_reps_forks_ts'] = np.where(DoD['d_reps_forks_ts']>0.5,
+                                      2.0*(DoD['d_reps_forks_ts']-0.5),
+                                      0.0)
+        
+    de_plot.write_DoD(DoD_file,DoD)
 
+if read_DoD == True:
+
+    DoD = de_plot.read_DoD(DoD_file)
+            
+DoD_file = out_dir + out_label + '_DoD.pdf'
+
+de_plot.plot_DoD(DoD_file,DoD)
         
         
         

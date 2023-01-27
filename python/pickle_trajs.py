@@ -18,8 +18,8 @@ importlib.reload(r_L_D)
 
 in_dir = '/home/ben/Data/btree_chromo/partition_testing/'
 in_label = 'partition_noloops_test'
-min_rep = 1
-max_rep = 2
+min_rep = 3
+max_rep = 3
 
 out_dir = '/home/ben/Data/btree_chromo/partition_testing/'
 out_label = 'partition_noloops_test'

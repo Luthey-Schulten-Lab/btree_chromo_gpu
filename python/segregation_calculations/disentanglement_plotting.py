@@ -13,6 +13,8 @@ import os
 import pickle
 import glob
 
+from . import fork_partitions as f_p
+
 
 # import matplotlib.font_manager as font_manager
 # font_manager._rebuild()
@@ -64,6 +66,7 @@ def fill_reps_DoD(DoD,traj,f_p_files,i_rep):
         ts_f_ps['ts'][i] = int(t)
 
         f_ps = f_p.fork_partitions()
+        #f_ps = fork_partitions()
         # append an empty fork_partition
         ts_f_ps['fork_partitions'].append(f_ps)
 
@@ -91,7 +94,7 @@ def fill_reps_DoD(DoD,traj,f_p_files,i_rep):
         x = traj[str(DoD['t'][i_t_m])]['DNA']['x']
 
         # get the forks and calculate the DoD
-        forks, d = disentanglement(f_ps,x,R)
+        forks, d = disentanglement(f_ps,x,DoD['R'])
 
         # perform actions for first iteration
         if i_t == 0:
@@ -107,7 +110,7 @@ def fill_reps_DoD(DoD,traj,f_p_files,i_rep):
 
                 if forks[i_fork] == final_forks[j_fork]:
 
-                    d_forks_ts[j_fork,i_t_m] = d_o_d[i_fork]
+                    d_forks_ts[j_fork,i_t_m] = d[i_fork]
 
     if i_rep == 0:
 
@@ -156,14 +159,26 @@ def fill_reps_DoD(DoD,traj,f_p_files,i_rep):
     
     return DoD
 
+def write_DoD(DoD_file,DoD):
+
+    with open(DoD_file,'wb') as f:
+        pickle.dump(DoD,f)
+
+    return
+
+def read_DoD(DoD_file):
+
+    with open(DoD_file,'rb') as f:
+        DoD = pickle.load(f)
+
+    return DoD
+
 def disentanglement(f_ps,x,R):
 
     R2 = np.power(R,2.0)
 
     N_forks = f_ps.get_N_forks()
     forks = f_ps.get_fork_list()
-    print(N_forks)
-    print(forks)
 
     d_o_d = np.zeros((N_forks),dtype=np.double)
 
@@ -273,7 +288,7 @@ def tanh_proximity_fraction(x,N_l,N_r,a_l,a_r,R2):
     phi_l = np.divide(n_s_l,(n_s_l + alpha*n_o_l))
     phi_r = np.divide(n_s_r,(n_s_r + n_o_r/alpha))
 
-    phi_bar_l = np.mean(phi_l)
+    phi_bar_l = np.mean(phi_l) 
     phi_bar_r = np.mean(phi_r)
 
     # print("phi_bar_l = " + str(phi_bar_l))
@@ -334,3 +349,60 @@ def tanh_proximity_opposite(x,N_l,a_l,N_r,a_r,R2):
         n_o_l[i] += np.sum(y)
     
     return n_o_l, n_o_r
+
+
+def plot_DoD(fig_file,DoD):
+
+    cmap = colormaps.get_cmap('cool')
+    c_space = np.linspace(0.0,1.0,DoD['N_forks'])
+
+    fig_size = [87,87]
+
+    fig = plt.figure(figsize=(fig_size[0]*mm,fig_size[1]*mm))
+
+    ax = plt.gca()
+
+    ax.set_xlabel(r'timestep', fontsize=12)
+    ax.set_ylabel(r'degree of disentanglement', fontsize=12)
+
+
+    tick_length = 4.0
+    tick_width = 2.0
+    ax.tick_params(axis='x',labelsize=9,
+                   length=tick_length,
+                   width=tick_width)
+    ax.tick_params(axis='y',labelsize=9,
+                   length=tick_length,
+                   width=tick_width)
+
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    ax.spines['left'].set_linewidth(2.0)
+    ax.spines['bottom'].set_linewidth(2.0)
+
+    ax.set_xlim(xmin=0,xmax=DoD['t'][-1])
+    ax.set_ylim(ymin=0.0,ymax=1.0)
+
+    ax.grid(which='major',axis='y')
+
+    for i_fork in range(DoD['N_forks']):
+
+        temp_color = cmap(c_space[i_fork])
+
+        for i_rep in range(DoD['N_reps']):
+
+            ax.plot(DoD['t'],
+                    DoD['d_reps_forks_ts'][i_rep,i_fork,:],
+                    lw=1.0,
+                    alpha=0.75,
+                    ls='--',
+                    c=temp_color,
+                    zorder=-1)
+
+    plt.tight_layout()
+
+    fig.savefig(fig_file,dpi=300)
+
+    plt.close()
+
+    return
