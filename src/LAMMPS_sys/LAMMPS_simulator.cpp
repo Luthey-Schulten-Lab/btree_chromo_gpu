@@ -1205,7 +1205,14 @@ void LAMMPS_simulator::extra_pots_to_sim_vars()
 }
 
 
-unsigned long LAMMPS_simulator::get_timestep()
+unsigned long LAMMPS_simulator::get_Nt()
 {
   return Nt;
+}
+
+
+void LAMMPS_simulator::increment_Nt(unsigned long dNt)
+{
+  Nt += dNt;
+  reset_timestep_to_Nt();
 }

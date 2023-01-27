@@ -102,7 +102,8 @@ public:
   // switch an extra potential on or off
   void switch_extra_potential(string p, bool s);
 
-  unsigned long get_timestep();
+  unsigned long get_Nt();
+  void increment_Nt(unsigned long dNt);
   
 private:
 

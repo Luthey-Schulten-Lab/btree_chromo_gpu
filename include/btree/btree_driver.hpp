@@ -68,6 +68,7 @@ private:
   void append_replicate_modifier(string &rep_mod, string &mod_param);
   void insert_replicate_modifier(string &rep_mod, string &mod_param);
   string get_timestep_modifier();
+  void append_timestep_modifier(string &ts_mod, string &mod_param);
   void insert_timestep_modifier(string &ts_mod, string &mod_param);
   
   // execute a single command
@@ -94,12 +95,16 @@ private:
   // terminate the directive execution
   int terminate();
 
+  // switch computations on/off
+  int switch_skip_runs(vector<string> &params);
+
   // create a new chromosome
   int new_chromo(vector<string> &params);
   
   // input-ouput
   int input_state(vector<string> &params);
   int output_state(vector<string> &params);
+  int output_state_at_timestep(vector<string> &params);
 
   // transforms
   int transforms_file(vector<string> &params);
@@ -178,6 +183,7 @@ private:
   int simulator_set_delta_t(vector<string> &params);
   int simulator_store_timestep();
   int simulator_restore_timestep();
+  int simulator_increment_timestep(vector<string> &params);
   int simulator_reset_prev_dump_timestep(vector<string> &params);
   int simulator_reset_timestep(vector<string> &params);
   
@@ -195,8 +201,14 @@ private:
 
   // fused commands
   int sys_write_sim_read_LAMMPS_data(vector<string> &params);
+  int sys_write_sim_read_LAMMPS_data_at_timestep(vector<string> &params);
   int simulator_relax_progressive(vector<string> &params);
-  
+
+  ///////////////
+  // variables //
+  ///////////////
+
+  bool skip_runs;
 
   /////////////
   // objects //

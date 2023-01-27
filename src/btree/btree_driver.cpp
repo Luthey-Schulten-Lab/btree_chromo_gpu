@@ -5,6 +5,7 @@ btree_driver::btree_driver()
 {
   driver_bt.reset_root();
   prepare_command_requirements();
+  skip_runs = false;
 }
 
 
@@ -577,6 +578,10 @@ void btree_driver::update_replicate_modified_params(string &rep_mod, string &com
     {
       insert_replicate_modifier(rep_mod,params[0]);
     }
+  else if (command == "output_state_at_timestep")
+    {
+      insert_replicate_modifier(rep_mod,params[0]);
+    }
   else if (command == "dump_topology")
     {
       insert_replicate_modifier(rep_mod,params[0]);
@@ -665,6 +670,14 @@ void btree_driver::update_replicate_modified_params(string &rep_mod, string &com
     {
       append_replicate_modifier(rep_mod,params[0]);
     }
+  else if (command == "sys_write_sim_read_LAMMPS_data")
+    {
+      append_replicate_modifier(rep_mod,params[0]);
+    }
+  else if (command == "sys_write_sim_read_LAMMPS_data_at_timestep")
+    {
+      append_replicate_modifier(rep_mod,params[0]);
+    }
   
 }
 
@@ -694,7 +707,13 @@ void btree_driver::insert_replicate_modifier(string &rep_mod, string &mod_param)
 // get the timestep modifier
 string btree_driver::get_timestep_modifier()
 {
-  return "_t" + to_string(driver_lmp_simulator.get_timestep());
+  return "_t" + to_string(driver_lmp_simulator.get_Nt());
+}
+
+// append the timestep modifier
+void btree_driver::append_timestep_modifier(string &ts_mod, string &mod_param)
+{
+  mod_param = mod_param + ts_mod;
 }
 
 
@@ -729,6 +748,16 @@ void btree_driver::prepare_command_requirements()
   // lock updates
   t_ls.clear();
   lock_updates["terminate"] = t_ls;
+
+  // switch_skip_runs
+  // number of required parameters
+  N_param_reqs["switch_skip_runs"] = 1;
+  // lock tests
+  t_ls.clear();
+  lock_tests["switch_skip_runs"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["switch_skip_runs"] = t_ls;
   
 
   ////////////////////////////////
@@ -772,6 +801,18 @@ void btree_driver::prepare_command_requirements()
   // lock updates
   t_ls.clear();
   lock_updates["output_state"] = t_ls;
+
+  // output_state_at_timestep
+  // number of required parameters
+  N_param_reqs["output_state_at_timestep"] = 1;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("btree_initialized",true));
+  t_ls.push_back(new_lock("simulator_prepared",true));
+  lock_tests["output_state_at_timestep"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["output_state_at_timestep"] = t_ls;
 
   // transforms_file
   // number of required parameters
@@ -1363,6 +1404,17 @@ void btree_driver::prepare_command_requirements()
   t_ls.clear();
   lock_updates["simulator_restore_timestep"] = t_ls;
 
+  // simulator_increment_timestep
+  // number of required parameters
+  N_param_reqs["simulator_increment_timestep"] = 1;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("simulator_prepared",true));
+  lock_tests["simulator_increment_timestep"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["simulator_increment_timestep"] = t_ls;
+
   // simulator_reset_timestep
   // number of required parameters
   N_param_reqs["simulator_reset_timestep"] = 1;
@@ -1613,6 +1665,23 @@ void btree_driver::prepare_command_requirements()
   t_ls.push_back(new_lock("lmp_data_present",true));
   lock_updates["sys_write_sim_read_LAMMPS_data"] = t_ls;
 
+  // sys_write_sim_read_LAMMPS_data_at_timestep
+  // number of required parameters
+  N_param_reqs["sys_write_sim_read_LAMMPS_data_at_timestep"] = 1;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("btree_initialized",true));
+  t_ls.push_back(new_lock("BD_lengths_present",true));
+  t_ls.push_back(new_lock("simulator_prepared",true));
+  t_ls.push_back(new_lock("DNA_model",true));
+  t_ls.push_back(new_lock("output_details",true));
+  t_ls.push_back(new_lock("delta_t",true));
+  lock_tests["sys_write_sim_read_LAMMPS_data_at_timestep"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  t_ls.push_back(new_lock("lmp_data_present",true));
+  lock_updates["sys_write_sim_read_LAMMPS_data_at_timestep"] = t_ls;
+
   // simulator_relax_progressive
   // number of required parameters
   N_param_reqs["simulator_relax_progressive"] = 2;
@@ -1724,6 +1793,12 @@ int btree_driver::execute_single_command(string &command,
   if (command == "terminate")
     {
       error_code = terminate();
+    }
+
+
+  else if (command == "switch_skip_runs")
+    {
+      error_code = switch_skip_runs(params);
     }      
 
 
@@ -1757,6 +1832,13 @@ int btree_driver::execute_single_command(string &command,
   else if (command == "output_state")
     {
       error_code = output_state(params);
+    }
+
+
+  // write the state to an output file
+  else if (command == "output_state_at_timestep")
+    {
+      error_code = output_state_at_timestep(params);
     }
 
       
@@ -2125,6 +2207,13 @@ int btree_driver::execute_single_command(string &command,
     }
 
 
+  // increment simulator's timestep
+  else if (command == "simulator_increment_timestep")
+    {
+      error_code = simulator_increment_timestep(params);
+    }
+
+
   // reset the simulator's timestep to the specified value
   else if (command == "simulator_reset_timestep")
     {
@@ -2262,6 +2351,13 @@ int btree_driver::execute_single_command(string &command,
       error_code = sys_write_sim_read_LAMMPS_data(params);
     }
 
+
+  // write LAMMPS data with system and read LAMMPS data with simulator
+  else if (command == "sys_write_sim_read_LAMMPS_data_at_timestep")
+    {
+      error_code = sys_write_sim_read_LAMMPS_data_at_timestep(params);
+    }
+
   
   // write LAMMPS data with system and read LAMMPS data with simulator
   else if (command == "simulator_relax_progressive")
@@ -2293,6 +2389,25 @@ int btree_driver::terminate()
 }
 
 
+int btree_driver::switch_skip_runs(vector<string> &params)
+{
+  if (params[0] == "T")
+    {
+      skip_runs = true;
+    }
+  else if (params[0] == "F")
+    {
+      skip_runs = false;
+    }
+  else
+    {
+      cout << "ERROR: invalid switch" << endl;
+      return 1;
+    }
+  return 0;
+}
+
+
 int btree_driver::new_chromo(vector<string> &params)
 {
   driver_st.size = stoi(params[0]);
@@ -2314,6 +2429,25 @@ int btree_driver::output_state(vector<string> &params)
 {
   driver_bt.write_state(params[0],driver_bt.dump_state());
   return 0;
+}
+
+
+int btree_driver::output_state_at_timestep(vector<string> &params)
+{
+  int e;
+  string ts_mod = get_timestep_modifier();
+  vector<string> params_w_ts;
+
+  for (string param : params)
+    {
+      params_w_ts.push_back(param);
+    }
+
+  insert_timestep_modifier(ts_mod,params_w_ts[0]);
+  
+  e = output_state(params_w_ts);
+  
+  return e;
 }
 
 
@@ -2943,6 +3077,9 @@ int btree_driver::simulator_minimize(vector<string> &params)
   t_d_p.dump_freq = 0;
   t_d_p.thermo_freq = stoi(params[0]);
 
+  // skip the minimization if skipping runs
+  if (skip_runs == true) return 0;
+
   // run the minimization
   if (HARMONIC_FENE == 0)
     {
@@ -2995,6 +3132,14 @@ int btree_driver::simulator_run(vector<string> &params)
   if (params[4] == "skip_first") t_d_p.write_first = false;
   t_d_p.dump_freq = stoi(params[2]);
   t_d_p.thermo_freq = stoi(params[1]);
+
+  // skip the run if skipping runs
+  if (skip_runs == true)
+    {
+      // still increment timestep for testing
+      driver_lmp_simulator.increment_Nt(stoul(params[0]));
+      return 0;
+    }
 
   // run the Brownian dynamics
   if (HARMONIC_FENE == 0)
@@ -3054,6 +3199,14 @@ int btree_driver::simulator_run_loops(vector<string> &params)
   t_d_p.dump_freq = stoi(params[3]);
   t_d_p.thermo_freq = stoi(params[2]);
 
+  // skip the run if skipping runs
+  if (skip_runs == true)
+    {
+      // still increment timestep for testing
+      driver_lmp_simulator.increment_Nt(stoul(params[1]));
+      return 0;
+    }
+
   driver_lmp_simulator.run_loops(stoi(params[0]),
 				 stoul(params[1]),
 				 t_d_p);
@@ -3072,6 +3225,13 @@ int btree_driver::simulator_store_timestep()
 int btree_driver::simulator_restore_timestep()
 {
   driver_lmp_simulator.restore_Nt();
+  return 0;
+}
+
+
+int btree_driver::simulator_increment_timestep(vector<string> &params)
+{
+  driver_lmp_simulator.increment_Nt(stoul(params[0]));
   return 0;
 }
 
@@ -3128,6 +3288,25 @@ int btree_driver::sys_write_sim_read_LAMMPS_data(vector<string> &params)
 }
 
 
+int btree_driver::sys_write_sim_read_LAMMPS_data_at_timestep(vector<string> &params)
+{
+  int e = 0;
+  string ts_mod = get_timestep_modifier();
+  vector<string> params_w_ts;
+
+  for (string param : params)
+    {
+      params_w_ts.push_back(param);
+    }
+
+  append_timestep_modifier(ts_mod,params_w_ts[0]);
+  
+  e += write_LAMMPS_data(params_w_ts);
+  e += simulator_read_data(params_w_ts);
+  return e;
+}
+
+
 int btree_driver::simulator_relax_progressive(vector<string> &params)
 {
   int e = 0;
@@ -3146,6 +3325,9 @@ int btree_driver::simulator_relax_progressive(vector<string> &params)
   run_params.push_back("0");
   run_params.push_back("noappend");
   run_params.push_back("first");
+
+  // skip the run if skipping runs
+  if (skip_runs == true) return 0;
   
   // store the current timestep
   e += simulator_store_timestep();

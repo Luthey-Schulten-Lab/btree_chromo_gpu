@@ -353,7 +353,7 @@ def tanh_proximity_opposite(x,N_l,a_l,N_r,a_r,R2):
 
 def plot_DoD(fig_file,DoD):
 
-    cmap = colormaps.get_cmap('cool')
+    cmap = colormaps.get_cmap('winter')
     c_space = np.linspace(0.0,1.0,DoD['N_forks'])
 
     fig_size = [87,87]
@@ -368,22 +368,29 @@ def plot_DoD(fig_file,DoD):
 
     tick_length = 4.0
     tick_width = 2.0
-    ax.tick_params(axis='x',labelsize=9,
+    ax.tick_params(labelsize=9,
                    length=tick_length,
-                   width=tick_width)
-    ax.tick_params(axis='y',labelsize=9,
-                   length=tick_length,
-                   width=tick_width)
+                   width=tick_width,
+                   direction='out',
+                   left=True,
+                   right=False,
+                   bottom=True,
+                   top=False)
 
-    ax.spines['right'].set_visible(False)
-    ax.spines['top'].set_visible(False)
+    #ax.spines['right'].set_visible(False)
+    #ax.spines['top'].set_visible(False)
     ax.spines['left'].set_linewidth(2.0)
     ax.spines['bottom'].set_linewidth(2.0)
+    ax.spines['right'].set_linewidth(2.0)
+    ax.spines['top'].set_linewidth(2.0)
+    
 
     ax.set_xlim(xmin=0,xmax=DoD['t'][-1])
     ax.set_ylim(ymin=0.0,ymax=1.0)
 
-    ax.grid(which='major',axis='y')
+    ax.grid(which='major',axis='both',zorder=-4)
+
+    d_means = np.mean(DoD['d_reps_forks_ts'],axis=0)
 
     for i_fork in range(DoD['N_forks']):
 
@@ -394,10 +401,39 @@ def plot_DoD(fig_file,DoD):
             ax.plot(DoD['t'],
                     DoD['d_reps_forks_ts'][i_rep,i_fork,:],
                     lw=1.0,
-                    alpha=0.75,
-                    ls='--',
+                    alpha=0.4,
+                    ls='-',
                     c=temp_color,
-                    zorder=-1)
+                    zorder=-2)
+
+        ax.plot(DoD['t'],
+                d_means[i_fork,:],
+                lw=2.0,
+                alpha=1.0,
+                ls='-',
+                c='w',
+                zorder=1)
+            
+        ax.plot(DoD['t'],
+                d_means[i_fork,:],
+                lw=1.5,
+                alpha=1.0,
+                ls='-',
+                c=temp_color,
+                zorder=2)
+
+        temp_str = DoD['forks'][i_fork]
+
+        x_fork_label = 1.01
+        y_fork_label = d_means[i_fork,-1]
+        ax.annotate(text=r''+temp_str,
+                    xy=(x_fork_label,y_fork_label),
+                    xycoords='axes fraction',
+                    color=temp_color,
+                    va='center',
+                    ha='left')
+
+        
 
     plt.tight_layout()
 

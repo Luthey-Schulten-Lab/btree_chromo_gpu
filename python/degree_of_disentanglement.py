@@ -19,15 +19,15 @@ import segregation_calculations.disentanglement_plotting as de_plot
 importlib.reload(de_plot)
 
 in_dir = '/home/ben/Data/btree_chromo/partition_testing/'
-in_label = 'partition_test'
-f_p_label = 'test_f_p'
+in_label = 'partition_noloops_test'
+f_p_label = 'test_noloops_f_p'
 min_rep = 1
-max_rep = 3
+max_rep = 5
 
 out_dir = '/home/ben/Documents/svn/Minimal_Cell_Chromosome_Organization_2022/tex_figures/disentanglement/raw_plots/'
-out_label = 'loops'
+out_label = 'noloops'
 
-write_DoD = False
+write_DoD = True
 read_DoD = True
 
 if not os.path.isdir(out_dir):
