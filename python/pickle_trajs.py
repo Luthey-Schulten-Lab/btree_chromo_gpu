@@ -16,13 +16,13 @@ import sys
 import LAMMPS_helpers.read_LAMMPS_DNA as r_L_D
 importlib.reload(r_L_D)
 
-in_dir = '/home/ben/Data/btree_chromo/partition_testing/'
-in_label = 'partition_noloops_test'
-min_rep = 4
-max_rep = 5
+in_dir = '/home/ben/Data/btree_chromo/disentanglement_testing/wloops_wotopo/'
+in_label = 'wloops_wotopo'
+min_rep = 1
+max_rep = 2
 
-out_dir = '/home/ben/Data/btree_chromo/partition_testing/'
-out_label = 'partition_noloops_test'
+out_dir = '/home/ben/Data/btree_chromo/disentanglement_testing/wloops_wotopo/'
+out_label = 'wloops_wotopo'
 
 timestep_options = ['Last','FirstLast','Slices','All']
 timestep_select = timestep_options[3]

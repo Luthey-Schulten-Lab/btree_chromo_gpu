@@ -18,14 +18,14 @@ importlib.reload(r_L_D)
 import segregation_calculations.disentanglement_plotting as de_plot
 importlib.reload(de_plot)
 
-in_dir = '/home/ben/Data/btree_chromo/partition_testing/'
-in_label = 'partition_noloops_test'
-f_p_label = 'test_noloops_f_p'
+in_dir = '/home/ben/Data/btree_chromo/disentanglement_testing/wloops_wotopo/'
+in_label = 'wloops_wotopo'
+f_p_label = 'wloops_wotopo_f_p'
 min_rep = 1
-max_rep = 5
+max_rep = 2
 
 out_dir = '/home/ben/Documents/svn/Minimal_Cell_Chromosome_Organization_2022/tex_figures/disentanglement/raw_plots/'
-out_label = 'noloops'
+out_label = 'wloops_wotopo'
 
 write_DoD = True
 read_DoD = True
@@ -35,7 +35,8 @@ if not os.path.isdir(out_dir):
 
 DoD_file = out_dir + out_label + '_DoD.pickle'
 
-ts_DoD = np.arange(500000,2500000+1,50000,dtype=np.int32)
+ts_DoD = np.arange(500000,20000000+1,250000,dtype=np.int32)
+print(ts_DoD)
 R = 4.0*17.0
 ts_DoD = np.sort(ts_DoD)
 

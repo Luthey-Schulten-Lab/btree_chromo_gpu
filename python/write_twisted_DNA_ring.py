@@ -15,21 +15,24 @@ sys.path.insert(1,'./system_preparation')
 import DNA_rings as D_r
 imp.reload(D_r)
 
-out_dir = '/home/ben/Data/btree_chromo/persistence_length_testing/'
-out_label = 'test'
+out_dir = '/home/ben/Data/btree_chromo/theta_example/'
+out_label = 'initial_ring'
 
 # r = 17.0
-# R = 300.0
-# c = 14.0
-#n, x, q = D_r.initialize_ring(r,R,c,10,1.0,1.0)
+# R = 600.0
+# c = 0.91
+r = 17.0
+R = 275.0
+c = 2.0
+n, x, q = D_r.initialize_ring(r,R,c,0.0,1.0,1.0)
 # r = 17.0
 # R = 300.0
 # c = 14.0
 #n, x, q = D_r.initialize_toroid(r,R,c,0,1.0,1.0,100.0,40)
-r = 17.0
-R = 150.0
-c = 3.0
-n, x, q = D_r.initialize_trefoil(r,R,c,0)
+# r = 17.0
+# R = 150.0
+# c = 3.0
+# n, x, q = D_r.initialize_trefoil(r,R,c,0)
 
 print(x.shape)
 

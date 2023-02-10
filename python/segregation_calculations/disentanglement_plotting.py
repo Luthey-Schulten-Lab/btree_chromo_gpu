@@ -85,9 +85,12 @@ def fill_reps_DoD(DoD,traj,f_p_files,i_rep):
 
         # increment backwards to begin with the most replicated state
         i_t_m = DoD['N_t'] - 1 - i_t
+        print('t = ' + str(DoD['t'][i_t_m]))
 
         # select fork_partition from most recent update
         ts_f_p_selected = np.argwhere(ts_f_ps['ts']<DoD['t'][i_t_m])[-1][0]
+        print(ts_f_ps['ts'])
+        print(ts_f_ps['ts'][ts_f_p_selected])
         f_ps = ts_f_ps['fork_partitions'][ts_f_p_selected]
 
         # get the coordinates of the DNA at the timestep
@@ -194,7 +197,7 @@ def disentanglement(f_ps,x,R):
         # print(a_l.shape)
         # print(a_r.shape)
 
-        phi_bar_l, phi_bar_r = tanh_proximity_fraction(x,
+        phi_bar_l, phi_bar_r = step_proximity_fraction(x,
                                                        N_l,
                                                        N_r,
                                                        a_l,
@@ -353,18 +356,27 @@ def tanh_proximity_opposite(x,N_l,a_l,N_r,a_r,R2):
 
 def plot_DoD(fig_file,DoD):
 
-    cmap = colormaps.get_cmap('winter')
-    c_space = np.linspace(0.0,1.0,DoD['N_forks'])
+    cmap = colormaps.get_cmap('RdPu')
+    c_space_lower_lim = 0.5
+    c_space_upper_lim = 1.0
+    c_space = np.linspace(c_space_lower_lim,
+                          c_space_upper_lim,
+                          DoD['N_forks'])
 
-    fig_size = [87,87]
+    #fig_size = [87,87]
+    fig_size = [87/1.5,87/1.5]
 
     fig = plt.figure(figsize=(fig_size[0]*mm,fig_size[1]*mm))
 
     ax = plt.gca()
 
-    ax.set_xlabel(r'timestep', fontsize=12)
-    ax.set_ylabel(r'degree of disentanglement', fontsize=12)
+    #ax.set_xlabel(r'timestep', fontsize=12)
+    #ax.set_ylabel(r'degree of disentanglement', fontsize=12)
 
+    t_trans = DoD['t']/DoD['t'][-1]
+    
+    ax.set_xticks(ticks=[0.0,0.5,1.0],minor=False)
+    ax.set_xticks(ticks=[0.25,0.75],minor=True)
 
     tick_length = 4.0
     tick_width = 2.0
@@ -375,7 +387,20 @@ def plot_DoD(fig_file,DoD):
                    left=True,
                    right=False,
                    bottom=True,
-                   top=False)
+                   top=False,
+                   which='major')
+
+    ax.tick_params(labelsize=9,
+                   length=tick_length/1.5,
+                   width=tick_width/1.5,
+                   direction='out',
+                   left=True,
+                   right=False,
+                   bottom=True,
+                   top=False,
+                   which='minor')
+
+    ax.set_xticklabels(labels=[r'$0$',r'$T_f/2$',r'$T_f$'])
 
     #ax.spines['right'].set_visible(False)
     #ax.spines['top'].set_visible(False)
@@ -385,10 +410,11 @@ def plot_DoD(fig_file,DoD):
     ax.spines['top'].set_linewidth(2.0)
     
 
-    ax.set_xlim(xmin=0,xmax=DoD['t'][-1])
+    ax.set_xlim(xmin=0.0,xmax=t_trans[-1])
     ax.set_ylim(ymin=0.0,ymax=1.0)
 
-    ax.grid(which='major',axis='both',zorder=-4)
+
+    ax.grid(which='both',axis='both',zorder=-4)
 
     d_means = np.mean(DoD['d_reps_forks_ts'],axis=0)
 
@@ -398,7 +424,7 @@ def plot_DoD(fig_file,DoD):
 
         for i_rep in range(DoD['N_reps']):
 
-            ax.plot(DoD['t'],
+            ax.plot(t_trans,
                     DoD['d_reps_forks_ts'][i_rep,i_fork,:],
                     lw=1.0,
                     alpha=0.4,
@@ -406,7 +432,7 @@ def plot_DoD(fig_file,DoD):
                     c=temp_color,
                     zorder=-2)
 
-        ax.plot(DoD['t'],
+        ax.plot(t_trans,
                 d_means[i_fork,:],
                 lw=2.0,
                 alpha=1.0,
@@ -414,7 +440,7 @@ def plot_DoD(fig_file,DoD):
                 c='w',
                 zorder=1)
             
-        ax.plot(DoD['t'],
+        ax.plot(t_trans,
                 d_means[i_fork,:],
                 lw=1.5,
                 alpha=1.0,
@@ -424,8 +450,22 @@ def plot_DoD(fig_file,DoD):
 
         temp_str = DoD['forks'][i_fork]
 
-        x_fork_label = 1.01
-        y_fork_label = d_means[i_fork,-1]
+        # label at start
+        
+        i_label = 0
+        for i in range(t_trans.shape[0]):
+            if d_means[i_fork,i] > 0.0:
+                break
+            else:
+                i_label = i
+
+        x_fork_label = t_trans[i_label] + 0.02
+        y_fork_label = 0.05
+
+        # label at end
+        # x_fork_label = 1.01
+        # y_fork_label = d_means[i_fork,-1]
+        
         ax.annotate(text=r''+temp_str,
                     xy=(x_fork_label,y_fork_label),
                     xycoords='axes fraction',
