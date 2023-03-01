@@ -962,52 +962,52 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
   thermo_dump_parameters t_d_p_iter = t_d_p;
   thermo_dump_parameters t_d_p_topo = t_d_p;
   unsigned long Nt_pre_topo, step_prev_topo;
+  bool first_iteration, new_bonds;
+  
+  // flag for first iteration
+  first_iteration = true;
 
-  sim_to_sys();
-  lmp_sys->initialize_loop_topo(N_loops);
+  // set the previous topology step to the step counter
+  step_prev_topo = step_counter;
 
-  t_d_p_iter.write_first = false;
-  t_d_p_iter.append = true;
+  // prepare the dummy thermo and dump info
   t_d_p_topo.dump_freq = 0;
 
-  step_prev_topo = step_counter;
-  
-  bool new_bonds = true;
-  update_loop_bonds(new_bonds);
-
-  // minimize the system
-  minimize_hard_harmonic(t_d_p_topo);
-  minimize_hard_FENE(t_d_p_topo);
-
-  // run the system with hard pairs and FENE bonds
-  step_increment = min(l_sim_p.freq_loop,N_steps-step_counter);
-
-  // Nt_pre_topo = Nt;
-  // run_hard_harmonic(step_increment/2,t_d_p_topo);
-  // reset_Nt(Nt_pre_topo);
-
-  // cout << "\n\nstep_counter = " << step_counter << endl;
-  // cout << "step_increment = " << step_increment << "\n\n" << endl;
-
-  // run the looped system
-  run_hard_FENE(step_increment,t_d_p);
-
-  step_counter += step_increment;
-
-  new_bonds = false;
-
+  // repeat until the final number of steps is reached
   while (step_counter < N_steps)
     {
 
-      // change the bonds
+      // set the system state to the current simulator state
       sim_to_sys();
+
+      // check if first iteration and perform specific actions
+      if (first_iteration == true)
+	{
+	  lmp_sys->initialize_loop_topo(N_loops);
+	  // enable the initialization of anchors on updating
+	  new_bonds = true;
+	  first_iteration = false;
+	}
+      else
+	{
+	  // disable the re-initialization of anchors on updating
+	  new_bonds = false;
+	  // modify thermo and dump info for subsequent iterations
+	  t_d_p_iter.write_first = false;
+	  t_d_p_iter.append = true;
+	}
       
       // update the loop bonds
       update_loop_bonds(new_bonds);
 
+      // determine the number of steps to be simulated
+      step_increment = min(l_sim_p.freq_loop,N_steps-step_counter);
+
       // simulate topoisomerase action
-      if (step_counter >= (l_sim_p.freq_topo + step_prev_topo))
+      if ((step_counter + step_increment) >=
+	  (step_prev_topo + l_sim_p.freq_topo))
 	{
+	  
 	  // store the timestep
 	  Nt_pre_topo = Nt;
 	  
@@ -1022,21 +1022,18 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
 	  minimize_soft_harmonic(t_d_p_topo);
 	  minimize_soft_FENE(t_d_p_topo);
 
-	  // reset the timestep
+	  // reset the timestep to before the topoisomerase action
 	  reset_Nt(Nt_pre_topo);
 
 	  // reset the previous topo step
-	  step_prev_topo = step_counter;
+	  step_prev_topo = step_counter + step_increment;
 	}
 
       // minimize with hard pair potentials
       minimize_hard_harmonic(t_d_p_topo);
       minimize_hard_FENE(t_d_p_topo);
-      
-      // run for loop freq
-      step_increment = min(l_sim_p.freq_loop,N_steps-step_counter);
 
-      // run the system
+      // run the looped system
       run_hard_FENE(step_increment,t_d_p_iter);
 
       // advance the step counter

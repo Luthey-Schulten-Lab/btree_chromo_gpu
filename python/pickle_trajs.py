@@ -16,13 +16,13 @@ import sys
 import LAMMPS_helpers.read_LAMMPS_DNA as r_L_D
 importlib.reload(r_L_D)
 
-in_dir = '/home/ben/Data/btree_chromo/disentanglement_testing/wloops_wotopo/'
-in_label = 'wloops_wotopo'
+in_dir = '/home/ben/Data/btree_chromo/disentanglement_testing/wextraloops_wotopo/'
+in_label = 'wextraloops_wotopo'
 min_rep = 1
-max_rep = 2
+max_rep = 5
 
-out_dir = '/home/ben/Data/btree_chromo/disentanglement_testing/wloops_wotopo/'
-out_label = 'wloops_wotopo'
+out_dir = '/home/ben/Data/btree_chromo/disentanglement_testing/wextraloops_wotopo/'
+out_label = 'wextraloops_wotopo'
 
 timestep_options = ['Last','FirstLast','Slices','All']
 timestep_select = timestep_options[3]

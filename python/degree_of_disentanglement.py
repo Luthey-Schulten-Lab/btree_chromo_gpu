@@ -18,14 +18,14 @@ importlib.reload(r_L_D)
 import segregation_calculations.disentanglement_plotting as de_plot
 importlib.reload(de_plot)
 
-in_dir = '/home/ben/Data/btree_chromo/disentanglement_testing/wloops_wotopo/'
-in_label = 'wloops_wotopo'
-f_p_label = 'wloops_wotopo_f_p'
+in_dir = '/home/ben/Data/btree_chromo/disentanglement_testing/wextraloops_wotopo/'
+in_label = 'wextraloops_wotopo'
+f_p_label = 'wextraloops_wotopo_f_p'
 min_rep = 1
-max_rep = 2
+max_rep = 5
 
 out_dir = '/home/ben/Documents/svn/Minimal_Cell_Chromosome_Organization_2022/tex_figures/disentanglement/raw_plots/'
-out_label = 'wloops_wotopo'
+out_label = 'wextraloops_wotopo'
 
 write_DoD = True
 read_DoD = True
