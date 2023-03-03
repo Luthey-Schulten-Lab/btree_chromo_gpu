@@ -58,7 +58,7 @@ struct CG_locus
 struct CG_leaf
 {
   string leaf;
-  int start, end;
+  int start, end, mid;
 };
 
 struct CG_map
@@ -190,7 +190,7 @@ private:
   fork_partition get_fork_partition(string loc);
 
   // create centered CG maps per branch
-  void centered_CG_map(vector<CG_locus> &loci, node *branch, int f_CG);
+  void centered_CG_map(int &mid, vector<CG_locus> &loci, node *branch, int f_CG);
 
   // traverse leaves and forks to determine identities
   vector<string> traverse_leaves(vector<string> leaves, node *branch);

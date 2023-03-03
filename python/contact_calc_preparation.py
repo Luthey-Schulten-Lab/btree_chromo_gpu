@@ -8,86 +8,44 @@ import numpy as np
 import time
 import os
 
-import implib
+import importlib
 import sys
 
 import LAMMPS_helpers.read_LAMMPS_DNA as r_L_D
 importlib.reload(r_L_D)
 
-in_dir = '/home/ben/Data/LAMMPS/s1c15_503ribos/s1c15_503ribos_m25000_ml5000_mr5000/'
-in_label = 's1c15_503ribos_m25000_ml5000_mr5000'
+in_dir = '/home/ben/Data/btree_chromo/disentanglement_testing/woloops_wotopo/'
+in_label = 'woloops_wotopo'
 min_rep = 1
-max_rep = 20
+max_rep = 5
 
-out_dir = '/home/ben/Data/contact_maps/s1c15_503ribos_LAMMPS/s1c15_503ribos_m25000_ml5000_mr5000/'
-out_label = 's1c15_503ribos_m25000_ml5000_mr5000'
+out_dir = '/home/ben/Data/contact_maps/btree_chromo/disentanglement_testing/woloops_wotopo/'
+out_label = 'woloops_wotopo'
 
-write_flag = True
-write_coords_flag = True
-timestep_options = ['Last','FirstLast','Slices','All']
-timestep_select = timestep_options[3]
-
-if not os.path.isdir(out_dir) and write_flag:
+if not os.path.isdir(out_dir):
     os.makedirs(out_dir)
 
-# size of chromosome
-genome_size = 54338
+rep_count = 1
 
-genome_features = {}
-unif_gene_size = 1000
+ts_contacts = np.arange(15000000,20000000+1,250000,dtype=np.int32)
 
-gene_starts = np.arange(1,genome_size,unif_gene_size)
-gene_ends = gene_starts + (unif_gene_size - 1)
-gene_ends[-1] = min(gene_ends[-1],genome_size-1)
-
-N_genes = gene_starts.shape[0]
-
-for i_gene in range(N_genes):
-    
-    genome_features['gene {:d}'.format(i_gene)] = [gene_starts[i_gene],gene_ends[i_gene]]
-
-# create mother chromosome
-mother = t_c.chromosome(genome_size,0,genome_features)
-
-mother.read_replication_state(in_dir+in_label+'_chromo_state.txt')
-
-mother.partition_units()
-
-CG_file = out_dir + out_label + '_CGinfo.txt'
-
-if write_flag:
-    
-    mother.write_replication_state(out_dir+out_label+'_chromo_state.txt')
-    mother.write_CG_file(CG_file,50)
-
-rep_count = 0
+write_coords_flag = True
 
 for rep in range(min_rep,max_rep+1):
 
-    in_file = in_dir + in_label + '_rep'+str(rep).zfill(5) + '.lammpstrj'
+    rep_label = '_rep' + str(rep).zfill(5)
 
-    print('LAMMPS trajectory: '+str(in_file))
+    in_file = in_dir + in_label + rep_label + '.pkl_traj'
+
+    print('LAMMPS trajectory: '+ in_file)
 
     if write_coords_flag == True:
-
-        print(timestep_select)
         
-        traj = r_L_D.read_traj(in_file,in_timesteps=timestep_select)
+        traj = r_L_D.read_pickle_traj(in_file)
 
-        # t_target = str(traj['timesteps'][-1])
+        for i_t in range(ts_contacts.shape[0]):
 
-        # out_file = out_dir + 'x_' + out_label +\
-        #     '_t' + str(t_target.zfill(len(str(traj['timesteps'][-1])))) +\
-        #     '_rep' + str(rep).zfill(5) + '.bin'  # output file
-        # print(out_file)
-
-        if rep == min_rep:
-            N_t = traj['timesteps'].shape[0]
-            rep_count += (min_rep-1)*N_t
-
-        for i_t in range(N_t):
-
-            t_target = str(traj['timesteps'][i_t])
+            t_target = str(ts_contacts[i_t])
 
             print(t_target)
     
@@ -104,4 +62,4 @@ for rep in range(min_rep,max_rep+1):
 
                 x.tofile(f)
 
-            rep_count+=1
+            rep_count += 1

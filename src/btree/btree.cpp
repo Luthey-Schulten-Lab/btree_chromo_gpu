@@ -1638,36 +1638,48 @@ CG_map btree::update_CG_map(int f_CG)
   CG_map m;
   CG_leaf temp_CG_leaf;
 
-  int N_leaves = count_total_leaves();
-  int init_size;//, N_CG_leaf;
+  int temp_lb, temp_ub, temp_mid, mid_offset;
+
   vector<string> leaves = get_leaves();
 
   m.f_CG = f_CG;
   m.N_base = root->size;
   m.N = total_size();
 
-  for (int i=0; i<N_leaves; i++)
+  for (size_t i_leaf=0; i_leaf<leaves.size(); i_leaf++)
     {
 
-      init_size = m.loci.size();
+      // get the current number of loci
+      temp_lb = m.loci.size();
 
-      centered_CG_map(m.loci,get_branch(leaves[i]),f_CG);
+      // add loci based on a centered CG map
+      centered_CG_map(temp_mid,m.loci,get_branch(leaves[i_leaf]),f_CG);
 
-      temp_CG_leaf.leaf = leaves[i];
-      temp_CG_leaf.start = init_size;
-      temp_CG_leaf.end = m.loci.size() - 1;
-      // N_CG_leaf = temp_CG_leaf.end - temp_CG_leaf.start + 1;
+      // get the updated number of loci
+      temp_ub = m.loci.size();
 
-      if (i == 0)
+      temp_CG_leaf.leaf = leaves[i_leaf];
+      temp_CG_leaf.start = temp_lb;
+      temp_CG_leaf.end = temp_ub - 1;
+      temp_CG_leaf.mid = temp_mid + temp_lb;
+
+      if (i_leaf == 0)
 	{
+	  // set the base number of CG to the first leaf's number of loci
 	  m.N_base_CG = m.loci.size();
 	}
       else
 	{
 
+	  // calculate the mid offset to correctly align Oris
+	  mid_offset = (m.CG_leaves[0].mid - m.CG_leaves[0].start) - 
+	    (temp_CG_leaf.mid - temp_CG_leaf.start);
+
+	  // correct loci indices for subsequent leaves
 	  for (int j=temp_CG_leaf.start; j<temp_CG_leaf.end+1; j++)
 	    {
 	      m.loci[j].CG += (m.loci[temp_CG_leaf.start-1].CG + 1);
+	      m.loci[j].bCG += mid_offset;
 	      m.loci[j].start += (m.loci[temp_CG_leaf.start-1].end + 1);
 	      m.loci[j].end += (m.loci[temp_CG_leaf.start-1].end + 1);
 	    }
@@ -1685,37 +1697,36 @@ CG_map btree::update_CG_map(int f_CG)
 
 
 // function to create a centered coarse-graining for a single branch
-void btree::centered_CG_map(vector<CG_locus> &loci, node *branch, int f_CG)
+void btree::centered_CG_map(int &mid, vector<CG_locus> &loci, node *branch, int f_CG)
 {
 
   CG_locus l;
-  int N = branch->topo.end - branch->topo.start + 1;
+  // int N = branch->topo.end - branch->topo.start + 1;
   // int ori_idx_m = branch->topo.mid - branch->topo.start;
-  int ori_idx_m = branch->topo.mid - branch->topo.start - 1;
-  int ori_idx_p = ori_idx_m + 1;
+  // int ori_idx_m = branch->topo.mid - branch->topo.start - 1;
+  // int ori_idx_p = ori_idx_m + 1;
+  int ori_idx_m = branch->topo.mid - branch->topo.start;
+  int ori_idx_p = branch->topo.end - branch->topo.mid + 1;
 
   int N_cum, N_CG_cum;
 
   int CG_rem_m, CG_rem_p, N_CG_m, N_CG_p, N_CG;
 
-  CG_rem_m = (ori_idx_m+1)%f_CG;
-  CG_rem_p = (N - ori_idx_p)%f_CG;
+  CG_rem_m = ori_idx_m%f_CG;
+  CG_rem_p = ori_idx_p%f_CG;
 
-  N_CG_m = (ori_idx_m+1)/f_CG;
+  // N_CG_m = (ori_idx_m+1)/f_CG;
+  N_CG_m = ori_idx_m/f_CG;
   if (CG_rem_m > 0) N_CG_m++;
-  N_CG_p = (N - ori_idx_p)/f_CG;
+  // N_CG_p = (N - ori_idx_p)/f_CG;
+  N_CG_p = ori_idx_p/f_CG;
   if (CG_rem_p > 0) N_CG_p++;
 
   N_CG = N_CG_m + N_CG_p;
+  mid = N_CG_m + 1;
 
   N_cum = 0;
   N_CG_cum = 0;
-
-  // cout << "N=" << N << endl;
-  // cout << "ori_idx_m=" <<  ori_idx_m << endl;
-  // cout << "CG_rem_m=" <<  CG_rem_m << endl;
-  // cout << "ori_idx_p=" <<  ori_idx_p << endl;
-  // cout << "CG_rem_p=" <<  CG_rem_p << endl;
 
   while (N_CG_cum < N_CG)
     {
