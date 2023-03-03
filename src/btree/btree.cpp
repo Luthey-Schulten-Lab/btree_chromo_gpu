@@ -1591,7 +1591,7 @@ void btree::dump_CG_map(string CG_filename, int idx, CG_map &m)
 	      << m.N_CG
 	      << endl;
 
-      CG_file << "\nN_leaves = "
+      CG_file << "\n\nN_leaves = "
 	      << m.CG_leaves.size()
 	      << endl;
 
