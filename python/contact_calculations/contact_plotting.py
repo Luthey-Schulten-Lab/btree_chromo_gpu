@@ -11,8 +11,6 @@ import os
 
 import imp
 
-import tree_chromo as t_c
-imp.reload(t_c)
 
 plt.rcParams['text.usetex'] = True
 plt.rcParams['text.latex.preamble'] = r'\usepackage[helvet]{sfmath}'
@@ -155,23 +153,66 @@ def plot_mat(out_dir,out_label,mat,CGinfo,fig_size,norm_flag,thresh,CGinfo_flag,
 
     ax = plt.gca()
 
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+
+
+    # if norm_flag == 'scaled':
+    #     map_norm = matplotlib.colors.Normalize(vmin=0.0, vmax=thresh)
+    # elif norm_flag == 'log':
+    #     map_norm = matplotlib.colors.LogNorm(vmin=np.min(mat), vmax=thresh)
+    # elif norm_flag == 'logmax':
+    #     map_norm = matplotlib.colors.LogNorm(vmin=np.min(mat), vmax=np.max(mat))
+    # else:
+    #     map_norm = matplotlib.colors.Normalize(vmin=0.0, vmax=np.max(mat))
+
     if norm_flag == 'scaled':
-        map_norm = matplotlib.colors.Normalize(vmin=0.0, vmax=thresh)
+        map_norm = matplotlib.colors.Normalize(vmin=0.0, vmax=thresh[1])
     elif norm_flag == 'log':
-        map_norm = matplotlib.colors.LogNorm(vmin=np.min(mat), vmax=thresh)
+        if np.min(mat) <= 0.0:
+            temp_min = mat.flatten()
+            temp_min.sort()
+            temp_min = temp_min[np.argwhere(temp_min>0.0)[0]]
+            mat = np.where(mat==0.0,temp_min,mat)
+        else:
+            temp_min = np.min(mat)
+        temp_max = np.max(mat)
+        print('max = '+str(temp_max))
+        map_norm = matplotlib.colors.LogNorm(vmin=temp_min, vmax=thresh)
     elif norm_flag == 'logmax':
-        map_norm = matplotlib.colors.LogNorm(vmin=np.min(mat), vmax=np.max(mat))
+        if np.min(mat) <= 0.0:
+            temp_min = mat.flatten()
+            temp_min.sort()
+            temp_min = temp_min[np.argwhere(temp_min>0.0)[0]]
+            mat = np.where(mat==0.0,temp_min,mat)
+        else:
+            temp_min = np.min(mat)
+        temp_min = np.percentile(mat,10)
+        temp_max = np.max(mat)
+        print('min = '+str(temp_min))
+        print('max = '+str(temp_max))
+        map_norm = matplotlib.colors.LogNorm(vmin=temp_min, vmax=temp_max)
+    elif norm_flag == 'manual':
+        map_norm = matplotlib.colors.LogNorm(vmin=thresh[0], vmax=thresh[1])
     else:
         map_norm = matplotlib.colors.Normalize(vmin=0.0, vmax=np.max(mat))
 
-    im = ax.imshow(mat,cmap='plasma',norm=map_norm)
+    im = ax.imshow(mat,cmap='binary',norm=map_norm)
 
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="5%", pad=0.1)
 
     cbar = fig.colorbar(im, cax=cax)
-    cbar.set_label(label=r'Contact Frequency', fontsize=8)
+    cbar.set_label(label=r'Contact Frequency', fontsize=7)
     cbar.ax.tick_params(labelsize=6)
+
+
+    s_expand = 0.015*float(CGinfo['N_CG'])
+
+    ax.set_xlim(xmin=0.0-s_expand,xmax=float(CGinfo['N_CG'])+s_expand)
+    ax.set_ylim(ymin=float(CGinfo['N_CG'])+s_expand,ymax=1.0-s_expand)
 
 
     if CGinfo_flag == True:
@@ -189,7 +230,7 @@ def plot_mat(out_dir,out_label,mat,CGinfo,fig_size,norm_flag,thresh,CGinfo_flag,
 
     if overlay_flag == True:
 
-        overlay_color = 'limegreen'
+        overlay_color = 'red'
 
         for i_ter in range(CGinfo['N_ter']):
         # Create a Rectangle patch
@@ -200,7 +241,9 @@ def plot_mat(out_dir,out_label,mat,CGinfo,fig_size,norm_flag,thresh,CGinfo_flag,
             print(xy_anchor)
             print(w)
             print(h)
-            rect = patches.Rectangle(xy=xy_anchor,width=w,height=h,linewidth=0.5,edgecolor=overlay_color,facecolor='none')
+            rect = patches.Rectangle(xy=xy_anchor,width=w,height=h,linewidth=1.75,edgecolor='white',facecolor='none')
+            ax.add_patch(rect)
+            rect = patches.Rectangle(xy=xy_anchor,width=w,height=h,linewidth=1.0,edgecolor=overlay_color,facecolor='none')
             ax.add_patch(rect)
 
             sl = 0.85
@@ -213,27 +256,25 @@ def plot_mat(out_dir,out_label,mat,CGinfo,fig_size,norm_flag,thresh,CGinfo_flag,
             # y = np.array([float(xy_anchor[1])+0.7*float(h)/2.0,float(xy_anchor[1])+0.85*float(h)/2.0],dtype=np.float32)
             # ax.plot(x,y,linewidth=0.25,color=overlay_color)
 
-            if i_ter == 0:
-                xy_anchor = (CGinfo['ter_ranges'][i_ter][0],CGinfo['ter_ranges'][i_ter][1])
-                ax.annotate(text=r''+CGinfo['ter_chromos'][i_ter],xy=xy_anchor,va='bottom',ha='left',fontsize=8,color=overlay_color)
-            else:
-                xy_anchor = (CGinfo['ter_ranges'][i_ter][0],CGinfo['ter_ranges'][i_ter][1])
-                ax.annotate(text=r''+CGinfo['ter_chromos'][i_ter],xy=xy_anchor,va='bottom',ha='right',fontsize=8,color=overlay_color)
+            # if i_ter == 0:
+            #     xy_anchor = (CGinfo['ter_ranges'][i_ter][0],CGinfo['ter_ranges'][i_ter][1])
+            #     ax.annotate(text=r''+CGinfo['ter_chromos'][i_ter],xy=xy_anchor,va='bottom',ha='left',fontsize=6,color=overlay_color)
+            # else:
+            #     xy_anchor = (CGinfo['ter_ranges'][i_ter][0],CGinfo['ter_ranges'][i_ter][1])
+            #     ax.annotate(text=r''+CGinfo['ter_chromos'][i_ter],xy=xy_anchor,va='bottom',ha='right',fontsize=6,color=overlay_color)
+
+            xy_anchor = (CGinfo['ter_ranges'][i_ter][0],CGinfo['ter_ranges'][i_ter][1])
+            ax.annotate(text=r''+CGinfo['ter_chromos'][i_ter],xy=xy_anchor,va='bottom',ha='left',fontsize=6,color=overlay_color)
 
     print(tick_labels)
     print(ticks)
     ax.set_xticks(ticks)
-    ax.set_xticklabels(tick_labels,fontsize=8,ha='left')
+    ax.set_xticklabels(tick_labels,fontsize=6,ha='left')
     ax.set_yticks(ticks)
-    ax.set_yticklabels(tick_labels,fontsize=8,rotation=90,va='center')
+    ax.set_yticklabels(tick_labels,fontsize=6,rotation=90,va='center')
 
-    ax.set_xlabel(r'Relative DNA content',fontsize=10)
-    ax.set_ylabel(r'Relative DNA content',fontsize=10)
-
-    ax.spines['right'].set_visible(False)
-    ax.spines['top'].set_visible(False)
-    ax.spines['left'].set_visible(False)
-    ax.spines['bottom'].set_visible(False)
+    ax.set_xlabel(r'Relative DNA content',fontsize=8)
+    ax.set_ylabel(r'Relative DNA content',fontsize=8)
 
     plt.tight_layout()
 
@@ -247,25 +288,66 @@ def plot_mat_mapped(out_dir,out_label,mat,CGinfo,fig_size,norm_flag,thresh,CGinf
 
     ax = plt.gca()
 
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+
+    # if norm_flag == 'scaled':
+    #     map_norm = matplotlib.colors.Normalize(vmin=0.0, vmax=thresh)
+    # elif norm_flag == 'log':
+    #     map_norm = matplotlib.colors.LogNorm(vmin=np.min(mat), vmax=thresh)
+    # elif norm_flag == 'logmax':
+    #     map_norm = matplotlib.colors.LogNorm(vmin=np.min(mat), vmax=np.max(mat))
+    # else:
+    #     map_norm = matplotlib.colors.Normalize(vmin=0.0, vmax=np.max(mat))
+
     if norm_flag == 'scaled':
-        map_norm = matplotlib.colors.Normalize(vmin=0.0, vmax=thresh)
+        map_norm = matplotlib.colors.Normalize(vmin=0.0, vmax=thresh[1])
     elif norm_flag == 'log':
-        map_norm = matplotlib.colors.LogNorm(vmin=np.min(mat), vmax=thresh)
+        if np.min(mat) <= 0.0:
+            temp_min = mat.flatten()
+            temp_min.sort()
+            temp_min = temp_min[np.argwhere(temp_min>0.0)[0]]
+            mat = np.where(mat==0.0,temp_min,mat)
+        else:
+            temp_min = np.min(mat)
+        temp_max = np.max(mat)
+        print('max = '+str(temp_max))
+        map_norm = matplotlib.colors.LogNorm(vmin=temp_min, vmax=thresh)
     elif norm_flag == 'logmax':
-        map_norm = matplotlib.colors.LogNorm(vmin=np.min(mat), vmax=np.max(mat))
+        if np.min(mat) <= 0.0:
+            temp_min = mat.flatten()
+            temp_min.sort()
+            temp_min = temp_min[np.argwhere(temp_min>0.0)[0]]
+            mat = np.where(mat==0.0,temp_min,mat)
+        else:
+            temp_min = np.min(mat)
+        temp_min = np.percentile(mat,10)
+        temp_max = np.max(mat)
+        print('min = '+str(temp_min))
+        print('max = '+str(temp_max))
+        map_norm = matplotlib.colors.LogNorm(vmin=temp_min, vmax=temp_max)
+    elif norm_flag == 'manual':
+        map_norm = matplotlib.colors.LogNorm(vmin=thresh[0], vmax=thresh[1])
     else:
         map_norm = matplotlib.colors.Normalize(vmin=0.0, vmax=np.max(mat))
 
-    im = ax.imshow(mat,cmap='plasma',norm=map_norm)
+    im = ax.imshow(mat,cmap='binary',norm=map_norm)
 
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="5%", pad=0.1)
 
     cbar = fig.colorbar(im, cax=cax)
-    cbar.set_label(label=r'Contact Frequency', fontsize=8)
+    cbar.set_label(label=r'Contact Frequency', fontsize=7)
     cbar.ax.tick_params(labelsize=6)
 
+    s_expand = 0.015*float(CGinfo['N_base_CG'])
 
+    ax.set_xlim(xmin=0.0-s_expand,xmax=float(CGinfo['N_base_CG'])+s_expand)
+    ax.set_ylim(ymin=float(CGinfo['N_base_CG'])+s_expand,ymax=1.0-s_expand)
+
+    
     if CGinfo_flag == True:
         ticks = np.arange(0.0,1.0+0.02,0.5,dtype=np.float32)
         tick_labels = []
@@ -276,8 +358,8 @@ def plot_mat_mapped(out_dir,out_label,mat,CGinfo,fig_size,norm_flag,thresh,CGinf
 
     if overlay_flag == True:
 
-        overlay_color = 'limegreen'
-        s = 0.9
+        overlay_color = 'red'
+        s = 0.95
 
         for i_ter in range(CGinfo['N_ter']):
             
@@ -291,20 +373,16 @@ def plot_mat_mapped(out_dir,out_label,mat,CGinfo,fig_size,norm_flag,thresh,CGinf
                 x = np.array([xmap,xmap,xmap+s*w],dtype=np.float32)
                 y = np.array([ymap-s*h,ymap,ymap],dtype=np.float32)
 
-                ax.plot(x,y,linewidth=0.25,color=overlay_color,alpha=0.85)
+                ax.plot(x,y,linewidth=1.5,color='white',alpha=1.0)
+                ax.plot(x,y,linewidth=1.0,color=overlay_color,alpha=1.0)
 
     ax.set_xticks(ticks)
-    ax.set_xticklabels(tick_labels,fontsize=8,ha='left')
+    ax.set_xticklabels(tick_labels,fontsize=6,ha='left')
     ax.set_yticks(ticks)
-    ax.set_yticklabels(tick_labels,fontsize=8,rotation=90,va='center')
+    ax.set_yticklabels(tick_labels,fontsize=6,rotation=90,va='center')
 
-    ax.set_xlabel(r'Combined DNA content',fontsize=10)
-    ax.set_ylabel(r'Combined DNA content',fontsize=10)
-
-    ax.spines['right'].set_visible(False)
-    ax.spines['top'].set_visible(False)
-    ax.spines['left'].set_visible(False)
-    ax.spines['bottom'].set_visible(False)
+    ax.set_xlabel(r'Combined DNA content',fontsize=8)
+    ax.set_ylabel(r'Combined DNA content',fontsize=8)
 
     plt.tight_layout()
 
@@ -339,7 +417,7 @@ def plot_mat_abs(out_dir,out_label,mat,CGinfo,fig_size,norm_flag,thresh,CGinfo_f
             mat = np.where(mat==0.0,temp_min,mat)
         else:
             temp_min = np.min(mat)
-            temp_min = np.percentile(mat,10)
+        temp_min = np.percentile(mat,10)
         temp_max = np.max(mat)
         print('min = '+str(temp_min))
         print('max = '+str(temp_max))
