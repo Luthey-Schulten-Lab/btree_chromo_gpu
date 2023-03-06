@@ -736,6 +736,267 @@ def plot_mapping(out_dir,out_label,CGinfo,fig_size,CGinfo_flag,overlay_flag):
 
     return
 
+def plot_mapping_simple(out_dir,out_label,CGinfo,cb_length,fig_size,CGinfo_flag,overlay_flag):
+
+    fig = plt.figure(figsize=(fig_size[0]*mm,fig_size[1]*mm))
+
+    ax = plt.gca()
+
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+
+    s_expand = 0.015*float(CGinfo['N_CG'])
+
+    ax.set_xlim(xmin=0.0-s_expand,xmax=float(CGinfo['N_CG'])+s_expand)
+    ax.set_ylim(ymin=float(CGinfo['N_CG'])+s_expand,ymax=1.0-s_expand)
+
+    map_norm = matplotlib.colors.Normalize(vmin=0.0, vmax=1.0)
+
+    img = np.zeros((CGinfo['N_CG'],CGinfo['N_CG']),dtype=np.single)
+
+    ter_colors = np.zeros((CGinfo['N_ter']),dtype=np.single)
+
+    for i_ter in range(CGinfo['N_ter']):
+
+        CGinfo['ter_ranges'][i_ter] -= 1
+        ter_colors[i_ter] = np.mean(CGinfo['ter_ranges'][i_ter])/CGinfo['N_CG']
+        print(CGinfo['ter_ranges'][i_ter])
+
+    # fill squares
+    for i_ter in range(CGinfo['N_ter']):
+
+        img[CGinfo['ter_ranges'][i_ter][0]:CGinfo['ter_ranges'][i_ter][1]+1,
+            CGinfo['ter_ranges'][i_ter][0]:CGinfo['ter_ranges'][i_ter][1]+1] = ter_colors[i_ter]
+
+    # fill checkerboards
+    for i_ter in range(CGinfo['N_ter']-1):
+
+        row_ter_range = CGinfo['ter_ranges'][i_ter]
+        
+        N_rows = CGinfo['ter_ranges'][i_ter][1] - CGinfo['ter_ranges'][i_ter][0] + 1
+        N_row_cbs = N_rows//cb_length
+        if N_row_cbs*cb_length < N_rows:
+            N_row_cbs += 1
+
+        row_cb_ranges = np.zeros((N_row_cbs,2),dtype=np.int32)
+        row_cb_ranges[0,0] = row_ter_range[0]
+
+        for i in range(N_row_cbs):
+
+            if i != 0:
+                
+                row_cb_ranges[i,0] = row_cb_ranges[i-1,1]
+
+            row_cb_ranges[i,1] = min(row_cb_ranges[i,0]+cb_length,row_cb_ranges[0,0]+N_rows+1)
+        
+        for j_ter in range(i_ter+1,CGinfo['N_ter']):
+
+            col_ter_range = CGinfo['ter_ranges'][j_ter]
+
+            N_cols = CGinfo['ter_ranges'][i_ter][1] - CGinfo['ter_ranges'][i_ter][0] + 1
+            N_col_cbs = N_cols//cb_length
+            if N_col_cbs*cb_length < N_cols:
+                N_col_cbs += 1
+
+            col_cb_ranges = np.zeros((N_col_cbs,2),dtype=np.int32)
+            col_cb_ranges[0,0] = col_ter_range[0]
+
+            for i in range(N_col_cbs):
+
+                if i != 0:
+
+                    col_cb_ranges[i,0] = col_cb_ranges[i-1,1]
+
+                col_cb_ranges[i,1] = min(col_cb_ranges[i,0]+cb_length,col_cb_ranges[0,0]+N_cols+1)
+
+            
+            # select colors for checkerboard
+            if j_ter%2 == 0:
+                c1 = ter_colors[i_ter]
+                c2 = ter_colors[j_ter]
+            else:
+                c1 = ter_colors[j_ter]
+                c2 = ter_colors[i_ter]
+
+            cb_counter = 0
+            for i in range(row_cb_ranges.shape[0]):
+                for j in range(col_cb_ranges.shape[0]):
+
+                    if cb_counter%2 == 0:
+                        cb_color = c1
+                    else:
+                        cb_color = c2
+                        
+                    
+                    img[row_cb_ranges[i,0]:row_cb_ranges[i,1],
+                        col_cb_ranges[j,0]:col_cb_ranges[j,1]] = cb_color
+
+                    img[col_cb_ranges[j,0]:col_cb_ranges[j,1],
+                        row_cb_ranges[i,0]:row_cb_ranges[i,1]] = cb_color
+
+                    cb_counter += 1
+
+            
+
+    im = ax.imshow(img,cmap='viridis',norm=map_norm)
+    
+
+    if CGinfo_flag == True:
+        ticks = np.arange(0.0,float(CGinfo['N_CG'])/CGinfo['N_base_CG']+0.02,0.5,dtype=np.float32)
+        tick_labels = []
+
+        tick_labels.append(r'{:.1f} (ter)'.format(ticks[0]))
+        tick_labels.append(r'{:.1f} (ori)'.format(ticks[1]))
+        tick_labels.append(r'{:.1f} (ter)'.format(ticks[2]))
+        
+        if ticks.shape[0] > 3:
+            for i in range(3,ticks.shape[0]):
+                tick_labels.append(r'{:.1f}'.format(ticks[i]))
+        ticks = ticks*CGinfo['N_base_CG']
+
+    if overlay_flag == True:
+
+        overlay_color = 'red'
+
+        for i_ter in range(CGinfo['N_ter']):
+        # Create a Rectangle patch
+            xy_anchor = (CGinfo['ter_ranges'][i_ter][0],CGinfo['ter_ranges'][i_ter][0])
+            w = CGinfo['ter_ranges'][i_ter][1] - CGinfo['ter_ranges'][i_ter][0] + 1
+            h = CGinfo['ter_ranges'][i_ter][1] - CGinfo['ter_ranges'][i_ter][0] + 1
+
+            print(xy_anchor)
+            print(w)
+            print(h)
+            rect = patches.Rectangle(xy=xy_anchor,width=w,height=h,linewidth=1.75,edgecolor='white',facecolor='none')
+            ax.add_patch(rect)
+            rect = patches.Rectangle(xy=xy_anchor,width=w,height=h,linewidth=1.0,edgecolor=overlay_color,facecolor='none')
+            ax.add_patch(rect)
+
+            sl = 0.85
+            su = 1.0
+            x = np.array([float(xy_anchor[0])+sl*float(w)/2.0,float(xy_anchor[0])+su*float(w)/2.0],dtype=np.float32)
+            y = np.array([float(xy_anchor[1])+(2.0-sl)*float(h)/2.0,float(xy_anchor[1])+(2.0-su)*float(h)/2.0],dtype=np.float32)
+
+            xy_anchor = (CGinfo['ter_ranges'][i_ter][0],CGinfo['ter_ranges'][i_ter][1])
+            ax.annotate(text=r''+CGinfo['ter_chromos'][i_ter],xy=xy_anchor,va='bottom',ha='left',fontsize=6,color=overlay_color)
+
+    print(tick_labels)
+    print(ticks)
+    ax.set_xticks(ticks)
+    ax.set_xticklabels(tick_labels,fontsize=6,ha='left')
+    ax.set_yticks(ticks)
+    ax.set_yticklabels(tick_labels,fontsize=6,rotation=90,va='center')
+
+    ax.set_xlabel(r'Total DNA content',fontsize=8)
+    ax.set_ylabel(r'Total DNA content',fontsize=8)
+
+    #plt.tight_layout()
+
+    fig.savefig(out_dir+out_label+'_mapping.pdf',dpi=300)
+
+    plt.close()
+
+    
+
+    fig = plt.figure(figsize=(fig_size[0]*mm,fig_size[1]*mm))
+
+    ax = plt.gca()
+
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+
+    s_expand = 0.015*float(CGinfo['N_base_CG'])
+
+    ax.set_xlim(xmin=0.0-s_expand,xmax=float(CGinfo['N_base_CG'])+s_expand)
+    ax.set_ylim(ymin=float(CGinfo['N_base_CG'])+s_expand,ymax=1.0-s_expand)
+
+    img_merged = np.zeros((CGinfo['N_base_CG'],CGinfo['N_base_CG']),dtype=np.single)
+
+    print(CGinfo['map'])
+
+    for i_ter in range(CGinfo['N_ter']):
+
+        temp_ter_range = CGinfo['ter_ranges'][i_ter]
+
+        for i in range(temp_ter_range[0],temp_ter_range[1]+1):
+
+            i_m = CGinfo['map'][i,1]
+
+            for j in range(temp_ter_range[0],CGinfo['N_CG']):
+
+                j_m = CGinfo['map'][j,1]
+
+                img_merged[i_m,j_m] = img[i,j]
+                # img_merged[i_m,j_m] = img[j,i]
+
+                # if j > temp_ter_range[1]:
+                #      img_merged[j_m,i_m] = img[i,j]
+                #      img_merged[j_m,i_m] = img[j,i]
+
+    img_merged = np.maximum(img_merged,img_merged.T)
+
+    im_merged = ax.imshow(img_merged,cmap='viridis',norm=map_norm)
+
+    if CGinfo_flag == True:
+        ticks = np.arange(0.0,1.0+0.02,0.5,dtype=np.float32)
+        tick_labels = []
+        tick_labels.append(r'{:.1f} (ter)'.format(ticks[0]))
+        tick_labels.append(r'{:.1f} (ori)'.format(ticks[1]))
+        tick_labels.append(r'{:.1f} (ter)'.format(ticks[2]))
+        ticks = ticks*CGinfo['N_base_CG']
+
+    if overlay_flag == True:
+
+        overlay_color = 'red'
+
+        for i_ter in range(CGinfo['N_ter']):
+        # Create a Rectangle patch
+            x_mapped = CGinfo['map'][CGinfo['ter_ranges'][i_ter][0]][1]
+            y_mapped = CGinfo['map'][CGinfo['ter_ranges'][i_ter][0]][1]
+            xy_anchor = (x_mapped,y_mapped)
+            w = CGinfo['ter_ranges'][i_ter][1] - CGinfo['ter_ranges'][i_ter][0] + 1
+            h = CGinfo['ter_ranges'][i_ter][1] - CGinfo['ter_ranges'][i_ter][0] + 1
+
+            print(xy_anchor)
+            print(w)
+            print(h)
+            rect = patches.Rectangle(xy=xy_anchor,width=w,height=h,linewidth=1.75,edgecolor='white',facecolor='none')
+            ax.add_patch(rect)
+            rect = patches.Rectangle(xy=xy_anchor,width=w,height=h,linewidth=1.0,edgecolor=overlay_color,facecolor='none')
+            ax.add_patch(rect)
+
+            sl = 0.85
+            su = 1.0
+            x = np.array([float(xy_anchor[0])+sl*float(w)/2.0,float(xy_anchor[0])+su*float(w)/2.0],dtype=np.float32)
+            y = np.array([float(xy_anchor[1])+(2.0-sl)*float(h)/2.0,float(xy_anchor[1])+(2.0-su)*float(h)/2.0],dtype=np.float32)
+
+            x_mapped = CGinfo['map'][CGinfo['ter_ranges'][i_ter][0]][1]
+            y_mapped = CGinfo['map'][CGinfo['ter_ranges'][i_ter][1]][1]
+            xy_anchor = (x_mapped,y_mapped)
+            ax.annotate(text=r''+CGinfo['ter_chromos'][i_ter],xy=xy_anchor,va='bottom',ha='left',fontsize=6,color=overlay_color)
+
+    print(tick_labels)
+    print(ticks)
+    ax.set_xticks(ticks)
+    ax.set_xticklabels(tick_labels,fontsize=6,ha='left')
+    ax.set_yticks(ticks)
+    ax.set_yticklabels(tick_labels,fontsize=6,rotation=90,va='center')
+
+    ax.set_xlabel(r'Mapped DNA content',fontsize=8)
+    ax.set_ylabel(r'Mapped DNA content',fontsize=8)
+
+    #plt.tight_layout()
+
+    fig.savefig(out_dir+out_label+'_merged.pdf',dpi=300)
+
+    plt.close()
+
+    return
+
 def plot_mat_mapped_dev(out_dir,out_label,mat,CGinfo,fig_size,CGinfo_flag,overlay_flag):
 
     fig = plt.figure(figsize=(fig_size[0]*mm,fig_size[1]*mm))
