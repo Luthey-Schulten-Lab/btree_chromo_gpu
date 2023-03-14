@@ -146,7 +146,7 @@ def map_matrix(mat,CGinfo):
 
     return mapped_mat
 
-def plot_mat(out_dir,out_label,mat,CGinfo,fig_size,norm_flag,thresh,CGinfo_flag,overlay_flag):
+def plot_mat(out_dir,out_label,mat,CGinfo,fig_size,norm_flag,thresh,CGinfo_flag,overlay_flag,dm_flag):
 
     # fig = plt.figure(figsize=(fig_size[0]*mm,fig_size[1]*mm))
     fig = plt.figure(figsize=(1.15*fig_size[0]*mm,fig_size[1]*mm))
@@ -209,6 +209,27 @@ def plot_mat(out_dir,out_label,mat,CGinfo,fig_size,norm_flag,thresh,CGinfo_flag,
     cbar.ax.tick_params(labelsize=6)
 
 
+    if dm_flag == True:
+        dm = np.mean(np.diagonal(mat))
+        print(dm)
+        arrow = dict()
+        arrow['width'] = 2
+        arrow['headwidth'] = 5
+        arrow['headlength'] = 7
+        arrow['shrink'] = 0.0
+        arrow['ec'] = 'black'
+        arrow['fc'] = 'white'
+        
+        cax.annotate(r'$\frac{\sum_{i}\mathsf{A}_{ii}}{N}=$'+' {:.3f}'.format(dm),
+                     xy=(0.0,dm),
+                     xytext=(-0.5,dm),
+                     xycoords='data',
+                     arrowprops=arrow,
+                     ha='right',
+                     va='center',
+                     fontsize=8)
+
+
     s_expand = 0.015*float(CGinfo['N_CG'])
 
     ax.set_xlim(xmin=0.0-s_expand,xmax=float(CGinfo['N_CG'])+s_expand)
@@ -269,14 +290,14 @@ def plot_mat(out_dir,out_label,mat,CGinfo,fig_size,norm_flag,thresh,CGinfo_flag,
     print(tick_labels)
     print(ticks)
     ax.set_xticks(ticks)
-    ax.set_xticklabels(tick_labels,fontsize=6,ha='left')
+    ax.set_xticklabels(tick_labels,fontsize=6,ha='center')
     ax.set_yticks(ticks)
     ax.set_yticklabels(tick_labels,fontsize=6,rotation=90,va='center')
 
-    ax.set_xlabel(r'Relative DNA content',fontsize=8)
-    ax.set_ylabel(r'Relative DNA content',fontsize=8)
+    ax.set_xlabel(r'Total DNA content',fontsize=8)
+    ax.set_ylabel(r'Total DNA content',fontsize=8)
 
-    plt.tight_layout()
+    # plt.tight_layout()
 
     fig.savefig(out_dir+out_label+'_contacts.pdf',dpi=300)
 
@@ -381,10 +402,10 @@ def plot_mat_mapped(out_dir,out_label,mat,CGinfo,fig_size,norm_flag,thresh,CGinf
     ax.set_yticks(ticks)
     ax.set_yticklabels(tick_labels,fontsize=6,rotation=90,va='center')
 
-    ax.set_xlabel(r'Combined DNA content',fontsize=8)
-    ax.set_ylabel(r'Combined DNA content',fontsize=8)
+    ax.set_xlabel(r'Mapped DNA content',fontsize=8)
+    ax.set_ylabel(r'Mapped DNA content',fontsize=8)
 
-    plt.tight_layout()
+    #plt.tight_layout()
 
     fig.savefig(out_dir+out_label+'_contacts_mapped.pdf',dpi=300)
 
@@ -1089,5 +1110,204 @@ def plot_mat_mapped_dev(out_dir,out_label,mat,CGinfo,fig_size,CGinfo_flag,overla
     plt.tight_layout()
 
     fig.savefig(out_dir+out_label+'_contacts_dev.pdf',dpi=300)
+
+    return
+
+def plot_mat_diff(out_dir,out_label,mat,CGinfo,fig_size,CGinfo_flag,overlay_flag):
+
+    fig = plt.figure(figsize=(1.15*fig_size[0]*mm,fig_size[1]*mm))
+
+    ax = plt.gca()
+
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+
+    # if norm_flag == 'scaled':
+    #     map_norm = matplotlib.colors.Normalize(vmin=0.0, vmax=thresh)
+    # elif norm_flag == 'log':
+    #     map_norm = matplotlib.colors.LogNorm(vmin=np.min(mat), vmax=thresh)
+    # elif norm_flag == 'logmax':
+    #     map_norm = matplotlib.colors.LogNorm(vmin=np.min(mat), vmax=np.max(mat))
+    # else:
+    #     map_norm = matplotlib.colors.Normalize(vmin=0.0, vmax=np.max(mat))
+
+    # mat_max = np.max(mat)
+    # mat_min = np.min(mat)
+    mat_max = np.max(np.abs(mat))
+    mat_min = -mat_max
+    mat_mid = 0.0
+    #mat_mid = (mat_min + mat_max)/2.0
+    dm = np.mean(np.diagonal(mat))
+    print(dm)
+
+    map_norm = matplotlib.colors.TwoSlopeNorm(vmin=mat_min, vcenter=mat_mid, vmax=mat_max)
+
+    im = ax.imshow(mat,cmap='PiYG',norm=map_norm)
+
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.1)
+
+    cbar = fig.colorbar(im, cax=cax, ticks=[-0.1,0,0.1])
+    cbar.set_label(label=r'$(\tilde{\mathsf{A}}-\tilde{\mathsf{B}})_{ij}$ - Mapped Contact Frequency Difference', fontsize=7, labelpad=0)
+    cbar.ax.tick_params(labelsize=6)
+
+    arrow = dict()
+    arrow['width'] = 2
+    arrow['headwidth'] = 5
+    arrow['headlength'] = 7
+    arrow['shrink'] = 0.0
+    arrow['ec'] = 'black'
+    arrow['fc'] = 'white'
+
+    cax.annotate(r'$\frac{\sum_{i}(\tilde{\mathsf{A}}-\tilde{\mathsf{B}})_{ii}}{\tilde{N}}=$'+' {:.3f}'.format(dm),
+                 xy=(-0.11,dm),
+                 xytext=(-0.6,dm),
+                 xycoords='data',
+                 arrowprops=arrow,
+                 ha='right',
+                 va='center',
+                 fontsize=8,
+                 annotation_clip=False)
+
+    s_expand = 0.015*float(CGinfo['N_base_CG'])
+
+    ax.set_xlim(xmin=0.0-s_expand,xmax=float(CGinfo['N_base_CG'])+s_expand)
+    ax.set_ylim(ymin=float(CGinfo['N_base_CG'])+s_expand,ymax=1.0-s_expand)
+
+    
+    if CGinfo_flag == True:
+        ticks = np.arange(0.0,1.0+0.02,0.5,dtype=np.float32)
+        tick_labels = []
+        tick_labels.append(r'{:.1f} (ter)'.format(ticks[0]))
+        tick_labels.append(r'{:.1f} (ori)'.format(ticks[1]))
+        tick_labels.append(r'{:.1f} (ter)'.format(ticks[2]))
+        ticks = ticks*CGinfo['N_base_CG']
+
+    if overlay_flag == True:
+
+        overlay_color = 'red'
+        s = 0.95
+
+        for i_ter in range(CGinfo['N_ter']):
+            
+            if i_ter > 0:
+
+                xmap = float(CGinfo['map'][CGinfo['ter_ranges'][i_ter][0]-1,1])
+                ymap = float(CGinfo['map'][CGinfo['ter_ranges'][i_ter][1]-1,1])
+                w = float(CGinfo['ter_ranges'][i_ter][1] - CGinfo['ter_ranges'][i_ter][0] + 1)
+                h = float(CGinfo['ter_ranges'][i_ter][1] - CGinfo['ter_ranges'][i_ter][0] + 1)
+
+                x = np.array([xmap,xmap,xmap+s*w],dtype=np.float32)
+                y = np.array([ymap-s*h,ymap,ymap],dtype=np.float32)
+
+                ax.plot(x,y,linewidth=1.5,color='white',alpha=1.0)
+                ax.plot(x,y,linewidth=1.0,color=overlay_color,alpha=1.0)
+
+    ax.set_xticks(ticks)
+    ax.set_xticklabels(tick_labels,fontsize=6,ha='left')
+    ax.set_yticks(ticks)
+    ax.set_yticklabels(tick_labels,fontsize=6,rotation=90,va='center')
+
+    ax.set_xlabel(r'Mapped DNA content',fontsize=8)
+    ax.set_ylabel(r'Mapped DNA content',fontsize=8)
+
+    #plt.tight_layout()
+
+    fig.savefig(out_dir+out_label+'_contacts_diff.pdf',dpi=300)
+
+    return
+
+def plot_mat_mapped_simple(out_dir,out_label,mat,CGinfo,fig_size,norm_flag,thresh,CGinfo_flag):
+
+    fig = plt.figure(figsize=(fig_size[0]*mm,fig_size[1]*mm))
+
+    ax = plt.gca()
+
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+
+    # if norm_flag == 'scaled':
+    #     map_norm = matplotlib.colors.Normalize(vmin=0.0, vmax=thresh)
+    # elif norm_flag == 'log':
+    #     map_norm = matplotlib.colors.LogNorm(vmin=np.min(mat), vmax=thresh)
+    # elif norm_flag == 'logmax':
+    #     map_norm = matplotlib.colors.LogNorm(vmin=np.min(mat), vmax=np.max(mat))
+    # else:
+    #     map_norm = matplotlib.colors.Normalize(vmin=0.0, vmax=np.max(mat))
+
+    if norm_flag == 'scaled':
+        map_norm = matplotlib.colors.Normalize(vmin=0.0, vmax=thresh[1])
+    elif norm_flag == 'log':
+        if np.min(mat) <= 0.0:
+            temp_min = mat.flatten()
+            temp_min.sort()
+            temp_min = temp_min[np.argwhere(temp_min>0.0)[0]]
+            mat = np.where(mat==0.0,temp_min,mat)
+        else:
+            temp_min = np.min(mat)
+        temp_max = np.max(mat)
+        print('max = '+str(temp_max))
+        map_norm = matplotlib.colors.LogNorm(vmin=temp_min, vmax=thresh)
+    elif norm_flag == 'logmax':
+        if np.min(mat) <= 0.0:
+            temp_min = mat.flatten()
+            temp_min.sort()
+            temp_min = temp_min[np.argwhere(temp_min>0.0)[0]]
+            mat = np.where(mat==0.0,temp_min,mat)
+        else:
+            temp_min = np.min(mat)
+        temp_min = np.percentile(mat,10)
+        temp_max = np.max(mat)
+        print('min = '+str(temp_min))
+        print('max = '+str(temp_max))
+        map_norm = matplotlib.colors.LogNorm(vmin=temp_min, vmax=temp_max)
+    elif norm_flag == 'manual':
+        map_norm = matplotlib.colors.LogNorm(vmin=thresh[0], vmax=thresh[1])
+    elif norm_flag == 'split':
+        mat = np.sqrt(mat)
+        #mat = -1.0*mat
+        map_norm = matplotlib.colors.TwoSlopeNorm(vmin=-thresh[1], vcenter=0.0, vmax=thresh[1])
+    else:
+        map_norm = matplotlib.colors.Normalize(vmin=0.0, vmax=np.max(mat))
+
+    im = ax.imshow(mat,cmap='PiYG',norm=map_norm)
+
+    s_expand = 0.015*float(CGinfo['N_base_CG'])
+
+    ax.set_xlim(xmin=0.0-s_expand,xmax=float(CGinfo['N_base_CG'])+s_expand)
+    ax.set_ylim(ymin=float(CGinfo['N_base_CG'])+s_expand,ymax=1.0-s_expand)
+
+    mat_max = np.max(np.abs(mat))
+
+    print(mat_max)
+
+    
+    if CGinfo_flag == True:
+        ticks = np.arange(0.0,1.0+0.02,0.5,dtype=np.float32)
+        tick_labels = []
+        tick_labels.append(r'{:.1f} (ter)'.format(ticks[0]))
+        tick_labels.append(r'{:.1f} (ori)'.format(ticks[1]))
+        tick_labels.append(r'{:.1f} (ter)'.format(ticks[2]))
+        ticks = ticks*CGinfo['N_base_CG']
+
+    ax.set_xticks(ticks)
+    ax.set_xticklabels(tick_labels,fontsize=6,ha='left')
+    ax.set_yticks(ticks)
+    ax.set_yticklabels(tick_labels,fontsize=6,rotation=90,va='center')
+
+    ax.set_xlabel(r'Mapped DNA content',fontsize=8)
+    ax.set_ylabel(r'Mapped DNA content',fontsize=8)
+
+    ax.axis('off')
+    
+    plt.tight_layout()
+
+    fig.savefig(out_dir+out_label+'_contacts_mapped_simple.pdf',dpi=300)
+
+    plt.close()
 
     return
