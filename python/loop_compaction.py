@@ -73,7 +73,7 @@ if read_RoG == True:
 
     RoG = c_s.read_RoG(RoG_file)
             
-RoG_file = out_dir + out_label + '_RoG.pdf'
+RoG_file = out_dir + out_label + '_RoG.png'
 
 c_s.plot_RoG(RoG_file,RoG)
         

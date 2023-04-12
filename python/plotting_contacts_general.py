@@ -25,22 +25,25 @@ out_label = 'wextraloops_wotopo'
 
 mat = c_plot.read_matrix(in_dir,in_label,True)
 
+print(np.max(mat))
+
 CGinfo = c_plot.read_CGinfo_file(CGinfo_file)
 
 mapped_mat = c_plot.read_matrix(in_dir,'mapped_'+in_label,True)
 
-thresh = [1.0E-6,5.0E-1]
+#thresh = [1.0E-6,5.0E-1] # mat_mapped_simple
+thresh = [0.0,1.6E-1] # mat
 
-#norm_flag = 'manual'
-#norm_flag = 'scaled'
+#norm_flag = 'manual' 
+norm_flag = 'scaled' # mat
 #norm_flag = 'logmax'
-norm_flag = 'split'
+#norm_flag = 'split' # mat_mapped_simple
 
-#c_plot.plot_mat(out_dir,out_label,mat,CGinfo,[80,80],norm_flag,thresh,True,True,True)
+c_plot.plot_mat(out_dir,out_label,mat,CGinfo,[80,80],norm_flag,thresh,True,True,True)
 
 #c_plot.plot_mat_mapped(out_dir,out_label,mapped_mat,CGinfo,[80,80],norm_flag,thresh,True,False)
 
-c_plot.plot_mat_mapped_simple(out_dir,out_label,mapped_mat,CGinfo,[80,80],norm_flag,thresh,True)
+#c_plot.plot_mat_mapped_simple(out_dir,out_label,mapped_mat,CGinfo,[80,80],norm_flag,thresh,True)
 
 #c_plot.plot_mat_mapped_dev(out_dir,out_label,mapped_mat,CGinfo,[87,87],True,True)
 

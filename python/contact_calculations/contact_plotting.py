@@ -299,7 +299,8 @@ def plot_mat(out_dir,out_label,mat,CGinfo,fig_size,norm_flag,thresh,CGinfo_flag,
 
     # plt.tight_layout()
 
-    fig.savefig(out_dir+out_label+'_contacts.pdf',dpi=300)
+    #fig.savefig(out_dir+out_label+'_contacts.pdf',dpi=300)
+    fig.savefig(out_dir+out_label+'_contacts.png',dpi=300)
 
     return
 
@@ -1215,7 +1216,7 @@ def plot_mat_diff(out_dir,out_label,mat,CGinfo,fig_size,CGinfo_flag,overlay_flag
 
     #plt.tight_layout()
 
-    fig.savefig(out_dir+out_label+'_contacts_diff.pdf',dpi=300)
+    fig.savefig(out_dir+out_label+'_contacts_diff.png',dpi=300)
 
     return
 
@@ -1269,7 +1270,7 @@ def plot_mat_mapped_simple(out_dir,out_label,mat,CGinfo,fig_size,norm_flag,thres
         map_norm = matplotlib.colors.LogNorm(vmin=thresh[0], vmax=thresh[1])
     elif norm_flag == 'split':
         mat = np.sqrt(mat)
-        #mat = -1.0*mat
+        mat = -1.0*mat
         map_norm = matplotlib.colors.TwoSlopeNorm(vmin=-thresh[1], vcenter=0.0, vmax=thresh[1])
     else:
         map_norm = matplotlib.colors.Normalize(vmin=0.0, vmax=np.max(mat))
@@ -1306,7 +1307,8 @@ def plot_mat_mapped_simple(out_dir,out_label,mat,CGinfo,fig_size,norm_flag,thres
     
     plt.tight_layout()
 
-    fig.savefig(out_dir+out_label+'_contacts_mapped_simple.pdf',dpi=300)
+    #fig.savefig(out_dir+out_label+'_contacts_mapped_simple.pdf',dpi=300)
+    fig.savefig(out_dir+out_label+'_contacts_mapped_simple.png',dpi=300)
 
     plt.close()
 

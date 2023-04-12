@@ -39,7 +39,7 @@ print('dm_m={:.3f}\n'.format(dm_m))
 
 mat = mat_m - mat_p
 
-thresh = [1.0E-6,1.0E-1]
+thresh = [1.0E-6,1.0E-2]
 
 #norm_flag = 'manual'
 norm_flag = 'scaled'
