@@ -14,20 +14,21 @@ import sys
 import LAMMPS_helpers.read_LAMMPS_DNA as r_L_D
 importlib.reload(r_L_D)
 
-in_dir = '/home/ben/Data/btree_chromo/disentanglement_testing/woloops_wotopo/'
-in_label = 'woloops_wotopo'
+in_dir = '/home/ben/Data/btree_chromo/disentanglement_testing/wextraloops_wotopo/'
+in_label = 'wextraloops_wotopo'
 min_rep = 1
 max_rep = 5
 
-out_dir = '/home/ben/Data/contact_maps/btree_chromo/disentanglement_testing/woloops_wotopo/'
-out_label = 'woloops_wotopo'
+out_dir = '/home/ben/Data/contact_maps/btree_chromo/disentanglement_testing/wextraloops_wotopo/'
+out_label = 'wextraloops_wotopo'
 
 if not os.path.isdir(out_dir):
     os.makedirs(out_dir)
 
 rep_count = 1
 
-ts_contacts = np.arange(15000000,20000000+1,250000,dtype=np.int32)
+#ts_contacts = np.arange(15000000,20000000+1,250000,dtype=np.int32)
+ts_contacts = np.arange(15000000,20000000+1,50000,dtype=np.int32)
 
 write_coords_flag = True
 

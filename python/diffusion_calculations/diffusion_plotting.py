@@ -481,7 +481,7 @@ def shell_MSD_calc_diffusion(shell_MSD,dt,lims):
 
     return shell_MSD
 
-def plot_shell_MSD_reps(fig_file,shell_MSD,dt,lims,species_select):
+def plot_shell_MSD_reps(fig_file,fig_filetype,shell_MSD,dt,lims,species_select):
 
     A_to_micro = 1.0E+4 # A/mu
     ns_to_s = 1.0E+9 # ns/s
@@ -593,14 +593,17 @@ def plot_shell_MSD_reps(fig_file,shell_MSD,dt,lims,species_select):
 
     #plt.grid()
 
-    new_fig_file = fig_file.strip('.pdf')
-    new_fig_file = new_fig_file + '_' + species_select + '.pdf'
+    # new_fig_file = fig_file.strip('.pdf')
+    # new_fig_file = new_fig_file + '_' + species_select + '.pdf'
+
+    new_fig_file = fig_file + '_' + species_select
+    new_fig_file = new_fig_file + fig_filetype
 
     fig.savefig(new_fig_file,dpi=300)
 
     return
 
-def plot_shell_law_reps(fig_file,shell_MSD,dt,lims,species_select):
+def plot_shell_law_reps(fig_file,fig_filetype,shell_MSD,dt,lims,species_select):
 
     A_to_micro = 1.0E+4 # A/mu
     ns_to_s = 1.0E+9 # ns/s
@@ -723,14 +726,17 @@ def plot_shell_law_reps(fig_file,shell_MSD,dt,lims,species_select):
 
     #plt.grid()
 
-    new_fig_file = fig_file.strip('.pdf')
-    new_fig_file = new_fig_file + '_' + species_select + '.pdf'
+    # new_fig_file = fig_file.strip('.pdf')
+    # new_fig_file = new_fig_file + '_' + species_select + '.pdf'
+
+    new_fig_file = fig_file + '_' + species_select
+    new_fig_file = new_fig_file + fig_filetype
 
     fig.savefig(new_fig_file,dpi=300)
 
     return
 
-def plot_shell_diff_vs_density_reps(fig_file,shell_MSD,species_select):
+def plot_shell_diff_vs_density_reps(fig_file,fig_filetype,shell_MSD,species_select):
 
     A_to_micro = 1.0E+4 # A/mu
     ns_to_s = 1.0E+9 # ns/s
@@ -813,14 +819,17 @@ def plot_shell_diff_vs_density_reps(fig_file,shell_MSD,species_select):
 
     #plt.grid()
 
-    new_fig_file = fig_file.strip('.pdf')
-    new_fig_file = new_fig_file + '_' + species_select + '.pdf'
+    # new_fig_file = fig_file.strip('.pdf')
+    # new_fig_file = new_fig_file + '_' + species_select + '.pdf'
+
+    new_fig_file = fig_file + '_' + species_select
+    new_fig_file = new_fig_file + fig_filetype
 
     fig.savefig(new_fig_file,dpi=300)
 
     return
 
-def plot_shell_law_vs_density_reps(fig_file,shell_MSD,species_select):
+def plot_shell_law_vs_density_reps(fig_file,fig_filetype,shell_MSD,species_select):
 
     A_to_micro = 1.0E+4 # A/mu
     ns_to_s = 1.0E+9 # ns/s
@@ -900,14 +909,17 @@ def plot_shell_law_vs_density_reps(fig_file,shell_MSD,species_select):
 
     #plt.grid()
 
-    new_fig_file = fig_file.strip('.pdf')
-    new_fig_file = new_fig_file + '_' + species_select + '.pdf'
+    # new_fig_file = fig_file.strip('.pdf')
+    # new_fig_file = new_fig_file + '_' + species_select + '.pdf'
+
+    new_fig_file = fig_file + '_' + species_select
+    new_fig_file = new_fig_file + fig_filetype
 
     fig.savefig(new_fig_file,dpi=300)
 
     return
 
-def plot_shell_diff_vs_diff_reps(fig_file,shell_MSD):
+def plot_shell_diff_vs_diff_reps(fig_file,fig_filetype,shell_MSD):
 
     A_to_micro = 1.0E+4 # A/mu
     ns_to_s = 1.0E+9 # ns/s
@@ -984,7 +996,7 @@ def plot_shell_diff_vs_diff_reps(fig_file,shell_MSD):
                                       edgecolor='white',
                                       fill=False,
                                       alpha=0.95,
-                                      linewidth=2.25,
+                                      linewidth=2.75,
                                       zorder=2)
 
         cov_ellipses.append(cov_ellipse)
@@ -997,7 +1009,7 @@ def plot_shell_diff_vs_diff_reps(fig_file,shell_MSD):
                                       edgecolor=temp_color,
                                       fill=False,
                                       alpha=0.95,
-                                      linewidth=1.25,
+                                      linewidth=1.75,
                                       linestyle='-',
                                       zorder=3)
 
@@ -1020,11 +1032,11 @@ def plot_shell_diff_vs_diff_reps(fig_file,shell_MSD):
 
     #plt.grid()
 
-    fig.savefig(fig_file,dpi=300)
+    fig.savefig(fig_file+fig_filetype,dpi=300)
 
     return
 
-def plot_shell_law_vs_law_reps(fig_file,shell_MSD):
+def plot_shell_law_vs_law_reps(fig_file,fig_filetype,shell_MSD):
 
     A_to_micro = 1.0E+4 # A/mu
     ns_to_s = 1.0E+9 # ns/s
@@ -1101,7 +1113,7 @@ def plot_shell_law_vs_law_reps(fig_file,shell_MSD):
                                       edgecolor='white',
                                       fill=False,
                                       alpha=0.95,
-                                      linewidth=2.25,
+                                      linewidth=2.75,
                                       zorder=2)
 
         cov_ellipses.append(cov_ellipse)
@@ -1114,7 +1126,7 @@ def plot_shell_law_vs_law_reps(fig_file,shell_MSD):
                                       edgecolor=temp_color,
                                       fill=False,
                                       alpha=0.95,
-                                      linewidth=1.25,
+                                      linewidth=1.75,
                                       linestyle='-',
                                       zorder=3)
 
@@ -1138,7 +1150,7 @@ def plot_shell_law_vs_law_reps(fig_file,shell_MSD):
 
     #plt.grid()
 
-    fig.savefig(fig_file,dpi=300)
+    fig.savefig(fig_file+fig_filetype,dpi=300)
 
     return
 

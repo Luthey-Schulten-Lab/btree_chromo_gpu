@@ -26,6 +26,8 @@ max_rep = 50
 out_dir = '/home/ben/Documents/svn/Minimal_Cell_Chromosome_Organization_2022/tex_figures/diffusion/raw_plots/'
 out_label = 'diffusion_no_interactions'
 
+fig_filetype = ".png"
+
 write_shell_diff = False
 read_shell_diff = True
 
@@ -70,60 +72,70 @@ if read_shell_diff == True:
 shell_MSD = d_plot.shell_MSD_calc_diffusion(shell_MSD,dt,[100,200])
     
 
-shell_MSD_fig_file = out_dir + out_label + '_shellMSD.pdf'
+shell_MSD_fig_file = out_dir + out_label + '_shellMSD'
 
 d_plot.plot_shell_MSD_reps(shell_MSD_fig_file,
+                           fig_filetype,
                            shell_MSD,
                            dt,
                            [50,100],
                            'DNA')
 
 d_plot.plot_shell_MSD_reps(shell_MSD_fig_file,
+                           fig_filetype,
                            shell_MSD,
                            dt,
                            [50,100],
                            'ribo')
 
-shell_law_fig_file = out_dir + out_label + '_law.pdf'
+shell_law_fig_file = out_dir + out_label + '_law'
 
 d_plot.plot_shell_law_reps(shell_law_fig_file,
+                           fig_filetype,
                            shell_MSD,
                            dt,
                            [50,100],
                            'DNA')
 
 d_plot.plot_shell_law_reps(shell_law_fig_file,
+                           fig_filetype,
                            shell_MSD,
                            dt,
                            [50,100],
                            'ribo')
 
-shell_diff_vs_density_fig_file = out_dir + out_label + '_DiffvDensity.pdf'
+shell_diff_vs_density_fig_file = out_dir + out_label + '_DiffvDensity'
 
 d_plot.plot_shell_diff_vs_density_reps(shell_diff_vs_density_fig_file,
-                           shell_MSD,
-                           'DNA')
+                                       fig_filetype,
+                                       shell_MSD,
+                                       'DNA')
 
 d_plot.plot_shell_diff_vs_density_reps(shell_diff_vs_density_fig_file,
+                                       fig_filetype,
                                        shell_MSD,
                                        'ribo')
 
-shell_law_vs_density_fig_file = out_dir + out_label + '_LawvDensity.pdf'
+shell_law_vs_density_fig_file = out_dir + out_label + '_LawvDensity'
 
 d_plot.plot_shell_law_vs_density_reps(shell_law_vs_density_fig_file,
-                           shell_MSD,
-                           'DNA')
+                                      fig_filetype,
+                                      shell_MSD,
+                                      'DNA')
 
 d_plot.plot_shell_law_vs_density_reps(shell_law_vs_density_fig_file,
-                                       shell_MSD,
-                                       'ribo')
+                                      fig_filetype,
+                                      shell_MSD,
+                                      'ribo')
 
-shell_diff_vs_diff_fig_file = out_dir + out_label + '_DiffvDiff.pdf'
+shell_diff_vs_diff_fig_file = out_dir + out_label + '_DiffvDiff'
 
 d_plot.plot_shell_diff_vs_diff_reps(shell_diff_vs_diff_fig_file,
+                                    fig_filetype,
                                     shell_MSD)
 
-shell_law_vs_law_fig_file = out_dir + out_label + '_LawvLaw.pdf'
+shell_law_vs_law_fig_file = out_dir + out_label + '_LawvLaw'
 
 d_plot.plot_shell_law_vs_law_reps(shell_law_vs_law_fig_file,
+                                  fig_filetype,
                                   shell_MSD)

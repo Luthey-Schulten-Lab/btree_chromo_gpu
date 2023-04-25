@@ -276,8 +276,9 @@ def plot_shell_RDFs(fig_file,shell_RDF,res):
         y = eval_cheb_RDF(shell_RDF['Rc'],a,x)
         sigma_val = eval_cheb_RDF(shell_RDF['Rc'],a,10.0*sigma)
 
+        # lw 2.0
         ax.plot(x/10,y,
-                lw=2.0,
+                lw=2.5,
                 alpha=1.0,
                 ls='-',
                 c=temp_color,
@@ -285,9 +286,10 @@ def plot_shell_RDFs(fig_file,shell_RDF,res):
 
         x_sigma = np.array([sigma,sigma,0.0],dtype=np.double)
         y_sigma = np.array([0.0,sigma_val,sigma_val],dtype=np.double)
-        
+
+        # lw 1.5
         ax.plot(x_sigma,y_sigma,
-                lw=1.5,
+                lw=2.0,
                 alpha=0.75,
                 ls='--',
                 c=temp_color,
