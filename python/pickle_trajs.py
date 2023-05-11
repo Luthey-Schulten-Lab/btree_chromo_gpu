@@ -16,17 +16,21 @@ import sys
 import LAMMPS_helpers.read_LAMMPS_DNA as r_L_D
 importlib.reload(r_L_D)
 
-in_dir = '/mnt/HDD_linux/Data/btree_chromo/disentanglement_testing/woloops_wotopo/'
-in_label = 'woloops_wotopo'
+# in_dir = '/mnt/HDD_linux/Data/btree_chromo/disentanglement_testing/woloops_wotopo/'
+# in_label = 'woloops_wotopo'
 #in_dir = '/mnt/HDD_linux/Data/btree_chromo/loop_compaction_testing/loops_25/'
 #in_label = 'loops_25'
-min_rep = 5
-max_rep = 5
+in_dir = '/home/ben/Data/btree_chromo/small_system_Jan/'
+in_label = 'woloops_wotopo'
+min_rep = 1
+max_rep = 10
 
-out_dir = '/mnt/HDD_linux/Data/btree_chromo/disentanglement_testing/woloops_wotopo/'
-out_label = 'woloops_wotopo'
+# out_dir = '/mnt/HDD_linux/Data/btree_chromo/disentanglement_testing/woloops_wotopo/'
+# out_label = 'woloops_wotopo'
 #out_dir = '/mnt/HDD_linux/Data/btree_chromo/loop_compaction_testing/loops_25/'
 #out_label = 'loops_25'
+out_dir = '/home/been/Data/btree_chromo/small_system_Jan/'
+out_label = 'woloops_wotopo'
 
 timestep_options = ['Last','FirstLast','Slices','All']
 timestep_select = timestep_options[3]
