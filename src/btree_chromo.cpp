@@ -1,5 +1,5 @@
 #include <btree/btree_driver.hpp>
-#include <program.hpp>
+#include <btree_chromo.hpp>
 
 int main(int argc, char *argv[])
 {
@@ -7,10 +7,10 @@ int main(int argc, char *argv[])
   int error_code = 0;
   btree_driver driver;
 
-  if (argc == 1)
+  if (argc != 2)
     {
       cout << "ERROR: missing directive file as command-line argument" << endl;
-      return 0;
+      return 1;
     }
 
   string drctv_filename(argv[argc-1]);

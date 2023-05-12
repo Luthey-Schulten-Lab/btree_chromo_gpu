@@ -1043,7 +1043,7 @@ void btree::solve_topology()
 		  else
 		    {
 		      free_branch->topo.start_link = link_branch->topo.end +
-			((mid - query_branch->rho_ccw) - link_branch->topo.start);
+			((mid - query_branch->rho_ccw) - link_branch->topo.start); // BRG - caution
 		    }
 		  // determine the end link
 		  free_branch->topo.end_link = mid + 1;
@@ -1077,8 +1077,10 @@ void btree::solve_topology()
 		    }
 		  else
 		    {
-		      free_branch->topo.start_link = link_branch->topo.end +
-			((mid - query_branch->rho_ccw) - link_branch->topo.start);
+		      // free_branch->topo.start_link = link_branch->topo.end +
+		      // 	((mid - query_branch->rho_ccw) - link_branch->topo.start); // BRG - caution
+
+		      free_branch->topo.start_link = link_branch->topo.start;
 		    }
 
 		  // determine the end link
