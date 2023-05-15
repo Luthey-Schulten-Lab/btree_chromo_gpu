@@ -10,21 +10,21 @@ Upon execution a **btree_driver** executes a series of directives stored in a fi
 
 The **btree_driver** contains the following objects.
 
-- btree - *a specialized binary tree class representing replicating circular dsDNA in nested theta structures that can only be manipulated using public member functions representing processes physically possible for circular dsDNA*
+- **btree** - *a specialized binary tree class representing replicating circular dsDNA in nested theta structures that can only be manipulated using public member functions representing processes physically possible for circular dsDNA*
 
-  	To understand the terminology that will be used to describe replication of circular dsDNA within the program, visualize an analog clock mirrored over the horizontal axis - the *Ori* is at 6 (top) and the *Ter* is at 12 (bottom), monomers are indexed in ascending order (1 -> 12) in the clockwise direction; two replication forks travel in the clockwise (cw) and counter-clockwise (ccw) from the *Ori* towards the *Ter* until they collide. Newly created dsDNA is indexed in ascending order beginning from the end linked to the ccw replication fork to the opposite end of the strand linked to the cw replication fork.
+  	To understand the terminology that will be used to describe replication of circular dsDNA within the program, visualize an analog clock that has been rotated 180 degrees - the *Ori* is at 6 (top) and the *Ter* is at 12 (bottom), monomers are indexed in ascending order (1 -> 12) in the clockwise direction; two replication forks travel in the clockwise (cw, 6->5->4->...) and counter-clockwise (ccw, 6->7->->8->...) from the *Ori* towards the *Ter* until they collide. Newly created dsDNA is indexed in ascending order beginning from the end linked to the ccw replication fork to the opposite end of the strand linked to the cw replication fork.
 
   1) determines topology when system is represented as circular(/theta structure) polymers (for arbitrary replication states)
   2) counts genome features at nucleotide resolution (for arbitrary replication states)
   3) prepares coarse-graining into chromosomal loci for contact map calculations (for arbitrary replication states)
 
-- replicator - *a class containing a stochastic chemical kinetics model for DNA replication initiation due to DnaA, which then simulates trajectories in the space of replication states using the Gillespie method*
+- **replicator** - *a class containing a stochastic chemical kinetics model for DNA replication initiation due to DnaA, which then simulates trajectories in the space of replication states using the Gillespie method*
        
-- LAMMPS_sys - *a class storing the spatial (and other) information of a system of replicating circular dsDNA (monomers of ellipsoidal), ribosomes (ellipsoidal particles), and boundary particles (point-like particles) for use in Brownian dynamics simulations using LAMMPS*
+- **LAMMPS_sys** - *a class storing the spatial (and other) information of a system of replicating circular dsDNA (monomers of ellipsoidal particles), ribosomes (ellipsoidal particles), and boundary particles (point-like particles) for use in Brownian dynamics simulations using LAMMPS*
        
-- mapper - *a class that governs the creation of new DNA monomers in the spatial model given an 'initial replication state' and a 'final replication state' using the train-track model of replication*
+- **mapper** - *a class that governs the creation of new DNA monomers in the spatial model given an 'initial replication state' and a 'final replication state' using the train-track model of replication*
        
-- LAMMPS_simulator - *a class that runs Brownian dynamics and accessory routines using LAMMPS to simulate the spatial model*
+- **LAMMPS_simulator** - *a class that runs Brownian dynamics and accessory routines using LAMMPS to simulate the spatial model*
 
 Member functions of the **btree_driver** control the interactions and exchange of information between these different objects.
 
@@ -44,12 +44,12 @@ By combining a series of directives together a user could perform the following 
 
 ## Repository directory structure
 
- - /src - *source files for program*
- - /include - *header files for program*
- - /test_case - *test cases to demonstrate program*
- - /LAMMPS_src_additions - *source files to be added to LAMMPS build for DNA polymer model*
- - /LAMMPS_DNA_model - *files to be included in LAMMPS simulations running DNA polymer model*
- - /LAMMPS_basic_input_scripts - *basic input scripts for LAMMPS simulations of DNA polymer model*
+ - `src` - *source files for program*
+ - `include` - *header files for program*
+ - `examples` - *examples to demonstrate program*
+ - `LAMMPS_src_additions` - *source files to be added to LAMMPS build for DNA polymer model*
+ - `LAMMPS_DNA_model` - *files to be included in LAMMPS simulations running DNA polymer model*
+ - `LAMMPS_basic_input_scripts` - *basic input scripts for LAMMPS simulations of DNA polymer model*
 
 ## Installation
 
@@ -67,9 +67,9 @@ All dependencies can be installed within a conda virtual environment with the An
       - **FMT_INCLUDE** - *fmt headers*
       - **LAMMPS_INCLUDE** - *LAMMPS headers in source*
 
-   6) make all
+   6) `make all` or `make debug`
 
-The executable (*program*) will be in /build/apps.
+The executable (**btree_chromo**) will be in `build/apps`.
 
 ## Usage
 
@@ -78,9 +78,15 @@ Prepare a *directives.inp* file containing the directives to be executed by the 
 
 Prepare any input files needed for the chosen directives.
 
-Run with: **./program (some location)/directives.inp**.
+Run with: `./btree_chromo (some location)/(some name)_directives.inp`
 
-Use the testcase for an example: **./program /home/ben/Workspace/btree_chromo/test_case/directives.inp**
+See `examples` directory for a demonstration:
+
+1) `examples/preparing_chromosome`
+2) `examples/querying_chromosome`
+3) `examples/preparing_physical_structure`
+4) `examples/simulating_chromosome`
+5) `examples/simulating_replicate_protocols`
 
 ### Program Execution
 
@@ -95,120 +101,120 @@ Use the testcase for an example: **./program /home/ben/Workspace/btree_chromo/te
 
 ### Possible Directives (parameters are comma-separated and following ':' when needed)
 
-** General **
+#### General
 
- - terminate - *terminates the execution immediately*
- - switch_skip_runs:(T/F) - *skips all runs/minimizes of the simulator while incrementing timestep for debugging purposes*
+ - `terminate` - *terminates the execution immediately*
+ - `switch_skip_runs:(T/F)` - *skips all runs/minimizes of the simulator while incrementing timestep for debugging purposes*
 
-**Controlling Replication State**
+#### Controlling Replication State
 
- - new_chromo:size - *initializes an unreplicated chromosome with given size*
+ - `new_chromo:size` - *initializes an unreplicated chromosome with given size*
  
- - input_state:input_file - *creates state from input_file*
- - output_state:output_file - *writes state to output_file*
- - output_state_at_timestep:output_file - *execute output_state, but append a modifier to the output_file with the current timestep of the simulator*
+ - `input_state:input_file` - *creates state from input_file*
+ - `output_state:output_file` - *writes state to output_file*
+ - `output_state_at_timestep:output_file` - *execute output_state, but append a modifier to the output_file with the current timestep of the simulator*
  
- - print - *prints binary tree state in terminal*
+ - `print` - *prints binary tree state in terminal*
  
- - btree_prng_seed:seed - *seeds the btree's prng*
+ - `btree_prng_seed:seed` - *seeds the btree's prng*
  
- - transform:(b)\_cw(r_cw)\_ccw(r_ccw) - *applies single transform to branch (b), with replication extents (r\_cw) and (r\_ccw) along clockwise and counter-clockwise directions, respectively*
- - transforms_file:transforms_file - *applies transforms stored in transforms_file*
- - random_transforms:N - *applies random transforms until (N) units are added or the maximum size is reached*
+ - `transform:(b)\_cw(r_cw)\_ccw(r_ccw)` - *applies single transform to branch (b), with replication extents (r\_cw) and (r\_ccw) along clockwise and counter-clockwise directions, respectively*
+ - `transforms_file:transforms_file` - *applies transforms stored in transforms_file*
+ - `random_transforms:N` - *applies random transforms until (N) units are added or the maximum size is reached*
  
- - replicator_prng_seed:seed - *seeds the replicator's prng*
- - load_replication_model:rep_model_file - *loads the parameters and initial conditions for a replication model*
- - replicate:t - *replicates the current btree using loaded replication model for (t) seconds*
+ - `replicator_prng_seed:seed` - *seeds the replicator's prng*
+ - `load_replication_model:rep_model_file` - *loads the parameters and initial conditions for a replication model*
+ - `replicate:t` - *replicates the current btree using loaded replication model for (t) seconds*
  
-**Querying Replication State**
+#### Querying Replication State
 
- - update_topology - *solves bond topology of system*
- - dump_topology:topology_file,idx - *dumps topology to topology_file with selected indexing convention (idx)*
- - dump_topology_at_timestep:topology_file,idx - *execute dump_topology, but append a modifier to the topology_file with the current timestep of the simulator*
+ - `update_topology` - *solves bond topology of system*
+ - `dump_topology:topology_file,idx` - *dumps topology to topology_file with selected indexing convention (idx)*
+ - `dump_topology_at_timestep:topology_file,idx` - *execute dump_topology, but append a modifier to the topology_file with the current timestep of the simulator*
 
- - dump_fork_partitions:fork_partition_file,idx - *dumps monomer partitioning about forks to fork_partition_file with selected indexing convention (idx)*
- - dump_fork_partitions_at_timestep:fork_partition_file,idx - *execute dump_fork_partitions, but append a modifier to the fork_partition_file with the current timestep of the simulator*
+ - `dump_fork_partitions:fork_partition_file,idx` - *dumps monomer partitioning about forks to fork_partition_file with selected indexing convention (idx)*
+ - `dump_fork_partitions_at_timestep:fork_partition_file,idx` - *execute dump_fork_partitions, but append a modifier to the fork_partition_file with the current timestep of the simulator*
  
- - update_CG_map:f_CG - *update coarse-graining with selected factor (f_CG)*
- - dump_CG_map:CG_map_file,f_CG,idx - *dumps CG_map to CG_map_file with selected factor (f_CG) and indexing convention (idx)*
- - dump_CG_map_at_timeste:CG_map_file,f_CG,idx - *execute dump_CG_map, but append a modifier to the CG_map_file with the current timestep of the simulator*
+ - `update_CG_map:f_CG` - *update coarse-graining with selected factor (f_CG)*
+ - `dump_CG_map:CG_map_file,f_CG,idx` - *dumps CG_map to CG_map_file with selected factor (f_CG) and indexing convention (idx)*
+ - `dump_CG_map_at_timestep:CG_map_file,f_CG,idx` - *execute dump_CG_map, but append a modifier to the CG_map_file with the current timestep of the simulator*
  
- - regions_file:regions_file,idx - *reads chromosome regions from regions_file with selected indexing convention (idx)*
- - dump_regions:regions_count_file - *updates regions counts given current state and dumps counts to regions_count_file*
- - dump_regions_at_timestep:regions_count_file - *execute dump_regions, but append a modifier to the regions_count_file with the current timestep of the simulator*
+ - `regions_file:regions_file,idx` - *reads chromosome regions from regions_file with selected indexing convention (idx)*
+ - `dump_regions:regions_count_file,idx` - *updates regions counts given current state and dumps counts to regions_count_file with selected indexing convention (idx)*
+ - `dump_regions_at_timestep:regions_count_file` - *execute dump_regions, but append a modifier to the regions_count_file with the current timestep of the simulator*
  
-**Spatial System for Simulations**
+#### Spatial System for Simulations
 
- - load_BD_lengths:BD_length_file - *reads lengths for Brownian dynamics simulation*
+ - `load_BD_lengths:BD_length_file` - *reads lengths for Brownian dynamics simulation*
 
- - spherical_bdry:R,x0,y0,z0 - *generates bdry particles forming a sphere of radius R centered at (x0,y0,z0)*
+ - `spherical_bdry:R,x0,y0,z0` - *generates bdry particles forming a sphere of radius R centered at (x0,y0,z0)*
 
- - load_mono_coords:coords_file,order - *reads binary file with monomer coordinates (doubles) using data ordering convention (row/col)*
- - load_mono_quats:quats_file,order - *reads binary file with monomer quaternions (doubles) using data ordering convention (row/col)*
- - load_ribo_coords:coords_file,order - *reads binary file with ribosome coordinates (doubles) using data ordering convention (row/col)*
- - load_ribo_quats:quats_file,order - *reads binary file with ribosome quaternions (doubles) using data ordering convention (row/col)*
- - load_bdry_coords:coords_file,order - *reads binary file with boundary coordinates (doubles) using data ordering convention (row/col)*
+ - `load_mono_coords:coords_file,order` - *reads binary file with monomer coordinates (doubles) using data ordering convention (row/col)*
+ - `load_mono_quats:quats_file,order` - *reads binary file with monomer quaternions (doubles) using data ordering convention (row/col)*
+ - `load_ribo_coords:coords_file,order` - *reads binary file with ribosome coordinates (doubles) using data ordering convention (row/col)*
+ - `load_ribo_quats:quats_file,order` - *reads binary file with ribosome quaternions (doubles) using data ordering convention (row/col)*
+ - `load_bdry_coords:coords_file,order` - *reads binary file with boundary coordinates (doubles) using data ordering convention (row/col)*
  
- - write_mono_coords:coords_file,order - *write binary file with monomer coordinates (doubles) using data ordering convention (row/col)*
- - write_mono_quats:quats_file,order - *write binary file with monomer quaternions (doubles) using data ordering convention (row/col)*
- - write_ribo_coords:coords_file,order - *write binary file with ribosome coordinates (doubles) using data ordering convention (row/col)*
- - write_ribo_quats:quats_file,order - *write binary file with ribosome quaternions (doubles) using data ordering convention (row/col)*
- - write_bdry_coords:coords_file,order - *write binary file with boundary coordinates (doubles) using data ordering convention (row/col)*
+ - `write_mono_coords:coords_file,order` - *write binary file with monomer coordinates (doubles) using data ordering convention (row/col)*
+ - `write_mono_quats:quats_file,order` - *write binary file with monomer quaternions (doubles) using data ordering convention (row/col)*
+ - `write_ribo_coords:coords_file,order` - *write binary file with ribosome coordinates (doubles) using data ordering convention (row/col)*
+ - `write_ribo_quats:quats_file,order` - *write binary file with ribosome quaternions (doubles) using data ordering convention (row/col)*
+ - `write_bdry_coords:coords_file,order` - *write binary file with boundary coordinates (doubles) using data ordering convention (row/col)*
 
- - switch_bonds:(T/F) - *enable/disable bonds between DNA monomers, must be used prior to 'write_LAMMPS_data_file' to take effect*
- - switch_bending_angles:(T/F) - *enable/disable bending angles between DNA monomers, must be used prior to 'write_LAMMPS_data_file' to take effect*
- - switch_twisting_angles:(T/F) - *enable/disable twisting angles between DNA monomers, must be used prior to 'write_LAMMPS_data_file' to take effect*
- - switch_Ori_bdry_attraction:(T/F) - *enable/disable attraction of Ori bead to bdry using morse/cut potential*
- - switch_Ori_pair_repulsion:(T/F) - *enable/disable repulsion between Ori beads using harmonic/cut potential*
+ - `switch_bonds:(T/F)` - *enable/disable bonds between DNA monomers (default T), must be used prior to 'write_LAMMPS_data_file' to take effect*
+ - `switch_bending_angles:(T/F)` - *enable/disable bending angles between DNA monomers (default T), must be used prior to 'write_LAMMPS_data_file' to take effect*
+ - `switch_twisting_angles:(T/F)` - *enable/disable twisting angles between DNA monomers (default T), must be used prior to 'write_LAMMPS_data_file' to take effect*
+ - `switch_Ori_bdry_attraction:(T/F)` - *enable/disable attraction of Ori bead to bdry using morse/cut potential (default F)*
+ - `switch_Ori_pair_repulsion:(T/F)` - *enable/disable repulsion between Ori beads using harmonic/cut potential (default F)*
  
- - write_LAMMPS_data:LAMMPS_data_file - *write a LAMMPS file (data.-) using the current mono, ribo, and bdry coordinates, and the current replication state for the bond/angle topology*
- - write_mono_xyz:mono_file_xyz - *write the current monomer coordinates as an .xyz file to load into VMD*
+ - `write_LAMMPS_data:LAMMPS_data_file` - *write a LAMMPS file (data.-) using the current mono, ribo, and bdry coordinates, and the current replication state for the bond/angle topology*
+ - `write_mono_xyz:mono_file_xyz` - *write the current monomer coordinates as an .xyz file to load into visualization software*
 
-**Mapper**
+#### Mapper
 
- - set_initial_state - *set the initial state of the mapper to the current replication state*
- - set_final_state - *set the final state of the mapper to the current replication state*
- - map_replication - *based on the difference in final and initial replication states, determine new monomer coordinates and add new monomers to the LAMMPS system*
+ - `set_initial_state` - *set the initial state of the mapper to the current replication state*
+ - `set_final_state` - *set the final state of the mapper to the current replication state*
+ - `map_replication` - *based on the difference in final and initial replication states, determine new monomer coordinates and add new monomers to the LAMMPS system*
  
-**Simulator**
+#### Simulator
 
- - prepare_simulator:log_file - *initialize MPI and a LAMMPS object that writes its output to log_file, all further commands with 'simulator' in their name will use this LAMMPS object*
- - simulator_include_file:inc_file - *executes the 'include' command to run the LAMMPS commands stored in inc_file*
- - sync_simulator_and_system - *copies the current simulation state to the LAMMPS_sys object used to control the topology*
- - clear_simulator - *execute the 'clear' command to clear the LAMMPS object*
+ - `prepare_simulator:log_file` - *initialize MPI and a LAMMPS object that writes its output to log_file, all further commands with 'simulator' in their name will use this LAMMPS object*
+ - `simulator_include_file:inc_file` - *executes the 'include' command to run the LAMMPS commands stored in inc_file*
+ - `sync_simulator_and_system` - *copies the current simulation state to the LAMMPS_sys object used to control the topology*
+ - `clear_simulator` - *execute the 'clear' command to clear the LAMMPS object*
  
- - simulator_set_prng_seed:seed - *seeds the simulator's prng, must be greater than 0*
- - simulator_set_nProc:nProc - *sets the number of processors used by the simulator*
- - simulator_set_DNA_model:DNA_model_dir - *sets the directory containing the DNA model used by the simulator*
- - simulator_set_output_details:output_dir,output_label - *sets the output directory (output_dir) and label (output_label) used for files generated by the simulator*
- - simulator_set_delta_t:delta_t - *sets the timestep (delta_t) used for Brownian dynamics within the simulator*
+ - `simulator_set_prng_seed:seed` - *seeds the simulator's prng, must be greater than 0*
+ - `simulator_set_nProc:nProc` - *sets the number of processors used by the simulator*
+ - `simulator_set_DNA_model:DNA_model_dir` - *sets the directory containing the DNA model used by the simulator*
+ - `simulator_set_output_details:output_dir,output_label` - *sets the output directory (output_dir) and label (output_label) used for files generated by the simulator*
+ - `simulator_set_delta_t:delta_t` - *sets the timestep (delta_t) used for Brownian dynamics within the simulator*
  
- - simulator_store_timestep - *stores the current timestep of the simulator*
- - simulator_restore_timestep - *restores the simulator timestep based on the stored timestep*
- - simulator_increment_timestep:dt - *increments the timestep by (dt), this must be a non-negative amount*
- - simulator_reset_timestep:t - *resets the timestep to (t)*
- - simulator_reset_prev_dump_timestep:t - *resets the timestep of the previous dump to (t)*
+ - `simulator_store_timestep` - *stores the current timestep of the simulator*
+ - `simulator_restore_timestep` - *restores the simulator timestep based on the stored timestep*
+ - `simulator_increment_timestep:dt` - *increments the timestep by (dt), this must be a non-negative amount*
+ - `simulator_reset_timestep:t` - *resets the timestep to (t)*
+ - `simulator_reset_prev_dump_timestep:t` - *resets the timestep of the previous dump to (t)*
  
- - simulator_read_data:LAMMPS_data_file - *read a LAMMPS file (data.-) into the simulator*
+ - `simulator_read_data:LAMMPS_data_file` - *read a LAMMPS file (data.-) into the simulator*
  
- - simulator_minimize_(soft/hard/topoDNA)_(harmonic/FENE):Tfreq - *run a minimization with the dictated potential while printing thermodynamic information every Tfreq steps*
- - simulator_run_(soft/hard/topoDNA)_(harmonic/FENE):Nsteps,Tfreq,Dfreq,append_option,skip_option - *run Brownian dynamics with the dictated potential for Nsteps, while printing thermodynamic information every Tfreq steps and dumping every Dfreq steps - append_option = noappend/append and skip_option = first/skip_first*
+ - `simulator_minimize_(soft/hard/topoDNA)_(harmonic/FENE):Tfreq` - *run a minimization with the dictated potential while printing thermodynamic information every Tfreq steps*
+ - `simulator_run_(soft/hard/topoDNA)_(harmonic/FENE):Nsteps,Tfreq,Dfreq,append_option,skip_option` - *run Brownian dynamics with the dictated potential for Nsteps, while printing thermodynamic information every Tfreq steps and dumping every Dfreq steps - append_option = noappend/append and skip_option = first/skip_first*
 
- - simulator_load_loop_params:loop_params_file - *read a file (loop_params_file) containing the parameters for the looping interactions*
- - simulator_run_loops:Nloops,Nsteps,Tfreq,Dfreq,append_option,skip_option - *run Brownian dynamics with the hard/FENE potential for Nsteps with Nloops randomly placed, while printing thermodynamic information every Tfreq steps and dumping every Dfreq steps - append_option = noappend/append and skip_option = first/skip_first*
+ - `simulator_load_loop_params:loop_params_file` - *read a file (loop_params_file) containing the parameters for the looping interactions*
+ - `simulator_run_loops:Nloops,Nsteps,Tfreq,Dfreq,append_option,skip_option` - *run Brownian dynamics with the hard/FENE potential for Nsteps with Nloops randomly placed, while printing thermodynamic information every Tfreq steps and dumping every Dfreq steps - append_option = noappend/append and skip_option = first/skip_first*
 
-**Fused Directives**
+#### Fused Directives
 
- - sys_write_sim_read_LAMMPS_data:LAMMPS_data_file - *write a LAMMPS file (data.-) with the system, then read the same data file into the simulator*
- - sys_write_sim_read_LAMMPS_data_at_timestep:LAMMPS_data_file - *execute sys_write_sim_read_LAMMPS_data, but append a modifier to the LAMMPS_data_file with the current timestep of the simulator*
- - simulator_relax_progressive:Nsteps,Tfreq - *run a protocol of 1) minimize_soft_harmonic, 2) run_soft_harmonic, 3) minimize_hard_harmonic, 4) run_hard_harmonic, 5) minimize_soft_FENE to relax the system, where all runs are for Nsteps and thermodynamic information is printed every Tfreq steps*
+ - `sys_write_sim_read_LAMMPS_data:LAMMPS_data_file` - *write a LAMMPS file (data.-) with the system, then read the same data file into the simulator*
+ - `sys_write_sim_read_LAMMPS_data_at_timestep:LAMMPS_data_file` - *execute sys_write_sim_read_LAMMPS_data, but append a modifier to the LAMMPS_data_file with the current timestep of the simulator*
+ - `simulator_relax_progressive:Nsteps,Tfreq` - *run a protocol of 1) minimize_soft_harmonic, 2) run_soft_harmonic, 3) minimize_hard_harmonic, 4) run_hard_harmonic, 5) minimize_soft_FENE to relax the system, where all runs are for Nsteps and thermodynamic information is printed every Tfreq steps*
 
-**Metadirectives**
+#### Metadirectives
 
- - repeat:N - *begin a region of directives that will be repeated (N) times*
- - end_repeat - *must follow a 'repeat' and terminates the region of directives that will be repeated*
- - repeat_replicates:min_rep,max_rep,label_padding - *begin a region of directives that will be repeated for replicates ranging inclusively from (min_rep) to (max_rep), all I/O directives within the region will be modified to include a replicate label of the form '_rep0000X', where (label_padding) specifies the number of zeros*
- - end_repeat_replicates - *must follow a 'repeat_replicates' and terminates the region of directives that will be repeated with replicate identifiers*
+ - `repeat:N` - *begin a region of directives that will be repeated (N) times*
+ - `end_repeat` - *must follow a 'repeat' and terminates the region of directives that will be repeated*
+ - `repeat_replicates:min_rep,max_rep,label_padding` - *begin a region of directives that will be repeated for replicates ranging inclusively from (min_rep) to (max_rep), all I/O directives within the region will be modified to include a replicate label of the form '_rep0000X', where (label_padding) specifies the number of zeros*
+ - `end_repeat_replicates` - *must follow a 'repeat_replicates' and terminates the region of directives that will be repeated with replicate identifiers*
 
 ## Visualization
 
@@ -222,9 +228,9 @@ Visualizing the trajectories using VMD requires some extra work to account for t
 
  1) install LAMMPS plugin for VMD
  2) open TkConsole in VMD
- 3) run "set env(LAMMPSDUMMYPOS) {xd,yd,zd}" in the TkConsole, where {xd,yd,zd} is a tuple of the x,y,z coordinates of dummy atoms for systems with varying atom numbers
- 4) run "set env(LAMMPSMAXATOMS) Nmax" in the TkConsole, where Nmax is the maximum number of atoms appearing in any frame of the trajectory
- 5) run "set env(LAMMPSREMAPFIELDS) {vx=c_id_track,vy=c_type_track}" in the TkConsole, this will remap the fields of "c_id_track" and "c_type_track" to the x and y velocity, respectively, for every frame of the trajectory
+ 3) run `set env(LAMMPSDUMMYPOS) {xd,yd,zd}` in the TkConsole, where {xd,yd,zd} is a tuple of the x,y,z coordinates of dummy atoms for systems with varying atom numbers
+ 4) run `set env(LAMMPSMAXATOMS) Nmax` in the TkConsole, where Nmax is the maximum number of atoms appearing in any frame of the trajectory
+ 5) run `set env(LAMMPSREMAPFIELDS) {vx=c_id_track,vy=c_type_track}` in the TkConsole, this will remap the fields of "c_id_track" and "c_type_track" to the x and y velocity, respectively, for every frame of the trajectory
  6) Load the trajectory file
 
 The x-velocity (vx) now stores the frame-dependent atom indices and the y-velocity (vy) now stores the frame-dependent atom types for the entire course of the trajectory. Use these fields rather than the default indices and types (which are defined only using the first frame of the trajectory) when making atom selections.
