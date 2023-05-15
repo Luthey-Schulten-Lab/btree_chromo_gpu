@@ -2,7 +2,7 @@
 
 ## Description
 
-**C++ program to model theta structures of replicating bacterial chromosomes using binary trees.**
+**A C++ program to model theta structures of replicating bacterial chromosomes using binary trees.**
 
 The program is organized in the following manner:
 
@@ -12,11 +12,11 @@ The **btree_driver** contains the following objects.
 
 - **btree** - *a specialized binary tree class representing replicating circular dsDNA in nested theta structures that can only be manipulated using public member functions representing processes physically possible for circular dsDNA*
 
-  	To understand the terminology that will be used to describe replication of circular dsDNA within the program, visualize an analog clock that has been rotated 180 degrees - the *Ori* is at 6 (top) and the *Ter* is at 12 (bottom), monomers are indexed in ascending order (1 -> 12) in the clockwise direction; two replication forks travel in the clockwise (cw, 6->5->4->...) and counter-clockwise (ccw, 6->7->->8->...) from the *Ori* towards the *Ter* until they collide. Newly created dsDNA is indexed in ascending order beginning from the end linked to the ccw replication fork to the opposite end of the strand linked to the cw replication fork.
+  	To understand the terminology that will be used to describe replication of circular dsDNA within the program, visualize an analog clock that has been rotated 180 degrees - the *Ori* is at 6 (top) and the *Ter* is at 12 (bottom), monomers are indexed in ascending order (1 -> 12) in the clockwise direction; two replication forks travel in the clockwise (cw, 6->7->8->...) and counter-clockwise (ccw, 6->5->4->...) from the *Ori* towards the *Ter* until they collide. Newly created dsDNA is indexed in ascending order beginning from the end linked to the ccw replication fork to the opposite end of the strand linked to the cw replication fork.
 
-  1) determines topology when system is represented as circular(/theta structure) polymers (for arbitrary replication states)
-  2) counts genome features at nucleotide resolution (for arbitrary replication states)
-  3) prepares coarse-graining into chromosomal loci for contact map calculations (for arbitrary replication states)
+  1) determines topology when system is represented as circular(/theta structure) polymers
+  2) counts genome features at nucleotide resolution
+  3) prepares coarse-graining into chromosomal loci for contact map calculations
 
 - **replicator** - *a class containing a stochastic chemical kinetics model for DNA replication initiation due to DnaA, which then simulates trajectories in the space of replication states using the Gillespie method*
        
@@ -40,7 +40,7 @@ By combining a series of directives together a user could perform the following 
    8) Output the counts of genome features.
    9) Output the coarse-graining for contact map calculations.
 
-   The user now has **A)** a replication state halfway through the cell cycle, **B)** a matching spatial model, **C)** the counts of genome features in this replication state, and **D)** the coarse-graining necessary to calculate chromosome contact maps for replicating chromosomes.
+   The user now has **A)** a replication state halfway through the cell cycle, **B)** a matching spatial model, **C)** the copy numbers of genome features in this replication state, and **D)** the coarse-graining necessary to calculate chromosome contact maps for replicating chromosomes.
 
 ## Repository directory structure
 
@@ -86,7 +86,8 @@ See `examples` directory for a demonstration:
 2) `examples/querying_chromosome`
 3) `examples/preparing_physical_structure`
 4) `examples/simulating_chromosome`
-5) `examples/simulating_replicate_protocols`
+5) `examples/simulating_replication_kinetics`
+6) `examples/simulating_ensemble_protocols`
 
 ### Program Execution
 
@@ -233,7 +234,7 @@ Visualizing the trajectories using VMD requires some extra work to account for t
  5) run `set env(LAMMPSREMAPFIELDS) {vx=c_id_track,vy=c_type_track}` in the TkConsole, this will remap the fields of "c_id_track" and "c_type_track" to the x and y velocity, respectively, for every frame of the trajectory
  6) Load the trajectory file
 
-The x-velocity (vx) now stores the frame-dependent atom indices and the y-velocity (vy) now stores the frame-dependent atom types for the entire course of the trajectory. Use these fields rather than the default indices and types (which are defined only using the first frame of the trajectory) when making atom selections.
+The x-velocity (vx) now stores the frame-dependent atom indices and the y-velocity (vy) now stores the frame-dependent atom types for the entire course of the trajectory. Use these fields rather than the default indices and types (which are defined using only the first frame of the trajectory) when making atom selections.
 
 ### Ovito Instructions
 

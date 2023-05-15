@@ -1,0 +1,36 @@
+# volume - [liter]
+V=3.3E-17
+N_init_SA=1000
+tau_SA=7.2E+3
+
+# initial DnaA count
+N_init_DnaA=148
+
+# maximum possible number of functional replisomes
+max_replisomes=8
+
+# average replication rate per replisome, bp/s
+k_rep=5.0E+1
+
+# DnaA creation and destruction
+# units - [particle^-1*s^-1]
+k_c=2.0E-3
+# units - [particle^-1*s^-1]
+k_d=9.6E-5
+
+# DnaA filament details
+
+N_hi=1
+# units - [particle^-1*s^-1]
+k_hi=1.3E-17
+
+N_lo=2
+# units - [particle^-1*s^-1]
+k_lo=5.8E-20
+
+N_fil=27
+#N_fil=3
+# units - [particle^-1*s^-1]
+k_on=1.7E-19
+# units - [s^-1]
+k_off=5.5E-1

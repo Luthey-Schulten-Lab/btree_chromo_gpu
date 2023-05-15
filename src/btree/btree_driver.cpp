@@ -1010,14 +1010,14 @@ void btree_driver::prepare_command_requirements()
   
   // load_rep_model
   // number of required parameters
-  N_param_reqs["load_rep_model"] = 1;
+  N_param_reqs["load_replication_model"] = 1;
   // lock tests
   t_ls.clear();
-  lock_tests["load_rep_model"] = t_ls;
+  lock_tests["load_replication_model"] = t_ls;
   // lock updates
   t_ls.clear();
   t_ls.push_back(new_lock("rep_model_present",true));
-  lock_updates["load_rep_model"] = t_ls;
+  lock_updates["load_replication_model"] = t_ls;
 
   // replicate
   // number of required parameters
