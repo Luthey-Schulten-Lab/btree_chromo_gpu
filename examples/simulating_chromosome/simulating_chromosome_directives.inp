@@ -1,3 +1,7 @@
+#enable/disable the skipping of runs/minimizations for debugging of directive file
+switch_skip_runs:F
+
+
 #set the prng seed
 btree_prng_seed:10
 
