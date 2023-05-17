@@ -1,5 +1,27 @@
+######################
+######  README  ######
+######################
+
+# PURPOSE: run a simulation of an unreplicated chromosome
+
+# NOTE 1: comment the ``terminate'' at the top to execute all of the commands
+
+# NOTE 2: change all directories in this file from ``/home/ben/Workspace/'' to the local repository location
+
+# NOTE 3: by default the runs will be skipped
+
+# NOTE 4: change the number of processors to whatever is appropriate
+
+######################
+######################
+######################
+
+
+terminate
+
+
 #enable/disable the skipping of runs/minimizations for debugging of directive file
-switch_skip_runs:F
+switch_skip_runs:T
 
 
 #set the prng seed

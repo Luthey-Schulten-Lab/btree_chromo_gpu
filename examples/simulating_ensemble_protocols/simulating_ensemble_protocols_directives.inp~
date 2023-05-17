@@ -1,27 +1,5 @@
-######################
-######  README  ######
-######################
-
-# PURPOSE: run a simulation of a chromosome undergoing replication
-
-# NOTE 1: comment the ``terminate'' at the top to execute all of the commands
-
-# NOTE 2: change all directories in this file from ``/home/ben/Workspace/'' to the local repository location
-
-# NOTE 3: by default the runs will be skipped
-
-# NOTE 4: change the number of processors to whatever is appropriate
-
-######################
-######################
-######################
-
-
-terminate
-
-
 #enable/disable the skipping of runs/minimizations for debugging of directive file
-switch_skip_runs:T
+switch_skip_runs:F
 
 
 #set the prng seed
@@ -98,7 +76,7 @@ simulator_relax_progressive:10000,10000
 
 
 #run the system, append the output to the current output file and do not write the initial timestep
-simulator_run_hard_FENE:100000,1000,10000,append,nofirst
+simulator_run_hard_FENE:100000,1000,5000,append,nofirst
 
 
 #end the region of directives that will be repeated

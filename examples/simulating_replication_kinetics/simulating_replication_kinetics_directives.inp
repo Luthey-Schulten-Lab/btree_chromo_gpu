@@ -1,3 +1,21 @@
+######################
+######  README  ######
+######################
+
+# PURPOSE: simulate replication kinetics of DnaA
+
+# NOTE 1: comment the ``terminate'' at the top to execute all of the commands
+
+# NOTE 2: change all directories in this file from ``/home/ben/Workspace/'' to the local repository location
+
+######################
+######################
+######################
+
+
+terminate
+
+
 #set the prng seed
 btree_prng_seed:10
 replicator_prng_seed:15
