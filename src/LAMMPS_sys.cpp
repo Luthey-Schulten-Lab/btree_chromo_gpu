@@ -1,4 +1,4 @@
-#include <LAMMPS_sys/LAMMPS_sys.hpp>
+#include <LAMMPS_sys.hpp>
 
 // constructor
 LAMMPS_sys::LAMMPS_sys()

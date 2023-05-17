@@ -3,11 +3,11 @@
 
 #include <unordered_map>
 
-#include <btree/btree.hpp>
-#include <btree/mapper.hpp>
-#include <rep_kinetics/replicator.hpp>
-#include <LAMMPS_sys/LAMMPS_sys.hpp>
-#include <LAMMPS_sys/LAMMPS_simulator.hpp>
+#include <btree.hpp>
+#include <mapper.hpp>
+#include <replicator.hpp>
+#include <LAMMPS_sys.hpp>
+#include <LAMMPS_simulator.hpp>
 
 using namespace std;
 

@@ -1,8 +1,8 @@
 #ifndef INCLUDE_REPLICATOR_HPP
 #define INCLUDE_REPLICATOR_HPP
 
-#include <rep_kinetics/replication_model.hpp>
-#include <rep_kinetics/gillespie_solver.hpp>
+#include <replication_model.hpp>
+#include <gillespie_solver.hpp>
 
 using namespace std;
 

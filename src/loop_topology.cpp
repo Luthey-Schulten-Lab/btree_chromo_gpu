@@ -1,4 +1,4 @@
-#include <LAMMPS_sys/loop_topology.hpp>
+#include <loop_topology.hpp>
 
 // constructor
 loop_topology::loop_topology()

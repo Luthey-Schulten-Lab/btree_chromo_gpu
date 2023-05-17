@@ -1,4 +1,4 @@
-#include <LAMMPS_sys/boundary_surface.hpp>
+#include <boundary_surface.hpp>
 
 // constructor
 boundary_surface::boundary_surface()

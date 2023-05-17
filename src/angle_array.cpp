@@ -1,4 +1,4 @@
-#include <LAMMPS_sys/angle_array.hpp>
+#include <angle_array.hpp>
 
 // constructor
 angle_array::angle_array()

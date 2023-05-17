@@ -8,14 +8,14 @@
 #include <vector>
 #include <memory>
 
-#include <btree/btree.hpp>
-#include <LAMMPS_sys/vec_quat_manipulator.hpp>
-#include <LAMMPS_sys/boundary_surface.hpp>
-#include <LAMMPS_sys/atom_array.hpp>
-#include <LAMMPS_sys/ellipsoid_array.hpp>
-#include <LAMMPS_sys/bond_array.hpp>
-#include <LAMMPS_sys/angle_array.hpp>
-#include <LAMMPS_sys/loop_topology.hpp>
+#include <btree.hpp>
+#include <vec_quat_manipulator.hpp>
+#include <boundary_surface.hpp>
+#include <atom_array.hpp>
+#include <ellipsoid_array.hpp>
+#include <bond_array.hpp>
+#include <angle_array.hpp>
+#include <loop_topology.hpp>
 
 using namespace std;
 

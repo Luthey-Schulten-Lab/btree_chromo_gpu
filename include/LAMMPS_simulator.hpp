@@ -22,7 +22,7 @@
 #include "library.h"
 
 // btree_chromo include files
-#include <LAMMPS_sys/LAMMPS_sys.hpp>
+#include <LAMMPS_sys.hpp>
 
 using namespace std;
 

@@ -1,4 +1,4 @@
-#include <LAMMPS_sys/loop.hpp>
+#include <loop.hpp>
 
 // constructor
 loop::loop(int a_region, int h_region)

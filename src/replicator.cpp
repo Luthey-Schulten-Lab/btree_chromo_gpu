@@ -1,4 +1,4 @@
-#include <rep_kinetics/replicator.hpp>
+#include <replicator.hpp>
 
 // constructor
 replicator::replicator()

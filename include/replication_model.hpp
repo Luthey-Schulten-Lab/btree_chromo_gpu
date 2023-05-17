@@ -10,7 +10,7 @@
 #include <cmath>
 #include <iterator>
 
-#include <rep_kinetics/rxn_manipulator.hpp>
+#include <rxn_manipulator.hpp>
 
 using namespace std;
 

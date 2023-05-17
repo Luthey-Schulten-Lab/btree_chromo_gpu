@@ -1,4 +1,4 @@
-#include <LAMMPS_sys/bond_array.hpp>
+#include <bond_array.hpp>
 
 // constructor
 bond_array::bond_array()

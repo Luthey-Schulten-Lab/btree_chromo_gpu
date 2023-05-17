@@ -1,4 +1,4 @@
-#include <rep_kinetics/replication_model.hpp>
+#include <replication_model.hpp>
 
 // constructor
 replication_model::replication_model()

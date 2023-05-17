@@ -1,4 +1,4 @@
-#include <LAMMPS_sys/binding_region.hpp>
+#include <binding_region.hpp>
 
 // constructor
 binding_region::binding_region(string leaf, int ll, int ul, int size,

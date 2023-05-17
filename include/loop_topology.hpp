@@ -6,11 +6,11 @@
 #include <string>
 #include <vector>
 
-#include <btree/btree.hpp>
-#include <LAMMPS_sys/vec_quat_manipulator.hpp>
-#include <LAMMPS_sys/loop.hpp>
-#include <LAMMPS_sys/binding_region.hpp>
-#include <LAMMPS_sys/intra_step_distribution.hpp>
+#include <btree.hpp>
+#include <vec_quat_manipulator.hpp>
+#include <loop.hpp>
+#include <binding_region.hpp>
+#include <intra_step_distribution.hpp>
 
 using namespace std;
 

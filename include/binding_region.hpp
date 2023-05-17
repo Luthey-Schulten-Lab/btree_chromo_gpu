@@ -10,8 +10,8 @@
 #include <random>
 #include <unordered_map>
 
-#include <btree/btree.hpp>
-#include <LAMMPS_sys/vec_quat_manipulator.hpp>
+#include <btree.hpp>
+#include <vec_quat_manipulator.hpp>
 
 using namespace std;
 

@@ -1,4 +1,4 @@
-#include <LAMMPS_sys/intra_step_distribution.hpp>
+#include <intra_step_distribution.hpp>
 
 // constructor
 intra_step_distribution::intra_step_distribution()

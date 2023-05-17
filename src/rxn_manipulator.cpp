@@ -1,4 +1,4 @@
-#include <rep_kinetics/rxn_manipulator.hpp>
+#include <rxn_manipulator.hpp>
 
 // constructor
 rxn_manipulator::rxn_manipulator()

@@ -2,6 +2,7 @@
 #define INCLUDE_BTREE_CHROMO_HPP
 
 #include <iostream>
+#include <btree_driver.hpp>
 
 namespace btree_chromo
 {

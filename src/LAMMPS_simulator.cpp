@@ -1,4 +1,4 @@
-#include <LAMMPS_sys/LAMMPS_simulator.hpp>
+#include <LAMMPS_simulator.hpp>
 
 // constructor
 LAMMPS_simulator::LAMMPS_simulator()

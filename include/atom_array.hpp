@@ -6,7 +6,7 @@
 #include <fstream>
 #include <cstring>
 
-#include <LAMMPS_sys/vec_quat_manipulator.hpp>
+#include <vec_quat_manipulator.hpp>
 
 using namespace std;
 

@@ -1,4 +1,4 @@
-#include <rep_kinetics/gillespie_solver.hpp>
+#include <gillespie_solver.hpp>
 
 // constructor
 gillespie_solver::gillespie_solver()

@@ -1,7 +1,7 @@
 #ifndef INCLUDE_MAPPER_HPP
 #define INCLUDE_MAPPER_HPP
 
-#include <btree/btree.hpp>
+#include <btree.hpp>
 
 using namespace std;
 

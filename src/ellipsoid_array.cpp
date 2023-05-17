@@ -1,4 +1,4 @@
-#include <LAMMPS_sys/ellipsoid_array.hpp>
+#include <ellipsoid_array.hpp>
 
 // constructor
 ellipsoid_array::ellipsoid_array()

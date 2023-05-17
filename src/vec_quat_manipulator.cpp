@@ -1,4 +1,4 @@
-#include <LAMMPS_sys/vec_quat_manipulator.hpp>
+#include <vec_quat_manipulator.hpp>
 
 // constructor
 vec_quat_manipulator::vec_quat_manipulator()

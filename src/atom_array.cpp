@@ -1,4 +1,4 @@
-#include <LAMMPS_sys/atom_array.hpp>
+#include <atom_array.hpp>
 
 // constructor
 atom_array::atom_array()

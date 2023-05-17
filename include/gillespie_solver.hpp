@@ -7,8 +7,8 @@
 #include <cmath>
 #include <iostream>
 
-#include <rep_kinetics/rxn_manipulator.hpp>
-#include <rep_kinetics/replication_model.hpp>
+#include <rxn_manipulator.hpp>
+#include <replication_model.hpp>
 
 using namespace std;
 
