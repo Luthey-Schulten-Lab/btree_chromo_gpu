@@ -35,11 +35,13 @@ APP_DIR  := $(BUILD)/apps
 
 TARGET   := btree_chromo
 
-SRC      :=                      \
-   $(wildcard src/LAMMPS_sys/*.cpp) \
-   $(wildcard src/rep_kinetics/*.cpp) \
-   $(wildcard src/btree/*.cpp) \
-   $(wildcard src/*.cpp) \
+# SRC      :=                      \
+#    $(wildcard src/LAMMPS_sys/*.cpp) \
+#    $(wildcard src/rep_kinetics/*.cpp) \
+#    $(wildcard src/btree/*.cpp) \
+#    $(wildcard src/*.cpp)
+
+SRC      := $(wildcard src/*.cpp)
 
 OBJECTS  := $(SRC:%.cpp=$(OBJ_DIR)/%.o)
 DEPENDENCIES \
