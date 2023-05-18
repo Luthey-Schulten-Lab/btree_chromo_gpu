@@ -4,8 +4,6 @@
 #include <cmath>
 #include <vector>
 
-using namespace std;
-
 struct vec
 {
   double x, y, z;
@@ -38,8 +36,8 @@ public:
   vec v_cross(vec v, vec w);
   vec v_linterp(double s, vec v, vec w);
 
-  void v_array_from_vector(double **&x, int &N, vector<vec> &vs);
-  void v_vector_from_array(vector<vec> &vs, double **&x, int &N);
+  void v_array_from_vector(double **&x, int &N, std::vector<vec> &vs);
+  void v_vector_from_array(std::vector<vec> &vs, double **&x, int &N);
 
   quat q_null();
 

@@ -8,8 +8,6 @@
 
 #include <vec_quat_manipulator.hpp>
 
-using namespace std;
-
 struct ellipsoid
 {
   int id;
@@ -36,17 +34,17 @@ public:
   // manipulate columns
   void set_min_id(int min_id); // set the minimum atom id and range accordingly [min,min+N)
   void set_shape_all(vec shape); // set the shape of all ellipsoids
-  void set_quats(vector<quat> qs); // set element-wise orientations
-  void set_quats_arr(double *&q, string order);
+  void set_quats(std::vector<quat> qs); // set element-wise orientations
+  void set_quats_arr(double *&q, std::string order);
   void set_quat(int i, quat q);
   void normalize_quats();
 
   // read quats from files
-  int read_bin_quats(string data_filename, string order, bool force_resize);
+  int read_bin_quats(std::string data_filename, std::string order, bool force_resize);
 
   // write atom data
-  void write(fstream &data_file);
-  int write_bin(string data_filename, string order);
+  void write(std::fstream &data_file);
+  int write_bin(std::string data_filename, std::string order);
 
 private:
 

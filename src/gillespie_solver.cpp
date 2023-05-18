@@ -10,7 +10,7 @@ gillespie_solver::gillespie_solver()
   this->xFPT = nullptr;
   this->W = nullptr;
   this->rand_eng.seed(0);
-  this->u_rand = uniform_real_distribution<double>(0.0,1.0);
+  this->u_rand = std::uniform_real_distribution<double>(0.0,1.0);
 }
 
 // destructor
@@ -181,7 +181,7 @@ void gillespie_solver::set_M(int M)
 
 
 // set the state vector
-void gillespie_solver::set_x(vector<species_count> &s_cs)
+void gillespie_solver::set_x(std::vector<species_count> &s_cs)
 {
   for (species_count s_c : s_cs)
     {
@@ -191,7 +191,7 @@ void gillespie_solver::set_x(vector<species_count> &s_cs)
 
 
 // set the FPT vector
-void gillespie_solver::set_xFPT(vector<species_count> s_cs)
+void gillespie_solver::set_xFPT(std::vector<species_count> s_cs)
 {
   for (species_count s_c : s_cs)
     {
@@ -201,7 +201,7 @@ void gillespie_solver::set_xFPT(vector<species_count> s_cs)
 
 
 // set the stoichiometry matrix
-void gillespie_solver::set_S(vector<reaction> &rxns)
+void gillespie_solver::set_S(std::vector<reaction> &rxns)
 {
   for (size_t j=0; j<rxns.size(); j++)
     {
@@ -218,9 +218,9 @@ void gillespie_solver::set_S(vector<reaction> &rxns)
 
 
 // conver the system state to species counts
-vector<species_count> gillespie_solver::state_to_sc()
+std::vector<species_count> gillespie_solver::state_to_sc()
 {
-  vector<species_count> s_cs;
+  std::vector<species_count> s_cs;
   species_count s_c;
 
   for (int i=0; i<N; i++)
@@ -240,16 +240,16 @@ vector<species_count> gillespie_solver::state_to_sc()
 void gillespie_solver::initialize_reaction_system(int N, int M)
 {
   destroy_reaction_system();
-  // cout << "setting M and N" << endl;
+  // std::cout << "setting M and N" << std::endl;
   set_N(N);
   set_M(M);
-  // cout << "initializing x" << endl;
+  // std::cout << "initializing x" << std::endl;
   initialize_x();
-  // cout << "initializing xFPT" << endl;
+  // std::cout << "initializing xFPT" << std::endl;
   initialize_xFPT();
-  // cout << "initializing S" << endl;
+  // std::cout << "initializing S" << std::endl;
   initialize_S();
-  // cout << "initializing W" << endl;
+  // std::cout << "initializing W" << std::endl;
   initialize_W();
 }
 
@@ -268,41 +268,41 @@ void gillespie_solver::destroy_reaction_system()
 void gillespie_solver::print_reaction_system()
 {
 
-  cout << "x, state vector" << endl;
+  std::cout << "x, state vector" << std::endl;
   for (int i=0; i<N-1; i++)
     {
-      cout << x[i] << ",";
+      std::cout << x[i] << ",";
     }
-  cout << x[N-1] << endl;
+  std::cout << x[N-1] << std::endl;
   
-  cout << "xFPT, first-passage state vector" << endl;
+  std::cout << "xFPT, first-passage state vector" << std::endl;
   for (int i=0; i<N-1; i++)
     {
-      cout << xFPT[i] << ",";
+      std::cout << xFPT[i] << ",";
     }
-  cout << xFPT[N-1] << endl;
+  std::cout << xFPT[N-1] << std::endl;
   
-  cout << "S, stoichiometric matrix" << endl;
+  std::cout << "S, stoichiometric matrix" << std::endl;
   for (int j=0; j<M-1; j++)
     {
       for (int i=0; i<N-1; i++)
 	{
-	  cout << S[j][i] << ",";
+	  std::cout << S[j][i] << ",";
 	}
-      cout << S[j][N-1] << endl;
+      std::cout << S[j][N-1] << std::endl;
     }
   for (int i=0; i<N-1; i++)
     {
-      cout << S[M-1][i] << ",";
+      std::cout << S[M-1][i] << ",";
     }
-  cout << S[M-1][N-1] << endl;
+  std::cout << S[M-1][N-1] << std::endl;
 
-  cout << "W, propensity vector" << endl;
+  std::cout << "W, propensity vector" << std::endl;
   for (int i=0; i<M-1; i++)
     {
-      cout << W[i] << ",";
+      std::cout << W[i] << ",";
     }
-  cout << W[M-1] << endl;
+  std::cout << W[M-1] << std::endl;
 }
 
 
@@ -382,7 +382,7 @@ void gillespie_solver::run_FPT(double &t, double &t_max)
   while (1)
     {
 
-      // cout << "t=" << t << endl;
+      // std::cout << "t=" << t << std::endl;
       // sample random numbers for the reaction and time
       r_t = u_rand(rand_eng);
       r_rxn = u_rand(rand_eng);
@@ -395,7 +395,7 @@ void gillespie_solver::run_FPT(double &t, double &t_max)
 
       // sample time based on total propensity
       dt = -log(r_t)/total_propensity;
-      // cout << "dt=" << dt << endl;
+      // std::cout << "dt=" << dt << std::endl;
       
       // test of proposed time exceeds maximum
       if (t+dt > t_max)
@@ -417,19 +417,19 @@ void gillespie_solver::run_FPT(double &t, double &t_max)
       // test for FPT species and break the loop if they are found
       FPT_index = test_FPT();
 
-      // cout << "FPT_index = " << FPT_index << endl;
+      // std::cout << "FPT_index = " << FPT_index << std::endl;
 
       if (FPT_index != -1) break;
       
     } // end while loop
 
-  cout << "\nxf, final state vector at t = " << t << " (s)" << endl;
+  std::cout << "\nxf, final state vector at t = " << t << " (s)" << std::endl;
   for (int i=0; i<N-1; i++)
     {
-      cout << x[i] << ",";
+      std::cout << x[i] << ",";
     }
-  cout << x[N-1] << endl;
-  cout << "\n" << endl;
+  std::cout << x[N-1] << std::endl;
+  std::cout << "\n" << std::endl;
 }
 
 

@@ -15,9 +15,9 @@ void btree::reset_root()
 // destructor
 btree::~btree()
 {
-  // cout << "btree destructor before destroy" << endl;
+  // std::cout << "btree destructor before destroy" << std::endl;
   destroy_tree();
-  // cout << "btree destructor after destroy" << endl;
+  // std::cout << "btree destructor after destroy" << std::endl;
 }
 
 
@@ -50,7 +50,7 @@ void btree::prepare_state(btree_state st)
 
       if (error_code == -1)
 	{
-	  cout << "ERROR: impossible state, destroying tree" << endl;
+	  std::cout << "ERROR: impossible state, destroying tree" << std::endl;
 	  destroy_tree();
 	  return;
 	}
@@ -72,7 +72,7 @@ btree_state btree::dump_state()
       st.size = root->size;
 
       // add completed forks to state
-      for (string s: get_completed_forks())
+      for (std::string s: get_completed_forks())
 	{
 	  
 	  f_r.fork = s;
@@ -85,7 +85,7 @@ btree_state btree::dump_state()
 	}
 
       // add active forks to state
-      for (string s: get_active_forks())
+      for (std::string s: get_active_forks())
 	{
 	  
 	  f_r.fork = s;
@@ -121,7 +121,7 @@ void btree::apply_transforms(btree_transforms tr)
 
       if (error_code == -1)
 	{
-	  cout << "ERROR: impossible state, destroying tree and returning to initial state" << endl;
+	  std::cout << "ERROR: impossible state, destroying tree and returning to initial state" << std::endl;
 
 	  // destroy the impossible tree and return to the initial state
 	  destroy_tree();
@@ -145,7 +145,7 @@ void btree::single_transform(fork_rho f_r)
 
   if (error_code == -1)
     {
-      cout << "ERROR: impossible state, destroying tree and returning to initial state" << endl;
+      std::cout << "ERROR: impossible state, destroying tree and returning to initial state" << std::endl;
 
       // destroy the impossible tree and return to the initial state
       destroy_tree();
@@ -157,20 +157,20 @@ void btree::single_transform(fork_rho f_r)
 
 
 // function to write a binary tree state to a file
-void btree::write_state(string st_filename, btree_state st)
+void btree::write_state(std::string st_filename, btree_state st)
 {
-  fstream st_file;
+  std::fstream st_file;
 
-  st_file.open(st_filename, ios::out);
+  st_file.open(st_filename, std::ios::out);
 
   if (!st_file.is_open())
     {
-      cout << "ERROR: file not opened in write_state" << endl;
+      std::cout << "ERROR: file not opened in write_state" << std::endl;
     }
   else
     {
 
-      st_file << "size=" << st.size << endl;
+      st_file << "size=" << st.size << std::endl;
 
       for (fork_rho f_r: st.transforms)
 	{
@@ -178,7 +178,7 @@ void btree::write_state(string st_filename, btree_state st)
 	  st_file << f_r.fork <<
 	    "_cw" << f_r.rho_cw <<
 	    "_ccw" << f_r.rho_ccw <<
-	    endl;
+	    std::endl;
       
 	}
       st_file.close();
@@ -187,27 +187,27 @@ void btree::write_state(string st_filename, btree_state st)
 
 
 // function to read a binary tree state from a file
-btree_state btree::read_state(string st_filename)
+btree_state btree::read_state(std::string st_filename)
 {
-  fstream st_file;
+  std::fstream st_file;
 
   btree_state st;
   fork_rho f_r;
   
-  string line;
+  std::string line;
 
   int delim;
   
   bool size_found = false;
 
-  st_file.open(st_filename, ios::in);
+  st_file.open(st_filename, std::ios::in);
 
-  // cout << st_filename << endl;
+  // std::cout << st_filename << std::endl;
 
   if (!st_file.is_open())
     {
       st.size = -1;
-      cout << "ERROR: file not opened in read_state" << endl;
+      std::cout << "ERROR: file not opened in read_state" << std::endl;
     }
   else
     {
@@ -216,14 +216,14 @@ btree_state btree::read_state(string st_filename)
 	  st_file >> line;
 	  if (st_file.eof()) break;
 	  
-	  // cout << line << endl;
+	  // std::cout << line << std::endl;
 
 	  if (size_found == false)
 	    {
 	      
 	      delim = line.find("=");
-	      // cout << line.substr(0,delim) << endl;
-	      // cout << line.substr(delim+1,line.length()) << endl;
+	      // std::cout << line.substr(0,delim) << std::endl;
+	      // std::cout << line.substr(delim+1,line.length()) << std::endl;
 	      
 	      if (line.substr(0,delim) == "size")
 		{
@@ -250,22 +250,22 @@ btree_state btree::read_state(string st_filename)
 
 
 // function to read a binary tree state from a file
-btree_transforms btree::read_transforms(string tr_filename)
+btree_transforms btree::read_transforms(std::string tr_filename)
 {
-  fstream tr_file;
+  std::fstream tr_file;
 
   btree_transforms tr;
   fork_rho f_r;
   
-  string line;
+  std::string line;
 
-  tr_file.open(tr_filename, ios::in);
+  tr_file.open(tr_filename, std::ios::in);
 
-  // cout << tr_filename << endl;
+  // std::cout << tr_filename << std::endl;
 
   if (!tr_file.is_open())
     {
-      cout << "ERROR: file not opened in read_transforms" << endl;
+      std::cout << "ERROR: file not opened in read_transforms" << std::endl;
     }
   else
     {
@@ -274,7 +274,7 @@ btree_transforms btree::read_transforms(string tr_filename)
 	  tr_file >> line;
 	  if (tr_file.eof()) break;
 	  
-	  // cout << line << endl;
+	  // std::cout << line << std::endl;
 	  f_r = parse_transform(line);
 	  tr.push_back(f_r);
 
@@ -289,8 +289,8 @@ btree_transforms btree::read_transforms(string tr_filename)
 
 
 
-// function to parse string into the transform
-fork_rho btree::parse_transform(string s)
+// function to parse std::string into the transform
+fork_rho btree::parse_transform(std::string s)
 {
   fork_rho f_r;
   int delim;
@@ -337,7 +337,7 @@ void btree::initialize_branch(node *branch, int g, int s)
 
 
 // function to begin a branching procedure if it is valid
-int btree::branch(string loc)
+int btree::branch(std::string loc)
 {
   node *branch;
 
@@ -345,20 +345,20 @@ int btree::branch(string loc)
 
   if (branch == nullptr)
     {
-      cout << "invalid branch ("
+      std::cout << "invalid branch ("
 	   << loc
 	   << ")"
-	   << endl;
+	   << std::endl;
       
       return 1;
     }
   else
     {
       
-      // cout << "branching at ("
+      // std::cout << "branching at ("
       // 	   << loc
       // 	   << ")"
-      // 	   << endl;
+      // 	   << std::endl;
       
       split_branch(branch);
       
@@ -386,7 +386,7 @@ void btree::split_branch(node *branch)
 
 
 // function to increase rho in a manner dependent on the possible growth
-int btree::grow_at_branch_sym(string loc, int r_sym)
+int btree::grow_at_branch_sym(std::string loc, int r_sym)
 {
   int rem, error_code;
   int r_cw, r_ccw;
@@ -404,7 +404,7 @@ int btree::grow_at_branch_sym(string loc, int r_sym)
       r_cw = r_sym/2;
       r_ccw = r_sym - r_cw;
 
-      uniform_real_distribution<double> u_dist(0.0,1.0);
+      std::uniform_real_distribution<double> u_dist(0.0,1.0);
       double ur = u_dist(rand_eng);
       if (ur < 0.5)
 	{
@@ -426,11 +426,11 @@ int btree::grow_at_branch_sym(string loc, int r_sym)
 
 
 // function to increase rho in a manner dependent on the possible growth
-int btree::grow_at_branch_asym(string loc, int r_cw, int r_ccw)
+int btree::grow_at_branch_asym(std::string loc, int r_cw, int r_ccw)
 {
   int error_code;
   node *g_branch;
-  array<int,2> part_growths;
+  std::array<int,2> part_growths;
 
   error_code = branch(loc);
   if (error_code < 0)
@@ -511,9 +511,9 @@ int btree::get_max_growth_ccw(node *branch)
 }
 
 // function to partition maximum growths assuming symmetric rates along cw and ccw
-array<int,2> btree::partition_growths_sym(node *branch, int proposed_r_cw, int proposed_r_ccw)
+std::array<int,2> btree::partition_growths_sym(node *branch, int proposed_r_cw, int proposed_r_ccw)
 {
-  array<int,2> growths;
+  std::array<int,2> growths;
   int max_growth_cw, max_growth_ccw;
   
   bool cw_first = true;
@@ -534,7 +534,7 @@ array<int,2> btree::partition_growths_sym(node *branch, int proposed_r_cw, int p
     }
   else
     {
-      uniform_real_distribution<double> u_dist(0.0,1.0);
+      std::uniform_real_distribution<double> u_dist(0.0,1.0);
       double ur = u_dist(rand_eng);
       if (ur < 0.5) cw_first = false;
     }
@@ -579,10 +579,10 @@ void btree::random_transforms(int r)
 {
   int rem = r;
   int potential_size = max_size();
-  vector<string> forks;
+  std::vector<std::string> forks;
   int N_forks, fork_add, fork_rem, r_cw, r_ccw;
   int cycle_rem;
-  vector<int> partitions;
+  std::vector<int> partitions;
 
 
   // do while units remain  and the total size is the less than the maximum possible size
@@ -598,7 +598,7 @@ void btree::random_transforms(int r)
 
       cycle_rem = rem;
 
-      uniform_int_distribution<int> unif_dist(0,rem);
+      std::uniform_int_distribution<int> unif_dist(0,rem);
 
       // sample partitions
       for (int i=0; i<N_forks; i++)
@@ -609,10 +609,10 @@ void btree::random_transforms(int r)
       // sort the partitions
       sort(partitions.begin(),partitions.end());
 
-      // cout << "rem = " << rem << endl;
+      // std::cout << "rem = " << rem << std::endl;
       // for (int i=0; i<N_parts; i++)
       // 	{
-      // 	  cout << partitions[i] << endl;
+      // 	  std::cout << partitions[i] << std::endl;
       // 	}
 
       for (int i=0; i<N_forks; i++)
@@ -635,7 +635,7 @@ void btree::random_transforms(int r)
 
 	      if (fork_add > 0)
 		{
-		  binomial_distribution<int> binom_dist(fork_add,0.5);
+		  std::binomial_distribution<int> binom_dist(fork_add,0.5);
 		  r_cw = binom_dist(rand_eng);
 		  r_ccw = fork_add - r_cw;
 		  fork_rem = grow_at_branch_asym(forks[i],r_cw,r_ccw);
@@ -643,11 +643,11 @@ void btree::random_transforms(int r)
 		}
 	    }
 
-	  // cout << forks[i] << endl;
-	  // cout << " fork_add = " << fork_add << endl;
-	  // cout << " fork_rem = " << fork_rem << endl;
+	  // std::cout << forks[i] << std::endl;
+	  // std::cout << " fork_add = " << fork_add << std::endl;
+	  // std::cout << " fork_rem = " << fork_rem << std::endl;
 
-	  // cout << " rem = " << rem << endl;
+	  // std::cout << " rem = " << rem << std::endl;
 	    
 	} // end loop over forks
 	
@@ -657,7 +657,7 @@ void btree::random_transforms(int r)
 
 
 // function get pointer for a branch given the code
-node *btree::get_branch(string loc)
+node *btree::get_branch(std::string loc)
 {
 
   int n = loc.length();
@@ -705,7 +705,7 @@ int btree::count_total_leaves()
   return count_leaves("m");
 }
 
-int btree::count_leaves(string loc)
+int btree::count_leaves(std::string loc)
 {
   return leaf_counter(get_branch(loc));
 }
@@ -732,7 +732,7 @@ int btree::count_total_forks()
   return count_total_forks("m");
 }
 
-int btree::count_total_forks(string loc)
+int btree::count_total_forks(std::string loc)
 {
   return total_fork_counter(get_branch(loc));
 }
@@ -756,7 +756,7 @@ int btree::count_completed_forks()
   return count_completed_forks("m");
 }
 
-int btree::count_completed_forks(string loc)
+int btree::count_completed_forks(std::string loc)
 {
   return completed_fork_counter(get_branch(loc));
 }
@@ -780,7 +780,7 @@ int btree::count_active_forks()
   return count_active_forks("m");
 }
 
-int btree::count_active_forks(string loc)
+int btree::count_active_forks(std::string loc)
 {
   return active_fork_counter(get_branch(loc));
 }
@@ -799,9 +799,9 @@ int btree::active_fork_counter(node *branch)
 
 
 // functions to get labels for leaves
-vector<string> btree::get_leaves()
+std::vector<std::string> btree::get_leaves()
 {
-  vector<string> leaves;
+  std::vector<std::string> leaves;
   if (count_total_leaves() > 0)
     {
       leaves.push_back("m");
@@ -810,11 +810,11 @@ vector<string> btree::get_leaves()
   return leaves;
 }
 
-vector<string> btree::traverse_leaves(vector<string> leaves, node *branch)
+std::vector<std::string> btree::traverse_leaves(std::vector<std::string> leaves, node *branch)
 {
   if (branch->leaf == false)
     {
-      string temp_parent = leaves.back();
+      std::string temp_parent = leaves.back();
       leaves.back() += "l";
       leaves = traverse_leaves(leaves,branch->left);
       leaves.push_back(temp_parent+"r");
@@ -825,9 +825,9 @@ vector<string> btree::traverse_leaves(vector<string> leaves, node *branch)
 
 
 // functions to get labels for completed forks
-vector<string> btree::get_completed_forks()
+std::vector<std::string> btree::get_completed_forks()
 {
-  vector<string> forks;
+  std::vector<std::string> forks;
   if (count_completed_forks() > 0)
     {
       forks = traverse_completed_forks(forks,0,get_branch("m"));
@@ -835,7 +835,7 @@ vector<string> btree::get_completed_forks()
   return forks;
 }
 
-vector<string> btree::traverse_completed_forks(vector<string> forks, int i, node *branch)
+std::vector<std::string> btree::traverse_completed_forks(std::vector<std::string> forks, int i, node *branch)
 {
   
   // case for root node
@@ -866,9 +866,9 @@ vector<string> btree::traverse_completed_forks(vector<string> forks, int i, node
 
 
 // functions to get labels for active forks
-vector<string> btree::get_active_forks()
+std::vector<std::string> btree::get_active_forks()
 {
-  vector<string> forks;
+  std::vector<std::string> forks;
   if (count_active_forks() > 0)
     {
       forks = traverse_active_forks(forks,"m",get_branch("m"));
@@ -876,7 +876,7 @@ vector<string> btree::get_active_forks()
   return forks;
 }
 
-vector<string> btree::traverse_active_forks(vector<string> forks, string f, node *branch)
+std::vector<std::string> btree::traverse_active_forks(std::vector<std::string> forks, std::string f, node *branch)
 {
   
   if (branch->leaf == false)
@@ -930,14 +930,14 @@ int btree::max_size()
 void btree::solve_topology()
 {
   int temp_start, target_size;
-  string free_leaf;
-  string query_leaf;
+  std::string free_leaf;
+  std::string query_leaf;
   node *free_branch; // free branch whose topology is being determined
   node *query_branch; // branch queried for sizing of free branch
   node *link_branch; // branch that free branch is linked to
 
   int N_leaves = count_total_leaves();
-  vector<string> leaves = get_leaves();
+  std::vector<std::string> leaves = get_leaves();
 
   bool match;
   int j_q, j_f;
@@ -1109,24 +1109,24 @@ void btree::solve_topology()
 
 
 // function used to dump the topology to a file
-void btree::dump_topology(string topo_filename, int idx)
+void btree::dump_topology(std::string topo_filename, int idx)
 {
-  fstream topo_file;
+  std::fstream topo_file;
   
   node *topo_branch;
 
-  topo_file.open(topo_filename, ios::out);
+  topo_file.open(topo_filename, std::ios::out);
 
   if (!topo_file.is_open())
     {
-      cout << "ERROR: file not opened in dump_topology" << endl;
+      std::cout << "ERROR: file not opened in dump_topology" << std::endl;
     }
   else
     {
 
-      topo_file << "size=" << total_size() <<  endl;      
+      topo_file << "size=" << total_size() <<  std::endl;      
   
-      for (string leaf: get_leaves())
+      for (std::string leaf: get_leaves())
 	{
 	  
 	  topo_branch = get_branch(leaf);
@@ -1140,7 +1140,7 @@ void btree::dump_topology(string topo_filename, int idx)
 		    << "," << (topo_branch->topo.mid + idx)
 		    << "," << (topo_branch->topo.end + idx)
 		    << "," << (topo_branch->topo.end_link + idx)
-		    << endl;
+		    << std::endl;
       
 	}
 
@@ -1152,7 +1152,7 @@ void btree::dump_topology(string topo_filename, int idx)
 
 
 // get the topology of a single leaf
-theta_topo btree::get_leaf_topo(string loc)
+theta_topo btree::get_leaf_topo(std::string loc)
 {
   node *branch;
 
@@ -1163,48 +1163,48 @@ theta_topo btree::get_leaf_topo(string loc)
 
 
 // function used to dump the fork partitions to a file
-void btree::dump_fork_partitions(string fork_partitions_filename, int idx)
+void btree::dump_fork_partitions(std::string fork_partitions_filename, int idx)
 {
 
-  vector<fork_partition> f_ps = get_all_fork_partitions();
+  std::vector<fork_partition> f_ps = get_all_fork_partitions();
   
-  fstream f_ps_file;
-  string temp_line;
+  std::fstream f_ps_file;
+  std::string temp_line;
   int N_total;
   
-  f_ps_file.open(fork_partitions_filename, ios::out);
+  f_ps_file.open(fork_partitions_filename, std::ios::out);
 
   if (!f_ps_file.is_open())
     {
-      cout << "ERROR: file not opened in dump_fork_partitions" << endl;
+      std::cout << "ERROR: file not opened in dump_fork_partitions" << std::endl;
     }
   else
     {
 
       // write the total number of forks that were partitioned about
-      f_ps_file << "N_forks=" << f_ps.size() << endl;
+      f_ps_file << "N_forks=" << f_ps.size() << std::endl;
       // write the indexing convention
-      f_ps_file << "idx=" << idx << endl;
+      f_ps_file << "idx=" << idx << std::endl;
 
       for (fork_partition f_p : f_ps)
 	{
 
 	  temp_line = f_p.fork + ",";
-	  temp_line += to_string(f_p.left_monos.size()) + ",";
+	  temp_line += std::to_string(f_p.left_monos.size()) + ",";
 
 	  N_total = 0;
 	  for (size_t i=0; i<f_p.left_monos.size(); i++)
 	    N_total += f_p.left_monos[i].N;
-	  temp_line += to_string(N_total) + ",";
+	  temp_line += std::to_string(N_total) + ",";
 	  
-	  temp_line += to_string(f_p.right_monos.size()) + ",";
+	  temp_line += std::to_string(f_p.right_monos.size()) + ",";
 
 	  N_total = 0;
 	  for (size_t i=0; i<f_p.right_monos.size(); i++)
 	    N_total += f_p.right_monos[i].N;
-	  temp_line += to_string(N_total);
+	  temp_line += std::to_string(N_total);
 	  
-	  f_ps_file << temp_line << endl;
+	  f_ps_file << temp_line << std::endl;
 
 	  for (size_t i=0; i<f_p.left_monos.size(); i++)
 	    {
@@ -1218,13 +1218,13 @@ void btree::dump_fork_partitions(string fork_partitions_filename, int idx)
 		  temp_line = "\tw,";
 		}
 
-	      temp_line += to_string(f_p.left_monos[i].N) + ",";
-	      temp_line += to_string(f_p.left_monos[i].ll) + ",";
-	      temp_line += to_string(f_p.left_monos[i].mid_ll) + ",";
-	      temp_line += to_string(f_p.left_monos[i].mid_ul) + ",";
-	      temp_line += to_string(f_p.left_monos[i].ul);
+	      temp_line += std::to_string(f_p.left_monos[i].N) + ",";
+	      temp_line += std::to_string(f_p.left_monos[i].ll) + ",";
+	      temp_line += std::to_string(f_p.left_monos[i].mid_ll) + ",";
+	      temp_line += std::to_string(f_p.left_monos[i].mid_ul) + ",";
+	      temp_line += std::to_string(f_p.left_monos[i].ul);
 
-	      f_ps_file << temp_line << endl;
+	      f_ps_file << temp_line << std::endl;
 	      
 	    }
 
@@ -1240,13 +1240,13 @@ void btree::dump_fork_partitions(string fork_partitions_filename, int idx)
 		  temp_line = "\tw,";
 		}
 
-	      temp_line += to_string(f_p.right_monos[i].N) + ",";
-	      temp_line += to_string(f_p.right_monos[i].ll) + ",";
-	      temp_line += to_string(f_p.right_monos[i].mid_ll) + ",";
-	      temp_line += to_string(f_p.right_monos[i].mid_ul) + ",";
-	      temp_line += to_string(f_p.right_monos[i].ul);
+	      temp_line += std::to_string(f_p.right_monos[i].N) + ",";
+	      temp_line += std::to_string(f_p.right_monos[i].ll) + ",";
+	      temp_line += std::to_string(f_p.right_monos[i].mid_ll) + ",";
+	      temp_line += std::to_string(f_p.right_monos[i].mid_ul) + ",";
+	      temp_line += std::to_string(f_p.right_monos[i].ul);
 
-	      f_ps_file << temp_line << endl;
+	      f_ps_file << temp_line << std::endl;
 	      
 	    }
 	}
@@ -1258,27 +1258,27 @@ void btree::dump_fork_partitions(string fork_partitions_filename, int idx)
 
 
 // get all fork partitions
-vector<fork_partition> btree::get_all_fork_partitions()
+std::vector<fork_partition> btree::get_all_fork_partitions()
 {
-  vector<fork_partition> f_ps;
+  std::vector<fork_partition> f_ps;
   fork_partition f_p;
 
   // get the total set of forks (completed and active)
   
-  vector<string> total_forks;
+  std::vector<std::string> total_forks;
   
-  for (string fork : get_completed_forks())
+  for (std::string fork : get_completed_forks())
     {
       total_forks.push_back(fork);
     }
-  for (string fork : get_active_forks())
+  for (std::string fork : get_active_forks())
     {
       total_forks.push_back(fork);
     }
 
 
   // iterate over the forks and get the partition for each
-  for (string fork : total_forks)
+  for (std::string fork : total_forks)
     {
       f_p = get_fork_partition(fork);
       f_ps.push_back(f_p);
@@ -1290,7 +1290,7 @@ vector<fork_partition> btree::get_all_fork_partitions()
 
 
 // get the partition about a fork
-fork_partition btree::get_fork_partition(string loc)
+fork_partition btree::get_fork_partition(std::string loc)
 {
 
   fork_partition f_p;
@@ -1299,10 +1299,10 @@ fork_partition btree::get_fork_partition(string loc)
   f_p.fork = loc;
 
   // determine the leaves belonging to the left and right branches
-  string l_loc, r_loc;
+  std::string l_loc, r_loc;
   l_loc = loc + 'l';
   r_loc = loc + 'r';
-  vector<string> l_leaves, r_leaves;
+  std::vector<std::string> l_leaves, r_leaves;
   l_leaves.push_back(l_loc);
   l_leaves = traverse_leaves(l_leaves,get_branch(l_loc));
   r_leaves.push_back(r_loc);
@@ -1311,7 +1311,7 @@ fork_partition btree::get_fork_partition(string loc)
   // prepare the monomer ranges
   theta_topo temp_topo;
   mono_range temp_m_r;
-  string leaf;
+  std::string leaf;
 
   // add the monomer ranges for the left leaves
   for (size_t i_leaf=0; i_leaf<l_leaves.size(); i_leaf++)
@@ -1425,23 +1425,23 @@ fork_partition btree::get_fork_partition(string loc)
 
 
 // function to read chromosome regions from file
-vector<chromo_region> btree::read_regions(string rg_filename, int idx)
+std::vector<chromo_region> btree::read_regions(std::string rg_filename, int idx)
 {
-  fstream rg_file;
+  std::fstream rg_file;
 
   chromo_region c_r;
-  vector<chromo_region> c_rs;
+  std::vector<chromo_region> c_rs;
 
-  string line;
+  std::string line;
   
-  string rg_delim = ",";
+  std::string rg_delim = ",";
   int delim;
   
-  rg_file.open(rg_filename, ios::in);
+  rg_file.open(rg_filename, std::ios::in);
 
   if (!rg_file.is_open())
     {
-      cout << "ERROR: file not opened in read_regions" << endl;
+      std::cout << "ERROR: file not opened in read_regions" << std::endl;
     }
   else
     {
@@ -1480,7 +1480,7 @@ vector<chromo_region> btree::read_regions(string rg_filename, int idx)
 
 
 // function to update region counts
-void btree::update_region_counts(vector<chromo_region> &c_rs)
+void btree::update_region_counts(std::vector<chromo_region> &c_rs)
 {
 
   int offset;
@@ -1495,7 +1495,7 @@ void btree::update_region_counts(vector<chromo_region> &c_rs)
     }
 
   // iterate over leaves
-  for (string leaf: get_leaves())
+  for (std::string leaf: get_leaves())
     {
 	  
       count_branch = get_branch(leaf);
@@ -1508,8 +1508,8 @@ void btree::update_region_counts(vector<chromo_region> &c_rs)
       // offset = exists_size/2;
       // offset = count_branch->parent->rho_ccw; 
 
-      // cout << exists_size << endl;
-      // cout << offset << endl;
+      // std::cout << exists_size << std::endl;
+      // std::cout << offset << std::endl;
 
       // iterate over regions
       for (chromo_region &c_r: c_rs)
@@ -1518,7 +1518,7 @@ void btree::update_region_counts(vector<chromo_region> &c_rs)
 	  start_circ = (c_r.start + offset)%circ_size;
 	  end_circ = (c_r.end + offset)%circ_size;
 
-	  // cout << c_r.name << " " << start_circ << " " << end_circ << endl;
+	  // std::cout << c_r.name << " " << start_circ << " " << end_circ << std::endl;
 
 	  if ((start_circ >= 0) &&
 	      (end_circ >= 0) &&
@@ -1538,15 +1538,15 @@ void btree::update_region_counts(vector<chromo_region> &c_rs)
 
 
 // function used to dump the regions and counts to a file
-void btree::dump_regions(string rg_filename, vector<chromo_region> c_rs)
+void btree::dump_regions(std::string rg_filename, std::vector<chromo_region> c_rs)
 {
-  fstream rg_file;
+  std::fstream rg_file;
 
-  rg_file.open(rg_filename, ios::out);
+  rg_file.open(rg_filename, std::ios::out);
 
   if (!rg_file.is_open())
     {
-      cout << "ERROR: file not opened in dump_regions" << endl;
+      std::cout << "ERROR: file not opened in dump_regions" << std::endl;
     }
   else
     {
@@ -1558,7 +1558,7 @@ void btree::dump_regions(string rg_filename, vector<chromo_region> c_rs)
 		  << "," << c_r.start
 		  << "," << c_r.end
 		  << ":" << c_r.count
-		  << endl;
+		  << std::endl;
       
 	}
 
@@ -1568,15 +1568,15 @@ void btree::dump_regions(string rg_filename, vector<chromo_region> c_rs)
   
 }
 
-void btree::dump_CG_map(string CG_filename, int idx, CG_map &m)
+void btree::dump_CG_map(std::string CG_filename, int idx, CG_map &m)
 {
-  fstream CG_file;
+  std::fstream CG_file;
 
-  CG_file.open(CG_filename, ios::out);
+  CG_file.open(CG_filename, std::ios::out);
 
   if (!CG_file.is_open())
     {
-      cout << "ERROR: file not opened in dump_CG_map" << endl;
+      std::cout << "ERROR: file not opened in dump_CG_map" << std::endl;
     }
   else
     {
@@ -1591,11 +1591,11 @@ void btree::dump_CG_map(string CG_filename, int idx, CG_map &m)
 	      << m.N_base_CG
 	      << "\nN_CG = "
 	      << m.N_CG
-	      << endl;
+	      << std::endl;
 
       CG_file << "\n\nN_leaves = "
 	      << m.CG_leaves.size()
-	      << endl;
+	      << std::endl;
 
       for (CG_leaf leaf: m.CG_leaves)
 	{
@@ -1605,11 +1605,11 @@ void btree::dump_CG_map(string CG_filename, int idx, CG_map &m)
 		  << leaf.start + idx
 		  << ","
 		  << leaf.end + idx
-		  << endl;
+		  << std::endl;
       
 	}
 
-      CG_file << "\nID, base-ID, min, max" << endl;
+      CG_file << "\nID, base-ID, min, max" << std::endl;
       
   
       for (CG_locus l: m.loci)
@@ -1622,7 +1622,7 @@ void btree::dump_CG_map(string CG_filename, int idx, CG_map &m)
 		  << l.start + idx
 		  << ","
 		  << l.end + idx
-		  << endl;
+		  << std::endl;
       
 	}
 
@@ -1642,7 +1642,7 @@ CG_map btree::update_CG_map(int f_CG)
 
   int temp_lb, temp_ub, temp_mid, mid_offset;
 
-  vector<string> leaves = get_leaves();
+  std::vector<std::string> leaves = get_leaves();
 
   m.f_CG = f_CG;
   m.N_base = root->size;
@@ -1699,7 +1699,7 @@ CG_map btree::update_CG_map(int f_CG)
 
 
 // function to create a centered coarse-graining for a single branch
-void btree::centered_CG_map(int &mid, vector<CG_locus> &loci, node *branch, int f_CG)
+void btree::centered_CG_map(int &mid, std::vector<CG_locus> &loci, node *branch, int f_CG)
 {
 
   CG_locus l;
@@ -1805,7 +1805,7 @@ void btree::prepare_bonds(int **&c, int *&t, int &N, int idx)
 
   int i_bond = 0;
   // iterate over leaves in system
-  vector<string>leaves = get_leaves();
+  std::vector<std::string>leaves = get_leaves();
   for (int i_leaf=0; i_leaf<count_total_leaves(); i_leaf++)
     {
       
@@ -1878,7 +1878,7 @@ void btree::prepare_angles(int **&c, int *&t, int &N, int idx)
 
   int i_angle = 0;
   // iterate over leaves in system
-  vector<string>leaves = get_leaves();
+  std::vector<std::string>leaves = get_leaves();
   for (int i_leaf=0; i_leaf<count_total_leaves(); i_leaf++)
     {
       
@@ -1957,7 +1957,7 @@ void btree::prepare_angles(int **&c, int *&t, int &N, int idx)
 	  t[i_angle] = 1;
 	  c[i_angle][0] = topo_leaf->topo.start_link;
 	  c[i_angle][1] = topo_leaf->topo.start;
-	  c[i_angle][2] = min(topo_leaf->topo.start+1,topo_leaf->topo.end);
+	  c[i_angle][2] = std::min(topo_leaf->topo.start+1,topo_leaf->topo.end);
 	  i_angle += 1;
 
 	  t[i_angle] = 2;
@@ -1986,7 +1986,7 @@ void btree::prepare_angles(int **&c, int *&t, int &N, int idx)
 
 	  // angle at end
 	  t[i_angle] = 1;
-	  c[i_angle][0] = max(topo_leaf->topo.end-1,topo_leaf->topo.start);
+	  c[i_angle][0] = std::max(topo_leaf->topo.end-1,topo_leaf->topo.start);
 	  c[i_angle][1] = topo_leaf->topo.end;
 	  c[i_angle][2] = topo_leaf->topo.end_link;
 	  i_angle += 1;
@@ -2057,7 +2057,7 @@ void btree::prepare_types(int *&t, int &N, int base_type)
   t = new int[N];
 
   // iterate over leaves in system
-  vector<string>leaves = get_leaves();
+  std::vector<std::string>leaves = get_leaves();
   for (int i_leaf=0; i_leaf<count_total_leaves(); i_leaf++)
     {
       
@@ -2113,7 +2113,7 @@ void btree::destroy_tree()
 void btree::print_branch(node *branch)
 {
 
-  string gen_offset;
+  std::string gen_offset;
 
   gen_offset = "";
   for (int i=0; i<branch->gen; i++)
@@ -2122,10 +2122,10 @@ void btree::print_branch(node *branch)
     }
   gen_offset += "| ";
   
-  cout << gen_offset
+  std::cout << gen_offset
 	    << "generation = "
 	    << branch->gen
-	    << endl;
+	    << std::endl;
   
   if (branch->leaf == false)
     {
@@ -2142,7 +2142,7 @@ void btree::print_branch(node *branch)
 	  max_size_cw = max_size_t - branch->rho_ccw;
 	  max_size_ccw = max_size_t - branch->rho_cw;
 	}
-      cout << gen_offset
+      std::cout << gen_offset
 	   << "rho_t = "
 	   << branch->rho_t
 	   << "/" << max_size_t
@@ -2152,34 +2152,34 @@ void btree::print_branch(node *branch)
 	   << ", rho_ccw = "
 	   << branch->rho_ccw
 	   << "/" << max_size_ccw
-	   << endl;
+	   << std::endl;
     }
 
 
-  cout << gen_offset
+  std::cout << gen_offset
        << "start = "
        << branch->topo.start
        << ", mid = "
        << branch->topo.mid
        << ", end = "
        << branch->topo.end
-       << endl;
-  cout << gen_offset
+       << std::endl;
+  std::cout << gen_offset
        << "start_link = "
        << branch->topo.start_link
        << ", end_link = "
        << branch->topo.end_link
-       << endl;
+       << std::endl;
 
   if (branch->leaf == false)
     {
-      cout << gen_offset
+      std::cout << gen_offset
 		<< "left branch"
-		<< endl;
+		<< std::endl;
       print_branch(branch->left);
-      cout << gen_offset
+      std::cout << gen_offset
 		<< "right branch"
-		<< endl;
+		<< std::endl;
       print_branch(branch->right);
     }
 
@@ -2198,67 +2198,67 @@ void btree::print_tree()
       int N_completed_forks = count_completed_forks();
       int N_active_forks = count_active_forks();
       
-      cout << "\nprinting tree with "
+      std::cout << "\nprinting tree with "
 	   << N_leaves
 	   << " leaves and "
 	   << N_forks
 	   << " forks"
-	   << endl;
+	   << std::endl;
       
-      cout << "fork breakdown: "
+      std::cout << "fork breakdown: "
 	   << N_completed_forks
 	   << " completed, "
 	   << N_active_forks
 	   << " active"
-	   << endl;
+	   << std::endl;
 		     
-      cout << "leaves: "
-	   << endl;
+      std::cout << "leaves: "
+	   << std::endl;
       
-      for (string s: get_leaves())
+      for (std::string s: get_leaves())
 	{
-	  cout << s << " ";
+	  std::cout << s << " ";
 	}
-      cout << endl;
+      std::cout << std::endl;
 
       if (N_completed_forks > 0)
 	{
-	  cout << "completed forks: "
-	       << endl;
+	  std::cout << "completed forks: "
+	       << std::endl;
       
-	  for (string s: get_completed_forks())
+	  for (std::string s: get_completed_forks())
 	    {
-	      cout << s << " ";
+	      std::cout << s << " ";
 	    }
-	  cout << endl;
+	  std::cout << std::endl;
 	}
 
       if (N_active_forks > 0)
 	{
-	  cout << "active forks: "
-	       << endl;
+	  std::cout << "active forks: "
+	       << std::endl;
       
-	  for (string s: get_active_forks())
+	  for (std::string s: get_active_forks())
 	    {
-	      cout << s << " ";
+	      std::cout << s << " ";
 	    }
-	  cout << endl;
+	  std::cout << std::endl;
 	}
 
-      cout << "total_size = "
+      std::cout << "total_size = "
 	   << total_size()
-	   << endl;
+	   << std::endl;
       
       print_branch(root);
     }
   else
     {
-      cout << "\n\ntree does not exist" << endl;
+      std::cout << "\n\ntree does not exist" << std::endl;
     }
-  cout << "\n\n" << endl;
+  std::cout << "\n\n" << std::endl;
 }
 
 void btree::foo()
 {
-  cout << "btree\n";
+  std::cout << "btree\n";
 }

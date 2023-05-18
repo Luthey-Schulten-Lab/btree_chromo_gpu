@@ -3,7 +3,6 @@
 
 #include <btree.hpp>
 
-using namespace std;
 
 class mapper
 {
@@ -20,7 +19,7 @@ public:
   // prepare the mapping
   int prepare_mapping();
 
-  vector<vector<array<int,3>>> get_map();
+  std::vector<std::vector<std::array<int,3>>> get_map();
 
 private:
 

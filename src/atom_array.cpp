@@ -37,7 +37,7 @@ void atom_array::initialize_atoms()
   if (N > 0)
     {
 
-      cout << "N = " << N << endl;
+      std::cout << "N = " << N << std::endl;
       atoms = new atom[N];
 
       for (int i=0; i<N; i++)
@@ -157,7 +157,7 @@ void atom_array::set_coord(int i, vec r)
 
 
 // set element-wise coordinates
-void atom_array::set_coords(vector<vec> rs)
+void atom_array::set_coords(std::vector<vec> rs)
 {
   for (int i=0; i<N; i++)
     {
@@ -168,7 +168,7 @@ void atom_array::set_coords(vector<vec> rs)
 
 
 // set the particle coordinates from a 1D array of doubles
-void atom_array::set_coords_arr(double *&x, string order)
+void atom_array::set_coords_arr(double *&x, std::string order)
 {
 
   vec r;
@@ -197,33 +197,33 @@ void atom_array::set_coords_arr(double *&x, string order)
 
 
 // read coordinates from binary file
-int atom_array::read_bin_coords(string data_filename, string order, bool force_resize)
+int atom_array::read_bin_coords(std::string data_filename, std::string order, bool force_resize)
 {
-  fstream data_file;
+  std::fstream data_file;
 
-  data_file.open(data_filename, ios::in | ios::binary | ios::ate);
+  data_file.open(data_filename, std::ios::in | std::ios::binary | std::ios::ate);
 
   // int data_size = 4;
     
   if (!data_file.is_open())
     {
-      cout << "ERROR: file not opened in read_bin_coords" << endl;
+      std::cout << "ERROR: file not opened in read_bin_coords" << std::endl;
       return 1;
     }
   else
     {
 
       // read in the binary file
-      streampos size = data_file.tellg();
+      std::streampos size = data_file.tellg();
       char *memblock;
       double *x;
 
       int data_size = sizeof(double);
       char vals[sizeof(double)];
       int N_data = size/data_size;
-      cout << "N_data = " << N_data << endl;
+      std::cout << "N_data = " << N_data << std::endl;
       int N_bin_coords = N_data/3;
-      cout << "N_bin_coords = " << N_bin_coords << endl;
+      std::cout << "N_bin_coords = " << N_bin_coords << std::endl;
 
       // test for resizing
       if (force_resize)
@@ -234,14 +234,14 @@ int atom_array::read_bin_coords(string data_filename, string order, bool force_r
 	{
 	  if (N_bin_coords != get_N())
 	    {
-	      cout << "ERROR: incorrect atom_array size" << endl;
+	      std::cout << "ERROR: incorrect atom_array size" << std::endl;
 	      return 1;
 	    }
 	}
 
       memblock = new char[size];
       
-      data_file.seekg(0, ios::beg);
+      data_file.seekg(0, std::ios::beg);
 
       data_file.read(memblock,size);
 
@@ -271,9 +271,9 @@ int atom_array::read_bin_coords(string data_filename, string order, bool force_r
 
 
 // write to stream
-void atom_array::write(fstream &data_file)
+void atom_array::write(std::fstream &data_file)
 {
-  data_file << "\nAtoms # atom-ID atom-type x y z molecule-ID ellipsoid-flag density\n" << endl;
+  data_file << "\nAtoms # atom-ID atom-type x y z molecule-ID ellipsoid-flag density\n" << std::endl;
 
   for (int i=0; i<N; i++)
     {
@@ -284,39 +284,39 @@ void atom_array::write(fstream &data_file)
 		<< atoms[i].r.z << "  \t"
 		<< atoms[i].mol_id << "\t"
 		<< atoms[i].ellipsoid_flag << "\t"
-		<< atoms[i].density << endl;
+		<< atoms[i].density << std::endl;
     }
   
 }
 
 
 // write the boundary coordinates to an xyz file
-int atom_array::write_xyz(string data_filename)
+int atom_array::write_xyz(std::string data_filename)
 {
 
   // begin writing data file
   
-  fstream data_file;
+  std::fstream data_file;
 
-  data_file.open(data_filename, ios::out);
+  data_file.open(data_filename, std::ios::out);
 
   if (!data_file.is_open())
     {
-      cout << "ERROR: file not opened in write_xyz" << endl;
+      std::cout << "ERROR: file not opened in write_xyz" << std::endl;
       return 1;
     }
   else
     {
 
       // write system summary
-      data_file << N << "\n" << endl;
+      data_file << N << "\n" << std::endl;
 
       for (int i=0; i<N; i++)
 	{
 	  data_file << "C\t"
 		    << atoms[i].r.x << "\t"
 		    << atoms[i].r.y << "\t"
-		    << atoms[i].r.z << endl;
+		    << atoms[i].r.z << std::endl;
 	}
 
       data_file.close();
@@ -328,17 +328,17 @@ int atom_array::write_xyz(string data_filename)
 
 
 // write coordinates to a binary file
-int atom_array::write_bin(string data_filename, string order)
+int atom_array::write_bin(std::string data_filename, std::string order)
 {
-  fstream data_file;
+  std::fstream data_file;
 
-  data_file.open(data_filename, ios::out | ios::binary);
+  data_file.open(data_filename, std::ios::out | std::ios::binary);
 
   // int data_size = 4;
     
   if (!data_file.is_open())
     {
-      cout << "ERROR: file not opened in write_bin" << endl;
+      std::cout << "ERROR: file not opened in write_bin" << std::endl;
       return 1;
     }
   else if (N > 0)
@@ -372,7 +372,7 @@ int atom_array::write_bin(string data_filename, string order)
     }
   else
     {
-      cout << "no coords to write" << endl;
+      std::cout << "no coords to write" << std::endl;
       data_file.close();
       return 0;
     }
@@ -384,9 +384,9 @@ int atom_array::write_bin(string data_filename, string order)
 
 
 // get coordinates
-vector<vec> atom_array::get_coords()
+std::vector<vec> atom_array::get_coords()
 {
-  vector<vec> coords;
+  std::vector<vec> coords;
 
   for (int i=0; i<N; i++)
     {

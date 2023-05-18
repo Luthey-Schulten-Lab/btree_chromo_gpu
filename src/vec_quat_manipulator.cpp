@@ -87,7 +87,7 @@ vec vec_quat_manipulator::v_linterp(double s, vec v, vec w)
   return v_axpy(s,v_xpy(v,v_inv(w)),w);
 }
 
-void vec_quat_manipulator::v_array_from_vector(double **&x, int &N, vector<vec> &vs)
+void vec_quat_manipulator::v_array_from_vector(double **&x, int &N, std::vector<vec> &vs)
 {
 
   N = static_cast<int>(vs.size());
@@ -103,7 +103,7 @@ void vec_quat_manipulator::v_array_from_vector(double **&x, int &N, vector<vec> 
   
 }
 
-void vec_quat_manipulator::v_vector_from_array(vector<vec> &vs, double **&x, int &N)
+void vec_quat_manipulator::v_vector_from_array(std::vector<vec> &vs, double **&x, int &N)
 {
 
   vs.clear();

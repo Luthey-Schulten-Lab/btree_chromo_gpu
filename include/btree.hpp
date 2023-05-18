@@ -10,8 +10,6 @@
 #include <memory>
 #include <random>
 
-using namespace std;
-
 struct theta_topo
 {
   int start, end, start_link, end_link, mid;
@@ -31,22 +29,22 @@ struct node
 
 struct fork_rho
 {
-  string fork;
+  std::string fork;
   int rho_cw, rho_ccw;
 };
 
-typedef vector<fork_rho> btree_transforms;
+typedef std::vector<fork_rho> btree_transforms;
 
 struct btree_state
 {
   int size;
-  //vector<fork_rho> fork_rhos;
+  //std::vector<fork_rho> fork_rhos;
   btree_transforms transforms;
 };
 
 struct chromo_region
 {
-  string name;
+  std::string name;
   int start, end, count;
 };
 
@@ -57,7 +55,7 @@ struct CG_locus
 
 struct CG_leaf
 {
-  string leaf;
+  std::string leaf;
   int start, end, mid;
 };
 
@@ -67,8 +65,8 @@ struct CG_map
   int N_base_CG, N_CG;
   int f_CG;
 
-  vector<CG_locus> loci;
-  vector<CG_leaf> CG_leaves;
+  std::vector<CG_locus> loci;
+  std::vector<CG_leaf> CG_leaves;
 };
 
 struct mono_range
@@ -79,8 +77,8 @@ struct mono_range
 
 struct fork_partition
 {
-  string fork;
-  vector<mono_range> left_monos, right_monos;
+  std::string fork;
+  std::vector<mono_range> left_monos, right_monos;
 };
 
 class btree
@@ -105,19 +103,19 @@ public:
 
   // initialize and branch
   void initialize_tree(int s);
-  int branch(string loc);
+  int branch(std::string loc);
 
   // prepare and dump state
   void prepare_state(btree_state st);
   btree_state dump_state();
 
   // read and write the state
-  void write_state(string st_filename, btree_state st);
-  btree_state read_state(string st_filename);
-  btree_transforms read_transforms(string tr_filename);
+  void write_state(std::string st_filename, btree_state st);
+  btree_state read_state(std::string st_filename);
+  btree_transforms read_transforms(std::string tr_filename);
 
   // parse transform of form "(branch)_cw(rho_cw)_ccw(rho_ccw)"
-  fork_rho parse_transform(string s);
+  fork_rho parse_transform(std::string s);
 
   // apply transformations to btree
   void apply_transforms(btree_transforms tr);
@@ -134,23 +132,23 @@ public:
 
   // solve the theta structure topology
   void solve_topology();
-  void dump_topology(string topo_filename, int idx);
-  theta_topo get_leaf_topo(string loc);
-  void dump_fork_partitions(string fork_partitions_filename, int idx);
+  void dump_topology(std::string topo_filename, int idx);
+  theta_topo get_leaf_topo(std::string loc);
+  void dump_fork_partitions(std::string fork_partitions_filename, int idx);
 
   // update the coarse-graining map based on the current state
   CG_map update_CG_map(int f_CG);
-  void dump_CG_map(string CG_filename, int idx, CG_map &m);
+  void dump_CG_map(std::string CG_filename, int idx, CG_map &m);
 
   // read, update, and dump chromo_regions
-  vector<chromo_region> read_regions(string rg_filename, int idx);
-  void update_region_counts(vector<chromo_region> &c_rs);
-  void dump_regions(string rg_filename, vector<chromo_region> c_rs);
+  std::vector<chromo_region> read_regions(std::string rg_filename, int idx);
+  void update_region_counts(std::vector<chromo_region> &c_rs);
+  void dump_regions(std::string rg_filename, std::vector<chromo_region> c_rs);
 
   // get details of tree
-  vector<string> get_completed_forks();
-  vector<string> get_active_forks();
-  vector<string> get_leaves();
+  std::vector<std::string> get_completed_forks();
+  std::vector<std::string> get_active_forks();
+  std::vector<std::string> get_leaves();
 
   // create the topologies
   void prepare_bonds(int **&c, int *&t, int &N, int idx);
@@ -168,10 +166,10 @@ private:
   void print_branch(node *branch);
 
   // used for calculating tree state
-  int count_leaves(string loc);
-  int count_total_forks(string loc);
-  int count_completed_forks(string loc);
-  int count_active_forks(string loc);
+  int count_leaves(std::string loc);
+  int count_total_forks(std::string loc);
+  int count_completed_forks(std::string loc);
+  int count_active_forks(std::string loc);
   int leaf_counter(node *branch);
   int total_fork_counter(node *branch);
   int completed_fork_counter(node *branch);
@@ -179,33 +177,33 @@ private:
   int branch_size(node *branch);
 
   // used for calculating growth
-  int grow_at_branch_sym(string loc, int r);
-  int grow_at_branch_asym(string loc, int r_cw, int r_ccw);
+  int grow_at_branch_sym(std::string loc, int r);
+  int grow_at_branch_asym(std::string loc, int r_cw, int r_ccw);
   int get_max_growth_cw(node *branch);
   int get_max_growth_ccw(node *branch);
-  array<int,2> partition_growths_sym(node *branch, int proposed_r_cw, int proposed_r_ccw);
+  std::array<int,2> partition_growths_sym(node *branch, int proposed_r_cw, int proposed_r_ccw);
 
   // get the fork partitions about a fork
-  vector<fork_partition> get_all_fork_partitions();
-  fork_partition get_fork_partition(string loc);
+  std::vector<fork_partition> get_all_fork_partitions();
+  fork_partition get_fork_partition(std::string loc);
 
   // create centered CG maps per branch
-  void centered_CG_map(int &mid, vector<CG_locus> &loci, node *branch, int f_CG);
+  void centered_CG_map(int &mid, std::vector<CG_locus> &loci, node *branch, int f_CG);
 
   // traverse leaves and forks to determine identities
-  vector<string> traverse_leaves(vector<string> leaves, node *branch);
-  vector<string> traverse_completed_forks(vector<string> forks, int i, node *branch);
-  vector<string> traverse_active_forks(vector<string> forks, string f, node *branch);
+  std::vector<std::string> traverse_leaves(std::vector<std::string> leaves, node *branch);
+  std::vector<std::string> traverse_completed_forks(std::vector<std::string> forks, int i, node *branch);
+  std::vector<std::string> traverse_active_forks(std::vector<std::string> forks, std::string f, node *branch);
 
   // branch manipulation routines
-  node *get_branch(string loc);
+  node *get_branch(std::string loc);
   void initialize_branch(node *branch, int g, int s);
   void split_branch(node *branch);
   node *parse_dir(node *branch, char d);
 
 
   // uniform_real_distribution<> u_dist;
-  mt19937 rand_eng;
+  std::mt19937 rand_eng;
   node *root;
   
 

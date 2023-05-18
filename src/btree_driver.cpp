@@ -12,29 +12,29 @@ btree_driver::btree_driver()
 // destructor
 btree_driver::~btree_driver()
 {
-  // cout << "btree_driver destructor after destroy" << endl;
+  // std::cout << "btree_driver destructor after destroy" << std::endl;
   driver_bt.destroy_tree();
   driver_rg.clear();
   drctvs.clear();
-  // cout << "btree_driver destructor after destroy" << endl;
+  // std::cout << "btree_driver destructor after destroy" << std::endl;
 } 
 
 
 // function to read directives from file
-void btree_driver::read_directives(string drctvs_filename)
+void btree_driver::read_directives(std::string drctvs_filename)
 {
-  fstream drctvs_file;
+  std::fstream drctvs_file;
   
-  string line;
+  std::string line;
 
-  drctvs_file.open(drctvs_filename, ios::in);
+  drctvs_file.open(drctvs_filename, std::ios::in);
 
-  cout << "\nREADING DIRECTIVES:\n" << endl;
-  cout << "\t" << drctvs_filename << endl;
+  std::cout << "\nREADING DIRECTIVES:\n" << std::endl;
+  std::cout << "\t" << drctvs_filename << std::endl;
 
   if (!drctvs_file.is_open())
     {
-      cout << "ERROR: file not opened in read_directives" << endl;
+      std::cout << "ERROR: file not opened in read_directives" << std::endl;
     }
   else
     {
@@ -58,12 +58,12 @@ void btree_driver::read_directives(string drctvs_filename)
 // function print all directives
 void btree_driver::print_directives()
 {
-  cout << "\n--- PROGRAM DIRECTIVES ---\n" << endl;
-  for (string drctv: drctvs)
+  std::cout << "\n--- PROGRAM DIRECTIVES ---\n" << std::endl;
+  for (std::string drctv: drctvs)
     {
-      cout << drctv << endl;
+      std::cout << drctv << std::endl;
     }
-  cout << "\n--------------------------\n" << endl;
+  std::cout << "\n--------------------------\n" << std::endl;
 }
 
 
@@ -93,14 +93,14 @@ void btree_driver::reset_command_locks_and_updates()
 
 
 // test the validity of the command given the lock state
-int btree_driver::test_command_parameter_validity(string &command, vector<string> &params)
+int btree_driver::test_command_parameter_validity(std::string &command, std::vector<std::string> &params)
 {
   
   // test the number of parameters
   if (N_param_reqs[command] != params.size())
     {
-      cout << "ERROR: wrong number of parameters for (" << command << ")" << endl;
-      cout << "\t" << params.size() << " were given but " << N_param_reqs[command] << " are required" << endl;
+      std::cout << "ERROR: wrong number of parameters for (" << command << ")" << std::endl;
+      std::cout << "\t" << params.size() << " were given but " << N_param_reqs[command] << " are required" << std::endl;
       return 1;
     }
 
@@ -111,7 +111,7 @@ int btree_driver::test_command_parameter_validity(string &command, vector<string
 // validate the parameters in the sequence of commands
 int btree_driver::validate_command_sequence_parameters()
 {
-  cout << "\n--- BEGIN COMMAND PARAMETER VALIDATION ---\n" << endl;
+  std::cout << "\n--- BEGIN COMMAND PARAMETER VALIDATION ---\n" << std::endl;
   
   int e = 0;
 
@@ -124,26 +124,26 @@ int btree_driver::validate_command_sequence_parameters()
 
   if (e > 0)
     {
-      cout << "\terror in command parameters" << endl;
+      std::cout << "\terror in command parameters" << std::endl;
     }
   else
     {
-      cout << "\tvalid command parameters" << endl;
+      std::cout << "\tvalid command parameters" << std::endl;
     }
 
-  cout << "\n--- END COMMAND PARAMETER VALIDATION ---\n" << endl;
+  std::cout << "\n--- END COMMAND PARAMETER VALIDATION ---\n" << std::endl;
   return e;
 }
 
 
 // test the validity of the command given the lock state
-int btree_driver::test_command_lock_validity(string &command)
+int btree_driver::test_command_lock_validity(std::string &command)
 {
 
   int e = 0;
 
   // test the lock state for compatability
-  string key;
+  std::string key;
   bool s;
   for (size_t i_lock=0; i_lock<lock_tests[command].size(); i_lock++)
     {
@@ -152,8 +152,8 @@ int btree_driver::test_command_lock_validity(string &command)
 
       if (lock_state[key] != s)
 	{
-	  cout << "ERROR: incompatible lock state for (" << command << ")" << endl;
-	  cout << "\t" << key << " = " << lock_state[key] << endl;
+	  std::cout << "ERROR: incompatible lock state for (" << command << ")" << std::endl;
+	  std::cout << "\t" << key << " = " << lock_state[key] << std::endl;
 	  e += 1;
 	}
     }
@@ -165,10 +165,10 @@ int btree_driver::test_command_lock_validity(string &command)
 
 
 // update the locks after the completion of a command
-void btree_driver::update_lock_state_post_command(string &command)
+void btree_driver::update_lock_state_post_command(std::string &command)
 {
   // update the lock state given the command
-  string key;
+  std::string key;
   bool s;
   for (size_t i_lock=0; i_lock<lock_updates[command].size(); i_lock++)
     {
@@ -180,7 +180,7 @@ void btree_driver::update_lock_state_post_command(string &command)
 
 
 // create a new lock
-lock btree_driver::new_lock(string key, bool s)
+lock btree_driver::new_lock(std::string key, bool s)
 {
   lock l;
   l.key = key;
@@ -193,7 +193,7 @@ lock btree_driver::new_lock(string key, bool s)
 int btree_driver::validate_command_sequence()
 {
 
-  cout << "\n--- BEGIN COMMAND SEQUENCE VALIDATION ---\n" << endl;
+  std::cout << "\n--- BEGIN COMMAND SEQUENCE VALIDATION ---\n" << std::endl;
 
   reset_command_locks_and_updates();
   
@@ -208,16 +208,16 @@ int btree_driver::validate_command_sequence()
 
   if (e > 0)
     {
-      cout << "\terror in command sequence" << endl;
+      std::cout << "\terror in command sequence" << std::endl;
     }
   else
     {
-      cout << "\tvalid command sequence" << endl;
+      std::cout << "\tvalid command sequence" << std::endl;
     }
 
   reset_command_locks_and_updates();
 
-  cout << "\n--- END COMMAND SEQUENCE VALIDATION ---\n" << endl;
+  std::cout << "\n--- END COMMAND SEQUENCE VALIDATION ---\n" << std::endl;
   
   return e;
 }
@@ -226,10 +226,10 @@ int btree_driver::validate_command_sequence()
 // parse all of the directives
 void btree_driver::parse_directives()
 {
-  string temp_command;
-  vector<string> temp_params;
+  std::string temp_command;
+  std::vector<std::string> temp_params;
 
-  for (string drctv : drctvs)
+  for (std::string drctv : drctvs)
     {
       temp_params.clear();
       parse_single_directive(drctv,temp_command,temp_params);
@@ -240,14 +240,14 @@ void btree_driver::parse_directives()
 
 
 // parse a single directive
-void btree_driver::parse_single_directive(string drctv,
-					  string &command,
-					  vector<string> &params)
+void btree_driver::parse_single_directive(std::string drctv,
+					  std::string &command,
+					  std::vector<std::string> &params)
 {
 
-  string param, temp_params;
-  string cmd_delim = ":";
-  string param_delim = ",";
+  std::string param, temp_params;
+  std::string cmd_delim = ":";
+  std::string param_delim = ",";
   int delim;
 
   delim = drctv.find(cmd_delim);
@@ -283,20 +283,20 @@ void btree_driver::parse_single_directive(string drctv,
 // print the set of commands
 void btree_driver::print_commands()
 {
-  cout << "\n----------------" << endl;
-  cout << "--- COMMANDS ---" << endl;
-  cout << "----------------\n" << endl;
+  std::cout << "\n----------------" << std::endl;
+  std::cout << "--- COMMANDS ---" << std::endl;
+  std::cout << "----------------\n" << std::endl;
   for (size_t i_c=0; i_c<commands.size(); i_c++)
     {
-      cout << "\nCOMMAND: " << commands[i_c] << endl;
+      std::cout << "\nCOMMAND: " << commands[i_c] << std::endl;
       for (size_t i_p=0; i_p<command_params[i_c].size(); i_p++)
 	{
-	  cout << "\tparam_" << i_p
+	  std::cout << "\tparam_" << i_p
 	       << ": " << command_params[i_c][i_p]
-	       << endl;
+	       << std::endl;
 	}
     }
-  cout << "\n--------------\n" << endl;
+  std::cout << "\n--------------\n" << std::endl;
 }
 
 
@@ -304,7 +304,7 @@ void btree_driver::print_commands()
 int btree_driver::expand_metacommands()
 {
 
-  cout << "\n--- BEGIN METACOMMAND EXPANSION ---\n" << endl;
+  std::cout << "\n--- BEGIN METACOMMAND EXPANSION ---\n" << std::endl;
 
   int e = 0;
 
@@ -314,23 +314,23 @@ int btree_driver::expand_metacommands()
 
   if (e > 0)
     {
-      cout << "\terror during metacommand expansion" << endl;
+      std::cout << "\terror during metacommand expansion" << std::endl;
     }
   else
     {
       expand_repeat_metacommands();
       expand_repeat_replicates_metacommands();
-      cout << "\tsuccessful metacommand expansion" << endl;
+      std::cout << "\tsuccessful metacommand expansion" << std::endl;
     }
 
-  cout << "\n--- END METACOMMAND EXPANSION ---\n" << endl;
+  std::cout << "\n--- END METACOMMAND EXPANSION ---\n" << std::endl;
   
   return e;
 }
 
 
 // test paired metacommands
-int btree_driver::test_paired_metacommands(string paired_command)
+int btree_driver::test_paired_metacommands(std::string paired_command)
 {
   int c = 0;
 
@@ -364,8 +364,8 @@ void btree_driver::expand_repeat_metacommands()
 {
   int N_repeats;
   size_t i_start, i_end;
-  vector<string> temp_commands, repeated_commands;
-  vector<vector<string>> temp_command_params, repeated_command_params;
+  std::vector<std::string> temp_commands, repeated_commands;
+  std::vector<std::vector<std::string>> temp_command_params, repeated_command_params;
 
   bool repeats_present, start_found, end_found;
 
@@ -461,9 +461,9 @@ void btree_driver::expand_repeat_replicates_metacommands()
 {
   int min_rep, max_rep, N_reps, padding;
   size_t i_start, i_end;
-  vector<string> temp_commands, repeated_commands;
-  vector<vector<string>> temp_command_params, repeated_command_params;
-  vector<string> replicate_modified_params;
+  std::vector<std::string> temp_commands, repeated_commands;
+  std::vector<std::vector<std::string>> temp_command_params, repeated_command_params;
+  std::vector<std::string> replicate_modified_params;
 
   bool repeats_present, start_found, end_found;
 
@@ -527,8 +527,8 @@ void btree_driver::expand_repeat_replicates_metacommands()
 	  // add the repeated commands and params
 	  for (int i_rep=0; i_rep<N_reps; i_rep++)
 	    {
-	      string rep_mod = to_string(min_rep + i_rep);
-	      rep_mod = string(padding-min<size_t>(padding,rep_mod.length()),'0') + rep_mod;
+	      std::string rep_mod = std::to_string(min_rep + i_rep);
+	      rep_mod = std::string(padding-std::min<size_t>(padding,rep_mod.length()),'0') + rep_mod;
 	      rep_mod = "_rep" + rep_mod;
 	      for (size_t i_c=0; i_c<repeated_commands.size(); i_c++)
 		{
@@ -567,7 +567,7 @@ void btree_driver::expand_repeat_replicates_metacommands()
 
 
 // update the parameters for commands modified by a replicate number
-void btree_driver::update_replicate_modified_params(string &rep_mod, string &command, vector<string> &params)
+void btree_driver::update_replicate_modified_params(std::string &rep_mod, std::string &command, std::vector<std::string> &params)
 {
   
   if (command == "input_state")
@@ -683,18 +683,18 @@ void btree_driver::update_replicate_modified_params(string &rep_mod, string &com
 
 
 // append the replicate modifier
-void btree_driver::append_replicate_modifier(string &rep_mod, string &mod_param)
+void btree_driver::append_replicate_modifier(std::string &rep_mod, std::string &mod_param)
 {
   mod_param = mod_param + rep_mod;
 }
 
 
 // insert the replicate modifier
-void btree_driver::insert_replicate_modifier(string &rep_mod, string &mod_param)
+void btree_driver::insert_replicate_modifier(std::string &rep_mod, std::string &mod_param)
 {
   int delim;
-  string file, file_ext;
-  string file_ext_delim = ".";
+  std::string file, file_ext;
+  std::string file_ext_delim = ".";
 
   delim = mod_param.find(file_ext_delim);
   file = mod_param.substr(0,delim);
@@ -705,24 +705,24 @@ void btree_driver::insert_replicate_modifier(string &rep_mod, string &mod_param)
 
 
 // get the timestep modifier
-string btree_driver::get_timestep_modifier()
+std::string btree_driver::get_timestep_modifier()
 {
-  return "_t" + to_string(driver_lmp_simulator.get_Nt());
+  return "_t" + std::to_string(driver_lmp_simulator.get_Nt());
 }
 
 // append the timestep modifier
-void btree_driver::append_timestep_modifier(string &ts_mod, string &mod_param)
+void btree_driver::append_timestep_modifier(std::string &ts_mod, std::string &mod_param)
 {
   mod_param = mod_param + ts_mod;
 }
 
 
 // insert the timestep modifier
-void btree_driver::insert_timestep_modifier(string &ts_mod, string &mod_param)
+void btree_driver::insert_timestep_modifier(std::string &ts_mod, std::string &mod_param)
 {
   int delim;
-  string file, file_ext;
-  string file_ext_delim = ".";
+  std::string file, file_ext;
+  std::string file_ext_delim = ".";
 
   delim = mod_param.find(file_ext_delim);
   file = mod_param.substr(0,delim);
@@ -736,7 +736,7 @@ void btree_driver::insert_timestep_modifier(string &ts_mod, string &mod_param)
 void btree_driver::prepare_command_requirements()
 {
   lock t_l;
-  vector<lock> t_ls;
+  std::vector<lock> t_ls;
 
 
   // terminate
@@ -1747,7 +1747,7 @@ void btree_driver::prepare_command_requirements()
 int btree_driver::execute_commands()
 {
   
-  cout << "\n---BEGIN EXECUTING COMMANDS---\n" << endl;
+  std::cout << "\n---BEGIN EXECUTING COMMANDS---\n" << std::endl;
 
   reset_command_locks_and_updates();
   
@@ -1762,25 +1762,25 @@ int btree_driver::execute_commands()
       update_lock_state_post_command(commands[i_c]);
     }
 
-  cout << "---END EXECUTING COMMANDS---\n" << endl;
+  std::cout << "---END EXECUTING COMMANDS---\n" << std::endl;
 
   return e;
 }
 
 
 // function to execute single command
-int btree_driver::execute_single_command(string &command,
-					 vector<string> &params)
+int btree_driver::execute_single_command(std::string &command,
+					 std::vector<std::string> &params)
 {
 
-  cout << "\nCOMMAND: " << command << endl;
+  std::cout << "\nCOMMAND: " << command << std::endl;
   for (size_t i_p=0; i_p<params.size(); i_p++)
     {
-      cout << "\tparam_" << i_p
+      std::cout << "\tparam_" << i_p
 	   << ": " << params[i_p]
-	   << endl;
+	   << std::endl;
     }
-  cout << "\n" << endl;
+  std::cout << "\n" << std::endl;
 
 
   int error_code = 0;
@@ -2369,7 +2369,7 @@ int btree_driver::execute_single_command(string &command,
   // the command is unrecognized
   else
     {
-      cout << "command is unrecognized!" << endl;
+      std::cout << "command is unrecognized!" << std::endl;
       error_code = 1;
     }
 
@@ -2389,7 +2389,7 @@ int btree_driver::terminate()
 }
 
 
-int btree_driver::switch_skip_runs(vector<string> &params)
+int btree_driver::switch_skip_runs(std::vector<std::string> &params)
 {
   if (params[0] == "T")
     {
@@ -2401,14 +2401,14 @@ int btree_driver::switch_skip_runs(vector<string> &params)
     }
   else
     {
-      cout << "ERROR: invalid switch" << endl;
+      std::cout << "ERROR: invalid switch" << std::endl;
       return 1;
     }
   return 0;
 }
 
 
-int btree_driver::new_chromo(vector<string> &params)
+int btree_driver::new_chromo(std::vector<std::string> &params)
 {
   driver_st.size = stoi(params[0]);
   driver_st.transforms.clear();
@@ -2417,7 +2417,7 @@ int btree_driver::new_chromo(vector<string> &params)
 }
 
 
-int btree_driver::input_state(vector<string> &params)
+int btree_driver::input_state(std::vector<std::string> &params)
 {
   driver_st = driver_bt.read_state(params[0]);
   driver_bt.prepare_state(driver_st);
@@ -2425,20 +2425,20 @@ int btree_driver::input_state(vector<string> &params)
 }
 
 
-int btree_driver::output_state(vector<string> &params)
+int btree_driver::output_state(std::vector<std::string> &params)
 {
   driver_bt.write_state(params[0],driver_bt.dump_state());
   return 0;
 }
 
 
-int btree_driver::output_state_at_timestep(vector<string> &params)
+int btree_driver::output_state_at_timestep(std::vector<std::string> &params)
 {
   int e;
-  string ts_mod = get_timestep_modifier();
-  vector<string> params_w_ts;
+  std::string ts_mod = get_timestep_modifier();
+  std::vector<std::string> params_w_ts;
 
-  for (string param : params)
+  for (std::string param : params)
     {
       params_w_ts.push_back(param);
     }
@@ -2451,7 +2451,7 @@ int btree_driver::output_state_at_timestep(vector<string> &params)
 }
 
 
-int btree_driver::transforms_file(vector<string> &params)
+int btree_driver::transforms_file(std::vector<std::string> &params)
 {
   driver_tr = driver_bt.read_transforms(params[0]);
   driver_bt.apply_transforms(driver_tr);
@@ -2459,21 +2459,21 @@ int btree_driver::transforms_file(vector<string> &params)
 }
 
 
-int btree_driver::transform(vector<string> &params)
+int btree_driver::transform(std::vector<std::string> &params)
 {
   driver_bt.single_transform(driver_bt.parse_transform(params[0]));
   return 0;
 }
 
 
-int btree_driver::random_transforms(vector<string> &params)
+int btree_driver::random_transforms(std::vector<std::string> &params)
 {
   driver_bt.random_transforms(stoi(params[0]));
   return 0;
 }
 
 
-int btree_driver::regions_file(vector<string> &params)
+int btree_driver::regions_file(std::vector<std::string> &params)
 {
   driver_rg.clear();
   driver_rg = driver_bt.read_regions(params[0],stoi(params[1]));
@@ -2481,7 +2481,7 @@ int btree_driver::regions_file(vector<string> &params)
 }
 
 
-int btree_driver::dump_regions(vector<string> &params)
+int btree_driver::dump_regions(std::vector<std::string> &params)
 {
   // update topology before updating regions
   if (lock_state["topo_update"] == true)
@@ -2495,13 +2495,13 @@ int btree_driver::dump_regions(vector<string> &params)
 }
 
 
-int btree_driver::dump_regions_at_timestep(vector<string> &params)
+int btree_driver::dump_regions_at_timestep(std::vector<std::string> &params)
 {
   int e;
-  string ts_mod = get_timestep_modifier();
-  vector<string> params_w_ts;
+  std::string ts_mod = get_timestep_modifier();
+  std::vector<std::string> params_w_ts;
 
-  for (string param : params)
+  for (std::string param : params)
     {
       params_w_ts.push_back(param);
     }
@@ -2514,7 +2514,7 @@ int btree_driver::dump_regions_at_timestep(vector<string> &params)
 }
 
 
-int btree_driver::dump_topology(vector<string> &params)
+int btree_driver::dump_topology(std::vector<std::string> &params)
 {
   // update topology before dumping
   if (lock_state["topo_update"] == true)
@@ -2527,13 +2527,13 @@ int btree_driver::dump_topology(vector<string> &params)
 }
 
 
-int btree_driver::dump_topology_at_timestep(vector<string> &params)
+int btree_driver::dump_topology_at_timestep(std::vector<std::string> &params)
 {
   int e;
-  string ts_mod = get_timestep_modifier();
-  vector<string> params_w_ts;
+  std::string ts_mod = get_timestep_modifier();
+  std::vector<std::string> params_w_ts;
 
-  for (string param : params)
+  for (std::string param : params)
     {
       params_w_ts.push_back(param);
     }
@@ -2546,7 +2546,7 @@ int btree_driver::dump_topology_at_timestep(vector<string> &params)
 }
 
 
-int btree_driver::dump_fork_partitions(vector<string> &params)
+int btree_driver::dump_fork_partitions(std::vector<std::string> &params)
 {
   // update topology before dumping
   if (lock_state["topo_update"] == true)
@@ -2559,13 +2559,13 @@ int btree_driver::dump_fork_partitions(vector<string> &params)
 }
 
 
-int btree_driver::dump_fork_partitions_at_timestep(vector<string> &params)
+int btree_driver::dump_fork_partitions_at_timestep(std::vector<std::string> &params)
 {
   int e;
-  string ts_mod = get_timestep_modifier();
-  vector<string> params_w_ts;
+  std::string ts_mod = get_timestep_modifier();
+  std::vector<std::string> params_w_ts;
 
-  for (string param : params)
+  for (std::string param : params)
     {
       params_w_ts.push_back(param);
     }
@@ -2587,7 +2587,7 @@ int btree_driver::update_topology()
 }
 
 
-int btree_driver::update_CG_map(vector<string> &params)
+int btree_driver::update_CG_map(std::vector<std::string> &params)
 {
   // update topology before dumping
   if (lock_state["topo_update"] == true)
@@ -2600,7 +2600,7 @@ int btree_driver::update_CG_map(vector<string> &params)
 }
 
 
-int btree_driver::dump_CG_map(vector<string> &params)
+int btree_driver::dump_CG_map(std::vector<std::string> &params)
 {
   // update topology before updating CG_map
   if (lock_state["topo_update"] == true)
@@ -2619,13 +2619,13 @@ int btree_driver::dump_CG_map(vector<string> &params)
 }
 
 
-int btree_driver::dump_CG_map_at_timestep(vector<string> &params)
+int btree_driver::dump_CG_map_at_timestep(std::vector<std::string> &params)
 {
   int e;
-  string ts_mod = get_timestep_modifier();
-  vector<string> params_w_ts;
+  std::string ts_mod = get_timestep_modifier();
+  std::vector<std::string> params_w_ts;
 
-  for (string param : params)
+  for (std::string param : params)
     {
       params_w_ts.push_back(param);
     }
@@ -2638,7 +2638,7 @@ int btree_driver::dump_CG_map_at_timestep(vector<string> &params)
 }
 
 
-int btree_driver::load_rep_model(vector<string> &params)
+int btree_driver::load_rep_model(std::vector<std::string> &params)
 {
   driver_replicator.read_rep_model(params[0]);
   // replication model is now present
@@ -2646,11 +2646,11 @@ int btree_driver::load_rep_model(vector<string> &params)
 }
 
 
-int btree_driver::replicate(vector<string> &params)
+int btree_driver::replicate(std::vector<std::string> &params)
 {
 
-  vector<init_loc> init_dist, new_leaves;
-  string rep_leaf;
+  std::vector<init_loc> init_dist, new_leaves;
+  std::string rep_leaf;
   init_loc i_l;
   double t, dt, t_max;
   int rep_amount, error_code, i_rep;
@@ -2664,7 +2664,7 @@ int btree_driver::replicate(vector<string> &params)
 
   init_dist.push_back(i_l);
   
-  for (string leaf : driver_bt.get_leaves())
+  for (std::string leaf : driver_bt.get_leaves())
     {
       i_l.loc = leaf;
       i_l.N = 0;
@@ -2680,7 +2680,7 @@ int btree_driver::replicate(vector<string> &params)
   t = 0.0;
   t_max = stod(params[0]);
 
-  cout << "Performing random replications until t = " << t_max << "\n" << endl;
+  std::cout << "Performing random replications until t = " << t_max << "\n" << std::endl;
 
   while (t < t_max)
     {
@@ -2698,10 +2698,10 @@ int btree_driver::replicate(vector<string> &params)
 
       // calculate amount of replicated DNA prior to new replication event
       // amount is proportional to time difference and number of active forks
-      rep_amount = driver_replicator.get_k_rep()*min(2*driver_bt.count_active_forks(),
-						     driver_replicator.get_max_replisomes())*dt;
+      rep_amount = driver_replicator.get_k_rep()*std::min(2*driver_bt.count_active_forks(),
+							  driver_replicator.get_max_replisomes())*dt;
 
-      cout << "\n" << rep_amount << " units were replicated on active forks prior to event(/termination)" << endl;
+      std::cout << "\n" << rep_amount << " units were replicated on active forks prior to event(/termination)" << std::endl;
 
       // perform random replications
       driver_bt.random_transforms(rep_amount);
@@ -2713,7 +2713,7 @@ int btree_driver::replicate(vector<string> &params)
       i_rep = 0;
       for (size_t i=0; i<init_dist.size(); i++)
 	{
-	  // cout << init_dist[i].loc << " = " << init_dist[i].N << endl;
+	  // std::cout << init_dist[i].loc << " = " << init_dist[i].N << std::endl;
 	  if (init_dist[i].N == -1)
 	    {
 	      i_rep = i;
@@ -2723,7 +2723,7 @@ int btree_driver::replicate(vector<string> &params)
 
       if (i_rep > 0)
 	{
-	  cout << "\nreplication event at t = " << t << endl;
+	  std::cout << "\nreplication event at t = " << t << std::endl;
 	  rep_leaf = init_dist[i_rep].loc;
 
 	  // branch the btree at the replicating leaf
@@ -2735,7 +2735,7 @@ int btree_driver::replicate(vector<string> &params)
 	    }
 	  else
 	    {
-	      cout << "\tsplitting at initiated branch (" << rep_leaf << ") and updating initiator distribution\n" << endl;
+	      std::cout << "\tsplitting at initiated branch (" << rep_leaf << ") and updating initiator distribution\n" << std::endl;
 	      init_dist.erase(init_dist.begin()+i_rep);
 
 	      i_l.N = 0;
@@ -2748,7 +2748,7 @@ int btree_driver::replicate(vector<string> &params)
 
 	      for (init_loc temp_i_l : init_dist)
 		{
-		  cout << temp_i_l.loc << " = " << temp_i_l.N << endl;
+		  std::cout << temp_i_l.loc << " = " << temp_i_l.N << std::endl;
 		}
 
 	    }
@@ -2757,12 +2757,12 @@ int btree_driver::replicate(vector<string> &params)
       
     }
 
-  cout << "\nfinal initiator distribution" << endl;
+  std::cout << "\nfinal initiator distribution" << std::endl;
   for (init_loc temp_i_l : init_dist)
     {
-      cout << temp_i_l.loc << " = " << temp_i_l.N << endl;
+      std::cout << temp_i_l.loc << " = " << temp_i_l.N << std::endl;
     }
-  cout << "\n" << endl;
+  std::cout << "\n" << std::endl;
 
   if (noninit_s != nullptr)
     {
@@ -2774,14 +2774,14 @@ int btree_driver::replicate(vector<string> &params)
 }
 
 
-int btree_driver::load_BD_lengths(vector<string> &params)
+int btree_driver::load_BD_lengths(std::vector<std::string> &params)
 {
   driver_lmp_sys.read_BD_lengths(params[0]);
   return 0;
 }
 
 
-int btree_driver::load_mono_coords(vector<string> &params)
+int btree_driver::load_mono_coords(std::vector<std::string> &params)
 {
   driver_lmp_sys.set_btree(driver_bt.dump_state());
   int e = driver_lmp_sys.read_mono_coords(params[0],params[1]);
@@ -2789,7 +2789,7 @@ int btree_driver::load_mono_coords(vector<string> &params)
 }
 
 
-int btree_driver::load_mono_quats(vector<string> &params)
+int btree_driver::load_mono_quats(std::vector<std::string> &params)
 {
   driver_lmp_sys.set_btree(driver_bt.dump_state());
   int e = driver_lmp_sys.read_mono_quats(params[0],params[1]);
@@ -2797,63 +2797,63 @@ int btree_driver::load_mono_quats(vector<string> &params)
 }
 
 
-int btree_driver::load_ribo_coords(vector<string> &params)
+int btree_driver::load_ribo_coords(std::vector<std::string> &params)
 {
   int e = driver_lmp_sys.read_ribo_coords(params[0],params[1]);
   return e;
 }
 
 
-int btree_driver::load_ribo_quats(vector<string> &params)
+int btree_driver::load_ribo_quats(std::vector<std::string> &params)
 {
   int e = driver_lmp_sys.read_ribo_quats(params[0],params[1]);
   return e;
 }
 
 
-int btree_driver::load_bdry_coords(vector<string> &params)
+int btree_driver::load_bdry_coords(std::vector<std::string> &params)
 {
   int e = driver_lmp_sys.read_bdry_coords(params[0],params[1]);
   return e;
 }
 
 
-int btree_driver::write_mono_coords(vector<string> &params)
+int btree_driver::write_mono_coords(std::vector<std::string> &params)
 {
   int e = driver_lmp_sys.write_mono_coords(params[0],params[1]);
   return e;
 }
 
 
-int btree_driver::write_mono_quats(vector<string> &params)
+int btree_driver::write_mono_quats(std::vector<std::string> &params)
 {
   int e = driver_lmp_sys.write_mono_quats(params[0],params[1]);
   return e;
 }
 
 
-int btree_driver::write_ribo_coords(vector<string> &params)
+int btree_driver::write_ribo_coords(std::vector<std::string> &params)
 {
   int e = driver_lmp_sys.write_ribo_coords(params[0],params[1]);
   return e;
 }
 
 
-int btree_driver::write_ribo_quats(vector<string> &params)
+int btree_driver::write_ribo_quats(std::vector<std::string> &params)
 {
   int e = driver_lmp_sys.write_ribo_quats(params[0],params[1]);
   return e;
 }
 
 
-int btree_driver::write_bdry_coords(vector<string> &params)
+int btree_driver::write_bdry_coords(std::vector<std::string> &params)
 {
   int e = driver_lmp_sys.write_bdry_coords(params[0],params[1]);
   return e;
 }
 
 
-int btree_driver::write_LAMMPS_data(vector<string> &params)
+int btree_driver::write_LAMMPS_data(std::vector<std::string> &params)
 {
   driver_lmp_sys.set_btree(driver_bt.dump_state());
   driver_lmp_sys.write_data(params[0]);
@@ -2861,7 +2861,7 @@ int btree_driver::write_LAMMPS_data(vector<string> &params)
 }
 
 
-int btree_driver::spherical_bdry(vector<string> &params)
+int btree_driver::spherical_bdry(std::vector<std::string> &params)
 {
   driver_lmp_sys.generate_spherical_bdry(stod(params[0]),
 					 stod(params[1]),
@@ -2871,7 +2871,7 @@ int btree_driver::spherical_bdry(vector<string> &params)
 }
 
 
-int btree_driver::switch_bonds(vector<string> &params)
+int btree_driver::switch_bonds(std::vector<std::string> &params)
 {
   if (params[0] == "T")
     {
@@ -2883,14 +2883,14 @@ int btree_driver::switch_bonds(vector<string> &params)
     }
   else
     {
-      cout << "ERROR: invalid switch" << endl;
+      std::cout << "ERROR: invalid switch" << std::endl;
       return 1;
     }
   return 0;
 }
 
 
-int btree_driver::switch_bending_angles(vector<string> &params)
+int btree_driver::switch_bending_angles(std::vector<std::string> &params)
 {
   if (params[0] == "T")
     {
@@ -2902,14 +2902,14 @@ int btree_driver::switch_bending_angles(vector<string> &params)
     }
   else
     {
-      cout << "ERROR: invalid switch" << endl;
+      std::cout << "ERROR: invalid switch" << std::endl;
       return 1;
     }
   return 0;
 }
 
 
-int btree_driver::switch_twisting_angles(vector<string> &params)
+int btree_driver::switch_twisting_angles(std::vector<std::string> &params)
 {
   if (params[0] == "T")
     {
@@ -2921,14 +2921,14 @@ int btree_driver::switch_twisting_angles(vector<string> &params)
     }
   else
     {
-      cout << "ERROR: invalid switch" << endl;
+      std::cout << "ERROR: invalid switch" << std::endl;
       return 1;
     }
   return 0;
 }
 
 
-int btree_driver::switch_extra_potential(string extra_pot, string s)
+int btree_driver::switch_extra_potential(std::string extra_pot, std::string s)
 {
   if (s == "T")
     {
@@ -2940,28 +2940,28 @@ int btree_driver::switch_extra_potential(string extra_pot, string s)
     }
   else
     {
-      cout << "ERROR: invalid switch" << endl;
+      std::cout << "ERROR: invalid switch" << std::endl;
       return 1;
     }
   return 0;
 }
 
 
-int btree_driver::switch_Ori_bdry_attraction(vector<string> &params)
+int btree_driver::switch_Ori_bdry_attraction(std::vector<std::string> &params)
 {
   int e = switch_extra_potential("Ori_bdry_attraction",params[0]);
   return e;
 }
 
 
-int btree_driver::switch_Ori_pair_repulsion(vector<string> &params)
+int btree_driver::switch_Ori_pair_repulsion(std::vector<std::string> &params)
 {
   int e = switch_extra_potential("Ori_pair_repulsion",params[0]);
   return e;
 }
 
 
-int btree_driver::write_mono_xyz(vector<string> &params)
+int btree_driver::write_mono_xyz(std::vector<std::string> &params)
 {
   driver_lmp_sys.write_mono_xyz(params[0]);
   return 0;
@@ -2990,7 +2990,7 @@ int btree_driver::map_replication()
 }
 
 
-int btree_driver::prepare_simulator(vector<string> &params)
+int btree_driver::prepare_simulator(std::vector<std::string> &params)
 {
   driver_lmp_simulator.LAMMPS_initialize(params[0]);
   driver_lmp_simulator.set_lmp_sys(&driver_lmp_sys);
@@ -2998,7 +2998,7 @@ int btree_driver::prepare_simulator(vector<string> &params)
 }
 
 
-int btree_driver::simulator_include_file(vector<string> &params)
+int btree_driver::simulator_include_file(std::vector<std::string> &params)
 {
   driver_lmp_simulator.include_file(params[0]);
   return 0;
@@ -3020,14 +3020,14 @@ int btree_driver::clear_simulator()
 }
 
 
-int btree_driver::simulator_set_nProc(vector<string> &params)
+int btree_driver::simulator_set_nProc(std::vector<std::string> &params)
 {
   driver_lmp_simulator.set_nProc(stoi(params[0]));  
   return 0;
 }
 
 
-int btree_driver::simulator_set_prng_seed(vector<string> &params)
+int btree_driver::simulator_set_prng_seed(std::vector<std::string> &params)
 {
   driver_lmp_simulator.set_prng_seed(stoi(params[0]));
   driver_lmp_sys.prng_seed(stoi(params[0]));
@@ -3035,28 +3035,28 @@ int btree_driver::simulator_set_prng_seed(vector<string> &params)
 }
 
 
-int btree_driver::simulator_set_DNA_model(vector<string> &params)
+int btree_driver::simulator_set_DNA_model(std::vector<std::string> &params)
 {
   driver_lmp_simulator.set_DNA_model_dir(params[0]);
   return 0;
 }
 
 
-int btree_driver::simulator_set_output_details(vector<string> &params)
+int btree_driver::simulator_set_output_details(std::vector<std::string> &params)
 {
   driver_lmp_simulator.set_output_details(params[0],params[1]);
   return 0;
 }
 
 
-int btree_driver::simulator_set_delta_t(vector<string> &params)
+int btree_driver::simulator_set_delta_t(std::vector<std::string> &params)
 {
   driver_lmp_simulator.set_delta_t(stod(params[0]));
   return 0;
 }
 
 
-int btree_driver::simulator_read_data(vector<string> &params)
+int btree_driver::simulator_read_data(std::vector<std::string> &params)
 {
   driver_lmp_simulator.clear();
   driver_lmp_simulator.reset_protocol_variables();
@@ -3068,7 +3068,7 @@ int btree_driver::simulator_read_data(vector<string> &params)
 
 
 template<int SOFT_HARD_TOPO, int HARMONIC_FENE>
-int btree_driver::simulator_minimize(vector<string> &params)
+int btree_driver::simulator_minimize(std::vector<std::string> &params)
 {
   thermo_dump_parameters t_d_p;
 
@@ -3118,7 +3118,7 @@ int btree_driver::simulator_minimize(vector<string> &params)
 
 
 template<int SOFT_HARD_TOPO, int HARMONIC_FENE>
-int btree_driver::simulator_run(vector<string> &params)
+int btree_driver::simulator_run(std::vector<std::string> &params)
 {
   thermo_dump_parameters t_d_p;
 
@@ -3177,14 +3177,14 @@ int btree_driver::simulator_run(vector<string> &params)
 }
 
 
-int btree_driver::simulator_load_loop_params(vector<string> &params)
+int btree_driver::simulator_load_loop_params(std::vector<std::string> &params)
 {
   int e = driver_lmp_simulator.read_loop_params(params[0]);
   return e;
 }
 
 
-int btree_driver::simulator_run_loops(vector<string> &params)
+int btree_driver::simulator_run_loops(std::vector<std::string> &params)
 {
   thermo_dump_parameters t_d_p;
 
@@ -3229,28 +3229,28 @@ int btree_driver::simulator_restore_timestep()
 }
 
 
-int btree_driver::simulator_increment_timestep(vector<string> &params)
+int btree_driver::simulator_increment_timestep(std::vector<std::string> &params)
 {
   driver_lmp_simulator.increment_Nt(stoul(params[0]));
   return 0;
 }
 
 
-int btree_driver::simulator_reset_timestep(vector<string> &params)
+int btree_driver::simulator_reset_timestep(std::vector<std::string> &params)
 {
   driver_lmp_simulator.reset_Nt(stoul(params[0]));
   return 0;
 }
 
 
-int btree_driver::simulator_reset_prev_dump_timestep(vector<string> &params)
+int btree_driver::simulator_reset_prev_dump_timestep(std::vector<std::string> &params)
 {
   driver_lmp_simulator.reset_prev_dump_Nt(stoul(params[0]));
   return 0;
 }
 
 
-int btree_driver::btree_prng_seed(vector<string> &params)
+int btree_driver::btree_prng_seed(std::vector<std::string> &params)
 {
   // seed the PRNG
   driver_bt.prng_seed(stoi(params[0]));
@@ -3258,7 +3258,7 @@ int btree_driver::btree_prng_seed(vector<string> &params)
 }
 
 
-int btree_driver::replicator_prng_seed(vector<string> &params)
+int btree_driver::replicator_prng_seed(std::vector<std::string> &params)
 {
   // seed the PRNG
   driver_replicator.prng_seed(stoi(params[0]));
@@ -3279,7 +3279,7 @@ int btree_driver::print_state()
 }
 
 
-int btree_driver::sys_write_sim_read_LAMMPS_data(vector<string> &params)
+int btree_driver::sys_write_sim_read_LAMMPS_data(std::vector<std::string> &params)
 {
   int e = 0;
   e += write_LAMMPS_data(params);
@@ -3288,13 +3288,13 @@ int btree_driver::sys_write_sim_read_LAMMPS_data(vector<string> &params)
 }
 
 
-int btree_driver::sys_write_sim_read_LAMMPS_data_at_timestep(vector<string> &params)
+int btree_driver::sys_write_sim_read_LAMMPS_data_at_timestep(std::vector<std::string> &params)
 {
   int e = 0;
-  string ts_mod = get_timestep_modifier();
-  vector<string> params_w_ts;
+  std::string ts_mod = get_timestep_modifier();
+  std::vector<std::string> params_w_ts;
 
-  for (string param : params)
+  for (std::string param : params)
     {
       params_w_ts.push_back(param);
     }
@@ -3307,21 +3307,21 @@ int btree_driver::sys_write_sim_read_LAMMPS_data_at_timestep(vector<string> &par
 }
 
 
-int btree_driver::simulator_relax_progressive(vector<string> &params)
+int btree_driver::simulator_relax_progressive(std::vector<std::string> &params)
 {
   int e = 0;
 
-  vector<string> min_params;
-  vector<string> run_params;
+  std::vector<std::string> min_params;
+  std::vector<std::string> run_params;
 
   int run_steps = stoi(params[0]);
   int thermo_freq = stoi(params[1]);
 
   // create the parameter vector for minimizations
-  min_params.push_back(to_string(thermo_freq));
+  min_params.push_back(std::to_string(thermo_freq));
   // create the parameter vector for runs
-  run_params.push_back(to_string(run_steps));
-  run_params.push_back(to_string(thermo_freq));
+  run_params.push_back(std::to_string(run_steps));
+  run_params.push_back(std::to_string(thermo_freq));
   run_params.push_back("0");
   run_params.push_back("noappend");
   run_params.push_back("first");

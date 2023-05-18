@@ -415,7 +415,7 @@ void LAMMPS_sys::generate_spherical_bdry(double r, double x0, double y0, double 
   // size the bdry_atoms
   bdry_atoms.set_N(b_surf.get_N_verts());
 
-  vector<vec> bdry_coords = b_surf.get_coords();
+  std::vector<vec> bdry_coords = b_surf.get_coords();
 
   vec r0 = vqm.v_new(x0,y0,z0);
 
@@ -561,22 +561,22 @@ void LAMMPS_sys::finalize_system()
 
 
 // read the the Brownian dynamics lengths
-void LAMMPS_sys::read_BD_lengths(string lengths_filename)
+void LAMMPS_sys::read_BD_lengths(std::string lengths_filename)
 {
-  fstream lengths_file;
+  std::fstream lengths_file;
 
-  string param_delim, param, val;
+  std::string param_delim, param, val;
   int delim;
   
-  string line;
+  std::string line;
 
   param_delim = "=";
 
-  lengths_file.open(lengths_filename, ios::in);
+  lengths_file.open(lengths_filename, std::ios::in);
 
   if (!lengths_file.is_open())
     {
-      cout << "ERROR: file not opened in read_BD_lengths" << endl;
+      std::cout << "ERROR: file not opened in read_BD_lengths" << std::endl;
     }
   else
     {
@@ -598,7 +598,7 @@ void LAMMPS_sys::read_BD_lengths(string lengths_filename)
 		  param = line.substr(0,delim);
 		  val = line.substr(delim+1,line.length());
 
-		  // cout << param << "=" << val << endl;
+		  // std::cout << param << "=" << val << std::endl;
 
 		  if (param == "r_sphere")
 		    {
@@ -648,77 +648,77 @@ void LAMMPS_sys::read_BD_lengths(string lengths_filename)
 
 
 // read the monomer coordinates - disallow resizing
-int LAMMPS_sys::read_mono_coords(string coords_filename, string order)
+int LAMMPS_sys::read_mono_coords(std::string coords_filename, std::string order)
 {
   return mono_atoms.read_bin_coords(coords_filename,order,false);
 }
 
 
 // read the monomer quaternions - disallow resizing
-int LAMMPS_sys::read_mono_quats(string quats_filename, string order)
+int LAMMPS_sys::read_mono_quats(std::string quats_filename, std::string order)
 {
   return mono_ellipsoids.read_bin_quats(quats_filename,order,false);
 }
 
 
 // read the ribosome coordinates - allow resizing
-int LAMMPS_sys::read_ribo_coords(string coords_filename, string order)
+int LAMMPS_sys::read_ribo_coords(std::string coords_filename, std::string order)
 {
   return ribo_atoms.read_bin_coords(coords_filename,order,true);
 }
 
 
 // read the ribosome quaternions - allow resizing
-int LAMMPS_sys::read_ribo_quats(string quats_filename, string order)
+int LAMMPS_sys::read_ribo_quats(std::string quats_filename, std::string order)
 {
   return ribo_ellipsoids.read_bin_quats(quats_filename,order,true);
 }
 
 
 // read the boundary coordinates - allow resizing
-int LAMMPS_sys::read_bdry_coords(string coords_filename, string order)
+int LAMMPS_sys::read_bdry_coords(std::string coords_filename, std::string order)
 {
   return bdry_atoms.read_bin_coords(coords_filename,order,true);
 }
 
 
 // write the monomer coordinates
-int LAMMPS_sys::write_mono_coords(string coords_filename, string order)
+int LAMMPS_sys::write_mono_coords(std::string coords_filename, std::string order)
 {
   return mono_atoms.write_bin(coords_filename,order);
 }
 
 
 // write the monomer quaternions
-int LAMMPS_sys::write_mono_quats(string quats_filename, string order)
+int LAMMPS_sys::write_mono_quats(std::string quats_filename, std::string order)
 {
   return mono_ellipsoids.write_bin(quats_filename,order);
 }
 
 
 // write the ribosome coordinates
-int LAMMPS_sys::write_ribo_coords(string coords_filename, string order)
+int LAMMPS_sys::write_ribo_coords(std::string coords_filename, std::string order)
 {
   return ribo_atoms.write_bin(coords_filename,order);
 }
 
 
 // write the ribosome quaternions
-int LAMMPS_sys::write_ribo_quats(string quats_filename, string order)
+int LAMMPS_sys::write_ribo_quats(std::string quats_filename, std::string order)
 {
   return ribo_ellipsoids.write_bin(quats_filename,order);
 }
 
 
 // write the boundary coordinates
-int LAMMPS_sys::write_bdry_coords(string coords_filename, string order)
+int LAMMPS_sys::write_bdry_coords(std::string coords_filename, std::string order)
 {
   return bdry_atoms.write_bin(coords_filename,order);
 }
 
 
 // apply mapping to the monomers
-void LAMMPS_sys::apply_mono_mapping(vector<vector<array<int,3>>> map)
+void LAMMPS_sys::apply_mono_mapping(std::vector<std::vector<std::array<int,3>>> map)
 {
   int N_trans, N_old, N_new;
 
@@ -761,16 +761,16 @@ void LAMMPS_sys::apply_mono_mapping(vector<vector<array<int,3>>> map)
       mono_atoms.set_N(N_new);
       mono_ellipsoids.set_N(N_new);
 
-      // cout << "N_old = " << N_old << endl;
-      // cout << "N_new = " << N_new << endl;
+      // std::cout << "N_old = " << N_old << std::endl;
+      // std::cout << "N_new = " << N_new << std::endl;
       
 
       for (int i=0; i<N_new; i++)
 	{
 
-	  // cout << map[i_trans][i][0] << "\t"
+	  // std::cout << map[i_trans][i][0] << "\t"
 	  //      << map[i_trans][i][1] << "\t"
-	  //      << map[i_trans][i][2] << endl;
+	  //      << map[i_trans][i][2] << std::endl;
 
 	  // store the previous atom and ellipsoid
 	  t_a = temp_atoms.get_atom(map[i_trans][i][1]);
@@ -815,7 +815,7 @@ void LAMMPS_sys::apply_mono_mapping(vector<vector<array<int,3>>> map)
 
 
 // write the system to a data file
-void LAMMPS_sys::write_data(string data_filename)
+void LAMMPS_sys::write_data(std::string data_filename)
 {
 
   // internal_btree.print_tree();
@@ -829,33 +829,33 @@ void LAMMPS_sys::write_data(string data_filename)
   
   // begin writing data file
   
-  fstream data_file;
+  std::fstream data_file;
 
-  data_file.open(data_filename, ios::out);
+  data_file.open(data_filename, std::ios::out);
 
   if (!data_file.is_open())
     {
-      cout << "ERROR: file not opened in write_data" << endl;
+      std::cout << "ERROR: file not opened in write_data" << std::endl;
     }
   else
     {
 
       // write system summary
-      data_file << "# LAMMPS data file for replicating chromosomes formed of rigid body monomers\n" << endl;
+      data_file << "# LAMMPS data file for replicating chromosomes formed of rigid body monomers\n" << std::endl;
 
-      data_file << atoms.get_N() << "\t\tatoms" << endl;
-      data_file << N_atom_types << "\t\tatom types" << endl;
-      data_file << ellipsoids.get_N() << "\t\tellipsoids" << endl;
-      data_file << bonds.get_N() << "\t\tbonds" << endl;
-      data_file << N_bond_types << "\t\tbond types" << endl;
-      data_file << angles.get_N() << "\t\tangles" << endl;
-      data_file << N_angle_types << "\t\tangle types" << endl;
+      data_file << atoms.get_N() << "\t\tatoms" << std::endl;
+      data_file << N_atom_types << "\t\tatom types" << std::endl;
+      data_file << ellipsoids.get_N() << "\t\tellipsoids" << std::endl;
+      data_file << bonds.get_N() << "\t\tbonds" << std::endl;
+      data_file << N_bond_types << "\t\tbond types" << std::endl;
+      data_file << angles.get_N() << "\t\tangles" << std::endl;
+      data_file << N_angle_types << "\t\tangle types" << std::endl;
 
-      data_file << "\n" << endl;
+      data_file << "\n" << std::endl;
 
-      data_file << bbox.r_min.x << "\t" << bbox.r_max.x << "\txlo xhi" << endl;
-      data_file << bbox.r_min.y << "\t" << bbox.r_max.y << "\tylo yhi" << endl;
-      data_file << bbox.r_min.z << "\t" << bbox.r_max.z << "\tzlo zhi" << endl;
+      data_file << bbox.r_min.x << "\t" << bbox.r_max.x << "\txlo xhi" << std::endl;
+      data_file << bbox.r_min.y << "\t" << bbox.r_max.y << "\tylo yhi" << std::endl;
+      data_file << bbox.r_min.z << "\t" << bbox.r_max.z << "\tzlo zhi" << std::endl;
       
       // write atom information
       atoms.write(data_file);
@@ -877,7 +877,7 @@ void LAMMPS_sys::write_data(string data_filename)
 
 
 // write an xyz file with the monomer atoms
-void LAMMPS_sys::write_mono_xyz(string data_filename)
+void LAMMPS_sys::write_mono_xyz(std::string data_filename)
 {
   mono_atoms.write_xyz(data_filename);
 }
@@ -970,14 +970,14 @@ void LAMMPS_sys::set_N_ribo_ellipsoids(int N_ribo)
 
 
 // set the total coordinate array for the system
-void LAMMPS_sys::set_coords_arr_total(double *&x, string order)
+void LAMMPS_sys::set_coords_arr_total(double *&x, std::string order)
 {
   atoms.set_coords_arr(x,order);
 }
 
 
 // set the total coordinate array for the system
-void LAMMPS_sys::set_quats_arr_total(double *&q, string order)
+void LAMMPS_sys::set_quats_arr_total(double *&q, std::string order)
 {
   ellipsoids.set_quats_arr(q,order);
 }
@@ -988,9 +988,9 @@ void LAMMPS_sys::sync_subarrays()
 {
   int N_mono, N_ribo, N_bdry;
 
-  N_mono = max(0,mono_atoms.get_N());
-  N_ribo = max(0,ribo_atoms.get_N());
-  N_bdry = max(0,bdry_atoms.get_N());
+  N_mono = std::max(0,mono_atoms.get_N());
+  N_ribo = std::max(0,ribo_atoms.get_N());
+  N_bdry = std::max(0,bdry_atoms.get_N());
   
   // copy to mono_atoms
   for (int i=0; i<N_mono; i++)
@@ -1029,10 +1029,10 @@ void LAMMPS_sys::sync_subarrays()
 void LAMMPS_sys::initialize_loop_topo(int N_loops)
 {
 
-  vector<string> leaves = internal_btree.get_leaves();
-  vector<theta_topo> leaf_topos;
+  std::vector<std::string> leaves = internal_btree.get_leaves();
+  std::vector<theta_topo> leaf_topos;
 
-  for (string leaf : leaves)
+  for (std::string leaf : leaves)
     {
       leaf_topos.push_back(internal_btree.get_leaf_topo(leaf));
     }
@@ -1050,12 +1050,12 @@ void LAMMPS_sys::initialize_loop_topo(int N_loops)
   // prepare the possible binding regions
   loop_topo.prepare_binding_regions(leaves,leaf_topos,t);
 
-  // vector<binding_region> regions = loop_topo.get_regions();
+  // std::vector<binding_region> regions = loop_topo.get_regions();
 
-  // cout << "BINDING REGIONS" << endl;
+  // std::cout << "BINDING REGIONS" << std::endl;
   // for (binding_region b_r : regions)
   //   {
-  //     cout << b_r.get_leaf() << " " << b_r.get_size() << endl;
+  //     std::cout << b_r.get_leaf() << " " << b_r.get_size() << std::endl;
   //   }
 
   delete[] t;
@@ -1079,13 +1079,13 @@ void LAMMPS_sys::update_loop_topo()
 
 
 // get the loops and convert them into bonds
-vector<bond> LAMMPS_sys::get_loop_bonds()
+std::vector<bond> LAMMPS_sys::get_loop_bonds()
 {
   bond loop_bond;
-  vector<bond> loop_bonds;
+  std::vector<bond> loop_bonds;
   int id = bonds.get_N() + 1;
   
-  vector<loop> loops = loop_topo.get_loops();
+  std::vector<loop> loops = loop_topo.get_loops();
 
   for (loop l : loops)
     {
@@ -1109,7 +1109,7 @@ void LAMMPS_sys::set_loop_sys_params(loop_sys_params &l_sys_p)
 
 
 // getter for monomer coordinates
-vector<vec> LAMMPS_sys::get_mono_coords()
+std::vector<vec> LAMMPS_sys::get_mono_coords()
 {
   return mono_atoms.get_coords();
 }

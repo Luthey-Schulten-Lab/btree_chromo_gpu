@@ -45,19 +45,19 @@ btree_transforms mapper::state_diff(btree_state initial_state, btree_state final
       
       fork_exists = false;
       fork_growth = false;
-      // cout << "f_r_f: " << f_r_f.fork << "_cw" << f_r_f.rho_cw << "_ccw" << f_r_f.rho_ccw << endl;
+      // std::cout << "f_r_f: " << f_r_f.fork << "_cw" << f_r_f.rho_cw << "_ccw" << f_r_f.rho_ccw << std::endl;
       
       for (fork_rho f_r_i : initial_state.transforms)
 	{
-	  // cout << "f_r_i: " << f_r_i.fork << "_cw" << f_r_i.rho_cw << "_ccw" << f_r_i.rho_ccw << endl;
+	  // std::cout << "f_r_i: " << f_r_i.fork << "_cw" << f_r_i.rho_cw << "_ccw" << f_r_i.rho_ccw << std::endl;
 	  
 	  if (f_r_f.fork == f_r_i.fork)
 	    {
 	      fork_exists = true;
 	      f_r_temp = f_r_f;
-	      f_r_temp.rho_cw = max(0,f_r_temp.rho_cw-f_r_i.rho_cw);
-	      f_r_temp.rho_ccw = max(0,f_r_temp.rho_ccw-f_r_i.rho_ccw);
-	      // cout << f_r_temp.fork << "_cw" << f_r_temp.rho_cw << "_ccw" << f_r_temp.rho_ccw << endl;
+	      f_r_temp.rho_cw = std::max(0,f_r_temp.rho_cw-f_r_i.rho_cw);
+	      f_r_temp.rho_ccw = std::max(0,f_r_temp.rho_ccw-f_r_i.rho_ccw);
+	      // std::cout << f_r_temp.fork << "_cw" << f_r_temp.rho_cw << "_ccw" << f_r_temp.rho_ccw << std::endl;
 	      if ((f_r_temp.rho_cw > 0) || (f_r_temp.rho_ccw > 0)) fork_growth = true;
 	      break;
 	    }
@@ -66,7 +66,7 @@ btree_transforms mapper::state_diff(btree_state initial_state, btree_state final
 
       if (fork_exists == false) f_r_temp = f_r_f;
 
-      // cout << f_r_temp.fork << "_cw" << f_r_temp.rho_cw << "_ccw" << f_r_temp.rho_ccw << endl;
+      // std::cout << f_r_temp.fork << "_cw" << f_r_temp.rho_cw << "_ccw" << f_r_temp.rho_ccw << std::endl;
       if ((fork_exists == false) || (fork_growth == true)) diff_tr.push_back(f_r_temp);
       
     }
@@ -174,11 +174,11 @@ int mapper::prepare_mapping()
   next_bt.solve_topology();
 
   // print the initial state
-  cout << "initial tree before transforms\n" << endl;
+  std::cout << "initial tree before transforms\n" << std::endl;
   prev_bt.print_tree();
 
   // print the final state
-  cout << "final tree after transforms\n" << endl;
+  std::cout << "final tree after transforms\n" << std::endl;
   next_bt.print_tree();
 
   btree_transforms diff_tr = state_diff(initial_st,final_st);
@@ -193,12 +193,12 @@ int mapper::prepare_mapping()
   initialize_map();
 
   int N_prev, N_next;
-  string map_fork;
-  string l_d_lmax_next, r_d_lmax_next;
-  string l_d_lmax_prev, r_d_lmax_prev;
+  std::string map_fork;
+  std::string l_d_lmax_next, r_d_lmax_next;
+  std::string l_d_lmax_prev, r_d_lmax_prev;
   bool new_fork, daughter_found, leaf_match;
-  vector<string> prev_leaves;
-  vector<string> next_leaves;
+  std::vector<std::string> prev_leaves;
+  std::vector<std::string> next_leaves;
   theta_topo topo_prev, topo_next, topo_special;
 
   for (int i_trans=0; i_trans<N_transforms; i_trans++)
@@ -220,10 +220,10 @@ int mapper::prepare_mapping()
       N_next = next_bt.total_size();
       N_new[i_trans] = N_next;
 
-      cout << "i_trans = " << i_trans << endl;
-      cout << diff_tr[i_trans].fork << "_cw" << diff_tr[i_trans].rho_cw << "_ccw" << diff_tr[i_trans].rho_ccw << endl;
-      cout << "N_prev = " << N_prev << endl;
-      cout << "N_new = " << N_new[i_trans] << endl;
+      std::cout << "i_trans = " << i_trans << std::endl;
+      std::cout << diff_tr[i_trans].fork << "_cw" << diff_tr[i_trans].rho_cw << "_ccw" << diff_tr[i_trans].rho_ccw << std::endl;
+      std::cout << "N_prev = " << N_prev << std::endl;
+      std::cout << "N_new = " << N_new[i_trans] << std::endl;
 
       // determine the leaves in the two states
       prev_leaves = prev_bt.get_leaves();
@@ -239,7 +239,7 @@ int mapper::prepare_mapping()
       while (daughter_found == false)
 	{
 	  leaf_match = false;
-	  for (string leaf : next_leaves)
+	  for (std::string leaf : next_leaves)
 	    {
 	      if (l_d_lmax_next == leaf.substr(0,l_d_lmax_next.length()))
 		{
@@ -266,7 +266,7 @@ int mapper::prepare_mapping()
       while (daughter_found == false)
 	{
 	  leaf_match = false;
-	  for (string leaf : next_leaves)
+	  for (std::string leaf : next_leaves)
 	    {
 	      if (r_d_lmax_next == leaf.substr(0,r_d_lmax_next.length()))
 		{
@@ -298,11 +298,11 @@ int mapper::prepare_mapping()
 	  r_d_lmax_prev = r_d_lmax_next;
 	}
 
-      // cout << map_fork << endl;
-      // cout << "l_d_lmax_prev = " << l_d_lmax_prev << endl;
-      // cout << "r_d_lmax_prev = " << r_d_lmax_prev << endl;
-      // cout << "l_d_lmax_next = " << l_d_lmax_next << endl;
-      // cout << "r_d_lmax_next = " << r_d_lmax_next << endl;
+      // std::cout << map_fork << std::endl;
+      // std::cout << "l_d_lmax_prev = " << l_d_lmax_prev << std::endl;
+      // std::cout << "r_d_lmax_prev = " << r_d_lmax_prev << std::endl;
+      // std::cout << "l_d_lmax_next = " << l_d_lmax_next << std::endl;
+      // std::cout << "r_d_lmax_next = " << r_d_lmax_next << std::endl;
 
       // print the next btree
       next_bt.print_tree();
@@ -312,12 +312,12 @@ int mapper::prepare_mapping()
 
       if (new_fork == true)
 	{
-	  // cout << "new leaf will be created" << endl;
+	  // std::cout << "new leaf will be created" << std::endl;
 	  
 	  // loop over the next leaves
-	  for (string leaf : next_leaves)
+	  for (std::string leaf : next_leaves)
 	    {
-	      // cout << "leaf = " << leaf << endl;
+	      // std::cout << "leaf = " << leaf << std::endl;
 	      
 	      if (leaf == l_d_lmax_next) // leaf is leftmost descendant of left daughter at growth fork
 		
@@ -429,11 +429,11 @@ int mapper::prepare_mapping()
       else // no new leaf was created
 	
 	{
-	  // cout << "no new leaf will be created" << endl;
+	  // std::cout << "no new leaf will be created" << std::endl;
 	  // loop over the next leaves
-	  for (string leaf : next_leaves)
+	  for (std::string leaf : next_leaves)
 	    {
-	      // cout << "leaf = " << leaf << endl;
+	      // std::cout << "leaf = " << leaf << std::endl;
 	      
 	      if (leaf == l_d_lmax_next) // leaf is leftmost descendant of left daughter at growth fork
 		
@@ -473,8 +473,8 @@ int mapper::prepare_mapping()
 
 			  start_link_offset = topo_prev.start_link - topo_special.start;
 			  end_link_offset = topo_special.end - topo_prev.end_link + 1;
-			  // cout << "start_link_offset = " << start_link_offset << endl;
-			  // cout << "end_link_offset = " << end_link_offset << endl;
+			  // std::cout << "start_link_offset = " << start_link_offset << std::endl;
+			  // std::cout << "end_link_offset = " << end_link_offset << std::endl;
 
 			  for (int j=0; j<(topo_next.end-end_link_offset-(topo_next.start+start_link_offset)); j++)
 			    {
@@ -598,8 +598,8 @@ int mapper::prepare_mapping()
 
 			      start_link_offset = topo_prev.start_link - topo_next.start_link;
 			      end_link_offset = topo_next.end_link - topo_prev.end_link;
-			      // cout << "start_link_offset = " << start_link_offset << endl;
-			      // cout << "end_link_offset = " << end_link_offset << endl;
+			      // std::cout << "start_link_offset = " << start_link_offset << std::endl;
+			      // std::cout << "end_link_offset = " << end_link_offset << std::endl;
 
 			      for (int j=0; j<(topo_next.end-end_link_offset+1-(topo_next.start+start_link_offset)); j++)
 				{
@@ -638,8 +638,8 @@ int mapper::prepare_mapping()
 
 			      start_link_offset = (topo_prev.start_link - topo_special.start + 1) + (topo_special.end - topo_next.start_link);
 			      end_link_offset = topo_next.end_link - topo_prev.end_link;
-			      // cout << "start_link_offset = " << start_link_offset << endl;
-			      // cout << "end_link_offset = " << end_link_offset << endl;
+			      // std::cout << "start_link_offset = " << start_link_offset << std::endl;
+			      // std::cout << "end_link_offset = " << end_link_offset << std::endl;
 
 			      for (int j=0; j<(topo_next.end-end_link_offset+1-(topo_next.start+start_link_offset)); j++)
 				{
@@ -685,8 +685,8 @@ int mapper::prepare_mapping()
 
 			      start_link_offset = topo_prev.start_link - topo_next.start_link;
 			      end_link_offset = (topo_special.end - topo_prev.end_link + 1) + (topo_next.end_link - topo_special.start);
-			      // cout << "start_link_offset = " << start_link_offset << endl;
-			      // cout << "end_link_offset = " << end_link_offset << endl;
+			      // std::cout << "start_link_offset = " << start_link_offset << std::endl;
+			      // std::cout << "end_link_offset = " << end_link_offset << std::endl;
 
 			      for (int j=0; j<(topo_next.end-end_link_offset+1-(topo_next.start+start_link_offset)); j++)
 				{
@@ -737,8 +737,8 @@ int mapper::prepare_mapping()
 
 			  start_link_offset = topo_prev.start_link - topo_next.start_link;
 			  end_link_offset = topo_next.end_link - topo_prev.end_link;
-			  // cout << "start_link_offset = " << start_link_offset << endl;
-			  // cout << "end_link_offset = " << end_link_offset << endl;
+			  // std::cout << "start_link_offset = " << start_link_offset << std::endl;
+			  // std::cout << "end_link_offset = " << end_link_offset << std::endl;
 
 			  for (int j=0; j<(topo_next.end-end_link_offset+1-(topo_next.start+start_link_offset)); j++)
 			    {
@@ -779,8 +779,8 @@ int mapper::prepare_mapping()
 
 			  start_link_offset = topo_prev.start_link - topo_next.start_link;
 			  end_link_offset = topo_next.end_link - topo_prev.end_link;
-			  // cout << "start_link_offset = " << start_link_offset << endl;
-			  // cout << "end_link_offset = " << end_link_offset << endl;
+			  // std::cout << "start_link_offset = " << start_link_offset << std::endl;
+			  // std::cout << "end_link_offset = " << end_link_offset << std::endl;
 
 			  for (int j=0; j<(topo_next.end-end_link_offset+1-(topo_next.start+start_link_offset)); j++)
 			    {
@@ -843,13 +843,13 @@ int mapper::prepare_mapping()
 
       // for (int k=0; k<N_new[i_trans]; k++)
       // 	{
-      // 	  cout << k << " : "
+      // 	  std::cout << k << " : "
       // 	       << m[i_trans][k][0] << ","
       // 	       << m[i_trans][k][1] << ","
-      // 	       << m[i_trans][k][2] << endl;
+      // 	       << m[i_trans][k][2] << std::endl;
       // 	}
 
-      // cout << "\n" << endl;
+      // std::cout << "\n" << std::endl;
 
       // set the previous binary tree state to the next state
       prev_bt.prepare_state(next_bt.dump_state());
@@ -865,11 +865,11 @@ int mapper::prepare_mapping()
 
 
 // get the map
-vector<vector<array<int,3>>> mapper::get_map()
+std::vector<std::vector<std::array<int,3>>> mapper::get_map()
 {
-  vector<vector<array<int,3>>> map;
-  vector<array<int,3>> map_per_transform;
-  array<int,3> map_element;
+  std::vector<std::vector<std::array<int,3>>> map;
+  std::vector<std::array<int,3>> map_per_transform;
+  std::array<int,3> map_element;
 
   for (int i_trans=0; i_trans<N_transforms; i_trans++)
     {

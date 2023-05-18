@@ -1,7 +1,7 @@
 #include <binding_region.hpp>
 
 // constructor
-binding_region::binding_region(string leaf, int ll, int ul, int size,
+binding_region::binding_region(std::string leaf, int ll, int ul, int size,
 		 bool completed,
 		 bool ter_crossing, int mid_ll, int mid_ul)
 {
@@ -86,12 +86,12 @@ void binding_region::prepare_idx()
 
 void binding_region::print_region_map()
 {
-  cout << "size = " << size << endl;
+  std::cout << "size = " << size << std::endl;
   int j;
   for (int i=0; i<size; i++)
     {
       j = get_mono_pos(i);
-      cout << i << "," << j << "," << get_reg_pos(j) << endl;
+      std::cout << i << "," << j << "," << get_reg_pos(j) << std::endl;
     }
 }
 
@@ -104,7 +104,7 @@ int binding_region::get_size()
 
 
 // getter for leaf
-string binding_region::get_leaf()
+std::string binding_region::get_leaf()
 {
   return leaf;
 }
@@ -202,11 +202,11 @@ int binding_region::get_dist(int mono_pos_i, int mono_pos_j)
     {
       if (reg_pos_i > reg_pos_j)
 	{
-	  d = min(reg_pos_i-reg_pos_j,size-reg_pos_i+reg_pos_j);
+	  d = std::min(reg_pos_i-reg_pos_j,size-reg_pos_i+reg_pos_j);
 	}
       else if (reg_pos_j > reg_pos_i)
 	{
-	  d = min(reg_pos_j-reg_pos_i,size-reg_pos_j+reg_pos_i);
+	  d = std::min(reg_pos_j-reg_pos_i,size-reg_pos_j+reg_pos_i);
 	}
       else
 	{
@@ -232,15 +232,15 @@ void binding_region::reset_proximities()
 
 
 // update the proximities given a grab radius and coordinate
-void binding_region::update_proximities(double r_g, vec a_coord, vector<vec> &coords)
+void binding_region::update_proximities(double r_g, vec a_coord, std::vector<vec> &coords)
 {
   double r_g_2 = pow(r_g,2.0);
   double test_dist_L2;
   
   for (int i=0; i<size; i++)
     {
-      // cout << "i = " << i << endl;
-      // cout << "m_i = " << get_mono_pos(i) << endl;
+      // std::cout << "i = " << i << std::endl;
+      // std::cout << "m_i = " << get_mono_pos(i) << std::endl;
       test_dist_L2 = vqm.v_L2(vqm.v_xpy(a_coord,vqm.v_inv(coords[get_mono_pos(i)])));
       if (test_dist_L2 < r_g_2)
 	{
@@ -274,9 +274,9 @@ void binding_region::filter_proximities_near_a(int min_dist, int a_mono_pos)
 
 
 // get the intra candidates and remove them from the set of proximities
-vector<int> binding_region::get_and_filter_intra_candidates(int ext_max, int h_mono_pos, int dir)
+std::vector<int> binding_region::get_and_filter_intra_candidates(int ext_max, int h_mono_pos, int dir)
 {
-  vector<int> intra_candidates;
+  std::vector<int> intra_candidates;
   intra_candidates.push_back(h_mono_pos);
   proximities[get_reg_pos(h_mono_pos)] = 0;
 
@@ -305,9 +305,9 @@ vector<int> binding_region::get_and_filter_intra_candidates(int ext_max, int h_m
 }
 
 // get the inter candidates
-vector<int> binding_region::get_inter_candidates()
+std::vector<int> binding_region::get_inter_candidates()
 {
-  vector<int> inter_candidates;
+  std::vector<int> inter_candidates;
 
   for (int i=0; i<size; i++)
     {

@@ -78,19 +78,19 @@ bond bond_array::get_bond(int i)
 
 
 // write to stream
-void bond_array::write(fstream &data_file)
+void bond_array::write(std::fstream &data_file)
 {
 
   if (N > 0)
     {
-      data_file << "\nBonds # bond-ID bond-type i j\n" << endl;
+      data_file << "\nBonds # bond-ID bond-type i j\n" << std::endl;
 
       for (int i=0; i<N; i++)
 	{
 	  data_file << bonds[i].id << "\t"
 		    << bonds[i].type << "\t"
 		    << bonds[i].i << "\t"
-		    << bonds[i].j << endl;
+		    << bonds[i].j << std::endl;
 	}
     }
   

@@ -4,9 +4,6 @@
 #include <replication_model.hpp>
 #include <gillespie_solver.hpp>
 
-using namespace std;
-
-
 class replicator
 {
 public:
@@ -19,17 +16,17 @@ public:
   void prng_seed(int s);
 
   // read the replication model
-  void read_rep_model(string rep_model_filename);
+  void read_rep_model(std::string rep_model_filename);
 
   // reset the noninitiator species
   void reset_noninit_s(int * &noninit_s);
   
   // prepare the reaction system
-  void prepare_system(int *noninit_s, vector<init_loc> &init_dist);
+  void prepare_system(int *noninit_s, std::vector<init_loc> &init_dist);
 
   // simulate the system until t_max
   void run_replicate_FPT(int *noninit_s,
-			 vector<init_loc> &init_dist,
+			 std::vector<init_loc> &init_dist,
 			 double &t, double &t_max);
 
   // getters to access replication model

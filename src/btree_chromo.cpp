@@ -8,11 +8,11 @@ int main(int argc, char *argv[])
 
   if (argc != 2)
     {
-      cout << "ERROR: missing directive file as command-line argument" << endl;
+      std::cout << "ERROR: missing directive file as command-line argument" << std::endl;
       return 1;
     }
 
-  string drctv_filename(argv[argc-1]);
+  std::string drctv_filename(argv[argc-1]);
 
   // read the directives from the directive file
   driver.read_directives(drctv_filename);
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
   error_code = driver.execute_commands();
   if (error_code != 0)
     {
-      cout << "error during command execution" << endl;
+      std::cout << "error during command execution" << std::endl;
       return 1;
     } 
 

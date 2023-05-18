@@ -12,12 +12,10 @@
 #include <binding_region.hpp>
 #include <intra_step_distribution.hpp>
 
-using namespace std;
-
 struct loop_sys_params
 {
   int min_dist;
-  string family;
+  std::string family;
   double ext_avg;
   int  ext_max;
   double p_unbinding, r_g;
@@ -41,30 +39,30 @@ public:
   void prng_seed(int s);
 
   // set the step distribution
-  void set_step_dist(string family, double l, int k_max);
+  void set_step_dist(std::string family, double l, int k_max);
 
   // set the coords
-  void set_coords(vector<vec> coords);
+  void set_coords(std::vector<vec> coords);
 
   // loop topology functions
-  void prepare_binding_regions(vector<string> leaves, vector<theta_topo> leaf_topos, int *&t);
+  void prepare_binding_regions(std::vector<std::string> leaves, std::vector<theta_topo> leaf_topos, int *&t);
   void initialize_loops(int N_loops, int min_dist);
   void update_loops(int ext_max, int min_dist, double p_unbinding, double r_g);
-  vector<loop> get_loops();
-  vector<binding_region> get_regions();
+  std::vector<loop> get_loops();
+  std::vector<binding_region> get_regions();
   
 private:
 
   // loop topology
-  vector<loop> loops;
-  vector<binding_region> regions;
-  vector<vec> coords;
+  std::vector<loop> loops;
+  std::vector<binding_region> regions;
+  std::vector<vec> coords;
 
   // step distribution
   intra_step_distribution step_dist;
 
   // prng
-  mt19937 rand_eng;
+  std::mt19937 rand_eng;
 
 };
 

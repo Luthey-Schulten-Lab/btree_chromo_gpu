@@ -12,8 +12,6 @@
 
 #include <rxn_manipulator.hpp>
 
-using namespace std;
-
 class replication_model;
 
 // typedef void (replication_model::* ptr)(int *, double*);
@@ -33,7 +31,7 @@ struct rep_model_params
 
 struct init_loc
 {
-  string loc;
+  std::string loc;
   int N;
 };
 
@@ -50,7 +48,7 @@ public:
   ~replication_model();
 
   // read the replication model
-  void read_rep_model(string rep_model_filename);
+  void read_rep_model(std::string rep_model_filename);
 
   // update the propensities
   void propensities(int *x, double *W);
@@ -73,18 +71,18 @@ public:
   void reset_noninit_s(int * &noninit_s);
   void update_noninit_s(int *noninit_s);
   void update_noninit_s_from_solver_s_cs(int *noninit_s,
-					 vector<species_count> &solver_s_cs);
+					 std::vector<species_count> &solver_s_cs);
 
   // convert initiator distribution to species counts and vice-versa
-  vector<species_count> id_to_sc(vector<init_loc> &init_dist);
-  void update_init_from_solver_s_cs(vector<init_loc> &init_dist,
-				    vector<species_count> &solver_s_cs);
+  std::vector<species_count> id_to_sc(std::vector<init_loc> &init_dist);
+  void update_init_from_solver_s_cs(std::vector<init_loc> &init_dist,
+				    std::vector<species_count> &solver_s_cs);
 
   // create the FPT species counts
-  vector<species_count> create_xFPT();
+  std::vector<species_count> create_xFPT();
 
   // get the reactions
-  vector<reaction> get_reactions();
+  std::vector<reaction> get_reactions();
 
   // functions for DnaA reaction model
   void number_rep_species();

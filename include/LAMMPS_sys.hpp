@@ -17,8 +17,6 @@
 #include <angle_array.hpp>
 #include <loop_topology.hpp>
 
-using namespace std;
-
 // structure defining bounding box for the system
 struct sys_bbox
 {
@@ -56,37 +54,37 @@ public:
   void set_btree(btree_state in_state);
 
   // read the Brownian dynamics lengths
-  void read_BD_lengths(string lengths_filename);
+  void read_BD_lengths(std::string lengths_filename);
 
   // generate a spherical boundary
   void generate_spherical_bdry(double r, double x0, double y0, double z0);
 
   // read the monomer coordinates and quaternions
-  int read_mono_coords(string coords_filename, string order);
-  int read_mono_quats(string quats_filename, string order);
+  int read_mono_coords(std::string coords_filename, std::string order);
+  int read_mono_quats(std::string quats_filename, std::string order);
   // read the ribo coordinates and quaternions
-  int read_ribo_coords(string coords_filename, string order);
-  int read_ribo_quats(string quats_filename, string order);
+  int read_ribo_coords(std::string coords_filename, std::string order);
+  int read_ribo_quats(std::string quats_filename, std::string order);
   // read the bdry coordinates
-  int read_bdry_coords(string coords_filename, string order);
+  int read_bdry_coords(std::string coords_filename, std::string order);
 
   // write the monomer coordinates and quaternions
-  int write_mono_coords(string coords_filename, string order);
-  int write_mono_quats(string quats_filename, string order);
+  int write_mono_coords(std::string coords_filename, std::string order);
+  int write_mono_quats(std::string quats_filename, std::string order);
   // write the ribo coordinates and quaternions
-  int write_ribo_coords(string coords_filename, string order);
-  int write_ribo_quats(string quats_filename, string order);
+  int write_ribo_coords(std::string coords_filename, std::string order);
+  int write_ribo_quats(std::string quats_filename, std::string order);
   // write the bdry coordinates
-  int write_bdry_coords(string coords_filename, string order);
+  int write_bdry_coords(std::string coords_filename, std::string order);
 
   // apply a mapping to the monomers
-  void apply_mono_mapping(vector<vector<array<int,3>>> map);
+  void apply_mono_mapping(std::vector<std::vector<std::array<int,3>>> map);
 
   // write the monomer coordinates to an xyz for quick visualization
-  void write_mono_xyz(string data_filename);
+  void write_mono_xyz(std::string data_filename);
 
   // write the data
-  void write_data(string data_filename);
+  void write_data(std::string data_filename);
 
   // getters for the total system state
   int get_N_total();
@@ -95,7 +93,7 @@ public:
   int get_N_bdry();
 
   // getters for vectors of properties
-  vector<vec> get_mono_coords();
+  std::vector<vec> get_mono_coords();
 
   // setters for the subarrays
   void set_N_total(int N);
@@ -110,8 +108,8 @@ public:
   void get_types(int *&t);
 
   // setters for the total system state
-  void set_coords_arr_total(double *&x, string order);
-  void set_quats_arr_total(double *&q, string order);
+  void set_coords_arr_total(double *&x, std::string order);
+  void set_quats_arr_total(double *&q, std::string order);
 
   // sync the subarrays
   void sync_subarrays();
@@ -120,7 +118,7 @@ public:
   void set_loop_sys_params(loop_sys_params &l_sys_p);
   void initialize_loop_topo(int N_loops);
   void update_loop_topo();
-  vector<bond> get_loop_bonds();
+  std::vector<bond> get_loop_bonds();
 
   // switches for the topology
   void switch_bonds(bool s);

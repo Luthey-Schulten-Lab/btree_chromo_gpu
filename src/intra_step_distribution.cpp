@@ -91,7 +91,7 @@ void intra_step_distribution::print_distribution()
 {
   for (int i=0; i<N; i++)
     {
-      cout << "i=" << i << "," << w[i] << "," << cw[i] << endl;
+      std::cout << "i=" << i << "," << w[i] << "," << cw[i] << std::endl;
     }
 }
 
@@ -102,8 +102,8 @@ int intra_step_distribution::get_k(double r, int k_max)
   int k = 0;
   double rc = r*cw[k_max-1];
 
-  // cout << "sampling k, rc=" << rc << endl;
-  // cout << r << "," << k_max << "," << cw[k_max-1];
+  // std::cout << "sampling k, rc=" << rc << std::endl;
+  // std::cout << r << "," << k_max << "," << cw[k_max-1];
 
   for (int i=0; i<k_max; i++)
     {
@@ -123,7 +123,7 @@ void intra_step_distribution::uniform_dist(int k_max)
   set_N(k_max);
   uniform_w();
   norm_w_prep_cw();
-  cout << "uniform step distribution" << endl;
+  std::cout << "uniform step distribution" << std::endl;
   print_distribution();
 }
 
@@ -144,7 +144,7 @@ void intra_step_distribution::poisson_dist(double l, int k_max)
   set_N(k_max);
   poisson_w(l);
   norm_w_prep_cw();
-  cout << "Poisson step distribution" << endl;
+  std::cout << "Poisson step distribution" << std::endl;
   print_distribution();
 }
 

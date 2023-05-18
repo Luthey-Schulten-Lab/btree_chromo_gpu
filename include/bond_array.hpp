@@ -6,8 +6,6 @@
 
 #include <vec_quat_manipulator.hpp>
 
-using namespace std;
-
 struct bond
 {
   int id, type, i, j;
@@ -32,7 +30,7 @@ public:
   bond get_bond(int i);
 
   // write bond data
-  void write(fstream &data_file);
+  void write(std::fstream &data_file);
 
 private:
 

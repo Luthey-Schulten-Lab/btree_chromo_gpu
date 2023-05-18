@@ -19,7 +19,7 @@ void loop_topology::prng_seed(int s)
 }
 
 
-void loop_topology::set_step_dist(string family, double l, int k_max)
+void loop_topology::set_step_dist(std::string family, double l, int k_max)
 {
   if (family == "poisson")
     {
@@ -32,21 +32,21 @@ void loop_topology::set_step_dist(string family, double l, int k_max)
 }
 
 
-void loop_topology::set_coords(vector<vec> coords)
+void loop_topology::set_coords(std::vector<vec> coords)
 {
   this->coords = coords;
 }
 
 
 // prepare the vector of binding regions
-void loop_topology::prepare_binding_regions(vector<string> leaves, vector<theta_topo> leaf_topos, int *&t)
+void loop_topology::prepare_binding_regions(std::vector<std::string> leaves, std::vector<theta_topo> leaf_topos, int *&t)
 {
 
   regions.clear();
 
-  vector<int> partitions;
+  std::vector<int> partitions;
 
-  string leaf; // leaf that binding region belongs to
+  std::string leaf; // leaf that binding region belongs to
   int ll, ul, size; // lower limit and upper limit of indices
   bool completed;
   bool ter_crossing;
@@ -198,10 +198,10 @@ void loop_topology::prepare_binding_regions(vector<string> leaves, vector<theta_
       
     } // end loop over leaves
 
-  //cout << "at end of prepare_binding_regions" << endl;
+  //std::cout << "at end of prepare_binding_regions" << std::endl;
   for (size_t i_reg=0; i_reg<regions.size(); i_reg++)
     {
-      //cout << "i_reg = " << i_reg << endl;
+      //std::cout << "i_reg = " << i_reg << std::endl;
       regions[i_reg].prepare_idx();
       //regions[i_reg].print_region_map();
     }
@@ -217,10 +217,10 @@ void loop_topology::initialize_loops(int N_loops, int min_dist)
   
   size_t N_regions = regions.size();
 
-  // cout << "at start of initialize_loops" << endl;
+  // std::cout << "at start of initialize_loops" << std::endl;
   // for (size_t i_reg=0; i_reg<regions.size(); i_reg++)
   //   {
-  //     cout << "i_reg = " << i_reg << endl;
+  //     std::cout << "i_reg = " << i_reg << std::endl;
   //     regions[i_reg].print_region_map();
   //   }
 
@@ -236,8 +236,8 @@ void loop_topology::initialize_loops(int N_loops, int min_dist)
 	}
     }
 
-  uniform_int_distribution<int> unif_dist(1,total_binding_region_size);
-  vector<int> a_dist;
+  std::uniform_int_distribution<int> unif_dist(1,total_binding_region_size);
+  std::vector<int> a_dist;
 
   // loop over the number of loops
   for (int i_loop=0; i_loop<N_loops; i_loop++)
@@ -267,7 +267,7 @@ void loop_topology::initialize_loops(int N_loops, int min_dist)
 
   int a_reg, h_reg;
 
-  uniform_real_distribution<double> dir_dist(0.0, 1.0);
+  std::uniform_real_distribution<double> dir_dist(0.0, 1.0);
   double r_d;
   int d, r_mono, a_mono, h_mono;
   
@@ -278,7 +278,7 @@ void loop_topology::initialize_loops(int N_loops, int min_dist)
       a_reg = loops[i_loop].get_a_region();
 
       // select a random monomer for the anchor
-      uniform_int_distribution<int> unif_dist(0,regions[a_reg].get_size()-1);
+      std::uniform_int_distribution<int> unif_dist(0,regions[a_reg].get_size()-1);
       r_mono = unif_dist(rand_eng);
       a_mono = regions[a_reg].get_mono_pos(r_mono);
       loops[i_loop].set_a(a_mono);
@@ -302,7 +302,7 @@ void loop_topology::initialize_loops(int N_loops, int min_dist)
 						       d);
       loops[i_loop].set_h(h_mono);
 
-      // cout << "a=" << a_mono << ", h=" << h_mono << ", d=" << d << endl;
+      // std::cout << "a=" << a_mono << ", h=" << h_mono << ", d=" << d << std::endl;
       // regions[a_reg].print_region_map();
       
       // bind the hinge
@@ -316,9 +316,9 @@ void loop_topology::initialize_loops(int N_loops, int min_dist)
 void loop_topology::update_loops(int ext_max, int min_dist, double p_unbinding, double r_g)
 {
 
-  uniform_real_distribution<double> unif_dist(0.0, 1.0);
-  vector<int> intra_updates;
-  vector<vector<int>> inter_updates;
+  std::uniform_real_distribution<double> unif_dist(0.0, 1.0);
+  std::vector<int> intra_updates;
+  std::vector<std::vector<int>> inter_updates;
   int a_mono, h_mono, d;
   size_t a_reg, h_reg;
   vec a_coord;
@@ -349,7 +349,7 @@ void loop_topology::update_loops(int ext_max, int min_dist, double p_unbinding, 
 	  d = loops[i_loop].get_d();
 
 	  // update the proximities in the hinge region
-	  // cout << "h_reg = " << h_reg << endl;
+	  // std::cout << "h_reg = " << h_reg << std::endl;
 	  // regions[h_reg].print_region_map();
 	  regions[h_reg].update_proximities(r_g,a_coord,coords);
 
@@ -358,10 +358,10 @@ void loop_topology::update_loops(int ext_max, int min_dist, double p_unbinding, 
 	  // get the intra updates
 	  intra_updates = regions[h_reg].get_and_filter_intra_candidates(ext_max,h_mono,d);
 
-	  // cout << "intra_updates, " << h_mono << ", " << intra_updates.size() << " candidates" << endl;
+	  // std::cout << "intra_updates, " << h_mono << ", " << intra_updates.size() << " candidates" << std::endl;
 	  // for (size_t i_intra=0; i_intra<intra_updates.size(); i_intra++)
 	  //   {
-	  //     cout << intra_updates[i_intra] << endl;
+	  //     std::cout << intra_updates[i_intra] << std::endl;
 	  //   }
 
 	  if (unif_dist(rand_eng) > p_unbinding)
@@ -369,9 +369,9 @@ void loop_topology::update_loops(int ext_max, int min_dist, double p_unbinding, 
 	  
 	      // select an updated hinge for 1D motion along strand
 	      r_intra = unif_dist(rand_eng);
-	      cout << "r_intra = " << r_intra << endl;
+	      std::cout << "r_intra = " << r_intra << std::endl;
 	      h_intra = intra_updates[step_dist.get_k(r_intra,static_cast<int>(intra_updates.size()))];
-	      cout << "h_intra_final = " << h_intra << endl;
+	      std::cout << "h_intra_final = " << h_intra << std::endl;
 
 	      loops[i_loop].set_h(h_intra);
 	  
@@ -407,11 +407,11 @@ void loop_topology::update_loops(int ext_max, int min_dist, double p_unbinding, 
 
 	      if (N_inter_total > 0)
 		{
-		  uniform_int_distribution<size_t> unif_dist(0,N_inter_total);
+		  std::uniform_int_distribution<size_t> unif_dist(0,N_inter_total);
 
 		  accumulator = 0;
 		  r_inter = unif_dist(rand_eng);
-		  cout << "r_inter = " << r_inter  << ", N_inter_total = " << N_inter_total << endl;
+		  std::cout << "r_inter = " << r_inter  << ", N_inter_total = " << N_inter_total << std::endl;
 
 		  // determine the candidate inter-strand hinge updates for all the regions
 		  for (size_t i_reg=0; i_reg<regions.size(); i_reg++)
@@ -421,8 +421,8 @@ void loop_topology::update_loops(int ext_max, int min_dist, double p_unbinding, 
 			{
 			  h_inter = static_cast<int>(r_inter-accumulator);
 			  // set the hinge
-			  cout << "accumulator = " << accumulator  << ", i_reg = " << i_reg << endl;
-			  cout << "size = " << inter_updates[i_reg].size()  << ", h_inter = " << h_inter << endl;
+			  std::cout << "accumulator = " << accumulator  << ", i_reg = " << i_reg << std::endl;
+			  std::cout << "size = " << inter_updates[i_reg].size()  << ", h_inter = " << h_inter << std::endl;
 			  loops[i_loop].set_h(inter_updates[i_reg][h_inter]);
 			  // set the hinge region
 			  loops[i_loop].set_h_region(i_reg);
@@ -481,7 +481,7 @@ void loop_topology::update_loops(int ext_max, int min_dist, double p_unbinding, 
 
 	  if (N_inter_total > 0)
 	    {
-	      uniform_int_distribution<int> unif_dist(0,N_inter_total);
+	      std::uniform_int_distribution<int> unif_dist(0,N_inter_total);
 
 	      accumulator = 0;
 	      r_inter = unif_dist(rand_eng);
@@ -522,13 +522,13 @@ void loop_topology::update_loops(int ext_max, int min_dist, double p_unbinding, 
 
 
 // get the loops
-vector<loop> loop_topology::get_loops()
+std::vector<loop> loop_topology::get_loops()
 {
   return loops;
 }
 
 // get the binding regions
-vector<binding_region> loop_topology::get_regions()
+std::vector<binding_region> loop_topology::get_regions()
 {
   return regions;
 }

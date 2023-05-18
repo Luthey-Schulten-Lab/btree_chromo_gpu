@@ -124,7 +124,7 @@ void ellipsoid_array::set_quat(int i, quat q)
 
 
 // set element-wise quaternions
-void ellipsoid_array::set_quats(vector<quat> qs)
+void ellipsoid_array::set_quats(std::vector<quat> qs)
 {
   for (int i=0; i<N; i++)
     {
@@ -134,7 +134,7 @@ void ellipsoid_array::set_quats(vector<quat> qs)
 
 
 // set the particle coordinates from a 1D array of doubles
-void ellipsoid_array::set_quats_arr(double *&q, string order)
+void ellipsoid_array::set_quats_arr(double *&q, std::string order)
 {
 
   quat p;
@@ -165,33 +165,33 @@ void ellipsoid_array::set_quats_arr(double *&q, string order)
 
 
 // read coordinates from binary file
-int ellipsoid_array::read_bin_quats(string data_filename, string order, bool force_resize)
+int ellipsoid_array::read_bin_quats(std::string data_filename, std::string order, bool force_resize)
 {
-  fstream data_file;
+  std::fstream data_file;
 
-  data_file.open(data_filename, ios::in | ios::binary | ios::ate);
+  data_file.open(data_filename, std::ios::in | std::ios::binary | std::ios::ate);
 
   // int data_size = 4;
     
   if (!data_file.is_open())
     {
-      cout << "ERROR: file not opened in read_bin_quats" << endl;
+      std::cout << "ERROR: file not opened in read_bin_quats" << std::endl;
       return 1;
     }
   else
     {
 
       // read in the binary file
-      streampos size = data_file.tellg();
+      std::streampos size = data_file.tellg();
       char *memblock;
       double *q;
 
       int data_size = sizeof(double);
       char vals[sizeof(double)];
       int N_data = size/data_size;
-      cout << "N_data = " << N_data << endl;
+      std::cout << "N_data = " << N_data << std::endl;
       int N_bin_quats = N_data/4;
-      cout << "N_bin_quats = " << N_bin_quats << endl;
+      std::cout << "N_bin_quats = " << N_bin_quats << std::endl;
 
       // test for resizing
       if (force_resize)
@@ -202,14 +202,14 @@ int ellipsoid_array::read_bin_quats(string data_filename, string order, bool for
 	{
 	  if (N_bin_quats != get_N())
 	    {
-	      cout << "ERROR: incorrect ellipsoid_array size" << endl;
+	      std::cout << "ERROR: incorrect ellipsoid_array size" << std::endl;
 	      return 1;
 	    }
 	}
 
       memblock = new char[size];
       
-      data_file.seekg(0, ios::beg);
+      data_file.seekg(0, std::ios::beg);
 
       data_file.read(memblock,size);
 
@@ -239,12 +239,12 @@ int ellipsoid_array::read_bin_quats(string data_filename, string order, bool for
 
 
 // write to stream
-void ellipsoid_array::write(fstream &data_file)
+void ellipsoid_array::write(std::fstream &data_file)
 {
 
   if (N > 0)
     {
-      data_file << "\nEllipsoids # atom-ID shapex shapey shapez quatw quati quatj quatk\n" << endl;
+      data_file << "\nEllipsoids # atom-ID shapex shapey shapez quatw quati quatj quatk\n" << std::endl;
 
       for (int i=0; i<N; i++)
 	{        
@@ -255,7 +255,7 @@ void ellipsoid_array::write(fstream &data_file)
 		    << ellipsoids[i].q.w << "\t"
 		    << ellipsoids[i].q.v.x << "\t"
 		    << ellipsoids[i].q.v.y << "\t"
-		    << ellipsoids[i].q.v.z << endl;
+		    << ellipsoids[i].q.v.z << std::endl;
 	}
     }
   
@@ -263,17 +263,17 @@ void ellipsoid_array::write(fstream &data_file)
 
 
 // write quaternions to a binary file
-int ellipsoid_array::write_bin(string data_filename, string order)
+int ellipsoid_array::write_bin(std::string data_filename, std::string order)
 {
-  fstream data_file;
+  std::fstream data_file;
 
-  data_file.open(data_filename, ios::out | ios::binary);
+  data_file.open(data_filename, std::ios::out | std::ios::binary);
 
   // int data_size = 4;
     
   if (!data_file.is_open())
     {
-      cout << "ERROR: file not opened in write_bin" << endl;
+      std::cout << "ERROR: file not opened in write_bin" << std::endl;
       return 1;
     }
   else if (N > 0)
@@ -309,7 +309,7 @@ int ellipsoid_array::write_bin(string data_filename, string order)
     }
   else
     {
-      cout << "no quats to write" << endl;
+      std::cout << "no quats to write" << std::endl;
       data_file.close();
       return 0;
     }

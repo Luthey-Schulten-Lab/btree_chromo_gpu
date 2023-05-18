@@ -6,8 +6,6 @@
 
 #include <vec_quat_manipulator.hpp>
 
-using namespace std;
-
 struct angle
 {
   int id, type, i, j, k;
@@ -32,7 +30,7 @@ public:
   angle get_angle(int i);
 
   // write angle data
-  void write(fstream &data_file);
+  void write(std::fstream &data_file);
 
 private:
 

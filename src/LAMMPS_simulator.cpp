@@ -37,7 +37,7 @@ LAMMPS_simulator::~LAMMPS_simulator()
 
 
 // initialize LAMMPS object
-void LAMMPS_simulator::LAMMPS_initialize(string logfile)
+void LAMMPS_simulator::LAMMPS_initialize(std::string logfile)
 {
   
   // int argc;
@@ -80,21 +80,21 @@ void LAMMPS_simulator::set_lmp_sys(LAMMPS_sys *lmp_sys)
 
 
 // feed an include file to LAMMPS simulation object
-void LAMMPS_simulator::include_file(string filename)
+void LAMMPS_simulator::include_file(std::string filename)
 {
   lmp->input->one(("include " + filename).c_str());
 }
 
 
 // feed a single command to the LAMMPS simulation object
-void LAMMPS_simulator::command(string command)
+void LAMMPS_simulator::command(std::string command)
 {
   lmp->input->one(command.c_str());
 }
 
 
 // read data into LAMMPS simulation object
-void LAMMPS_simulator::read_data(string data_file)
+void LAMMPS_simulator::read_data(std::string data_file)
 {
   // read the data
   lmp->input->one(("read_data " + data_file + " extra/bond/per/atom 2").c_str());
@@ -145,12 +145,12 @@ void LAMMPS_simulator::set_nProc(int nProc)
 {
   // variable with number of processors for OpenMP
   this->nProc = nProc;
-  lmp->input->one(("variable nProc internal " + to_string(this->nProc)).c_str());
+  lmp->input->one(("variable nProc internal " + std::to_string(this->nProc)).c_str());
 }
 
 
 // set DNA model
-void LAMMPS_simulator::set_DNA_model_dir(string DNA_model_dir)
+void LAMMPS_simulator::set_DNA_model_dir(std::string DNA_model_dir)
 {
   // directory with DNA model files (properties, parameters, and basic routines)
   this->DNA_model_dir = DNA_model_dir;
@@ -159,7 +159,7 @@ void LAMMPS_simulator::set_DNA_model_dir(string DNA_model_dir)
 
 
 // set output details
-void LAMMPS_simulator::set_output_details(string output_dir, string output_file_label)
+void LAMMPS_simulator::set_output_details(std::string output_dir, std::string output_file_label)
 {
   // output directory and file label
   this->output_dir = output_dir;
@@ -175,8 +175,8 @@ void LAMMPS_simulator::set_prng_seed(int s)
 {
   // PRNG seed for LAMMPS object
   this->prng_seed = s;
-  string old_str = to_string(this->prng_seed);
-  auto seed_str = string(6 - min(6,static_cast<int>(old_str.length())),'0') + old_str;
+  std::string old_str = std::to_string(this->prng_seed);
+  auto seed_str = std::string(6 - std::min(6,static_cast<int>(old_str.length())),'0') + old_str;
   lmp->input->one(("variable rng_seed internal " + seed_str).c_str());
 }
 
@@ -187,7 +187,7 @@ void LAMMPS_simulator::set_delta_t(double delta_t)
 {
   // timestep
   this->delta_t = delta_t;
-  lmp->input->one(("variable delta_t internal " + to_string(delta_t)).c_str());
+  lmp->input->one(("variable delta_t internal " + std::to_string(delta_t)).c_str());
   // lmp->input->one(("variable delta_t internal " + delta_t).c_str());
 }
 
@@ -196,7 +196,7 @@ void LAMMPS_simulator::set_delta_t(double delta_t)
 void LAMMPS_simulator::reset_protocol_variables()
 {
   // variable with number of processors for OpenMP
-  lmp->input->one(("variable nProc internal " + to_string(nProc)).c_str());
+  lmp->input->one(("variable nProc internal " + std::to_string(nProc)).c_str());
 
   // directory with DNA model files (properties, parameters, and basic routines)
   lmp->input->one(("variable DNA_model_dir string " + DNA_model_dir).c_str());
@@ -207,12 +207,12 @@ void LAMMPS_simulator::reset_protocol_variables()
   lmp->input->one("variable output_file string ${output_dir}${output_file_label}");
 
   // PRNG seed for LAMMPS object
-  string old_str = to_string(prng_seed);
-  auto seed_str = string(6 - min(6,static_cast<int>(old_str.length())),'0') + old_str;
+  std::string old_str = std::to_string(prng_seed);
+  auto seed_str = std::string(6 - std::min(6,static_cast<int>(old_str.length())),'0') + old_str;
   lmp->input->one(("variable rng_seed internal " + seed_str).c_str());
 
   // timestep
-  lmp->input->one(("variable delta_t internal " + to_string(delta_t)).c_str());
+  lmp->input->one(("variable delta_t internal " + std::to_string(delta_t)).c_str());
   // lmp->input->one(("variable delta_t internal " + delta_t).c_str());
 }
 
@@ -252,7 +252,7 @@ void LAMMPS_simulator::setup_minimize(thermo_dump_parameters &t_d_p)
 void LAMMPS_simulator::minimize_soft_harmonic(thermo_dump_parameters t_d_p)
 {
 
-  // cout << "---[ minimizing SOFT_HARMONIC ]---" << endl;
+  // std::cout << "---[ minimizing SOFT_HARMONIC ]---" << std::endl;
 
   // setup the minimization
   setup_minimize(t_d_p);
@@ -270,7 +270,7 @@ void LAMMPS_simulator::minimize_soft_harmonic(thermo_dump_parameters t_d_p)
 void LAMMPS_simulator::minimize_hard_harmonic(thermo_dump_parameters t_d_p)
 {
 
-  // cout << "---[ minimizing HARD_HARMONIC ]---" << endl;
+  // std::cout << "---[ minimizing HARD_HARMONIC ]---" << std::endl;
   
   // setup the minimization
   setup_minimize(t_d_p);
@@ -287,7 +287,7 @@ void LAMMPS_simulator::minimize_hard_harmonic(thermo_dump_parameters t_d_p)
 void LAMMPS_simulator::minimize_topoDNA_harmonic(thermo_dump_parameters t_d_p)
 {
 
-  // cout << "---[ minimizing topoDNA_HARMONIC ]---" << endl;
+  // std::cout << "---[ minimizing topoDNA_HARMONIC ]---" << std::endl;
   
   // setup the minimization
   setup_minimize(t_d_p);
@@ -304,7 +304,7 @@ void LAMMPS_simulator::minimize_topoDNA_harmonic(thermo_dump_parameters t_d_p)
 void LAMMPS_simulator::minimize_soft_FENE(thermo_dump_parameters t_d_p)
 {
 
-  // cout << "---[ minimizing SOFT_FENE ]---" << endl;
+  // std::cout << "---[ minimizing SOFT_FENE ]---" << std::endl;
   
   // setup the minimization
   setup_minimize(t_d_p);
@@ -321,7 +321,7 @@ void LAMMPS_simulator::minimize_soft_FENE(thermo_dump_parameters t_d_p)
 void LAMMPS_simulator::minimize_hard_FENE(thermo_dump_parameters t_d_p)
 {
 
-  // cout << "---[ minimizing HARD_FENE ]---" << endl;
+  // std::cout << "---[ minimizing HARD_FENE ]---" << std::endl;
   
   // setup the minimization
   setup_minimize(t_d_p);
@@ -338,7 +338,7 @@ void LAMMPS_simulator::minimize_hard_FENE(thermo_dump_parameters t_d_p)
 void LAMMPS_simulator::minimize_topoDNA_FENE(thermo_dump_parameters t_d_p)
 {
 
-  // cout << "---[ minimizing topoDNA_FENE ]---" << endl;
+  // std::cout << "---[ minimizing topoDNA_FENE ]---" << std::endl;
   
   // setup the minimization
   setup_minimize(t_d_p);
@@ -396,7 +396,7 @@ void LAMMPS_simulator::run_soft_harmonic(unsigned long N_steps, thermo_dump_para
   lmp->input->one("timestep ${delta_t}");
   
   // run for N_steps
-  lmp->input->one(("run " + to_string(N_steps)).c_str());
+  lmp->input->one(("run " + std::to_string(N_steps)).c_str());
 
   // increment Nt
   Nt += N_steps;
@@ -416,7 +416,7 @@ void LAMMPS_simulator::run_hard_harmonic(unsigned long N_steps, thermo_dump_para
   lmp->input->one("timestep ${delta_t}");
 
   // run for N_steps
-  lmp->input->one(("run " + to_string(N_steps)).c_str());
+  lmp->input->one(("run " + std::to_string(N_steps)).c_str());
 
   // increment Nt
   Nt += N_steps;
@@ -436,7 +436,7 @@ void LAMMPS_simulator::run_topoDNA_harmonic(unsigned long N_steps, thermo_dump_p
   lmp->input->one("timestep ${delta_t}");
 
   // run for N_steps
-  lmp->input->one(("run " + to_string(N_steps)).c_str());
+  lmp->input->one(("run " + std::to_string(N_steps)).c_str());
 
   // increment Nt
   Nt += N_steps;
@@ -456,7 +456,7 @@ void LAMMPS_simulator::run_soft_FENE(unsigned long N_steps, thermo_dump_paramete
   lmp->input->one("timestep ${delta_t}");
 
   // run for N_steps
-  lmp->input->one(("run " + to_string(N_steps)).c_str());
+  lmp->input->one(("run " + std::to_string(N_steps)).c_str());
 
   // increment Nt
   Nt += N_steps;
@@ -476,7 +476,7 @@ void LAMMPS_simulator::run_hard_FENE(unsigned long N_steps, thermo_dump_paramete
   lmp->input->one("include ${DNA_model_dir}/run_subroutines/subroutine.run_hard_FENE");
 
   // run for N_steps
-  lmp->input->one(("run " + to_string(N_steps)).c_str());
+  lmp->input->one(("run " + std::to_string(N_steps)).c_str());
 
   // increment Nt
   Nt += N_steps;
@@ -496,7 +496,7 @@ void LAMMPS_simulator::run_topoDNA_FENE(unsigned long N_steps, thermo_dump_param
   lmp->input->one("include ${DNA_model_dir}/run_subroutines/subroutine.run_topoDNA_FENE");
 
   // run for N_steps
-  lmp->input->one(("run " + to_string(N_steps)).c_str());
+  lmp->input->one(("run " + std::to_string(N_steps)).c_str());
 
   // increment Nt
   Nt += N_steps;
@@ -506,22 +506,22 @@ void LAMMPS_simulator::run_topoDNA_FENE(unsigned long N_steps, thermo_dump_param
 // prepare the dump
 void LAMMPS_simulator::prepare_dump(unsigned long N_steps, thermo_dump_parameters &t_d_p)
 {
-  string dump_cmd;
-  string dump_label = "lammpstrj";
+  std::string dump_cmd;
+  std::string dump_label = "lammpstrj";
   
   undump(dump_label);
 
-  // cout << "dump_freq = " << t_d_p.dump_freq << endl;
+  // std::cout << "dump_freq = " << t_d_p.dump_freq << std::endl;
   // lmp->input->one("print ${D_freq}");
   if ((dumps[dump_label] == false) && (t_d_p.dump_freq > 0))
     {
       // reset the number of timesteps to Nt
-      lmp->input->one(("reset_timestep " + to_string(Nt)).c_str());
+      lmp->input->one(("reset_timestep " + std::to_string(Nt)).c_str());
 
-      // lmp->input->one(("variable skip_condition equal \"step > "+ to_string(Nt) + "\"").c_str());
+      // lmp->input->one(("variable skip_condition equal \"step > "+ std::to_string(Nt) + "\"").c_str());
 
       // delay by an amount corresponding to when the previous dump occurred
-      lmp->input->one(("variable D_delay equal "+ to_string(prev_dump_Nt + t_d_p.dump_freq)).c_str());
+      lmp->input->one(("variable D_delay equal "+ std::to_string(prev_dump_Nt + t_d_p.dump_freq)).c_str());
   
       // include dump
       if (t_d_p.append == true)
@@ -570,7 +570,7 @@ void LAMMPS_simulator::reset_timestep_to_Nt()
     }
   
   // reset the number of timesteps to Nt
-  lmp->input->one(("reset_timestep " + to_string(Nt)).c_str());
+  lmp->input->one(("reset_timestep " + std::to_string(Nt)).c_str());
 }
 
 
@@ -610,8 +610,8 @@ void LAMMPS_simulator::sim_to_sys_atom_counts()
   
   double Nd = lammps_get_natoms(lmp);
   int N = int(Nd);
-  cout << "Nd = " << Nd << endl;
-  cout << "N = " << N << endl;
+  std::cout << "Nd = " << Nd << std::endl;
+  std::cout << "N = " << N << std::endl;
 
   // determine the sizes of the subarrays
   // unsigned long int *types = new unsigned long int[N];
@@ -634,7 +634,7 @@ void LAMMPS_simulator::sim_to_sys_atom_counts()
     {
       // t = static_cast<int>(types[i]);
       t = int(types[i]);
-      if (i%50 == 0) cout << i << "\t" << t << endl;
+      if (i%50 == 0) std::cout << i << "\t" << t << std::endl;
       if (t == 1)
 	{
 	  N_bdry += 1;
@@ -650,13 +650,13 @@ void LAMMPS_simulator::sim_to_sys_atom_counts()
     }
 
   int N_mono_ribo = N_mono + N_ribo;
-  cout << "N_mono = " << N_mono << endl;
-  cout << "N_ribo = " << N_ribo << endl;
-  cout << "N_bdry = " << N_bdry << endl;
-  cout << "N_mono_ribo = " << N_mono_ribo << endl;
+  std::cout << "N_mono = " << N_mono << std::endl;
+  std::cout << "N_ribo = " << N_ribo << std::endl;
+  std::cout << "N_bdry = " << N_bdry << std::endl;
+  std::cout << "N_mono_ribo = " << N_mono_ribo << std::endl;
 
   delete[] types;
-  cout << "past delete" << endl;
+  std::cout << "past delete" << std::endl;
 
   // resize the system state based on the simulator
   lmp_sys->set_N_total(N);
@@ -684,11 +684,11 @@ void LAMMPS_simulator::sim_to_sys()
   if (N_mono > 0) N_mono_ribo += N_mono;
   if (N_ribo > 0) N_mono_ribo += N_ribo;
 
-  cout << "N = " << N << endl;
-  cout << "N_mono = " << N_mono << endl;
-  cout << "N_ribo = " << N_ribo << endl;
-  cout << "N_bdry = " << N_bdry << endl;
-  cout << "N_mono_ribo = " << N_mono_ribo << endl;
+  std::cout << "N = " << N << std::endl;
+  std::cout << "N_mono = " << N_mono << std::endl;
+  std::cout << "N_ribo = " << N_ribo << std::endl;
+  std::cout << "N_bdry = " << N_bdry << std::endl;
+  std::cout << "N_mono_ribo = " << N_mono_ribo << std::endl;
 
   if (N > 0)
     {
@@ -758,26 +758,26 @@ void LAMMPS_simulator::sim_to_sys()
 
 
 // read the replication model
-int LAMMPS_simulator::read_loop_params(string loop_param_filename)
+int LAMMPS_simulator::read_loop_params(std::string loop_param_filename)
 {
 
-  fstream loop_param_file;
+  std::fstream loop_param_file;
 
-  string param_delim, param, val;
+  std::string param_delim, param, val;
   int delim;
   
-  string line;
+  std::string line;
 
   loop_sim_params l_sim_p;
   loop_sys_params l_sys_p;
 
   param_delim = "=";
 
-  loop_param_file.open(loop_param_filename, ios::in);
+  loop_param_file.open(loop_param_filename, std::ios::in);
 
   if (!loop_param_file.is_open())
     {
-      cout << "ERROR: file not opened in loop_param_file" << endl;
+      std::cout << "ERROR: file not opened in loop_param_file" << std::endl;
       return 1;
     }
   else
@@ -800,7 +800,7 @@ int LAMMPS_simulator::read_loop_params(string loop_param_filename)
 		  param = line.substr(0,delim);
 		  val = line.substr(delim+1,line.length());
 
-		  // cout << param << "=" << val << endl;
+		  // std::cout << param << "=" << val << std::endl;
 
 		  if (param == "min_dist")
 		    {
@@ -910,17 +910,17 @@ void LAMMPS_simulator::update_loop_bonds(bool new_bonds)
 
 
   // get the loop bonds
-  vector<bond> loop_bonds = lmp_sys->get_loop_bonds();
+  std::vector<bond> loop_bonds = lmp_sys->get_loop_bonds();
   
   // add the updated loop bonds
-  string temp_bond_command = "create_bonds single/bond";
-  string bond_command;
+  std::string temp_bond_command = "create_bonds single/bond";
+  std::string bond_command;
   for (size_t i_loop=0; i_loop<loop_bonds.size(); i_loop++)
     {
       bond_command = temp_bond_command;
-      bond_command += (" " + to_string(loop_bonds[i_loop].type));
-      bond_command += (" " + to_string(loop_bonds[i_loop].i));
-      bond_command += (" " + to_string(loop_bonds[i_loop].j));
+      bond_command += (" " + std::to_string(loop_bonds[i_loop].type));
+      bond_command += (" " + std::to_string(loop_bonds[i_loop].i));
+      bond_command += (" " + std::to_string(loop_bonds[i_loop].j));
 
       if (i_loop == loop_bonds.size() - 1)
 	{
@@ -931,7 +931,7 @@ void LAMMPS_simulator::update_loop_bonds(bool new_bonds)
 	  bond_command += " special no";
 	}
 
-      cout << i_loop << " " << bond_command << endl;
+      std::cout << i_loop << " " << bond_command << std::endl;
       
       lmp->input->one(bond_command);
 
@@ -1001,7 +1001,7 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
       update_loop_bonds(new_bonds);
 
       // determine the number of steps to be simulated
-      step_increment = min(l_sim_p.freq_loop,N_steps-step_counter);
+      step_increment = std::min(l_sim_p.freq_loop,N_steps-step_counter);
 
       // simulate topoisomerase action
       if ((step_counter + step_increment) >=
@@ -1056,7 +1056,7 @@ void LAMMPS_simulator::initialize_computes()
 
 
 // remove the compute
-void LAMMPS_simulator::uncompute(string compute_label)
+void LAMMPS_simulator::uncompute(std::string compute_label)
 {
   if (computes[compute_label] == true)
     {
@@ -1086,9 +1086,9 @@ void LAMMPS_simulator::uncompute(string compute_label)
 
 
 // trigger for preventing reuse of computes
-void LAMMPS_simulator::compute_trigger(string compute_label)
+void LAMMPS_simulator::compute_trigger(std::string compute_label)
 {
-  string compute_cmd;
+  std::string compute_cmd;
 
   // remove compute if it already exists
   uncompute(compute_label);
@@ -1112,7 +1112,7 @@ void LAMMPS_simulator::initialize_dumps()
 }
 
 
-void LAMMPS_simulator::undump(string dump_label)
+void LAMMPS_simulator::undump(std::string dump_label)
 {
   if (dumps[dump_label] == true)
     {
@@ -1129,7 +1129,7 @@ void LAMMPS_simulator::initialize_sim_vars()
   sim_vars["D_freq"] = false;
 
   // initialize internal variables for extra potentials
-  string p;
+  std::string p;
   for (auto extra_pot=extra_pots.begin(); extra_pot!=extra_pots.end(); ++extra_pot)
     {
       p = extra_pot->first;
@@ -1138,15 +1138,15 @@ void LAMMPS_simulator::initialize_sim_vars()
 }
 
 
-void LAMMPS_simulator::set_sim_var_int(string sim_var, int val)
+void LAMMPS_simulator::set_sim_var_int(std::string sim_var, int val)
 {
-  string sim_var_cmd;
+  std::string sim_var_cmd;
 
   // delete sim_var if it already exists
   delete_sim_var(sim_var);
 
   sim_var_cmd = "variable " + sim_var + " internal ";
-  sim_var_cmd += to_string(val);
+  sim_var_cmd += std::to_string(val);
 
   // input the sim_var command
   lmp->input->one(sim_var_cmd.c_str());
@@ -1156,7 +1156,7 @@ void LAMMPS_simulator::set_sim_var_int(string sim_var, int val)
 }
 
 
-void LAMMPS_simulator::delete_sim_var(string sim_var)
+void LAMMPS_simulator::delete_sim_var(std::string sim_var)
 {
   if (sim_vars[sim_var] == true)
     {
@@ -1173,7 +1173,7 @@ void LAMMPS_simulator::initialize_extra_potentials()
 }
 
 
-void LAMMPS_simulator::switch_extra_potential(string p, bool s)
+void LAMMPS_simulator::switch_extra_potential(std::string p, bool s)
 {
   extra_pots[p] = s;
 }
@@ -1181,7 +1181,7 @@ void LAMMPS_simulator::switch_extra_potential(string p, bool s)
 
 void LAMMPS_simulator::extra_pots_to_sim_vars()
 {
-  string p;
+  std::string p;
   bool v;
 
   // iterate over the set of extra potentials and set sim_vars accordingly

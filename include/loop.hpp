@@ -1,17 +1,6 @@
 #ifndef INCLUDE_LOOP_HPP
 #define INCLUDE_LOOP_HPP
 
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <cstring>
-#include <vector>
-#include <memory>
-
-#include <vec_quat_manipulator.hpp>
-
-using namespace std;
-
 class loop
 {
 public:

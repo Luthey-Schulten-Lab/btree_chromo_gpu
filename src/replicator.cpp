@@ -20,7 +20,7 @@ void replicator::prng_seed(int s)
 
 
 // load replication model parameters
-void replicator::read_rep_model(string rep_model_filename)
+void replicator::read_rep_model(std::string rep_model_filename)
 {
   this->rep_model.read_rep_model(rep_model_filename);
 }
@@ -55,7 +55,7 @@ void replicator::reset_noninit_s(int * &noninit_s)
 
 // prepare the system state using the replication model
 void replicator::prepare_system(int *noninit_s,
-				vector<init_loc> &init_dist)
+				std::vector<init_loc> &init_dist)
 {
 
   // set the number of leaves in the replication model
@@ -70,20 +70,20 @@ void replicator::prepare_system(int *noninit_s,
 					  rep_model.get_M_rxns());
 
   // get reaction stoichiometries from the replication model
-  vector<reaction> rxns = this->rep_model.get_reactions();
+  std::vector<reaction> rxns = this->rep_model.get_reactions();
 
   // set the reaction stoichiometries in the solver
   this->solver.set_S(rxns);
 
   // convert the initiator distribution to species counts
-  vector<species_count> init_s_cs = this->rep_model.id_to_sc(init_dist);
+  std::vector<species_count> init_s_cs = this->rep_model.id_to_sc(init_dist);
   // set the state vector values from the initiator distribution
   this->solver.set_x(init_s_cs);
 
   // update gene counts based on the number of leaves
   this->rep_model.update_noninit_s(noninit_s);
   // set the state vector values from the noninitiator species
-  vector<species_count> noninit_s_cs;
+  std::vector<species_count> noninit_s_cs;
   species_count s_c;
   for (int i=0; i<(this->rep_model.get_N_non_leaf()-1); i++)
     {
@@ -107,7 +107,7 @@ void replicator::prepare_system(int *noninit_s,
 
 
 void replicator::run_replicate_FPT(int *noninit_s,
-				   vector<init_loc> &init_dist,
+				   std::vector<init_loc> &init_dist,
 				   double &t, double &t_max)
 {
 
@@ -119,7 +119,7 @@ void replicator::run_replicate_FPT(int *noninit_s,
   this->solver.run_FPT(t,t_max);
 
   // redistribute initiators based on FPT result
-  vector<species_count> solver_s_cs = this->solver.state_to_sc();
+  std::vector<species_count> solver_s_cs = this->solver.state_to_sc();
   this->rep_model.update_init_from_solver_s_cs(init_dist,solver_s_cs);
   this->rep_model.update_noninit_s_from_solver_s_cs(noninit_s,solver_s_cs);
 

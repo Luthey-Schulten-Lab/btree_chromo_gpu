@@ -124,12 +124,12 @@ void boundary_surface::unit_tetrahedron()
 
 
 // interpolate triangles within a single face
-void boundary_surface::interpolate_face(tri_face t_f, vector<edge_map> &unique_edges)
+void boundary_surface::interpolate_face(tri_face t_f, std::vector<edge_map> &unique_edges)
 {
   
   const int perm_edges[3][2] = {{0,1},{1,2},{2,0}};
   int new_verts[3];
-  array<int,2> temp_edge;
+  std::array<int,2> temp_edge;
 
   for (int i=0; i<3; i++)
     {
@@ -138,7 +138,7 @@ void boundary_surface::interpolate_face(tri_face t_f, vector<edge_map> &unique_e
 
       new_verts[i] = vert_from_edge(temp_edge,unique_edges);
 
-      if (new_verts[i] == -1) cout << temp_edge[0] << "," << temp_edge[1] << " fail" << endl;
+      if (new_verts[i] == -1) std::cout << temp_edge[0] << "," << temp_edge[1] << " fail" << std::endl;
     }
 
   //   0
@@ -158,7 +158,7 @@ void boundary_surface::interpolate_face(tri_face t_f, vector<edge_map> &unique_e
 
 
 // test edge equivalence
-bool boundary_surface::edge_equiv(array<int,2> &e0, array<int,2> &e1)
+bool boundary_surface::edge_equiv(std::array<int,2> &e0, std::array<int,2> &e1)
 {
   if (((e0[0] == e1[0]) && (e0[1] == e1[1])) ||
       ((e0[1] == e1[0]) && (e0[0] == e1[1])))
@@ -170,7 +170,7 @@ bool boundary_surface::edge_equiv(array<int,2> &e0, array<int,2> &e1)
 
 
 // find vertex from edge mapping
-int boundary_surface::vert_from_edge(array<int,2> &e, vector<edge_map> &edge_mapping)
+int boundary_surface::vert_from_edge(std::array<int,2> &e, std::vector<edge_map> &edge_mapping)
 {
   for (edge_map e_m : edge_mapping)
     {
@@ -185,13 +185,13 @@ void boundary_surface::interpolate_surface()
 {
 
   const int perm_edges[3][2] = {{0,1},{1,2},{2,0}};
-  vector<tri_face> old_tri_surf = tri_surf;
+  std::vector<tri_face> old_tri_surf = tri_surf;
   tri_surf.clear();
 
   // determine the set of unique edges between vertices
-  vector<array<int,2>> unique_edges;
+  std::vector<std::array<int,2>> unique_edges;
   bool new_edge;
-  array<int,2> temp_edge;
+  std::array<int,2> temp_edge;
 
   unique_edges.clear();
 
@@ -199,7 +199,7 @@ void boundary_surface::interpolate_surface()
   for (tri_face t_f : old_tri_surf)
     {
 
-      // cout << t_f.verts[0] << "," << t_f.verts[1] << "," << t_f.verts[2] << endl;
+      // std::cout << t_f.verts[0] << "," << t_f.verts[1] << "," << t_f.verts[2] << std::endl;
       // loop over edges in face of old surface
       for (int j=0; j<3; j++)
 	{
@@ -209,7 +209,7 @@ void boundary_surface::interpolate_surface()
 
 	  // loop over set of unique edges
 	  new_edge = true;
-	  for (array<int,2> edge : unique_edges)
+	  for (std::array<int,2> edge : unique_edges)
 	    {
 	      if (edge_equiv(temp_edge,edge) == true)
 		{
@@ -222,19 +222,19 @@ void boundary_surface::interpolate_surface()
 	  if (new_edge == true)
 	    {
 	      unique_edges.push_back(temp_edge);
-	      // cout << temp_edge[0] << " " << temp_edge[1] << endl;
+	      // std::cout << temp_edge[0] << " " << temp_edge[1] << std::endl;
 	    }
 	  
 	}
     }
   edge_map temp_e_m;
-  vector<edge_map> edge_mapping;
+  std::vector<edge_map> edge_mapping;
 
   edge_mapping.clear();
   
-  for (array<int,2> edge : unique_edges)
+  for (std::array<int,2> edge : unique_edges)
     {
-      // cout << edge[0] << "," << edge[1] << endl;
+      // std::cout << edge[0] << "," << edge[1] << std::endl;
       coords.push_back((vqm.v_linterp(0.5,
 				      coords[edge[0]],
 				      coords[edge[1]])));
@@ -243,16 +243,16 @@ void boundary_surface::interpolate_surface()
       edge_mapping.push_back(temp_e_m);
     }
 
-  // cout << "number old_tri_surfs = " << old_tri_surf.size() << endl;
+  // std::cout << "number old_tri_surfs = " << old_tri_surf.size() << std::endl;
   
   for (tri_face t_f : old_tri_surf)
     {
-      // cout << t_f.verts[0] << "," << t_f.verts[1] << "," << t_f.verts[2] << endl;
+      // std::cout << t_f.verts[0] << "," << t_f.verts[1] << "," << t_f.verts[2] << std::endl;
       interpolate_face(t_f,edge_mapping);
-      // cout << tri_surf.size() << endl;
+      // std::cout << tri_surf.size() << std::endl;
     }
 
-  // cout << "number tri_surfs = " << tri_surf.size() << endl;
+  // std::cout << "number tri_surfs = " << tri_surf.size() << std::endl;
   
 }
 
@@ -275,7 +275,7 @@ void boundary_surface::generate_sphere(double R, double r)
 
 
 // getter for coordinates
-vector<vec> boundary_surface::get_coords()
+std::vector<vec> boundary_surface::get_coords()
 {
   return coords;
 }
@@ -289,31 +289,31 @@ int boundary_surface::get_N_verts()
 
 
 // write the boundary coordinates to an xyz file
-void boundary_surface::write_xyz(string data_filename)
+void boundary_surface::write_xyz(std::string data_filename)
 {
 
   // begin writing data file
   
-  fstream data_file;
+  std::fstream data_file;
 
-  data_file.open(data_filename, ios::out);
+  data_file.open(data_filename, std::ios::out);
 
   if (!data_file)
     {
-      cout << "ERROR: file not opened in write_xyz" << endl;
+      std::cout << "ERROR: file not opened in write_xyz" << std::endl;
     }
   else
     {
 
       // write system summary
-      data_file << coords.size() << "\n" << endl;
+      data_file << coords.size() << "\n" << std::endl;
 
       for (vec r : coords)
 	{
 	  data_file << "C\t"
 		    << r.x << "\t"
 		    << r.y << "\t"
-		    << r.z << endl;
+		    << r.z << std::endl;
 	}
       
     }

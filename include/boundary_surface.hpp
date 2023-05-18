@@ -9,8 +9,6 @@
 
 #include <vec_quat_manipulator.hpp>
 
-using namespace std;
-
 struct tri_face
 {
   int verts[3];
@@ -19,7 +17,7 @@ struct tri_face
 struct edge_map
 {
   int vert;
-  array<int,2> edge;
+  std::array<int,2> edge;
 };
 
 class boundary_surface
@@ -43,25 +41,25 @@ public:
   void interpolate_surface();
 
   // single face operations
-  void interpolate_face(tri_face t_f, vector<edge_map> &edge_mapping);
+  void interpolate_face(tri_face t_f, std::vector<edge_map> &edge_mapping);
 
   // getters
-  vector<vec> get_coords();
+  std::vector<vec> get_coords();
   int get_N_verts();
 
   // write an xyz file for testing
-  void write_xyz(string data_filename);
+  void write_xyz(std::string data_filename);
 
 private:
 
   tri_face new_tri_face(int v0, int v1, int v2);
 
   // edge comparisons
-  bool edge_equiv(array<int,2> &e0, array<int,2> &e1);
-  int vert_from_edge(array<int,2> &e, vector<edge_map> &edge_mapping);
+  bool edge_equiv(std::array<int,2> &e0, std::array<int,2> &e1);
+  int vert_from_edge(std::array<int,2> &e, std::vector<edge_map> &edge_mapping);
   
-  vector<tri_face> tri_surf;
-  vector<vec> coords;
+  std::vector<tri_face> tri_surf;
+  std::vector<vec> coords;
 
   vec_quat_manipulator vqm;
   

@@ -9,11 +9,9 @@
 #include <LAMMPS_sys.hpp>
 #include <LAMMPS_simulator.hpp>
 
-using namespace std;
-
 struct lock
 {
-  string key;
+  std::string key;
   bool s;
 };
 
@@ -27,7 +25,7 @@ public:
   ~btree_driver();
 
   // read directives from a file
-  void read_directives(string drctvs_filename);
+  void read_directives(std::string drctvs_filename);
 
   // print the directives
   void print_directives();
@@ -53,39 +51,39 @@ public:
 private:
 
   // parse a single directive
-  void parse_single_directive(string drctv, string &command, vector<string> &params);
+  void parse_single_directive(std::string drctv, std::string &command, std::vector<std::string> &params);
 
   // test if metacommands are properly paired
-  int test_paired_metacommands(string paired_command);
+  int test_paired_metacommands(std::string paired_command);
   // compose any metacommands, loops etc.
   void compose_metacommands();
   // expand repeat metacommands
   void expand_repeat_metacommands();
   void expand_repeat_replicates_metacommands();
-  void update_replicate_modified_params(string &rep_mod, string &command, vector<string> &params);
+  void update_replicate_modified_params(std::string &rep_mod, std::string &command, std::vector<std::string> &params);
 
   // parameter modifiers
-  void append_replicate_modifier(string &rep_mod, string &mod_param);
-  void insert_replicate_modifier(string &rep_mod, string &mod_param);
-  string get_timestep_modifier();
-  void append_timestep_modifier(string &ts_mod, string &mod_param);
-  void insert_timestep_modifier(string &ts_mod, string &mod_param);
+  void append_replicate_modifier(std::string &rep_mod, std::string &mod_param);
+  void insert_replicate_modifier(std::string &rep_mod, std::string &mod_param);
+  std::string get_timestep_modifier();
+  void append_timestep_modifier(std::string &ts_mod, std::string &mod_param);
+  void insert_timestep_modifier(std::string &ts_mod, std::string &mod_param);
   
   // execute a single command
-  int execute_single_command(string &command, vector<string> &params);
+  int execute_single_command(std::string &command, std::vector<std::string> &params);
 
   // reset the command locks and updates
   void reset_command_locks_and_updates();
   // set the command requirements
   void prepare_command_requirements();
-  lock new_lock(string key, bool s);
+  lock new_lock(std::string key, bool s);
 
   // test the command for parameter validity
-  int test_command_parameter_validity(string &command, vector<string> &params);
+  int test_command_parameter_validity(std::string &command, std::vector<std::string> &params);
   // test the command for lock state validity
-  int test_command_lock_validity(string &command);
+  int test_command_lock_validity(std::string &command);
   // update the lock state following a command
-  void update_lock_state_post_command(string &command);
+  void update_lock_state_post_command(std::string &command);
   
 
   //////////////
@@ -96,74 +94,74 @@ private:
   int terminate();
 
   // switch computations on/off
-  int switch_skip_runs(vector<string> &params);
+  int switch_skip_runs(std::vector<std::string> &params);
 
   // create a new chromosome
-  int new_chromo(vector<string> &params);
+  int new_chromo(std::vector<std::string> &params);
   
   // input-ouput
-  int input_state(vector<string> &params);
-  int output_state(vector<string> &params);
-  int output_state_at_timestep(vector<string> &params);
+  int input_state(std::vector<std::string> &params);
+  int output_state(std::vector<std::string> &params);
+  int output_state_at_timestep(std::vector<std::string> &params);
 
   // transforms
-  int transforms_file(vector<string> &params);
-  int transform(vector<string> &params);
-  int random_transforms(vector<string> &params);
+  int transforms_file(std::vector<std::string> &params);
+  int transform(std::vector<std::string> &params);
+  int random_transforms(std::vector<std::string> &params);
 
   // regions
-  int regions_file(vector<string> &params);
-  int dump_regions(vector<string> &params);
-  int dump_regions_at_timestep(vector<string> &params);
+  int regions_file(std::vector<std::string> &params);
+  int dump_regions(std::vector<std::string> &params);
+  int dump_regions_at_timestep(std::vector<std::string> &params);
 
   // topology
   int update_topology();
-  int dump_topology(vector<string> &params);
-  int dump_topology_at_timestep(vector<string> &params);
-  int dump_fork_partitions(vector<string> &params);
-  int dump_fork_partitions_at_timestep(vector<string> &params);
+  int dump_topology(std::vector<std::string> &params);
+  int dump_topology_at_timestep(std::vector<std::string> &params);
+  int dump_fork_partitions(std::vector<std::string> &params);
+  int dump_fork_partitions_at_timestep(std::vector<std::string> &params);
 
   // coarse-graining
-  int update_CG_map(vector<string> &params);
-  int dump_CG_map(vector<string> &params);
-  int dump_CG_map_at_timestep(vector<string> &params);
+  int update_CG_map(std::vector<std::string> &params);
+  int dump_CG_map(std::vector<std::string> &params);
+  int dump_CG_map_at_timestep(std::vector<std::string> &params);
 
   // miscellaneous
-  int btree_prng_seed(vector<string> &params);
-  int replicator_prng_seed(vector<string> &params);
+  int btree_prng_seed(std::vector<std::string> &params);
+  int replicator_prng_seed(std::vector<std::string> &params);
   int print_state();
 
   // replication model
-  int load_rep_model(vector<string> &params);
-  int replicate(vector<string> &params);
+  int load_rep_model(std::vector<std::string> &params);
+  int replicate(std::vector<std::string> &params);
 
   // LAMMPS system
   // loading coordinates and quaternions
-  int load_mono_coords(vector<string> &params);
-  int load_mono_quats(vector<string> &params);
-  int load_ribo_coords(vector<string> &params);
-  int load_ribo_quats(vector<string> &params);
-  int load_bdry_coords(vector<string> &params);
+  int load_mono_coords(std::vector<std::string> &params);
+  int load_mono_quats(std::vector<std::string> &params);
+  int load_ribo_coords(std::vector<std::string> &params);
+  int load_ribo_quats(std::vector<std::string> &params);
+  int load_bdry_coords(std::vector<std::string> &params);
   // writing coordinates and quaternions
-  int write_mono_coords(vector<string> &params);
-  int write_mono_quats(vector<string> &params);
-  int write_ribo_coords(vector<string> &params);
-  int write_ribo_quats(vector<string> &params);
-  int write_bdry_coords(vector<string> &params);
+  int write_mono_coords(std::vector<std::string> &params);
+  int write_mono_quats(std::vector<std::string> &params);
+  int write_ribo_coords(std::vector<std::string> &params);
+  int write_ribo_quats(std::vector<std::string> &params);
+  int write_bdry_coords(std::vector<std::string> &params);
   // manual boundary specification
-  int spherical_bdry(vector<string> &params);
+  int spherical_bdry(std::vector<std::string> &params);
   // loading BD lengths
-  int load_BD_lengths(vector<string> &params);
+  int load_BD_lengths(std::vector<std::string> &params);
   // manipulate system interactions
-  int switch_bonds(vector<string> &params);
-  int switch_bending_angles(vector<string> &params);
-  int switch_twisting_angles(vector<string> &params);
-  int switch_extra_potential(string extra_pot, string s);
-  int switch_Ori_bdry_attraction(vector<string> &params);
-  int switch_Ori_pair_repulsion(vector<string> &params);
+  int switch_bonds(std::vector<std::string> &params);
+  int switch_bending_angles(std::vector<std::string> &params);
+  int switch_twisting_angles(std::vector<std::string> &params);
+  int switch_extra_potential(std::string extra_pot, std::string s);
+  int switch_Ori_bdry_attraction(std::vector<std::string> &params);
+  int switch_Ori_pair_repulsion(std::vector<std::string> &params);
   // writing LAMMPS data file
-  int write_LAMMPS_data(vector<string> &params);
-  int write_mono_xyz(vector<string> &params);
+  int write_LAMMPS_data(std::vector<std::string> &params);
+  int write_mono_xyz(std::vector<std::string> &params);
 
   // mapper
   int set_initial_state();
@@ -171,38 +169,38 @@ private:
   int map_replication();
 
   // simulator
-  int prepare_simulator(vector<string> &params);
-  int simulator_include_file(vector<string> &params);
+  int prepare_simulator(std::vector<std::string> &params);
+  int simulator_include_file(std::vector<std::string> &params);
   int sync_simulator_and_system();
   int clear_simulator();
-  int simulator_read_data(vector<string> &params);
-  int simulator_set_nProc(vector<string> &params);
-  int simulator_set_prng_seed(vector<string> &params);
-  int simulator_set_DNA_model(vector<string> &params);
-  int simulator_set_output_details(vector<string> &params);
-  int simulator_set_delta_t(vector<string> &params);
+  int simulator_read_data(std::vector<std::string> &params);
+  int simulator_set_nProc(std::vector<std::string> &params);
+  int simulator_set_prng_seed(std::vector<std::string> &params);
+  int simulator_set_DNA_model(std::vector<std::string> &params);
+  int simulator_set_output_details(std::vector<std::string> &params);
+  int simulator_set_delta_t(std::vector<std::string> &params);
   int simulator_store_timestep();
   int simulator_restore_timestep();
-  int simulator_increment_timestep(vector<string> &params);
-  int simulator_reset_prev_dump_timestep(vector<string> &params);
-  int simulator_reset_timestep(vector<string> &params);
+  int simulator_increment_timestep(std::vector<std::string> &params);
+  int simulator_reset_prev_dump_timestep(std::vector<std::string> &params);
+  int simulator_reset_timestep(std::vector<std::string> &params);
   
   // simulator minimization routines
   template <int SOFT_HARD_TOPO, int HARMONIC_FENE>
-  int simulator_minimize(vector<string> &params);
+  int simulator_minimize(std::vector<std::string> &params);
   
   // simulator run routines
   template <int SOFT_HARD_TOPO, int HARMONIC_FENE>
-  int simulator_run(vector<string> &params);
+  int simulator_run(std::vector<std::string> &params);
 
   // simulator looped DNA routines
-  int simulator_load_loop_params(vector<string> &params);
-  int simulator_run_loops(vector<string> &params);
+  int simulator_load_loop_params(std::vector<std::string> &params);
+  int simulator_run_loops(std::vector<std::string> &params);
 
   // fused commands
-  int sys_write_sim_read_LAMMPS_data(vector<string> &params);
-  int sys_write_sim_read_LAMMPS_data_at_timestep(vector<string> &params);
-  int simulator_relax_progressive(vector<string> &params);
+  int sys_write_sim_read_LAMMPS_data(std::vector<std::string> &params);
+  int sys_write_sim_read_LAMMPS_data_at_timestep(std::vector<std::string> &params);
+  int simulator_relax_progressive(std::vector<std::string> &params);
 
   ///////////////
   // variables //
@@ -224,19 +222,19 @@ private:
   // internal variables for directive execution
   btree_state driver_st; // state structure
   btree_transforms driver_tr; // transform structure
-  vector<chromo_region> driver_rg; // vector of chromo_regions
+  std::vector<chromo_region> driver_rg; // vector of chromo_regions
   CG_map driver_CG; // coarse-graining map
 
   // directives, commands, and parameters
-  vector<string> drctvs; // set of directives
-  vector<string> commands; // vector of commands as strings
-  vector<vector<string>> command_params; // vector command parameters as vectors of strings
+  std::vector<std::string> drctvs; // set of directives
+  std::vector<std::string> commands; // vector of commands as std::strings
+  std::vector<std::vector<std::string>> command_params; // vector command parameters as vectors of std::strings
 
   // variables to hold requirements for directives
-  unordered_map<string,bool> lock_state; // locks for the command sequence
-  unordered_map<string,vector<lock>> lock_tests; // lock requirements for command execution
-  unordered_map<string,vector<lock>> lock_updates; // lock updates given successful command execution
-  unordered_map<string,size_t> N_param_reqs; // requirements for the number of parameters
+  std::unordered_map<std::string,bool> lock_state; // locks for the command sequence
+  std::unordered_map<std::string,std::vector<lock>> lock_tests; // lock requirements for command execution
+  std::unordered_map<std::string,std::vector<lock>> lock_updates; // lock updates given successful command execution
+  std::unordered_map<std::string,size_t> N_param_reqs; // requirements for the number of parameters
 
 };
 

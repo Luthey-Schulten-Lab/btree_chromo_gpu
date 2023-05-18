@@ -10,7 +10,6 @@
 #include <rxn_manipulator.hpp>
 #include <replication_model.hpp>
 
-using namespace std;
 
 class gillespie_solver
 {
@@ -34,13 +33,13 @@ public:
   void print_reaction_system();
   
   // set arrays
-  void set_x(vector<species_count> &s_cs);
-  void set_xFPT(vector<species_count> s_cs);
-  void set_S(vector<reaction> &rxns);
+  void set_x(std::vector<species_count> &s_cs);
+  void set_xFPT(std::vector<species_count> s_cs);
+  void set_S(std::vector<reaction> &rxns);
   void set_replication_model(replication_model &r_m);
 
   // convert the state to species counts
-  vector<species_count> state_to_sc();
+  std::vector<species_count> state_to_sc();
 
   void update_propensities();
   
@@ -76,8 +75,8 @@ private:
   int N, M; // N species, M reactions
   int *x, *xFPT, **S; // state vector x, FPT state vector xFPT, and stoichiometry matrix S
   double *W; // rate vector
-  mt19937 rand_eng;
-  uniform_real_distribution<double> u_rand;
+  std::mt19937 rand_eng;
+  std::uniform_real_distribution<double> u_rand;
   replication_model rep_model;
 
 };

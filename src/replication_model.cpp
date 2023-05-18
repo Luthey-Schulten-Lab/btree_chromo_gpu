@@ -11,23 +11,23 @@ replication_model::~replication_model()
 }
 
 // read the replication model
-void replication_model::read_rep_model(string rep_model_filename)
+void replication_model::read_rep_model(std::string rep_model_filename)
 {
 
-  fstream rep_model_file;
+  std::fstream rep_model_file;
 
-  string param_delim, param, val;
+  std::string param_delim, param, val;
   int delim;
   
-  string line;
+  std::string line;
 
   param_delim = "=";
 
-  rep_model_file.open(rep_model_filename, ios::in);
+  rep_model_file.open(rep_model_filename, std::ios::in);
 
   if (!rep_model_file.is_open())
     {
-      cout << "ERROR: file not opened in read_rep_model" << endl;
+      std::cout << "ERROR: file not opened in read_rep_model" << std::endl;
     }
   else
     {
@@ -49,7 +49,7 @@ void replication_model::read_rep_model(string rep_model_filename)
 		  param = line.substr(0,delim);
 		  val = line.substr(delim+1,line.length());
 
-		  // cout << param << "=" << val << endl;
+		  // std::cout << param << "=" << val << std::endl;
 
 		  if (param == "V")
 		    {
@@ -232,10 +232,10 @@ void replication_model::number_rep_rxns()
 }
 
 // prepare a vector of the reactions
-vector<reaction> replication_model::get_reactions()
+std::vector<reaction> replication_model::get_reactions()
 {
 
-  vector<reaction> rxns;
+  std::vector<reaction> rxns;
   reaction r;
   int df = N_non_leaf;
   int free_idx = N_non_leaf - 1;
@@ -354,9 +354,9 @@ void replication_model::update_noninit_s(int *noninit_s)
 }
 
 
-vector<species_count> replication_model::id_to_sc(vector<init_loc> &init_dist)
+std::vector<species_count> replication_model::id_to_sc(std::vector<init_loc> &init_dist)
 {
-  vector<species_count> s_cs;
+  std::vector<species_count> s_cs;
   species_count s_c;
 
   s_c.id = N_non_leaf - 1;
@@ -374,14 +374,14 @@ vector<species_count> replication_model::id_to_sc(vector<init_loc> &init_dist)
   return s_cs;
 }
 
-void replication_model::update_init_from_solver_s_cs(vector<init_loc> &init_dist,
-							vector<species_count> &solver_s_cs)
+void replication_model::update_init_from_solver_s_cs(std::vector<init_loc> &init_dist,
+							std::vector<species_count> &solver_s_cs)
 {
   for (species_count s_c : solver_s_cs)
     {
       if (s_c.id > N_non_leaf - 1)
 	{
-	  // cout << (s_c.id-N_non_leaf)/N_per_leaf+1 << " " << (s_c.id-N_non_leaf)%N_per_leaf << endl;
+	  // std::cout << (s_c.id-N_non_leaf)/N_per_leaf+1 << " " << (s_c.id-N_non_leaf)%N_per_leaf << std::endl;
 	  init_dist[(s_c.id-N_non_leaf)/N_per_leaf+1].N = (s_c.id-N_non_leaf)%N_per_leaf;
 	}
       else if(s_c.id == N_non_leaf - 1)
@@ -392,7 +392,7 @@ void replication_model::update_init_from_solver_s_cs(vector<init_loc> &init_dist
 }
 
 void replication_model::update_noninit_s_from_solver_s_cs(int *noninit_s,
-							  vector<species_count> &solver_s_cs)
+							  std::vector<species_count> &solver_s_cs)
 {
   for (int i=0; i<N_non_leaf-1; i++)
     {
@@ -407,9 +407,9 @@ void replication_model::update_noninit_s_from_solver_s_cs(int *noninit_s,
     }
 }
 
-vector<species_count> replication_model::create_xFPT()
+std::vector<species_count> replication_model::create_xFPT()
 {
-  vector<species_count> s_cs;
+  std::vector<species_count> s_cs;
   species_count s_c;
 
   for (int i=0; i<N_leaves; i++)
@@ -431,7 +431,7 @@ void replication_model::propensities(int *xf, double *Wf)
 
   inv_V = xf[0]*inv_V;
   inv_V = pow(inv_V,3.0/2.0);
-  inv_V = 1.0/(min(inv_V,2.0)*r_m_p.V); // calculate the inverse volume based on the SA particle change
+  inv_V = 1.0/(std::min(inv_V,2.0)*r_m_p.V); // calculate the inverse volume based on the SA particle change
 
   // create SA particles at rate given by SA doubling time (tau_SA)
   if (xf[0] < 2*r_m_p.N_init_SA)

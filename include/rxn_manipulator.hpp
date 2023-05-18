@@ -3,8 +3,6 @@
 
 #include <vector>
 
-using namespace std;
-
 struct species_count
 {
   int id;
@@ -13,7 +11,7 @@ struct species_count
 
 struct reaction
 {
-  vector<species_count> inputs, outputs;
+  std::vector<species_count> inputs, outputs;
 };
 
 
