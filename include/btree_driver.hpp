@@ -128,12 +128,17 @@ private:
 
   // miscellaneous
   int btree_prng_seed(std::vector<std::string> &params);
-  int replicator_prng_seed(std::vector<std::string> &params);
   int print_state();
 
   // replication model
-  int load_rep_model(std::vector<std::string> &params);
-  int replicate(std::vector<std::string> &params);
+  int replicator_prng_seed(std::vector<std::string> &params);
+  int replicator_set_time(std::vector<std::string> &params);
+  int replicator_set_volume(std::vector<std::string> &params);
+  int replicator_load_volume_protocol(std::vector<std::string> &params);
+  int replicator_load_model(std::vector<std::string> &params);
+  int replicator_set_DnaA(std::vector<std::string> &params);
+  int replicator_set_max_replisomes(std::vector<std::string> &params);
+  int replicator_run(std::vector<std::string> &params);
 
   // LAMMPS system
   // loading coordinates and quaternions

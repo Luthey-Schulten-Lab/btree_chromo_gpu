@@ -3,6 +3,10 @@
 // constructor
 replicator::replicator()
 {
+  V_protocol = false;
+  n_DnaA = 0;
+  t = 0.0;
+  V = 1.0; 
 }
 
 
@@ -19,120 +23,105 @@ void replicator::prng_seed(int s)
 }
 
 
-// load replication model parameters
-void replicator::read_rep_model(std::string rep_model_filename)
+// set the time
+void replicator::set_time(double t)
 {
-  this->rep_model.read_rep_model(rep_model_filename);
+  this->t = t;
 }
 
 
-// get the initial number of DnaA
-int replicator::get_N_init_DnaA()
+// set the DnaA count
+void replicator::set_DnaA(int n_DnaA)
 {
-  return this->rep_model.get_N_init_DnaA();
+  this->n_DnaA = n_DnaA;
 }
 
 
-// get the maximum number of replisomes
-int replicator::get_max_replisomes()
+// set the DnaA gene copy number
+void replicator::set_DnaA_genes(int n_DnaA_genes)
 {
-  return this->rep_model.get_max_replisomes();
+  this->n_DnaA_genes = n_DnaA_genes;
 }
 
 
-// get the replication rate
-double replicator::get_k_rep()
+// set the maximum number of replisomes
+void replicator::set_max_replisomes(int max_rep)
 {
-  return this->rep_model.get_k_rep();
+  this->max_rep = max_rep;
 }
 
 
-void replicator::reset_noninit_s(int * &noninit_s)
+// set the volume
+void replicator::set_volume(double V)
 {
-  this->rep_model.reset_noninit_s(noninit_s);
+  this->V = V;
+  V_protocol = false;
 }
 
 
-// prepare the system state using the replication model
-void replicator::prepare_system(int *noninit_s,
-				std::vector<init_loc> &init_dist)
+//load the replication model
+void replicator::load_volume_protocol(std::string volume_protocol_filename)
 {
 
-  // set the number of leaves in the replication model
-  this->rep_model.set_N_leaves(static_cast<int>(init_dist.size())-1);
+  std::cout << volume_protocol_filename << std::endl;
+  // rep_model.load_model(rep_model_filename);
+}
 
-  // set the number of replication species and reactions in the replication model
-  this->rep_model.number_rep_species();
-  this->rep_model.number_rep_rxns();
 
-  // initialize the solver with N and M from rep_model
-  this->solver.initialize_reaction_system(rep_model.get_N_species(),
-					  rep_model.get_M_rxns());
+//load the replication model
+void replicator::load_model(std::string rep_model_filename)
+{
 
-  // get reaction stoichiometries from the replication model
-  std::vector<reaction> rxns = this->rep_model.get_reactions();
+  std::cout << rep_model_filename << std::endl;
+  // rep_model.load_model(rep_model_filename);
+}
 
-  // set the reaction stoichiometries in the solver
-  this->solver.set_S(rxns);
 
-  // convert the initiator distribution to species counts
-  std::vector<species_count> init_s_cs = this->rep_model.id_to_sc(init_dist);
-  // set the state vector values from the initiator distribution
-  this->solver.set_x(init_s_cs);
-
-  // update gene counts based on the number of leaves
-  this->rep_model.update_noninit_s(noninit_s);
-  // set the state vector values from the noninitiator species
-  std::vector<species_count> noninit_s_cs;
-  species_count s_c;
-  for (int i=0; i<(this->rep_model.get_N_non_leaf()-1); i++)
-    {
-      s_c.id = i;
-      s_c.N = noninit_s[i];
-      noninit_s_cs.push_back(s_c);
-    }
-  this->solver.set_x(noninit_s_cs);
-
-  // set the FPT state vector
-  this->solver.set_xFPT(rep_model.create_xFPT());
-
-  // set the propensity function
-  this->solver.set_replication_model(rep_model);
-
-  // print the system as a sanity check
-  // this->solver.print_reaction_system();
+//run the replicator for a time increment or until a first-passage
+void replicator::run(std::vector<init_loc> &init_dist,
+		     double &dt, double &dt_target)
+{
   
-}
+  std::cout << "dt_target = " << dt_target << std::endl;
 
+  // determine the number of Oris
+  int N_leaves = static_cast<int>(init_dist.size()-1);
+  // set the number of DnaA genes equal to the number of Oris
+  set_DnaA_genes(N_leaves);
+  // set the number of Oris for the reaction model
+  rep_model.set_N_leaves(N_leaves);
 
+  
+  // prepare a vector of the initial species counts with the rep model
 
-void replicator::run_replicate_FPT(int *noninit_s,
-				   std::vector<init_loc> &init_dist,
-				   double &t, double &t_max)
-{
+  // prepare a vector of FPT events
 
-  // prepare the reaction system based on the reaction model
-  prepare_system(noninit_s,
-		 init_dist);
+  // prepare the reaction system
 
-  // run the system
-  this->solver.run_FPT(t,t_max);
+  
+  // initialize the solver
 
-  // redistribute initiators based on FPT result
-  std::vector<species_count> solver_s_cs = this->solver.state_to_sc();
-  this->rep_model.update_init_from_solver_s_cs(init_dist,solver_s_cs);
-  this->rep_model.update_noninit_s_from_solver_s_cs(noninit_s,solver_s_cs);
-
-  int fil_trigger = this->rep_model.get_N_per_leaf() - 1;
-  for (size_t i=1; i<init_dist.size(); i++)
+  // set the volume for the solver or assign a volume protocol
+  if (V_protocol == false)
     {
-      if (init_dist[i].N == fil_trigger)
-	{
-	  init_dist[i].N = -1;
-	  init_dist[0].N += fil_trigger;
-	  break;
-	}
+      solver.set_V(V);
     }
 
-  this->solver.destroy_reaction_system();
+  // resize the solver arrays given N_species and M_rxns
+
+  // set the solver's state vector to the species counts
+
+  // set the solver's FPT conditions
+
+  // set the solver's reaction events
+
+  
+  // run the solver
+  solver.run_FPT(t,dt,dt_target);
+
+
+  // get the species counts from the solver
+  
+  // update the initiator distribution from the species counts
+  
 }

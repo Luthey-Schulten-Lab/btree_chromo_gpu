@@ -5,9 +5,12 @@ gillespie_solver::gillespie_solver()
 {
   this->N = -1;
   this->M = -1;
-  this->S = nullptr;
   this->x = nullptr;
-  this->xFPT = nullptr;
+  this->nreactants = nullptr;
+  this->nproducts = nullptr;
+  this->reactants = nullptr;
+  this->products = nullptr;
+  this->k = nullptr;
   this->W = nullptr;
   this->rand_eng.seed(0);
   this->u_rand = std::uniform_real_distribution<double>(0.0,1.0);
@@ -16,7 +19,6 @@ gillespie_solver::gillespie_solver()
 // destructor
 gillespie_solver::~gillespie_solver()
 {
-  destroy_reaction_system();
 }
 
 // prng seed
@@ -26,157 +28,10 @@ void gillespie_solver::prng_seed(int s)
 }
 
 
-// initialize the state vector
-void gillespie_solver::initialize_x()
+// reaction volume
+void gillespie_solver::set_V(double V)
 {
-  destroy_x();
-  
-  if (N > 0)
-    {
-      
-      x = new int[N];
-
-      for (int i=0; i<N; i++)
-	{
-	  x[i] = 0;
-	}
-      
-    }
-  
-}
-
-
-// destroy the state vector
-void gillespie_solver::destroy_x()
-{
-  if (x != nullptr)
-    {
-      delete[] x;
-      x = nullptr;
-    }
-}
-
-
-// initialize the FPT vector
-void gillespie_solver::initialize_xFPT()
-{
-  destroy_xFPT();
-  
-  if (N > 0)
-    {
-      
-      xFPT = new int[N];
-
-      for (int i=0; i<N; i++)
-	{
-	  xFPT[i] = -1;
-	}
-      
-    }
-  
-}
-
-
-// destroy the FPT vector
-void gillespie_solver::destroy_xFPT()
-{
-  if (xFPT != nullptr)
-    {
-      delete[] xFPT;
-      xFPT = nullptr;
-    }
-}
-
-
-// initialize the propensity vector
-void gillespie_solver::initialize_W()
-{
-  destroy_W();
-  
-  if (M > 0)
-    {
-      
-      W = new double[M];
-
-      for (int i=0; i<M; i++)
-	{
-	  W[i] = 0.0;
-	}
-      
-    }
-  
-}
-
-
-// destroy the propensity vector
-void gillespie_solver::destroy_W()
-{
-  if (W != nullptr)
-    {
-      delete[] W;
-      W = nullptr;
-    }
-}
-
-
-// intialize the stoichiometry matrix
-void gillespie_solver::initialize_S()
-{
-  destroy_S();
-  if ((N > 0) &&
-      (M > 0))
-    {
-      
-      S = new int*[M];
-      for (int j=0; j<M; j++)
-	{
-	  S[j] = new int[N];
-	}
-
-      for (int j=0; j<M; j++)
-	{
-	  for (int i=0; i<N; i++)
-	    {
-	      S[j][i] = 0;
-	    }
-	}
-      
-    }
-}
-
-
-// destroy the stoichiometry matrix
-void gillespie_solver::destroy_S()
-{
-  if (S != nullptr)
-    {
-      for (int j=0; j<M; j++)
-	{
-	  delete[] S[j];
-	}
-      delete[] S;
-      S = nullptr;
-    }
-}
-
-
-// set the number of species
-void gillespie_solver::set_N(int N)
-{
-  if (N > 0)
-    {
-      this->N = N;
-    }
-}
-
-
-// set the number of reactions
-void gillespie_solver::set_M(int M)
-{
-  if (M > 0)
-    {
-      this->M = M;
-    }
+  this->V = V;
 }
 
 
@@ -193,27 +48,7 @@ void gillespie_solver::set_x(std::vector<species_count> &s_cs)
 // set the FPT vector
 void gillespie_solver::set_xFPT(std::vector<species_count> s_cs)
 {
-  for (species_count s_c : s_cs)
-    {
-      xFPT[s_c.id] = s_c.N;
-    }
-}
-
-
-// set the stoichiometry matrix
-void gillespie_solver::set_S(std::vector<reaction> &rxns)
-{
-  for (size_t j=0; j<rxns.size(); j++)
-    {
-      for (species_count s_c : rxns[j].inputs)
-	{
-	  S[j][s_c.id] -= s_c.N;
-	}
-      for (species_count s_c : rxns[j].outputs)
-	{
-	  S[j][s_c.id] += s_c.N;
-	}
-    }
+  xFPT = s_cs;
 }
 
 
@@ -240,69 +75,108 @@ std::vector<species_count> gillespie_solver::state_to_sc()
 void gillespie_solver::initialize_reaction_system(int N, int M)
 {
   destroy_reaction_system();
-  // std::cout << "setting M and N" << std::endl;
-  set_N(N);
-  set_M(M);
-  // std::cout << "initializing x" << std::endl;
-  initialize_x();
-  // std::cout << "initializing xFPT" << std::endl;
-  initialize_xFPT();
-  // std::cout << "initializing S" << std::endl;
-  initialize_S();
-  // std::cout << "initializing W" << std::endl;
-  initialize_W();
+  
+  this->N = N;
+  this->M = M;
+
+  if (N > 0)
+    {
+      x = new int[N];
+
+      for (int i=0; i<N; i++)
+	{
+	  x[i] = 0;
+	}
+    }
+
+  if (M > 0)
+    {
+      nreactants = new int[M];
+      nproducts = new int[M];
+
+      reactants = new int*[M];
+      products = new int*[M];
+
+      k = new double[M];
+      W = new double[M];
+
+      for (int j=0; j<M; j++)
+	{
+	  nreactants[j] = 0;
+	  nproducts[j] = 0;
+	  k[j] = 0.0;
+	  W[j] = 0.0;
+	  
+	  reactants[j] = new int[2];
+	  products[j] = new int[max_nproducts];
+
+	  for (int i=0; i<2; i++)
+	    {
+	      reactants[j][i] = 0;
+	    }
+	  for (int i=0; i<max_nproducts; i++)
+	    {
+	      products[j][i] = 0;
+	    }
+	  
+	}
+      
+    }
+
+  
+  
 }
 
 
 // destroy the reaction system
 void gillespie_solver::destroy_reaction_system()
 {
-  destroy_x();
-  destroy_xFPT();
-  destroy_S();
-  destroy_W();
-}
-
-
-// print the reaction system
-void gillespie_solver::print_reaction_system()
-{
-
-  std::cout << "x, state vector" << std::endl;
-  for (int i=0; i<N-1; i++)
+  if (x != nullptr)
     {
-      std::cout << x[i] << ",";
+      delete[] x;
+      x = nullptr;
     }
-  std::cout << x[N-1] << std::endl;
   
-  std::cout << "xFPT, first-passage state vector" << std::endl;
-  for (int i=0; i<N-1; i++)
+  if (nreactants != nullptr)
     {
-      std::cout << xFPT[i] << ",";
+      delete[] nreactants;
+      nreactants = nullptr;
     }
-  std::cout << xFPT[N-1] << std::endl;
-  
-  std::cout << "S, stoichiometric matrix" << std::endl;
-  for (int j=0; j<M-1; j++)
+  if (nproducts != nullptr)
     {
-      for (int i=0; i<N-1; i++)
+      delete[] nproducts;
+      nproducts = nullptr;
+    }
+
+  if (reactants != nullptr)
+    {
+      for (int j=0; j<M; j++)
 	{
-	  std::cout << S[j][i] << ",";
+	  delete[] reactants[j];
 	}
-      std::cout << S[j][N-1] << std::endl;
+      delete[] reactants;
+      reactants = nullptr;
     }
-  for (int i=0; i<N-1; i++)
+  if (products != nullptr)
     {
-      std::cout << S[M-1][i] << ",";
+      for (int j=0; j<M; j++)
+	{
+	  delete[] products[j];
+	}
+      delete[] products;
+      products = nullptr;
     }
-  std::cout << S[M-1][N-1] << std::endl;
-
-  std::cout << "W, propensity vector" << std::endl;
-  for (int i=0; i<M-1; i++)
+  
+  if (k != nullptr)
     {
-      std::cout << W[i] << ",";
+      delete[] k;
+      k = nullptr;
     }
-  std::cout << W[M-1] << std::endl;
+  if (W != nullptr)
+    {
+      delete[] W;
+      W = nullptr;
+    }
 }
 
 
@@ -323,18 +197,12 @@ int gillespie_solver::select_rxn(double r_rxn, double total_propensity)
   return j;
 }
 
-// update the propensities based on the current system state
-void gillespie_solver::set_replication_model(replication_model &r_m)
-{
-  this->rep_model = r_m;
-}
-
 // test the xFPT
 int gillespie_solver::test_FPT()
 {
-  for (int i=0; i<N; i++)
+  for (size_t i=0; i<xFPT.size(); i++)
     {
-      if (x[i] == xFPT[i]) return i;
+      if (x[xFPT[i].id] == xFPT[i].N) return xFPT[i].id;
     }
   return -1;
 }
@@ -342,18 +210,25 @@ int gillespie_solver::test_FPT()
 // update the system state based on the chosen reaction
 void gillespie_solver::update_state(int j_rxn)
 {
-  for (int i=0; i<N; i++)
+  // subtract the reactants
+  for (int i=0; i<nreactants[j_rxn]; i++)
     {
-      x[i] += S[j_rxn][i];
+      x[reactants[j_rxn][i]] -= 1;
+    }
+  // add the products
+  for (int i=0; i<nproducts[j_rxn]; i++)
+    {
+      x[products[j_rxn][i]] += 1;
     }
 }
 
 
-// update propensities
+// update the propensities
 void gillespie_solver::update_propensities()
 {
-  rep_model.propensities(x,W);
+  
 }
+
 
 
 // calculate the total propensity
@@ -367,14 +242,21 @@ double gillespie_solver::calc_total_propensity()
   return t_p;
 }
 
+
 // run the system until max time or first-passage occurs
-void gillespie_solver::run_FPT(double &t, double &t_max)
+void gillespie_solver::run_FPT(double t,
+			       double &dt,
+			       double &dt_max)
 {
+
+  // double t_V;
   double r_t, r_rxn;
-  double dt, total_propensity;
+  double ds, total_propensity;
   int FPT_index = -1;
   int j_rxn;
 
+  dt = 0.0;
+  
   r_rxn = 0.0;
   total_propensity = 0.0;
   j_rxn = 0;
@@ -387,6 +269,9 @@ void gillespie_solver::run_FPT(double &t, double &t_max)
       r_t = u_rand(rand_eng);
       r_rxn = u_rand(rand_eng);
 
+      // calculate time-dependent volume
+      // t_V = t + dt;
+      
       // update the propensities
       update_propensities();
 
@@ -394,18 +279,18 @@ void gillespie_solver::run_FPT(double &t, double &t_max)
       total_propensity = calc_total_propensity();
 
       // sample time based on total propensity
-      dt = -log(r_t)/total_propensity;
+      ds = -log(r_t)/total_propensity;
       // std::cout << "dt=" << dt << std::endl;
       
       // test of proposed time exceeds maximum
-      if (t+dt > t_max)
+      if (dt + ds > dt_max)
 	{
-	  t = t_max;
+	  dt = dt_max;
 	  break;
 	}
       else
 	{
-	  t += dt;
+	  dt += ds;
 	}
 
       // sample the reactions

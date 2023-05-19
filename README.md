@@ -122,10 +122,16 @@ See `examples` directory for a demonstration:
  - `transform:(b)\_cw(r_cw)\_ccw(r_ccw)` - *applies single transform to branch (b), with replication extents (r\_cw) and (r\_ccw) along clockwise and counter-clockwise directions, respectively*
  - `transforms_file:transforms_file` - *applies transforms stored in transforms_file*
  - `random_transforms:N` - *applies random transforms until (N) units are added or the maximum size is reached*
- 
+
+### Replicator
+
  - `replicator_prng_seed:seed` - *seeds the replicator's prng*
- - `load_replication_model:rep_model_file` - *loads the parameters and initial conditions for a replication model*
- - `replicate:t` - *replicates the current btree using loaded replication model for (t) seconds*
+ - `replicator_set_time:t` - *set the replicator's internal time in seconds*
+ - `replicator_set_volume:V` - *set the replicator's volume in liters*
+ - `replicator_load_volume_protocol:volume_protocol_file` - *loads a file containing a time-dependent protocol for changes in the volume*
+ - `replicator_set_DnaA:N` - *set the replicator's current count of free DnaA*
+ - `replicator_set_max_replisomes:N` - *set the replicator's maximum number of replisomes*
+ - `replicator_run:t` - *replicates the current btree using loaded replication model for (t) seconds*
  
 #### Querying Replication State
 

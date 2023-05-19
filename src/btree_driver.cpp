@@ -75,6 +75,9 @@ void btree_driver::reset_command_locks_and_updates()
   lock_state["btree_initialized"] = false;
   lock_state["regions_present"] = false;
   lock_state["rep_model_present"] = false;
+  lock_state["rep_DnaA_present"] = false;
+  lock_state["rep_max_replisomes_present"] = false;
+  lock_state["rep_volume_present"] = false;
   lock_state["BD_lengths_present"] = false;
   lock_state["map_initial_present"] = false;
   lock_state["map_final_present"] = false;
@@ -1007,31 +1010,98 @@ void btree_driver::prepare_command_requirements()
   // replicator command requirements //
   /////////////////////////////////////
 
-  
-  // load_rep_model
+  // replicator_set_time
   // number of required parameters
-  N_param_reqs["load_replication_model"] = 1;
+  N_param_reqs["replicator_set_time"] = 1;
   // lock tests
   t_ls.clear();
-  lock_tests["load_replication_model"] = t_ls;
+  lock_tests["replicator_set_time"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["replicator_set_time"] = t_ls;
+
+  // replicator_set_volume
+  // number of required parameters
+  N_param_reqs["replicator_set_volume"] = 1;
+  // lock tests
+  t_ls.clear();
+  lock_tests["replicator_set_volume"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  t_ls.push_back(new_lock("rep_volume_present",true));
+  lock_updates["replicator_set_volume"] = t_ls;
+
+  // replicator_load_volume_protocol
+  // number of required parameters
+  N_param_reqs["replicator_load_volume_protocol"] = 1;
+  // lock tests
+  t_ls.clear();
+  lock_tests["replicator_load_volume_protocol"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  t_ls.push_back(new_lock("rep_volume_present",true));
+  lock_updates["replicator_load_volume_protocol"] = t_ls;
+
+  // replicator_set_DnaA
+  // number of required parameters
+  N_param_reqs["replicator_set_DnaA"] = 1;
+  // lock tests
+  t_ls.clear();
+  lock_tests["replicator_set_DnaA"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  t_ls.push_back(new_lock("rep_DnaA_present",true));
+  lock_updates["replicator_set_DnaA"] = t_ls;
+
+  // replicator_set_max_replisomes
+  // number of required parameters
+  N_param_reqs["replicator_set_max_replisomes"] = 1;
+  // lock tests
+  t_ls.clear();
+  lock_tests["replicator_set_max_replisomes"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  t_ls.push_back(new_lock("rep_max_replisomes_present",true));
+  lock_updates["replicator_set_max_replisomes"] = t_ls;
+
+  // replicator_set_DnaA
+  // number of required parameters
+  N_param_reqs["replicator_set_DnaA"] = 1;
+  // lock tests
+  t_ls.clear();
+  lock_tests["replicator_set_DnaA"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  t_ls.push_back(new_lock("rep_DnaA_present",true));
+  lock_updates["replicator_set_DnaA"] = t_ls;
+  
+  // replicator_load_model
+  // number of required parameters
+  N_param_reqs["replicator_load_model"] = 1;
+  // lock tests
+  t_ls.clear();
+  lock_tests["replicator_load_model"] = t_ls;
   // lock updates
   t_ls.clear();
   t_ls.push_back(new_lock("rep_model_present",true));
-  lock_updates["load_replication_model"] = t_ls;
+  lock_updates["replicator_load_model"] = t_ls;
 
-  // replicate
+  // replicator_run
   // number of required parameters
-  N_param_reqs["replicate"] = 1;
+  N_param_reqs["replicator_run"] = 1;
   // lock tests
   t_ls.clear();
   t_ls.push_back(new_lock("btree_initialized",true));
   t_ls.push_back(new_lock("rep_model_present",true));
-  lock_tests["replicate"] = t_ls;
+  t_ls.push_back(new_lock("rep_volume_present",true));
+  t_ls.push_back(new_lock("rep_max_replisomes_present",true));
+  t_ls.push_back(new_lock("rep_DnaA_present",true));
+  lock_tests["replicator_run"] = t_ls;
   // lock updates
   t_ls.clear();
   t_ls.push_back(new_lock("topo_update",true));
   t_ls.push_back(new_lock("CG_update",true));
-  lock_updates["replicate"] = t_ls;
+  lock_updates["replicator_run"] = t_ls;
 
   // replicator_prng_seed
   // number of required parameters
@@ -1950,26 +2020,61 @@ int btree_driver::execute_single_command(std::string &command,
   /////////////////////////
   // Replicator Commands //
   /////////////////////////
- 
-      
-  // read the replication model
-  else if (command == "load_replication_model")
-    {
-      error_code = load_rep_model(params);
-    }
-
-
-  // replicate until t_max
-  else if (command == "replicate")
-    {
-      error_code = replicate(params);
-    }
 
 
   // seed the PRNG for the replicator
   else if (command == "replicator_prng_seed")
     {
       error_code = replicator_prng_seed(params);
+    }
+
+
+  // set the internal time of the replicator
+  else if (command == "replicator_set_time")
+    {
+      error_code = replicator_set_time(params);
+    }
+  
+
+  // set the volume of the replicator
+  else if (command == "replicator_set_volume")
+    {
+      error_code = replicator_set_volume(params);
+    }
+
+
+  // load a time-dependent protocol for the volume
+  else if (command == "replicator_load_volume_protocol")
+    {
+      error_code = replicator_load_volume_protocol(params);
+    }
+
+
+  // set the number of free DnaA
+  else if (command == "replicator_set_DnaA")
+    {
+      error_code = replicator_set_DnaA(params);
+    }
+
+
+  // set the maximum number of functional replisomes
+  else if (command == "replicator_set_max_replisomes")
+    {
+      error_code = replicator_set_max_replisomes(params);
+    }
+ 
+      
+  // load the replication model
+  else if (command == "replicator_load_model")
+    {
+      error_code = replicator_load_model(params);
+    }
+
+
+  // replicate for t
+  else if (command == "replicator_run")
+    {
+      error_code = replicator_run(params);
     }
 
 
@@ -2638,138 +2743,66 @@ int btree_driver::dump_CG_map_at_timestep(std::vector<std::string> &params)
 }
 
 
-int btree_driver::load_rep_model(std::vector<std::string> &params)
+int btree_driver::replicator_prng_seed(std::vector<std::string> &params)
 {
-  driver_replicator.read_rep_model(params[0]);
+  // seed the PRNG
+  driver_replicator.prng_seed(stoi(params[0]));
+  return 0;
+}
+
+
+int btree_driver::replicator_set_time(std::vector<std::string> &params)
+{
+  // set the replicator's internal time
+  driver_replicator.set_time(stod(params[0]));
+  return 0;
+}
+
+
+int btree_driver::replicator_set_DnaA(std::vector<std::string> &params)
+{
+  // set the replicator's free DnaA count
+  driver_replicator.set_DnaA(stoi(params[0]));
+  return 0;
+}
+
+
+int btree_driver::replicator_set_max_replisomes(std::vector<std::string> &params)
+{
+  // set the replicator's maximum number of replisomes
+  driver_replicator.set_max_replisomes(stoi(params[0]));
+  return 0;
+}
+
+
+int btree_driver::replicator_set_volume(std::vector<std::string> &params)
+{
+  // set the replicator's volume
+  driver_replicator.set_volume(stod(params[0]));
+  return 0;
+}
+
+
+int btree_driver::replicator_load_volume_protocol(std::vector<std::string> &params)
+{
+  // load a time-dependent volume protocol for the replicator
+  driver_replicator.load_volume_protocol(params[0]);
+  return 0;
+}
+
+
+int btree_driver::replicator_load_model(std::vector<std::string> &params)
+{
+  driver_replicator.load_model(params[0]);
   // replication model is now present
   return 0;
 }
 
 
-int btree_driver::replicate(std::vector<std::string> &params)
+int btree_driver::replicator_run(std::vector<std::string> &params)
 {
-
-  std::vector<init_loc> init_dist, new_leaves;
-  std::string rep_leaf;
-  init_loc i_l;
-  double t, dt, t_max;
-  int rep_amount, error_code, i_rep;
-  int *noninit_s = nullptr;
-
-  // create an initial distribution of initiator species with only free DnaA
-  init_dist.clear();
-  
-  i_l.loc = "free";
-  i_l.N = driver_replicator.get_N_init_DnaA();
-
-  init_dist.push_back(i_l);
-  
-  for (std::string leaf : driver_bt.get_leaves())
-    {
-      i_l.loc = leaf;
-      i_l.N = 0;
-
-      init_dist.push_back(i_l);
-    }
-
-  // create the species counts of noninitiator species
-  driver_replicator.reset_noninit_s(noninit_s);
-
-
-  // set the current time and the maximum time
-  t = 0.0;
-  t_max = stod(params[0]);
-
-  std::cout << "Performing random replications until t = " << t_max << "\n" << std::endl;
-
-  while (t < t_max)
-    {
-
-      dt = t;
-
-      // run Gillespie algorithm until an initiation event occurs
-      driver_replicator.run_replicate_FPT(noninit_s,
-					  init_dist,
-					  t,
-					  t_max);
-      
-      // calculate time difference
-      dt = t - dt;
-
-      // calculate amount of replicated DNA prior to new replication event
-      // amount is proportional to time difference and number of active forks
-      rep_amount = driver_replicator.get_k_rep()*std::min(2*driver_bt.count_active_forks(),
-							  driver_replicator.get_max_replisomes())*dt;
-
-      std::cout << "\n" << rep_amount << " units were replicated on active forks prior to event(/termination)" << std::endl;
-
-      // perform random replications
-      driver_bt.random_transforms(rep_amount);
-
-      // clear the new leaves
-      new_leaves.clear();
-      
-      // update the distribution to represent the new number of leaves and determine the branch leaf
-      i_rep = 0;
-      for (size_t i=0; i<init_dist.size(); i++)
-	{
-	  // std::cout << init_dist[i].loc << " = " << init_dist[i].N << std::endl;
-	  if (init_dist[i].N == -1)
-	    {
-	      i_rep = i;
-	      break;
-	    }
-	}
-
-      if (i_rep > 0)
-	{
-	  std::cout << "\nreplication event at t = " << t << std::endl;
-	  rep_leaf = init_dist[i_rep].loc;
-
-	  // branch the btree at the replicating leaf
-	  error_code = driver_bt.branch(rep_leaf);
-
-	  if (error_code == 1)
-	    {
-	      return 1;
-	    }
-	  else
-	    {
-	      std::cout << "\tsplitting at initiated branch (" << rep_leaf << ") and updating initiator distribution\n" << std::endl;
-	      init_dist.erase(init_dist.begin()+i_rep);
-
-	      i_l.N = 0;
-	      i_l.loc = rep_leaf + "l";
-	      new_leaves.push_back(i_l);
-	      i_l.loc = rep_leaf + "r";
-	      new_leaves.push_back(i_l);
-
-	      init_dist.insert(init_dist.begin()+i_rep,new_leaves.begin(),new_leaves.end());
-
-	      for (init_loc temp_i_l : init_dist)
-		{
-		  std::cout << temp_i_l.loc << " = " << temp_i_l.N << std::endl;
-		}
-
-	    }
-	  
-	}
-      
-    }
-
-  std::cout << "\nfinal initiator distribution" << std::endl;
-  for (init_loc temp_i_l : init_dist)
-    {
-      std::cout << temp_i_l.loc << " = " << temp_i_l.N << std::endl;
-    }
-  std::cout << "\n" << std::endl;
-
-  if (noninit_s != nullptr)
-    {
-      delete[] noninit_s;
-      noninit_s = nullptr;
-    }
-  
+  driver_replicator.load_model(params[0]);
+  // replication model is now present
   return 0;
 }
 
@@ -3254,14 +3287,6 @@ int btree_driver::btree_prng_seed(std::vector<std::string> &params)
 {
   // seed the PRNG
   driver_bt.prng_seed(stoi(params[0]));
-  return 0;
-}
-
-
-int btree_driver::replicator_prng_seed(std::vector<std::string> &params)
-{
-  // seed the PRNG
-  driver_replicator.prng_seed(stoi(params[0]));
   return 0;
 }
 

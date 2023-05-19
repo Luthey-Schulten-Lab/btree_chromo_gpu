@@ -13,7 +13,7 @@
 ######################
 
 
-terminate
+#terminate
 
 
 #set the prng seed
@@ -34,12 +34,21 @@ output_state:/home/ben/Workspace/btree_chromo/examples/simulating_replication_ki
 
 
 #read the model of the replication kinetics
-load_replication_model:/home/ben/Workspace/btree_chromo/examples/simulating_replication_kinetics/rep_model.txt
+replicator_load_model:/home/ben/Workspace/btree_chromo/examples/simulating_replication_kinetics/rep_model.txt
 
 
-#replicate for 3600 seconds
-replicate:3600.0
+#set the volume, DnaA count, and maximum number of replisomes
+replicator_set_volume:3.3E-17
+replicator_set_DnaA:150
+replicator_set_max_replisomes:8
 
+
+#initialize the replicator's time
+replicator_set_time:0.0
+
+
+#run the replicator for 600 seconds
+replicator_run:600.0
 
 #print the current replication state
 print

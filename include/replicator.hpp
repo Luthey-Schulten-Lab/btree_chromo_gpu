@@ -15,26 +15,33 @@ public:
   // set the prng seed
   void prng_seed(int s);
 
+  // set the time
+  void set_time(double t);
+  // set the free DnaA number
+  void set_DnaA(int n_DnaA);
+  // set the DnaA gene copy number
+  void set_DnaA_genes(int n_DnaA_genes);
+  // set the maximum number of replisomes
+  void set_max_replisomes(int max_rep);
+  // set the volume or load a volume protocol
+  void set_volume(double V);
+  void load_volume_protocol(std::string volume_protocol_filename);
+
   // read the replication model
-  void read_rep_model(std::string rep_model_filename);
+  void load_model(std::string rep_model_filename);
 
-  // reset the noninitiator species
-  void reset_noninit_s(int * &noninit_s);
-  
-  // prepare the reaction system
-  void prepare_system(int *noninit_s, std::vector<init_loc> &init_dist);
-
-  // simulate the system until t_max
-  void run_replicate_FPT(int *noninit_s,
-			 std::vector<init_loc> &init_dist,
-			 double &t, double &t_max);
-
-  // getters to access replication model
-  int get_N_init_DnaA();
-  int get_max_replisomes();
-  double get_k_rep();
+  // run the replicator
+  void run(std::vector<init_loc> &init_dist,
+	   double &dt, double &dt_target);
   
 private:
+
+  bool V_protocol;
+
+  int n_DnaA, max_rep, n_DnaA_genes;
+  
+  double t;
+  double V;
 
   gillespie_solver solver;
   replication_model rep_model;
