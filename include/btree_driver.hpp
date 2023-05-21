@@ -132,6 +132,7 @@ private:
 
   // replication model
   int replicator_prng_seed(std::vector<std::string> &params);
+  int replicator_reset_init_dist();
   int replicator_set_time(std::vector<std::string> &params);
   int replicator_set_volume(std::vector<std::string> &params);
   int replicator_load_volume_protocol(std::vector<std::string> &params);

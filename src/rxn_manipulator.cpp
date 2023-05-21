@@ -16,6 +16,7 @@ void rxn_manipulator::reset_reaction(reaction &r)
 {
   r.inputs.clear();
   r.outputs.clear();
+  r.k = 0.0;
 }
 
 // add an input to a reaction
@@ -36,3 +37,8 @@ void rxn_manipulator::add_reaction_output(reaction &r, int id, int n)
   r.outputs.push_back(s_c);
 }
 
+// add an output to a reaction
+void rxn_manipulator::add_reaction_rate(reaction &r, double k)
+{
+  r.k = k;
+}

@@ -1010,6 +1010,17 @@ void btree_driver::prepare_command_requirements()
   // replicator command requirements //
   /////////////////////////////////////
 
+
+  // replicator_reset_init_dist
+  // number of required parameters
+  N_param_reqs["replicator_reset_init_dist"] = 0;
+  // lock tests
+  t_ls.clear();
+  lock_tests["replicator_reset_init_dist"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["replicator_reset_init_dist"] = t_ls;
+
   // replicator_set_time
   // number of required parameters
   N_param_reqs["replicator_set_time"] = 1;
@@ -2801,8 +2812,72 @@ int btree_driver::replicator_load_model(std::vector<std::string> &params)
 
 int btree_driver::replicator_run(std::vector<std::string> &params)
 {
-  driver_replicator.load_model(params[0]);
-  // replication model is now present
+
+  int error_code;
+  int rep_amount, N_replisomes_running;
+  std::string rep_leaf;
+  
+  std::cout << params[0] << std::endl;
+
+  // update the distribution of initiators in the replicator
+  driver_replicator.update_init_dist(driver_bt.get_leaves());
+
+  double ds, dt, dt_max;
+  dt = 0.0;
+  dt_max = stod(params[0]);
+
+  std::cout << "Performing random replications for interval of length t = " << dt_max << " (s)\n" << std::endl;
+
+  while (dt < dt_max)
+    {
+
+      // run the replicator until the maximum time is reached or a
+      // first-passage event occurs
+      driver_replicator.run(ds,dt_max-dt);
+
+      // calculate amount of replicated DNA prior to new replication event
+      // amount is proportional to time difference and number of active forks
+      N_replisomes_running = std::min(2*driver_bt.count_active_forks(),
+				      driver_replicator.get_max_replisomes());
+      rep_amount = std::round(driver_replicator.get_k_rep()*N_replisomes_running*ds);
+
+      std::cout << "\n" << rep_amount << " units were replicated on active forks prior to event(/termination)" << std::endl;
+
+      // perform random replications
+      driver_bt.random_transforms(rep_amount);
+
+      // check for an initiation event
+      rep_leaf = driver_replicator.initiation_test();
+
+      if (rep_leaf != "no")
+	{
+	  std::cout << "\nreplication event at t = "
+		    << driver_replicator.get_time()
+		    << std::endl;
+	  std::cout << "\tsplitting at initiated branch ("
+		    << rep_leaf
+		    << ") and updating initiator distribution\n"
+		    << std::endl;
+
+	  // branch the btree at the replicating leaf
+	  error_code = driver_bt.branch(rep_leaf);
+
+	  if (error_code == 1)
+	    {
+	      return 1;
+	    }
+	  else
+	    {
+	      // update the distribution of initiators in the replicator
+	      driver_replicator.update_init_dist(driver_bt.get_leaves());
+	    }
+	 
+	}
+
+      dt += ds;
+
+    }
+  
   return 0;
 }
 

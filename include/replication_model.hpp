@@ -45,6 +45,7 @@ public:
 
   // getters to access replication model details
   double get_k_rep();
+  int get_init_requirement();
   int get_N_species();
   int get_N_per_leaf();
   int get_N_non_leaf();

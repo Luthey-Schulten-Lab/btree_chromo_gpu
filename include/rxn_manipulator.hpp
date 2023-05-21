@@ -11,6 +11,7 @@ struct species_count
 
 struct reaction
 {
+  double k;
   std::vector<species_count> inputs, outputs;
 };
 
@@ -26,6 +27,7 @@ public:
   void reset_reaction(reaction &r);
   void add_reaction_input(reaction &r, int id, int n);
   void add_reaction_output(reaction &r, int id, int n);
+  void add_reaction_rate(reaction &r, double k);
   
 private:
 
