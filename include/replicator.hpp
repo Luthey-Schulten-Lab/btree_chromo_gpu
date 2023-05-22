@@ -69,6 +69,7 @@ private:
   
   double t;
   double V;
+  std::vector<volume_point> V_points;
 
   std::vector<init_loc> init_dist;
 

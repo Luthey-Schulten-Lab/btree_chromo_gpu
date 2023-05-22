@@ -3,17 +3,19 @@
 // constructor
 gillespie_solver::gillespie_solver()
 {
-  this->N = -1;
-  this->M = -1;
-  this->x = nullptr;
-  this->nreactants = nullptr;
-  this->nproducts = nullptr;
-  this->reactants = nullptr;
-  this->products = nullptr;
-  this->k = nullptr;
-  this->W = nullptr;
-  this->rand_eng.seed(0);
-  this->u_rand = std::uniform_real_distribution<double>(0.0,1.0);
+  N = -1;
+  M = -1;
+  x = nullptr;
+  nreactants = nullptr;
+  nproducts = nullptr;
+  reactants = nullptr;
+  products = nullptr;
+  k = nullptr;
+  W = nullptr;
+  rand_eng.seed(0);
+  u_rand = std::uniform_real_distribution<double>(0.0,1.0);
+  V = 1.0;
+  V_protocol = false;
 }
 
 // destructor
@@ -33,6 +35,54 @@ void gillespie_solver::set_V(double V)
 {
   this->V = V;
   volume_factors();
+}
+
+
+// constant volume
+void gillespie_solver::set_V_constant(double V)
+{
+  set_V(V);
+  V_protocol = false;
+}
+
+
+// volume protocol
+void gillespie_solver::set_V_points(std::vector<volume_point> V_points)
+{
+  this->V_points = V_points;
+  V_protocol = true;
+}
+
+
+// interpolate the volume
+void gillespie_solver::interpolate_volume(double t)
+{
+  double dV, dt, V_interp;
+  size_t lo, hi;
+
+  for (size_t k=0; k<V_points.size(); k++)
+    {
+      if (V_points[k].t <= t)
+	{
+	  lo = k;
+	}
+      else if (V_points[k].t > t)
+	{
+	  hi = k;
+	  break;
+	}
+    }
+
+  dt = V_points[hi].t - V_points[lo].t;
+  dV = V_points[hi].V - V_points[lo].V;
+
+  V_interp = V_points[lo].V;
+  V_interp += (t - V_points[lo].t)*(dV/dt);
+
+  set_V(V_interp);
+
+  std::cout << "t = " << t << ", V = " << V << std::endl;
+
 }
 
 
@@ -343,7 +393,7 @@ void gillespie_solver::run_FPT(double t,
 			       double dt_max)
 {
 
-  // double t_V;
+  double t_V;
   double r_t, r_rxn;
   double ds, total_propensity;
   int FPT_index = -1;
@@ -375,7 +425,11 @@ void gillespie_solver::run_FPT(double t,
       // std::cout << "r_rxn=" << r_rxn << std::endl;
 
       // calculate time-dependent volume
-      // t_V = t + dt;
+      if (V_protocol == true)
+	{
+	  t_V = t + dt;
+	  interpolate_volume(t_V);
+	}
       
       // update the propensities
       update_propensities();

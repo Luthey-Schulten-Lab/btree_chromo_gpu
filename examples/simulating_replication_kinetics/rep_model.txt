@@ -24,9 +24,9 @@ N_lo=2
 k_lo=3.5E+4
 
 
-# filamentation along ssDNA by domain II
+# filamentation along ssDNA by domain III
 # filament length
-N_fil=27
+N_fil=30
 # units - [M^-1*s^-1]
 k_on=1.0E+5
 # units - [s^-1]

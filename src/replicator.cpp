@@ -98,8 +98,58 @@ void replicator::set_volume(double V)
 void replicator::load_volume_protocol(std::string volume_protocol_filename)
 {
 
-  std::cout << volume_protocol_filename << std::endl;
-  // rep_model.load_model(rep_model_filename);
+  V_points.clear();
+  V_protocol = true;
+
+  std::fstream volume_protocol_file;
+
+  std::string param_delim;
+  int delim;
+  
+  std::string line;
+
+  volume_point v_p;
+
+  param_delim = ",";
+
+  volume_protocol_file.open(volume_protocol_filename, std::ios::in);
+
+  if (!volume_protocol_file.is_open())
+    {
+      std::cout << "ERROR: file not opened in load_model" << std::endl;
+    }
+  else
+    {
+      while (1)
+	{
+	  volume_protocol_file >> line;
+	  if (volume_protocol_file.eof()) break;
+	  
+
+	  if ((line.length() > 0) &&
+	      (line.find("#") != 0))
+	    {
+
+	      delim = line.find(param_delim);
+
+	      if (delim != -1)
+		{
+
+		  v_p.t = stod(line.substr(0,delim));
+		  v_p.V = stod(line.substr(delim+1,line.length()));
+
+		  V_points.push_back(v_p);
+
+		}
+	      	      
+	    }
+	      
+     	} // end while loop
+
+      volume_protocol_file.close();
+  
+    }
+
 }
 
 
@@ -294,7 +344,11 @@ void replicator::run(double &dt, double dt_target)
   // set the volume for the solver or assign a volume protocol
   if (V_protocol == false)
     {
-      solver.set_V(V);
+      solver.set_V_constant(V);
+    }
+  else
+    {
+      solver.set_V_points(V_points);
     }
 
   std::cout << "preparing solver" << std::endl;

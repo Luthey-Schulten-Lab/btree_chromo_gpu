@@ -39,7 +39,7 @@ void replication_model::load_model(std::string rep_model_filename)
 
   if (!rep_model_file.is_open())
     {
-      std::cout << "ERROR: file not opened in read_rep_model" << std::endl;
+      std::cout << "ERROR: file not opened in load_model" << std::endl;
     }
   else
     {

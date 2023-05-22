@@ -12,6 +12,12 @@
 #include <rxn_manipulator.hpp>
 #include <replication_model.hpp>
 
+struct volume_point
+{
+  double t, V;
+};
+
+
 class gillespie_solver
 {
 public:
@@ -33,8 +39,8 @@ public:
   void print_reaction_system();
 
   // set the volume
-  void set_V(double V);
-  void volume_factors();
+  void set_V_constant(double V);
+  void set_V_points(std::vector<volume_point> V_points);
   
   // set arrays
   void set_x(std::vector<species_count> s_cs);
@@ -48,6 +54,11 @@ private:
 
   void destroy_reaction_system();
 
+  // functions for the volume
+  void set_V(double V);
+  void volume_factors();
+  void interpolate_volume(double t);  
+
   // functions for Gillespie loop
   int select_rxn(double r_rxn, double total_propensity);
   double calc_total_propensity();
@@ -57,6 +68,8 @@ private:
   int test_FPT();
 
   // private variables
+
+  bool V_protocol;
 
   const int max_nproducts = 4;
   const double NAVOGADRO = 6.022E+23;
@@ -69,6 +82,7 @@ private:
   double *k, *W; // rates and propensities
 
   std::vector<species_count> xFPT;
+  std::vector<volume_point> V_points;
   
   std::mt19937 rand_eng;
   std::uniform_real_distribution<double> u_rand;
