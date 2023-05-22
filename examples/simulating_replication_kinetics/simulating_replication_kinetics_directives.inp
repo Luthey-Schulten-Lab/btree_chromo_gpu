@@ -39,7 +39,7 @@ replicator_load_model:/home/ben/Workspace/btree_chromo/examples/simulating_repli
 
 #set the volume, DnaA count, and maximum number of replisomes
 replicator_set_volume:3.3E-17
-replicator_set_DnaA:150
+replicator_set_DnaA:300
 replicator_set_max_replisomes:8
 
 
@@ -47,8 +47,8 @@ replicator_set_max_replisomes:8
 replicator_set_time:0.0
 
 
-#run the replicator for 600 seconds
-replicator_run:600.0
+#run the replicator for 1800 seconds
+replicator_run:1800.0
 
 #print the current replication state
 print

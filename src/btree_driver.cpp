@@ -2816,8 +2816,6 @@ int btree_driver::replicator_run(std::vector<std::string> &params)
   int error_code;
   int rep_amount, N_replisomes_running;
   std::string rep_leaf;
-  
-  std::cout << params[0] << std::endl;
 
   // update the distribution of initiators in the replicator
   driver_replicator.update_init_dist(driver_bt.get_leaves());
@@ -2877,6 +2875,11 @@ int btree_driver::replicator_run(std::vector<std::string> &params)
       dt += ds;
 
     }
+
+  std::cout << "Replicator, t = "
+	    << driver_replicator.get_time()
+	    << " (s)\n"
+	    << std::endl;
   
   return 0;
 }

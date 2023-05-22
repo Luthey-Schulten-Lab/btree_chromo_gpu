@@ -24,7 +24,7 @@ public:
   void prng_seed(int s);
 
   // run the system until max time or first-passage occurs
-  void run_FPT(double t, double &dt, double &dt_max);
+  void run_FPT(double t, double &dt, double dt_max);
 
   // initialize and destroy the reaction system
   void initialize_reaction_system(int N, int M);
@@ -34,9 +34,10 @@ public:
 
   // set the volume
   void set_V(double V);
+  void volume_factors();
   
   // set arrays
-  void set_x(std::vector<species_count> &s_cs);
+  void set_x(std::vector<species_count> s_cs);
   void set_xFPT(std::vector<species_count> s_cs);
   void set_reaction_system(std::vector<reaction> &rxns);
 
@@ -51,13 +52,16 @@ private:
   int select_rxn(double r_rxn, double total_propensity);
   double calc_total_propensity();
   void update_propensities();
+  void update_single_propensity(int j_rxn);
   void update_state(int j_rxn);
   int test_FPT();
 
   // private variables
 
   const int max_nproducts = 4;
+  const double NAVOGADRO = 6.022E+23;
   double V;
+  double factor_zero, factor_one, factor_two;
   int N, M; // N species, M reactions
   int *x; // particle counts
   int *nreactants, *nproducts; // number reactants and products per reaction

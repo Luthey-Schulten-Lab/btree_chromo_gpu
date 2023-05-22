@@ -51,6 +51,17 @@ public:
   
 private:
 
+  // print the initiator distribution
+  void print_replicator_state();
+
+  // create the vector of species counts
+  std::vector<species_count> prepare_species_counts();
+  // create the FPT vector
+  std::vector<species_count> prepare_xFPT();
+
+  // convert species counts to the replicator state
+  void species_counts_to_replicator_state(std::vector<species_count> s_cs);
+
   bool V_protocol;
 
   int N_leaves;

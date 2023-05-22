@@ -51,9 +51,6 @@ public:
   int get_N_non_leaf();
   int get_M_rxns();
 
-  // create the FPT species counts
-  std::vector<species_count> create_xFPT();
-
   // get the reactions
   std::vector<reaction> get_reactions();
   

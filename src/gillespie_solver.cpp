@@ -32,12 +32,28 @@ void gillespie_solver::prng_seed(int s)
 void gillespie_solver::set_V(double V)
 {
   this->V = V;
+  volume_factors();
+}
+
+
+// caclulate the volume factors
+void gillespie_solver::volume_factors()
+{
+  factor_zero = NAVOGADRO*V;
+  factor_one = 1.0;
+  factor_two = 1.0/(NAVOGADRO*V);
 }
 
 
 // set the state vector
-void gillespie_solver::set_x(std::vector<species_count> &s_cs)
+void gillespie_solver::set_x(std::vector<species_count> s_cs)
 {
+
+  for (int i=0; i<N; i++)
+    {
+      x[i] = 0;
+    }
+  
   for (species_count s_c : s_cs)
     {
       x[s_c.id] = s_c.N;
@@ -180,6 +196,48 @@ void gillespie_solver::destroy_reaction_system()
 }
 
 
+// set the reaction system to be run by the solver
+void gillespie_solver::set_reaction_system(std::vector<reaction> &rxns)
+{
+
+  // std::cout << "N = " << N << std::endl;
+  // std::cout << "M = " << M << std::endl;
+  // std::cout << "rxns size = " << rxns.size() << std::endl;
+  
+  for (size_t j=0; j<rxns.size(); j++)
+    {
+      // std::cout << "j = " << j << std::endl;
+      // std::cout << "\tk[j] = " << rxns[j].k << std::endl;
+      // set the counts of reactants and products
+      nreactants[j] = static_cast<int>(rxns[j].inputs.size());
+      nproducts[j] = static_cast<int>(rxns[j].outputs.size());
+
+      // std::cout << "\tnreactants[j] = " << nreactants[j] << std::endl;
+
+      // set the reactant species
+      for (int i=0; i<nreactants[j]; i++)
+	{
+	  // std::cout << "\t\treactants[j][i] = " << rxns[j].inputs[i] << std::endl;
+	  reactants[j][i] = rxns[j].inputs[i];
+	}
+
+      // std::cout << "\tnproducts[j] = " << nproducts[j] << std::endl;
+      
+      // set the product species
+      for (int i=0; i<nproducts[j]; i++)
+	{
+	  // std::cout << "\t\tproducts[j][i] = " << rxns[j].outputs[i] << std::endl;
+	  products[j][i] = rxns[j].outputs[i];
+	}
+
+      // set the rate
+      k[j] = rxns[j].k;
+      
+      
+    }
+}
+
+
 // select a reaction based on the propensities
 int gillespie_solver::select_rxn(double r_rxn, double total_propensity)
 {
@@ -226,7 +284,43 @@ void gillespie_solver::update_state(int j_rxn)
 // update the propensities
 void gillespie_solver::update_propensities()
 {
-  
+  // update all of the propensities
+  for (int j=0; j<M; j++)
+    {
+      update_single_propensity(j);
+    }
+}
+
+
+// update a single propensity
+void gillespie_solver::update_single_propensity(int j_rxn)
+{
+  // zero-order reaction
+  if (nreactants[j_rxn] == 0)
+    {
+      W[j_rxn] = factor_zero*k[j_rxn];
+    }
+  // first-order reaction
+  else if (nreactants[j_rxn] == 1)
+    {
+      W[j_rxn] = factor_one*k[j_rxn]*x[reactants[j_rxn][0]];
+    }
+  // second-order reaction
+  else
+    {
+      // like particles
+      if (reactants[j_rxn][0] == reactants[j_rxn][1])
+	{
+	  W[j_rxn] = factor_two*k[j_rxn]*
+	    x[reactants[j_rxn][0]]*(x[reactants[j_rxn][1]]-1);
+	}
+      // unlike
+      else
+	{
+	  W[j_rxn] = factor_two*k[j_rxn]*
+	    x[reactants[j_rxn][0]]*x[reactants[j_rxn][1]];
+	}
+    }
 }
 
 
@@ -246,7 +340,7 @@ double gillespie_solver::calc_total_propensity()
 // run the system until max time or first-passage occurs
 void gillespie_solver::run_FPT(double t,
 			       double &dt,
-			       double &dt_max)
+			       double dt_max)
 {
 
   // double t_V;
@@ -264,10 +358,13 @@ void gillespie_solver::run_FPT(double t,
   while (1)
     {
 
-      // std::cout << "t=" << t << std::endl;
+      // std::cout << "t=" << t + dt << std::endl;
       // sample random numbers for the reaction and time
       r_t = u_rand(rand_eng);
       r_rxn = u_rand(rand_eng);
+
+      // std::cout << "r_t=" << r_t << std::endl;
+      // std::cout << "r_rxn=" << r_rxn << std::endl;
 
       // calculate time-dependent volume
       // t_V = t + dt;
@@ -278,9 +375,11 @@ void gillespie_solver::run_FPT(double t,
       // calculate the total propensity
       total_propensity = calc_total_propensity();
 
+      // std::cout << "total_propensity=" << total_propensity << std::endl;
+
       // sample time based on total propensity
       ds = -log(r_t)/total_propensity;
-      // std::cout << "dt=" << dt << std::endl;
+      // std::cout << "ds=" << ds << std::endl;
       
       // test of proposed time exceeds maximum
       if (dt + ds > dt_max)
@@ -308,7 +407,7 @@ void gillespie_solver::run_FPT(double t,
       
     } // end while loop
 
-  std::cout << "\nxf, final state vector at t = " << t << " (s)" << std::endl;
+  std::cout << "\nxf, final state vector at t = " << t + dt << " (s)" << std::endl;
   for (int i=0; i<N-1; i++)
     {
       std::cout << x[i] << ",";

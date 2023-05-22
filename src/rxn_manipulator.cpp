@@ -20,21 +20,15 @@ void rxn_manipulator::reset_reaction(reaction &r)
 }
 
 // add an input to a reaction
-void rxn_manipulator::add_reaction_input(reaction &r, int id, int n)
+void rxn_manipulator::add_reaction_input(reaction &r, int id)
 {
-  species_count s_c;
-  s_c.id = id;
-  s_c.N = n;
-  r.inputs.push_back(s_c);
+  r.inputs.push_back(id);
 }
 
 // add an output to a reaction
-void rxn_manipulator::add_reaction_output(reaction &r, int id, int n)
+void rxn_manipulator::add_reaction_output(reaction &r, int id)
 {
-  species_count s_c;
-  s_c.id = id;
-  s_c.N = n;
-  r.outputs.push_back(s_c);
+  r.outputs.push_back(id);
 }
 
 // add an output to a reaction

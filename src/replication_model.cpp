@@ -209,7 +209,7 @@ void replication_model::number_rep_rxns()
   M_per_leaf = 0;
   M_per_leaf += r_m_p.N_hi; // high affinity site binding beginning with empty origin
   M_per_leaf += r_m_p.N_lo; // low affinity site binding beginning with last high affinity site
-  M_per_leaf += 2*(r_m_p.N_fil - 1); // filament addition beginning with last low affinity site
+  M_per_leaf += 2*r_m_p.N_fil - 1; // filament addition beginning with last low affinity site
   M_per_leaf += 1; // filament to bubble
 
   M_rxns = N_leaves*M_per_leaf + M_non_leaf;
@@ -226,15 +226,15 @@ std::vector<reaction> replication_model::get_reactions()
   int c, db;
 
   // DnaA creation
-  rxn_manip.add_reaction_input(r,0,1); // 1 gene in
-  rxn_manip.add_reaction_output(r,0,1); // 1 gene out
-  rxn_manip.add_reaction_output(r,free_idx,1); // 1 free DnaA out
+  rxn_manip.add_reaction_input(r,0); // 1 gene in
+  rxn_manip.add_reaction_output(r,0); // 1 gene out
+  rxn_manip.add_reaction_output(r,free_idx); // 1 free DnaA out
   rxn_manip.add_reaction_rate(r,r_m_p.k_c);
   rxns.push_back(r);
   rxn_manip.reset_reaction(r);
 
   // DnaA destruction
-  rxn_manip.add_reaction_input(r,free_idx,1); // 1 free DnaA in
+  rxn_manip.add_reaction_input(r,free_idx); // 1 free DnaA in
   rxn_manip.add_reaction_rate(r,r_m_p.k_d);
   rxns.push_back(r);
   rxn_manip.reset_reaction(r);
@@ -249,9 +249,9 @@ std::vector<reaction> replication_model::get_reactions()
       for (int j=0; j<r_m_p.N_hi; j++)
 	{
 	  // input is empty hi site and free DnaA
-	  rxn_manip.add_reaction_input(r,free_idx,1);
-	  rxn_manip.add_reaction_input(r,df+i*N_per_leaf+c+j,1);
-	  rxn_manip.add_reaction_output(r,df+i*N_per_leaf+c+j+1,1);
+	  rxn_manip.add_reaction_input(r,free_idx);
+	  rxn_manip.add_reaction_input(r,df+i*N_per_leaf+c+j);
+	  rxn_manip.add_reaction_output(r,df+i*N_per_leaf+c+j+1);
 	  rxn_manip.add_reaction_rate(r,r_m_p.k_hi);
 	  rxns.push_back(r);
 	  rxn_manip.reset_reaction(r);
@@ -265,9 +265,9 @@ std::vector<reaction> replication_model::get_reactions()
       for (int j=0; j<r_m_p.N_lo; j++)
 	{
 	  // input is empty lo site and free DnaA
-	  rxn_manip.add_reaction_input(r,free_idx,1);
-	  rxn_manip.add_reaction_input(r,df+i*N_per_leaf+c+j,1);
-	  rxn_manip.add_reaction_output(r,df+i*N_per_leaf+c+j+1,1);
+	  rxn_manip.add_reaction_input(r,free_idx);
+	  rxn_manip.add_reaction_input(r,df+i*N_per_leaf+c+j);
+	  rxn_manip.add_reaction_output(r,df+i*N_per_leaf+c+j+1);
 	  rxn_manip.add_reaction_rate(r,r_m_p.k_lo);
 	  rxns.push_back(r);
 	  rxn_manip.reset_reaction(r);
@@ -281,9 +281,9 @@ std::vector<reaction> replication_model::get_reactions()
       for (int j=0; j<r_m_p.N_fil; j++)
 	{
 	  // input is F_(i-1) site and free DnaA
-	  rxn_manip.add_reaction_input(r,free_idx,1);
-	  rxn_manip.add_reaction_input(r,df+i*N_per_leaf+c+j,1);
-	  rxn_manip.add_reaction_output(r,df+i*N_per_leaf+c+j+1,1);
+	  rxn_manip.add_reaction_input(r,free_idx);
+	  rxn_manip.add_reaction_input(r,df+i*N_per_leaf+c+j);
+	  rxn_manip.add_reaction_output(r,df+i*N_per_leaf+c+j+1);
 	  rxn_manip.add_reaction_rate(r,r_m_p.k_on);
 	  rxns.push_back(r);
 	  rxn_manip.reset_reaction(r);
@@ -292,39 +292,25 @@ std::vector<reaction> replication_model::get_reactions()
 	  if (j < r_m_p.N_fil-1)
 	    {
 	      // input is F_(i)
-	      rxn_manip.add_reaction_input(r,df+i*N_per_leaf+c+j+1,1);
-	      rxn_manip.add_reaction_output(r,free_idx,1);
-	      rxn_manip.add_reaction_output(r,df+i*N_per_leaf+c+j,1);
-	      rxn_manip.add_reaction_rate(r,r_m_p.k_on);
+	      rxn_manip.add_reaction_input(r,df+i*N_per_leaf+c+j+1);
+	      rxn_manip.add_reaction_output(r,free_idx);
+	      rxn_manip.add_reaction_output(r,df+i*N_per_leaf+c+j);
+	      rxn_manip.add_reaction_rate(r,r_m_p.k_off);
 	      rxns.push_back(r);
 	      rxn_manip.reset_reaction(r);
-	      db += 1;
 	    }
 	}
 
       c += db;
 
       // input is final filament site
-      rxn_manip.add_reaction_input(r,df+i*N_per_leaf+c,1);
-      rxn_manip.add_reaction_output(r,df+i*N_per_leaf+c+1,1);
+      rxn_manip.add_reaction_input(r,df+i*N_per_leaf+c);
+      rxn_manip.add_reaction_output(r,df+i*N_per_leaf+c+1);
       rxn_manip.add_reaction_rate(r,r_m_p.k_bubble);
+      rxns.push_back(r);
+      rxn_manip.reset_reaction(r);
+      c += 1;
       
     }
   return rxns;
-}
-
-
-
-std::vector<species_count> replication_model::create_xFPT()
-{
-  std::vector<species_count> s_cs;
-  species_count s_c;
-
-  for (int i=0; i<N_leaves; i++)
-    {
-      s_c.id = (N_non_leaf - 1) + (i+1)*N_per_leaf;
-      s_c.N = 1;
-      s_cs.push_back(s_c);
-    }
-  return s_cs;
 }

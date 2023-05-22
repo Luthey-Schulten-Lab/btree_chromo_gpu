@@ -4,9 +4,9 @@ k_rep=5.0E+1
 
 # DnaA creation from genes and destruction
 # units - [M^-1*s^-1]
-k_c=2.0E-3
+k_c=1.0E-3
 # units - [s^-1]
-k_d=9.6E-5
+k_d=1.0E-5
 
 # DnaA filament details
 
@@ -35,4 +35,4 @@ k_off=5.5E-1
 
 # insertion of replisome into bubble
 # units - [s^-1]
-k_bubble=1.0E+5
+k_bubble=1.0E-3
