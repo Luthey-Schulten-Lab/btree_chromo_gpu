@@ -354,6 +354,14 @@ void gillespie_solver::run_FPT(double t,
   r_rxn = 0.0;
   total_propensity = 0.0;
   j_rxn = 0;
+
+  std::cout << "\nxf, initial state vector at t = " << t + dt << " (s)" << std::endl;
+  for (int i=0; i<N-1; i++)
+    {
+      std::cout << x[i] << ",";
+    }
+  std::cout << x[N-1] << std::endl;
+  std::cout << "\n" << std::endl;
   
   while (1)
     {

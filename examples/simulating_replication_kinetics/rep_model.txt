@@ -1,6 +1,6 @@
 # average replication rate per replisome
 # units - [monomers/s]
-k_rep=5.0E+1
+k_rep=5.0E+2
 
 # DnaA creation from genes and destruction
 # units - [M^-1*s^-1]

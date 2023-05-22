@@ -151,7 +151,7 @@ std::string replicator::initiation_test()
       if (init_dist[i].N == n_bound)
 	{
 	  leaf_init = init_dist[i].loc;
-	  n_DnaA += n_bound;
+	  n_DnaA += (n_bound - 1);
 	}
     }
 
