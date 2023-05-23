@@ -34,27 +34,35 @@ void replicator::reset_init_dist()
 // update the distribution of initiators across leaves
 void replicator::update_init_dist(std::vector<std::string> leaves)
 {
-  init_loc temp_i_l;
-  std::vector<init_loc> old_init_dist = init_dist;
-
-  init_dist.clear();
-  for (size_t i=0; i<leaves.size(); i++)
+  // update the initiator distribution if there are new leaves
+  if (init_dist.size() != leaves.size())
     {
-      temp_i_l.loc = leaves[i];
-      temp_i_l.N = 0;
-      init_dist.push_back(temp_i_l);
+      
+      init_loc temp_i_l;
+      std::vector<init_loc> old_init_dist = init_dist;
 
-      for (size_t j=0; j<old_init_dist.size(); j++)
+      init_dist.clear();
+      for (size_t i=0; i<leaves.size(); i++)
 	{
-	  if (init_dist[i].loc == old_init_dist[j].loc)
+	  temp_i_l.loc = leaves[i];
+	  temp_i_l.N = 0;
+	  init_dist.push_back(temp_i_l);
+
+	  for (size_t j=0; j<old_init_dist.size(); j++)
 	    {
-	      init_dist[i].N = old_init_dist[j].N;
+	      if (init_dist[i].loc == old_init_dist[j].loc)
+		{
+		  init_dist[i].N = old_init_dist[j].N;
+		}
 	    }
 	}
-    }
 
-  // determine the number of Oris
-  N_leaves = static_cast<int>(init_dist.size());
+      // determine the number of Oris
+      N_leaves = static_cast<int>(init_dist.size());
+      // set the number of Oris for the reaction model
+      rep_model.set_N_leaves(N_leaves);
+      
+    }
 }
 
 
@@ -193,15 +201,26 @@ int replicator::get_DnaA()
 // test for an initiation event
 std::string replicator::initiation_test()
 {
+  // assume by default that there is no initiation
   std::string leaf_init = "no";
-  int n_bound = rep_model.get_init_requirement();
 
+  // get the initiation requirements from the model
+  std::vector<std::array<int,2>> init_reqs = rep_model.get_init_requirements();
+
+  // loop over the locations
   for (size_t i=0; i<init_dist.size(); i++)
     {
-      if (init_dist[i].N == n_bound)
+      // loop over the possible bubble formation outcomes
+      for (size_t j=0; j<init_reqs.size(); j++)
 	{
-	  leaf_init = init_dist[i].loc;
-	  n_DnaA += (n_bound - 1);
+	  if (init_dist[i].N == init_reqs[j][0])
+	    {
+	      // set the intiated leaf to the location in the distribution
+	      leaf_init = init_dist[i].loc;
+	      // return bound DnaA to pool of free DnaA
+	      n_DnaA += init_reqs[j][1];
+	      return leaf_init;
+	    }
 	}
     }
 
@@ -247,15 +266,20 @@ std::vector<species_count> replicator::prepare_xFPT()
   species_count s_c;
   int N_non_leaf = rep_model.get_N_non_leaf();
   int N_per_leaf = rep_model.get_N_per_leaf();
+  std::vector<std::array<int,2>> init_reqs = rep_model.get_init_requirements();
 
   for (int i=0; i<N_leaves; i++)
     {
-      s_c.id = (N_non_leaf - 1) + (i + 1)*N_per_leaf;
-      s_c.N = 1;
-      s_cs.push_back(s_c);
-      std::cout << "FPT[" << i << "],"
-		<< "id = " << s_c.id << " at "
-		<< "n = " << s_c.N << std::endl;
+      for (size_t j=0; j<init_reqs.size(); j++)
+	{
+	  s_c.id = N_non_leaf + i*N_per_leaf;
+	  s_c.id += init_reqs[j][0];
+	  s_c.N = 1;
+	  s_cs.push_back(s_c);
+	  std::cout << "FPT[" << i << "],"
+		    << "id = " << s_c.id << " at "
+		    << "n = " << s_c.N << std::endl;
+	}
     }
 
   return s_cs;
@@ -352,15 +376,11 @@ void replicator::load_state(std::string state_filename)
 //run the replicator for a time increment or until a first-passage
 void replicator::run(double &dt, double dt_target)
 {
-
-  dt = 100.0;
   
   std::cout << "dt_target = " << dt_target << std::endl;
 
   // set the number of DnaA genes equal to the number of Oris
   set_DnaA_genes(N_leaves);
-  // set the number of Oris for the reaction model
-  rep_model.set_N_leaves(N_leaves);
 
   std::cout << "preparing reaction system" << std::endl;
   

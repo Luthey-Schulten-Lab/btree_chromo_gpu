@@ -20,6 +20,7 @@ struct rep_model_params
   double k_c, k_d;
   double k_hi, k_lo, k_on, k_off, k_bubble;
   int N_hi, N_lo, N_fil;
+  int bubble_min_fil;
 };
 
 struct init_loc
@@ -45,14 +46,17 @@ public:
 
   // getters to access replication model details
   double get_k_rep();
-  int get_init_requirement();
   int get_N_species();
   int get_N_per_leaf();
+  int get_N_binding();
+  int get_N_bubble();
   int get_N_non_leaf();
   int get_M_rxns();
 
   // get the reactions
   std::vector<reaction> get_reactions();
+  // get the initiation requirements
+  std::vector<std::array<int,2>> get_init_requirements();
   
 private:
 
@@ -60,11 +64,23 @@ private:
   void number_rep_species();
   void number_rep_rxns();
 
+  // prepare the reactions
+  void prepare_reactions();
+  // prepare the initiator requirements
+  void prepare_init_requirements();
+
+  
+  // private variables
+  
   rep_model_params r_m_p;
   int N_species, M_rxns;
   int N_leaves;
   int N_non_leaf, N_per_leaf;
+  int N_bubble, N_binding;
   int M_non_leaf, M_per_leaf;
+
+  std::vector<reaction> rxns;
+  std::vector<std::array<int,2>> init_requirements;
 
   rxn_manipulator rxn_manip;
   

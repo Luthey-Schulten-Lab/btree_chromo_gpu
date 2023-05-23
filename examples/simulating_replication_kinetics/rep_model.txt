@@ -34,5 +34,7 @@ k_off=5.5E-1
 
 
 # insertion of replisome into bubble
+# minimum filament length (including N_hi and N_lo) for bubble formation
+bubble_min_fil=25
 # units - [s^-1]
 k_bubble=1.0E-3

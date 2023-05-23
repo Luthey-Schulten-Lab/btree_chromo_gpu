@@ -15,6 +15,7 @@ replication_model::replication_model()
   r_m_p.N_hi = 1;
   r_m_p.N_lo = 1;
   r_m_p.N_fil = 1;
+  r_m_p.bubble_min_fil = r_m_p.N_hi + r_m_p.N_lo + r_m_p.N_fil;
 }
 
 // destructor
@@ -113,6 +114,11 @@ void replication_model::load_model(std::string rep_model_filename)
 		      r_m_p.k_off = stod(val);
 		    }
 
+		  else if (param == "bubble_min_fil")
+		    {
+		      r_m_p.bubble_min_fil = stoi(val);
+		    }
+
 		  else if (param == "k_bubble")
 		    {
 		      r_m_p.k_bubble = stod(val);
@@ -128,13 +134,6 @@ void replication_model::load_model(std::string rep_model_filename)
   
     }
 
-}
-
-
-// get the initiation requirement
-int replication_model::get_init_requirement()
-{
-  return N_per_leaf - 1;
 }
 
 
@@ -166,7 +165,21 @@ int replication_model::get_N_per_leaf()
 }
 
 
-// get N_per_leaf
+// get N_bubble
+int replication_model::get_N_bubble()
+{
+  return N_bubble;
+}
+
+
+// get N_binding
+int replication_model::get_N_binding()
+{
+  return N_binding;
+}
+
+
+// get N_non_leaf
 int replication_model::get_N_non_leaf()
 {
   return N_non_leaf;
@@ -179,6 +192,8 @@ void replication_model::set_N_leaves(int N_leaves)
   this->N_leaves = N_leaves;
   number_rep_species();
   number_rep_rxns();
+  prepare_reactions();
+  prepare_init_requirements();
 }
 
 
@@ -190,12 +205,18 @@ void replication_model::number_rep_species()
   N_non_leaf = 2; // free DnaA and DnaA genes
   
   N_per_leaf = 1; // empty origin
-  N_per_leaf += r_m_p.N_hi; // high affinity sites
-  N_per_leaf += r_m_p.N_lo; // low affinity sites
-  N_per_leaf += r_m_p.N_fil; // filament sites
-  N_per_leaf += 1; // bubble
 
-  N_species = N_leaves*N_per_leaf + N_non_leaf;
+  N_binding = 0; // total number of binding sites
+  N_binding += r_m_p.N_hi; // high affinity sites
+  N_binding += r_m_p.N_lo; // low affinity sites
+  N_binding += r_m_p.N_fil; // filament sites
+  
+  N_per_leaf += N_binding; // binding sites
+  N_bubble = (N_binding - r_m_p.bubble_min_fil + 1); // possible bubbles
+ 
+  N_per_leaf += N_bubble; // bubble species
+
+  N_species = N_leaves*N_per_leaf + N_non_leaf; // total species
 }
 
 
@@ -209,17 +230,16 @@ void replication_model::number_rep_rxns()
   M_per_leaf = 0;
   M_per_leaf += r_m_p.N_hi; // high affinity site binding beginning with empty origin
   M_per_leaf += r_m_p.N_lo; // low affinity site binding beginning with last high affinity site
-  M_per_leaf += 2*r_m_p.N_fil - 1; // filament addition beginning with last low affinity site
-  M_per_leaf += 1; // filament to bubble
+  M_per_leaf += 2*r_m_p.N_fil; // filament addition beginning with last low affinity site
+  M_per_leaf += N_bubble; // filament to bubble
 
   M_rxns = N_leaves*M_per_leaf + M_non_leaf;
 }
 
 // prepare a vector of the reactions
-std::vector<reaction> replication_model::get_reactions()
+void replication_model::prepare_reactions()
 {
-
-  std::vector<reaction> rxns;
+  rxns.clear();
   reaction r;
   int df = N_non_leaf;
   int free_idx = N_non_leaf - 1;
@@ -289,7 +309,7 @@ std::vector<reaction> replication_model::get_reactions()
 	  rxn_manip.reset_reaction(r);
 	  db += 1;
 	  // defilamentation reaction
-	  if (j < r_m_p.N_fil-1)
+	  if (j < r_m_p.N_fil)
 	    {
 	      // input is F_(i)
 	      rxn_manip.add_reaction_input(r,df+i*N_per_leaf+c+j+1);
@@ -303,14 +323,51 @@ std::vector<reaction> replication_model::get_reactions()
 
       c += db;
 
-      // input is final filament site
-      rxn_manip.add_reaction_input(r,df+i*N_per_leaf+c);
-      rxn_manip.add_reaction_output(r,df+i*N_per_leaf+c+1);
-      rxn_manip.add_reaction_rate(r,r_m_p.k_bubble);
-      rxns.push_back(r);
-      rxn_manip.reset_reaction(r);
-      c += 1;
+      // add reactions for conversion of filaments to bubbles
+      db = 0;
+      for (int j=0; j<N_bubble; j++)
+	{
+	  rxn_manip.add_reaction_input(r,df+i*N_per_leaf+c-N_bubble+j+1);
+	  rxn_manip.add_reaction_output(r,df+i*N_per_leaf+c+j+1);
+	  rxn_manip.add_reaction_rate(r,r_m_p.k_bubble);
+	  rxns.push_back(r);
+	  rxn_manip.reset_reaction(r);
+	}
+      c += db;
       
     }
+}
+
+
+// get the reaction model
+std::vector<reaction> replication_model::get_reactions()
+{
   return rxns;
+}
+
+
+// prepare the initiator requirements
+void replication_model::prepare_init_requirements()
+{
+  init_requirements.clear();
+
+  std::array<int,2> init_req;
+
+  std::cout << "init_requirements" << std::endl;
+  for (int i=r_m_p.bubble_min_fil; i<(N_binding+1); i++)
+    {
+      init_req[0] = i + N_bubble;
+      init_req[1] = i;
+      init_requirements.push_back(init_req);
+      std::cout << init_req[0] << ","
+		<< init_req[1] << std::endl;
+    }
+  
+}
+
+
+// get the initiation requirements
+std::vector<std::array<int,2>> replication_model::get_init_requirements()
+{
+  return init_requirements;
 }
