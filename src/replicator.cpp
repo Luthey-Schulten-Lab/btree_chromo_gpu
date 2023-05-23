@@ -303,7 +303,7 @@ void replicator::species_counts_to_replicator_state(std::vector<species_count> s
 
 
 // print the replicator's state
-void replicator::print_replicator_state()
+void replicator::print_state()
 {
   std::cout << "n_DnaA_genes = " << n_DnaA_genes << std::endl;
   std::cout << "n_DnaA = " << n_DnaA << std::endl;
@@ -312,6 +312,40 @@ void replicator::print_replicator_state()
       std::cout << " " << init_dist[i].loc
 		<< "," << init_dist[i].N << std::endl;
     }
+}
+
+
+// dump the replicator's state
+void replicator::dump_state(std::string state_filename)
+{
+  std::fstream state_file;
+
+  state_file.open(state_filename, std::ios::out);
+
+  if (!state_file.is_open())
+    {
+      std::cout << "ERROR: file not opened in dump_state" << std::endl;
+    }
+  else
+    {
+      state_file << "n_DnaA=" << n_DnaA << std::endl;
+      state_file << "N_leaves=" << N_leaves << std::endl;
+
+      for (size_t i=0; i<init_dist.size(); i++)
+	{
+	  state_file << init_dist[i].loc << ","
+		     << init_dist[i].N << std::endl;
+	}
+      state_file.close();
+    }
+  
+}
+
+
+// load the replicator's state
+void replicator::load_state(std::string state_filename)
+{
+  std::cout << state_filename << std::endl;
 }
 
 
@@ -379,7 +413,7 @@ void replicator::run(double &dt, double dt_target)
   // update the initiator distribution from the species counts
   species_counts_to_replicator_state(x);
 
-  print_replicator_state();
+  print_state();
 
   // increment the time
   t += dt;

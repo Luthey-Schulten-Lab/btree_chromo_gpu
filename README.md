@@ -119,19 +119,24 @@ See `examples` directory for a demonstration:
  
  - `btree_prng_seed:seed` - *seeds the btree's prng*
  
- - `transform:(b)\_cw(r_cw)\_ccw(r_ccw)` - *applies single transform to branch (b), with replication extents (r\_cw) and (r\_ccw) along clockwise and counter-clockwise directions, respectively*
+ - `transform:(b)_cw(r_cw)_ccw(r_ccw)` - *applies single transform to branch (b), with replication extents (r\_cw) and (r\_ccw) along clockwise and counter-clockwise directions, respectively*
  - `transforms_file:transforms_file` - *applies transforms stored in transforms_file*
  - `random_transforms:N` - *applies random transforms until (N) units are added or the maximum size is reached*
 
 ### Replicator
 
+ - `replicator_load_model:replication_model_file` - *load a kinetic model of replication initiation*
  - `replicator_prng_seed:seed` - *seeds the replicator's prng*
  - `replicator_set_time:t` - *set the replicator's internal time in seconds*
  - `replicator_set_volume:V` - *set the replicator's volume in liters*
  - `replicator_load_volume_protocol:volume_protocol_file` - *loads a file containing a time-dependent protocol for changes in the volume*
  - `replicator_set_DnaA:N` - *set the replicator's current count of free DnaA*
  - `replicator_set_max_replisomes:N` - *set the replicator's maximum number of replisomes*
+ - `replicator_reset_init_dist` - *reset the replicator's distribution of initiators*
  - `replicator_run:t` - *replicates the current btree using loaded replication model for (t) seconds*
+ - `replicator_dump_state:replicator_state_file` - *dumps the replicator's state (initiator distribution and free initiators) to replicator_state_file*
+ - `replicator_dump_state_at_timestep:replicator_state_file` - *execute replicator_dump_state, but append a modifier to the replicator_state_file with the current timestep of the simulator*
+ - `replicator_load_state:replicator_state_file` - *load a replicator state (initiator distribution and free initiators) from the replicator_state_file*
  
 #### Querying Replication State
 

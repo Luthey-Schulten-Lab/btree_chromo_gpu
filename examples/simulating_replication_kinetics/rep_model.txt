@@ -4,9 +4,9 @@ k_rep=5.0E+2
 
 # DnaA creation from genes and destruction
 # units - [M^-1*s^-1]
-k_c=1.0E-3
+k_c=0.0
 # units - [s^-1]
-k_d=1.0E-5
+k_d=0.0
 
 # DnaA filament details
 

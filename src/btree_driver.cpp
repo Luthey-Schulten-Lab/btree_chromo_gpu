@@ -617,6 +617,14 @@ void btree_driver::update_replicate_modified_params(std::string &rep_mod, std::s
     {
       insert_replicate_modifier(rep_mod,params[0]);
     }
+  else if (command == "replicator_dump_state")
+    {
+      insert_replicate_modifier(rep_mod,params[0]);
+    }
+  else if (command == "replicator_dump_state_at_timestep")
+    {
+      insert_replicate_modifier(rep_mod,params[0]);
+    }
   else if (command == "load_mono_coords")
     {
       insert_replicate_modifier(rep_mod,params[0]);
@@ -1123,6 +1131,36 @@ void btree_driver::prepare_command_requirements()
   // lock updates
   t_ls.clear();
   lock_updates["replicator_prng_seed"] = t_ls;
+
+  // replicator_dump_state
+  // number of required parameters
+  N_param_reqs["replicator_dump_state"] = 1;
+  // lock tests
+  t_ls.clear();
+  lock_tests["replicator_dump_state"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["replicator_dump_state"] = t_ls;
+
+  // replicator_dump_state_at_timestep
+  // number of required parameters
+  N_param_reqs["replicator_dump_state_at_timestep"] = 1;
+  // lock tests
+  t_ls.clear();
+  lock_tests["replicator_dump_state_at_timestep"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["replicator_dump_state_at_timestep"] = t_ls;
+
+  // replicator_load_state
+  // number of required parameters
+  N_param_reqs["replicator_load_state"] = 1;
+  // lock tests
+  t_ls.clear();
+  lock_tests["replicator_load_state"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["replicator_load_state"] = t_ls;
 
   
   /////////////////////////////////////
@@ -2040,6 +2078,13 @@ int btree_driver::execute_single_command(std::string &command,
     }
 
 
+  // reset the replicator's initiator distribution
+  else if (command == "replicator_reset_init_dist")
+    {
+      error_code = replicator_reset_init_dist();
+    }
+
+
   // set the internal time of the replicator
   else if (command == "replicator_set_time")
     {
@@ -2086,6 +2131,27 @@ int btree_driver::execute_single_command(std::string &command,
   else if (command == "replicator_run")
     {
       error_code = replicator_run(params);
+    }
+
+
+  // dump the replicator's state
+  else if (command == "replicator_dump_state")
+    {
+      error_code = replicator_dump_state(params);
+    }
+
+
+  // dump the replicator's state at the simulator's timestep
+  else if (command == "replicator_dump_state_at_timestep")
+    {
+      error_code = replicator_dump_state_at_timestep(params);
+    }
+
+
+  // load a replicator state
+  else if (command == "replicator_load_state")
+    {
+      error_code = replicator_load_state(params);
     }
 
 
@@ -2762,6 +2828,14 @@ int btree_driver::replicator_prng_seed(std::vector<std::string> &params)
 }
 
 
+int btree_driver::replicator_reset_init_dist()
+{
+  // reset the distribution of initiator's
+  driver_replicator.reset_init_dist();
+  return 0;
+}
+
+
 int btree_driver::replicator_set_time(std::vector<std::string> &params)
 {
   // set the replicator's internal time
@@ -2806,6 +2880,39 @@ int btree_driver::replicator_load_model(std::vector<std::string> &params)
 {
   driver_replicator.load_model(params[0]);
   // replication model is now present
+  return 0;
+}
+
+
+int btree_driver::replicator_dump_state(std::vector<std::string> &params)
+{
+  driver_replicator.dump_state(params[0]);
+  return 0;
+}
+
+
+int btree_driver::replicator_dump_state_at_timestep(std::vector<std::string> &params)
+{
+  int e;
+  std::string ts_mod = get_timestep_modifier();
+  std::vector<std::string> params_w_ts;
+
+  for (std::string param : params)
+    {
+      params_w_ts.push_back(param);
+    }
+
+  insert_timestep_modifier(ts_mod,params_w_ts[0]);
+  
+  e = replicator_dump_state(params_w_ts);
+  
+  return e;
+}
+
+
+int btree_driver::replicator_load_state(std::vector<std::string> &params)
+{
+  driver_replicator.load_state(params[0]);
   return 0;
 }
 

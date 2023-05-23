@@ -140,6 +140,9 @@ private:
   int replicator_set_DnaA(std::vector<std::string> &params);
   int replicator_set_max_replisomes(std::vector<std::string> &params);
   int replicator_run(std::vector<std::string> &params);
+  int replicator_dump_state(std::vector<std::string> &params);
+  int replicator_dump_state_at_timestep(std::vector<std::string> &params);
+  int replicator_load_state(std::vector<std::string> &params);
 
   // LAMMPS system
   // loading coordinates and quaternions

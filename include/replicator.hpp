@@ -48,11 +48,16 @@ public:
 
   // run the replicator
   void run(double &dt, double dt_target);
+
+  // dump the relicator state
+  void dump_state(std::string state_filename);
+  // load the relicator state
+  void load_state(std::string state_filename);
   
 private:
 
   // print the initiator distribution
-  void print_replicator_state();
+  void print_state();
 
   // create the vector of species counts
   std::vector<species_count> prepare_species_counts();

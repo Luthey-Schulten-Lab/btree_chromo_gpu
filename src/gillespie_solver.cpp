@@ -81,7 +81,7 @@ void gillespie_solver::interpolate_volume(double t)
 
   set_V(V_interp);
 
-  std::cout << "t = " << t << ", V = " << V << std::endl;
+  // std::cout << "t = " << t << ", V = " << V << std::endl;
 
 }
 
@@ -417,6 +417,7 @@ void gillespie_solver::run_FPT(double t,
     {
 
       // std::cout << "t=" << t + dt << std::endl;
+      
       // sample random numbers for the reaction and time
       r_t = u_rand(rand_eng);
       r_rxn = u_rand(rand_eng);
@@ -441,9 +442,10 @@ void gillespie_solver::run_FPT(double t,
 
       // sample time based on total propensity
       ds = -log(r_t)/total_propensity;
+      
       // std::cout << "ds=" << ds << std::endl;
       
-      // test of proposed time exceeds maximum
+      // test if proposed time exceeds maximum
       if (dt + ds > dt_max)
 	{
 	  dt = dt_max;
@@ -454,10 +456,10 @@ void gillespie_solver::run_FPT(double t,
 	  dt += ds;
 	}
 
-      // sample the reactions
+      // sample the reactions given relative propensities
       j_rxn = select_rxn(r_rxn,total_propensity);
       
-      // update the state
+      // given the selected reaction, update the system's state
       update_state(j_rxn);
 
       // test for FPT species and break the loop if they are found
