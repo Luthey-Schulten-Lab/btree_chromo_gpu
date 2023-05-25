@@ -110,15 +110,11 @@ See `examples` directory for a demonstration:
 #### Controlling Replication State
 
  - `new_chromo:size` - *initializes an unreplicated chromosome with given size*
- 
  - `input_state:input_file` - *creates state from input_file*
  - `output_state:output_file` - *writes state to output_file*
  - `output_state_at_timestep:output_file` - *execute output_state, but append a modifier to the output_file with the current timestep of the simulator*
- 
  - `print` - *prints binary tree state in terminal*
- 
- - `btree_prng_seed:seed` - *seeds the btree's prng*
- 
+ - `btree_prng_seed:seed` - *seeds the btree's prng* 
  - `transform:(b)_cw(r_cw)_ccw(r_ccw)` - *applies single transform to branch (b), with replication extents (r\_cw) and (r\_ccw) along clockwise and counter-clockwise directions, respectively*
  - `transforms_file:transforms_file` - *applies transforms stored in transforms_file*
  - `random_transforms:N` - *applies random transforms until (N) units are added or the maximum size is reached*
@@ -131,6 +127,7 @@ See `examples` directory for a demonstration:
  - `replicator_set_volume:V` - *set the replicator's volume in liters*
  - `replicator_load_volume_protocol:volume_protocol_file` - *loads a file containing a time-dependent protocol for changes in the volume*
  - `replicator_set_DnaA:N` - *set the replicator's current count of free DnaA*
+ - `replicator_set_max_DnaA_genes:N` - *set the replicator's maximum number of active DnaA genes*
  - `replicator_set_max_replisomes:N` - *set the replicator's maximum number of replisomes*
  - `replicator_reset_init_dist` - *reset the replicator's distribution of initiators*
  - `replicator_run:t` - *replicates the current btree using loaded replication model for (t) seconds*
@@ -143,14 +140,11 @@ See `examples` directory for a demonstration:
  - `update_topology` - *solves bond topology of system*
  - `dump_topology:topology_file,idx` - *dumps topology to topology_file with selected indexing convention (idx)*
  - `dump_topology_at_timestep:topology_file,idx` - *execute dump_topology, but append a modifier to the topology_file with the current timestep of the simulator*
-
  - `dump_fork_partitions:fork_partition_file,idx` - *dumps monomer partitioning about forks to fork_partition_file with selected indexing convention (idx)*
  - `dump_fork_partitions_at_timestep:fork_partition_file,idx` - *execute dump_fork_partitions, but append a modifier to the fork_partition_file with the current timestep of the simulator*
- 
  - `update_CG_map:f_CG` - *update coarse-graining with selected factor (f_CG)*
  - `dump_CG_map:CG_map_file,f_CG,idx` - *dumps CG_map to CG_map_file with selected factor (f_CG) and indexing convention (idx)*
  - `dump_CG_map_at_timestep:CG_map_file,f_CG,idx` - *execute dump_CG_map, but append a modifier to the CG_map_file with the current timestep of the simulator*
- 
  - `regions_file:regions_file,idx` - *reads chromosome regions from regions_file with selected indexing convention (idx)*
  - `dump_regions:regions_count_file,idx` - *updates regions counts given current state and dumps counts to regions_count_file with selected indexing convention (idx)*
  - `dump_regions_at_timestep:regions_count_file` - *execute dump_regions, but append a modifier to the regions_count_file with the current timestep of the simulator*
@@ -158,27 +152,22 @@ See `examples` directory for a demonstration:
 #### Spatial System for Simulations
 
  - `load_BD_lengths:BD_length_file` - *reads lengths for Brownian dynamics simulation*
-
  - `spherical_bdry:R,x0,y0,z0` - *generates bdry particles forming a sphere of radius R centered at (x0,y0,z0)*
-
  - `load_mono_coords:coords_file,order` - *reads binary file with monomer coordinates (doubles) using data ordering convention (row/col)*
  - `load_mono_quats:quats_file,order` - *reads binary file with monomer quaternions (doubles) using data ordering convention (row/col)*
  - `load_ribo_coords:coords_file,order` - *reads binary file with ribosome coordinates (doubles) using data ordering convention (row/col)*
  - `load_ribo_quats:quats_file,order` - *reads binary file with ribosome quaternions (doubles) using data ordering convention (row/col)*
  - `load_bdry_coords:coords_file,order` - *reads binary file with boundary coordinates (doubles) using data ordering convention (row/col)*
- 
  - `write_mono_coords:coords_file,order` - *write binary file with monomer coordinates (doubles) using data ordering convention (row/col)*
  - `write_mono_quats:quats_file,order` - *write binary file with monomer quaternions (doubles) using data ordering convention (row/col)*
  - `write_ribo_coords:coords_file,order` - *write binary file with ribosome coordinates (doubles) using data ordering convention (row/col)*
  - `write_ribo_quats:quats_file,order` - *write binary file with ribosome quaternions (doubles) using data ordering convention (row/col)*
  - `write_bdry_coords:coords_file,order` - *write binary file with boundary coordinates (doubles) using data ordering convention (row/col)*
-
  - `switch_bonds:(T/F)` - *enable/disable bonds between DNA monomers (default T), must be used prior to 'write_LAMMPS_data_file' to take effect*
  - `switch_bending_angles:(T/F)` - *enable/disable bending angles between DNA monomers (default T), must be used prior to 'write_LAMMPS_data_file' to take effect*
  - `switch_twisting_angles:(T/F)` - *enable/disable twisting angles between DNA monomers (default T), must be used prior to 'write_LAMMPS_data_file' to take effect*
  - `switch_Ori_bdry_attraction:(T/F)` - *enable/disable attraction of Ori bead to bdry using morse/cut potential (default F)*
  - `switch_Ori_pair_repulsion:(T/F)` - *enable/disable repulsion between Ori beads using harmonic/cut potential (default F)*
- 
  - `write_LAMMPS_data:LAMMPS_data_file` - *write a LAMMPS file (data.-) using the current mono, ribo, and bdry coordinates, and the current replication state for the bond/angle topology*
  - `write_mono_xyz:mono_file_xyz` - *write the current monomer coordinates as an .xyz file to load into visualization software*
 
@@ -194,24 +183,19 @@ See `examples` directory for a demonstration:
  - `simulator_include_file:inc_file` - *executes the 'include' command to run the LAMMPS commands stored in inc_file*
  - `sync_simulator_and_system` - *copies the current simulation state to the LAMMPS_sys object used to control the topology*
  - `clear_simulator` - *execute the 'clear' command to clear the LAMMPS object*
- 
  - `simulator_set_prng_seed:seed` - *seeds the simulator's prng, must be greater than 0*
  - `simulator_set_nProc:nProc` - *sets the number of processors used by the simulator*
  - `simulator_set_DNA_model:DNA_model_dir` - *sets the directory containing the DNA model used by the simulator*
  - `simulator_set_output_details:output_dir,output_label` - *sets the output directory (output_dir) and label (output_label) used for files generated by the simulator*
  - `simulator_set_delta_t:delta_t` - *sets the timestep (delta_t) used for Brownian dynamics within the simulator*
- 
  - `simulator_store_timestep` - *stores the current timestep of the simulator*
  - `simulator_restore_timestep` - *restores the simulator timestep based on the stored timestep*
  - `simulator_increment_timestep:dt` - *increments the timestep by (dt), this must be a non-negative amount*
  - `simulator_reset_timestep:t` - *resets the timestep to (t)*
  - `simulator_reset_prev_dump_timestep:t` - *resets the timestep of the previous dump to (t)*
- 
  - `simulator_read_data:LAMMPS_data_file` - *read a LAMMPS file (data.-) into the simulator*
- 
  - `simulator_minimize_(soft/hard/topoDNA)_(harmonic/FENE):Tfreq` - *run a minimization with the dictated potential while printing thermodynamic information every Tfreq steps*
  - `simulator_run_(soft/hard/topoDNA)_(harmonic/FENE):Nsteps,Tfreq,Dfreq,append_option,skip_option` - *run Brownian dynamics with the dictated potential for Nsteps, while printing thermodynamic information every Tfreq steps and dumping every Dfreq steps - append_option = noappend/append and skip_option = first/skip_first*
-
  - `simulator_load_loop_params:loop_params_file` - *read a file (loop_params_file) containing the parameters for the looping interactions*
  - `simulator_run_loops:Nloops,Nsteps,Tfreq,Dfreq,append_option,skip_option` - *run Brownian dynamics with the hard/FENE potential for Nsteps with Nloops randomly placed, while printing thermodynamic information every Tfreq steps and dumping every Dfreq steps - append_option = noappend/append and skip_option = first/skip_first*
 

@@ -26,6 +26,8 @@ public:
   void set_DnaA(int n_DnaA);
   // set the DnaA gene copy number
   void set_DnaA_genes(int n_DnaA_genes);
+  // set the DnaA gene copy number
+  void set_max_DnaA_genes(int max_DnaA_genes);
   // set the maximum number of replisomes
   void set_max_replisomes(int max_rep);
   // set the volume or load a volume protocol
@@ -70,7 +72,8 @@ private:
   bool V_protocol;
 
   int N_leaves;
-  int n_DnaA, max_rep, n_DnaA_genes;
+  int n_DnaA, max_rep;
+  int n_DnaA_genes, max_DnaA_genes;
   
   double t;
   double V;

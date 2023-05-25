@@ -87,6 +87,13 @@ void replicator::set_DnaA_genes(int n_DnaA_genes)
 }
 
 
+// set the maximum active DnaA gene copy number
+void replicator::set_max_DnaA_genes(int max_DnaA_genes)
+{
+  this->max_DnaA_genes = max_DnaA_genes;
+}
+
+
 // set the maximum number of replisomes
 void replicator::set_max_replisomes(int max_rep)
 {
@@ -380,7 +387,7 @@ void replicator::run(double &dt, double dt_target)
   std::cout << "dt_target = " << dt_target << std::endl;
 
   // set the number of DnaA genes equal to the number of Oris
-  set_DnaA_genes(N_leaves);
+  set_DnaA_genes(std::min(N_leaves,max_DnaA_genes));
 
   std::cout << "preparing reaction system" << std::endl;
   

@@ -1072,6 +1072,17 @@ void btree_driver::prepare_command_requirements()
   t_ls.push_back(new_lock("rep_DnaA_present",true));
   lock_updates["replicator_set_DnaA"] = t_ls;
 
+  // replicator_set_max_DnaA_genes
+  // number of required parameters
+  N_param_reqs["replicator_set_max_DnaA_genes"] = 1;
+  // lock tests
+  t_ls.clear();
+  lock_tests["replicator_set_max_DnaA_genes"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  t_ls.push_back(new_lock("rep_DnaA_present",true));
+  lock_updates["replicator_set_max_DnaA_genes"] = t_ls;
+
   // replicator_set_max_replisomes
   // number of required parameters
   N_param_reqs["replicator_set_max_replisomes"] = 1;
@@ -2113,6 +2124,13 @@ int btree_driver::execute_single_command(std::string &command,
     }
 
 
+  // set the maximum number of active DnaA genes
+  else if (command == "replicator_set_max_DnaA_genes")
+    {
+      error_code = replicator_set_max_DnaA_genes(params);
+    }
+
+
   // set the maximum number of functional replisomes
   else if (command == "replicator_set_max_replisomes")
     {
@@ -2848,6 +2866,14 @@ int btree_driver::replicator_set_DnaA(std::vector<std::string> &params)
 {
   // set the replicator's free DnaA count
   driver_replicator.set_DnaA(stoi(params[0]));
+  return 0;
+}
+
+
+int btree_driver::replicator_set_max_DnaA_genes(std::vector<std::string> &params)
+{
+  // set the replicator's maximum number of active DnaA genes
+  driver_replicator.set_max_DnaA_genes(stoi(params[0]));
   return 0;
 }
 

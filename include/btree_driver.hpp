@@ -138,6 +138,7 @@ private:
   int replicator_load_volume_protocol(std::vector<std::string> &params);
   int replicator_load_model(std::vector<std::string> &params);
   int replicator_set_DnaA(std::vector<std::string> &params);
+  int replicator_set_max_DnaA_genes(std::vector<std::string> &params);
   int replicator_set_max_replisomes(std::vector<std::string> &params);
   int replicator_run(std::vector<std::string> &params);
   int replicator_dump_state(std::vector<std::string> &params);
