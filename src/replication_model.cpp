@@ -202,7 +202,7 @@ void replication_model::number_rep_species()
 {
   N_species = 0;
 
-  N_non_leaf = 2; // free DnaA and DnaA genes
+  N_non_leaf = 3; // free DnaA, DnaA genes, and free replisomes
   
   N_per_leaf = 1; // empty origin
 
@@ -327,7 +327,11 @@ void replication_model::prepare_reactions()
       db = 0;
       for (int j=0; j<N_bubble; j++)
 	{
+	  // filament in
 	  rxn_manip.add_reaction_input(r,df+i*N_per_leaf+c-N_bubble+j+1);
+	  // replisome in
+	  rxn_manip.add_reaction_input(r,1);
+	  // bubble out
 	  rxn_manip.add_reaction_output(r,df+i*N_per_leaf+c+j+1);
 	  rxn_manip.add_reaction_rate(r,r_m_p.k_bubble);
 	  rxns.push_back(r);

@@ -31,6 +31,14 @@ void replicator::reset_init_dist()
 }
 
 
+// reset the distribution of initiators
+void replicator::reset_replisomes()
+{
+  replicating_forks.clear();
+  n_free_replisomes = n_replisomes;
+}
+
+
 // update the distribution of initiators across leaves
 void replicator::update_init_dist(std::vector<std::string> leaves)
 {
@@ -95,9 +103,9 @@ void replicator::set_max_DnaA_genes(int max_DnaA_genes)
 
 
 // set the maximum number of replisomes
-void replicator::set_max_replisomes(int max_rep)
+void replicator::set_replisomes(int n_replisomes)
 {
-  this->max_rep = max_rep;
+  this->n_replisomes = n_replisomes;
 }
 
 
@@ -192,9 +200,9 @@ double replicator::get_k_rep()
 
 
 // get the maximum number of replisomes
-int replicator::get_max_replisomes()
+int replicator::get_replisomes()
 {
-  return max_rep;
+  return n_replisomes;
 }
 
 
@@ -202,6 +210,13 @@ int replicator::get_max_replisomes()
 int replicator::get_DnaA()
 {
   return n_DnaA;
+}
+
+
+// get the set of replicating forks
+std::vector<std::string> replicator::get_replicating_forks()
+{
+  return replicating_forks;
 }
 
 
@@ -226,12 +241,46 @@ std::string replicator::initiation_test()
 	      leaf_init = init_dist[i].loc;
 	      // return bound DnaA to pool of free DnaA
 	      n_DnaA += init_reqs[j][1];
+	      replicating_forks.push_back(leaf_init);
 	      return leaf_init;
 	    }
 	}
     }
 
   return leaf_init;
+}
+
+
+// unbind replisomes from completed forks
+void replicator::unbind_replisomes(std::vector<std::string> completed_forks)
+{
+  bool fork_complete;
+  std::vector<std::string> temp_forks = replicating_forks;
+
+  replicating_forks.clear();
+
+  for (size_t i_fork=0; i_fork<temp_forks.size(); i_fork++)
+    {
+      fork_complete = false;
+      for (size_t j_fork=0; j_fork<completed_forks.size(); j_fork++)
+	{
+	  if (temp_forks[i_fork] == completed_forks[i_fork])
+	    {
+	      fork_complete = true;
+	      break;
+	    }
+	}
+
+      // free the replisome or return it to the set of replicating forks
+      if (fork_complete == true)
+	{
+	  n_free_replisomes += 1;
+	}
+      else
+	{
+	  replicating_forks.push_back(temp_forks[i_fork]);
+	}
+    }
 }
 
 
@@ -249,8 +298,13 @@ std::vector<species_count> replicator::prepare_species_counts()
   s_c.N = n_DnaA_genes;
   s_cs.push_back(s_c);
 
-  // free DnaA
+  // free replisomes
   s_c.id = 1;
+  s_c.N = n_free_replisomes;
+  s_cs.push_back(s_c);
+
+  // free DnaA
+  s_c.id = 2;
   s_c.N = n_DnaA;
   s_cs.push_back(s_c);
 
@@ -314,6 +368,10 @@ void replicator::species_counts_to_replicator_state(std::vector<species_count> s
 	      n_DnaA_genes = s_cs[i].N;
 	    }
 	  else if (id == 1)
+	    {
+	      n_free_replisomes = s_cs[i].N;
+	    }
+	  else if (id == 2)
 	    {
 	      n_DnaA = s_cs[i].N;
 	    }

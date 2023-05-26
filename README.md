@@ -128,8 +128,9 @@ See `examples` directory for a demonstration:
  - `replicator_load_volume_protocol:volume_protocol_file` - *loads a file containing a time-dependent protocol for changes in the volume*
  - `replicator_set_DnaA:N` - *set the replicator's current count of free DnaA*
  - `replicator_set_max_DnaA_genes:N` - *set the replicator's maximum number of active DnaA genes*
- - `replicator_set_max_replisomes:N` - *set the replicator's maximum number of replisomes*
+ - `replicator_set_replisomes:N` - *set the replicator's maximum number of replisomes*
  - `replicator_reset_init_dist` - *reset the replicator's distribution of initiators*
+ - `replicator_reset_replisomes` - *reset the replicator's forks with bound replisomes*
  - `replicator_run:t` - *replicates the current btree using loaded replication model for (t) seconds*
  - `replicator_dump_state:replicator_state_file` - *dumps the replicator's state (initiator distribution and free initiators) to replicator_state_file*
  - `replicator_dump_state_at_timestep:replicator_state_file` - *execute replicator_dump_state, but append a modifier to the replicator_state_file with the current timestep of the simulator*

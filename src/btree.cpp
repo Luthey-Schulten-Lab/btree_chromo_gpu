@@ -574,7 +574,7 @@ std::array<int,2> btree::partition_growths_sym(node *branch, int proposed_r_cw, 
 }
 
 
-// function to perform random growths
+// function to perform random growths across active forks
 void btree::random_transforms(int r)
 {
   int rem = r;
@@ -652,6 +652,25 @@ void btree::random_transforms(int r)
 	} // end loop over forks
 	
     } // end loop over remaining units
+  
+}
+
+
+// apply transforms to specified forks using provided rate
+void btree::random_transforms_on_forks(std::vector<std::string> forks, double r)
+{
+  std::poisson_distribution<int> poisson_dist(r);
+  int r_cw, r_ccw;
+
+  for (size_t i_fork=0; i_fork<forks.size(); i_fork++)
+    {
+      // sample Poisson distribution for each direction
+      r_cw = poisson_dist(rand_eng);
+      r_ccw = poisson_dist(rand_eng);
+      // execute growth
+      // std::cout << forks[i_fork] << std::endl;
+      grow_at_branch_asym(forks[i_fork],r_cw,r_ccw);
+    }
   
 }
 

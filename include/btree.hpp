@@ -121,6 +121,7 @@ public:
   void apply_transforms(btree_transforms tr);
   void single_transform(fork_rho f_r);
   void random_transforms(int r);
+  void random_transforms_on_forks(std::vector<std::string> forks, double r);
 
   // queries about tree state
   int count_total_leaves();
