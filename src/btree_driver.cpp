@@ -1029,7 +1029,18 @@ void btree_driver::prepare_command_requirements()
   t_ls.clear();
   lock_updates["replicator_reset_init_dist"] = t_ls;
 
-  // replicator_reset_init_dist
+  // replicator_bind_init
+  // number of required parameters
+  N_param_reqs["replicator_bind_init"] = 2;
+  // lock tests
+  t_ls.clear();
+  lock_tests["replicator_bind_init"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  t_ls.push_back(new_lock("rep_DnaA_present",true));
+  lock_updates["replicator_bind_init"] = t_ls;
+
+  // replicator_reset_replisomes
   // number of required parameters
   N_param_reqs["replicator_reset_replisomes"] = 0;
   // lock tests
@@ -1038,6 +1049,17 @@ void btree_driver::prepare_command_requirements()
   // lock updates
   t_ls.clear();
   lock_updates["replicator_reset_replisomes"] = t_ls;
+
+  // replicator_bind_replisome
+  // number of required parameters
+  N_param_reqs["replicator_bind_replisome"] = 1;
+  // lock tests
+  t_ls.clear();
+  lock_tests["replicator_bind_replisome"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  t_ls.push_back(new_lock("rep_replisomes_present",true));
+  lock_updates["replicator_bind_replisome"] = t_ls;
 
   // replicator_set_time
   // number of required parameters
@@ -2106,10 +2128,24 @@ int btree_driver::execute_single_command(std::string &command,
     }
 
 
+  // bind initiators within the replicator
+  else if (command == "replicator_bind_init")
+    {
+      error_code = replicator_bind_init(params);
+    }
+
+
   // reset the replicator's replisome assignments
   else if (command == "replicator_reset_replisomes")
     {
       error_code = replicator_reset_replisomes();
+    }
+
+
+  // bind replisomes within the replicator
+  else if (command == "replicator_bind_replisome")
+    {
+      error_code = replicator_bind_replisome(params);
     }
 
 
@@ -2871,11 +2907,53 @@ int btree_driver::replicator_reset_init_dist()
 }
 
 
+int btree_driver::replicator_bind_init(std::vector<std::string> &params)
+{
+  // bind an initiator within the replicator
+  int e = 1;
+  std::vector<std::string> possible_leaves = driver_bt.get_leaves();
+
+  driver_replicator.update_init_dist(possible_leaves);
+  
+  for (size_t i=0; i<possible_leaves.size(); i++)
+    {
+      if (possible_leaves[i] == params[0])
+	{
+	  e = 0;
+	  driver_replicator.bind_init(params[0],stoi(params[1]));
+	  return e;
+	}
+    }
+  
+  return e;
+}
+
+
 int btree_driver::replicator_reset_replisomes()
 {
   // reset the distribution of replisomes
   driver_replicator.reset_replisomes();
   return 0;
+}
+
+
+int btree_driver::replicator_bind_replisome(std::vector<std::string> &params)
+{
+  // bind a replisome within the replicator
+  int e = 1;
+  std::vector<std::string> possible_forks = driver_bt.get_active_forks();
+
+  for (size_t i=0; i<possible_forks.size(); i++)
+    {
+      if (possible_forks[i] == params[0])
+	{
+	  e = 0;
+	  driver_replicator.bind_replisome(params[0]);
+	  return e;
+	}
+    }
+
+  return e;
 }
 
 

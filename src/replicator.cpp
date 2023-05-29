@@ -74,6 +74,20 @@ void replicator::update_init_dist(std::vector<std::string> leaves)
 }
 
 
+// bind a number of initiators
+void replicator::bind_init(std::string leaf, int n)
+{
+  for (size_t i=0; i<init_dist.size(); i++)
+    {
+      if (init_dist[i].loc == leaf)
+	{
+	  n_DnaA -= (n - init_dist[i].N);
+	  init_dist[i].N = n;
+	}
+    }
+}
+
+
 // set the time
 void replicator::set_time(double t)
 {
@@ -280,6 +294,17 @@ void replicator::unbind_replisomes(std::vector<std::string> completed_forks)
 	{
 	  replicating_forks.push_back(temp_forks[i_fork]);
 	}
+    }
+}
+
+
+// bind a replisome to one of the forks
+void replicator::bind_replisome(std::string fork)
+{
+  if (n_free_replisomes > 0)
+    {
+      replicating_forks.push_back(fork);
+      n_free_replisomes -= 1;
     }
 }
 

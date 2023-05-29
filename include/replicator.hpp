@@ -15,11 +15,6 @@ public:
   // set the prng seed
   void prng_seed(int s);
 
-  // reset the initiator distribution
-  void reset_init_dist();
-  // update the initiator distribution
-  void update_init_dist(std::vector<std::string> leaves);
-
   // set the time
   void set_time(double t);
   // set the free DnaA number
@@ -42,6 +37,12 @@ public:
   double get_k_rep();
   int get_replisomes();
 
+  // reset the initiator distribution
+  void reset_init_dist();
+  // update the initiator distribution
+  void update_init_dist(std::vector<std::string> leaves);
+  // add initiators on leaf
+  void bind_init(std::string leaf, int n);
   // test for initiation event and update
   std::string initiation_test();
   
@@ -51,6 +52,8 @@ public:
   void unbind_replisomes(std::vector<std::string> completed_forks);
   // reset the replisomes
   void reset_replisomes();
+  // bind replisome on fork
+  void bind_replisome(std::string fork);
 
   // read the replication model
   void load_model(std::string rep_model_filename);
