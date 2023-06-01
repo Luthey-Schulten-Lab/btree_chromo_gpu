@@ -3079,14 +3079,27 @@ int btree_driver::replicator_run(std::vector<std::string> &params)
 
       // perform random replications on forks with replisomes
       replicating_forks = driver_replicator.get_replicating_forks();
+      // for (std::string f : replicating_forks) std::cout << f << std::endl;
+      
       if (replicating_forks.size() > 0)
 	{
 	  driver_bt.random_transforms_on_forks(replicating_forks,
 					       rep_amount);
 	}
 
+      // std::cout << "replicating forks" << std::endl;
+      // replicating_forks = driver_replicator.get_replicating_forks();
+      // for (std::string f : replicating_forks) std::cout << f << std::endl;
+
+      // std::cout << "completed forks" << std::endl;
+      // for (std::string f : driver_bt.get_completed_forks()) std::cout << f << std::endl;
+
       // unbind replisomes from completed forks
       driver_replicator.unbind_replisomes(driver_bt.get_completed_forks());
+
+      // std::cout << "replicating forks" << std::endl;
+      // replicating_forks = driver_replicator.get_replicating_forks();
+      // for (std::string f : replicating_forks) std::cout << f << std::endl;
 
       // check for an initiation event
       rep_leaf = driver_replicator.initiation_test();

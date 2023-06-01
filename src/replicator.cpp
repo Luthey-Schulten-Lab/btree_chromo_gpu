@@ -278,7 +278,7 @@ void replicator::unbind_replisomes(std::vector<std::string> completed_forks)
       fork_complete = false;
       for (size_t j_fork=0; j_fork<completed_forks.size(); j_fork++)
 	{
-	  if (temp_forks[i_fork] == completed_forks[i_fork])
+	  if (temp_forks[i_fork] == completed_forks[j_fork])
 	    {
 	      fork_complete = true;
 	      break;
@@ -362,9 +362,9 @@ std::vector<species_count> replicator::prepare_xFPT()
 	  s_c.id += init_reqs[j][0];
 	  s_c.N = 1;
 	  s_cs.push_back(s_c);
-	  std::cout << "FPT[" << i << "],"
-		    << "id = " << s_c.id << " at "
-		    << "n = " << s_c.N << std::endl;
+	  // std::cout << "FPT[" << i << "],"
+	  // 	    << "id = " << s_c.id << " at "
+	  // 	    << "n = " << s_c.N << std::endl;
 	}
     }
 

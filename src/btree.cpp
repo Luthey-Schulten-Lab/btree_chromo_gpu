@@ -449,11 +449,12 @@ int btree::grow_at_branch_asym(std::string loc, int r_cw, int r_ccw)
       g_branch->rho_ccw += part_growths[1];
       g_branch->rho_t = g_branch->rho_cw + g_branch->rho_ccw;
 
-      if (g_branch->rho_t == g_branch->size)
+      if (g_branch->rho_t >= g_branch->size)
 	{
 	  g_branch->complete = true;
 	  g_branch->rho_cw = g_branch->size;
 	  g_branch->rho_ccw = g_branch->size;
+	  g_branch->rho_t = g_branch->size;
 	}
     
     }
@@ -660,7 +661,7 @@ void btree::random_transforms(int r)
 void btree::random_transforms_on_forks(std::vector<std::string> forks, double r)
 {
   std::poisson_distribution<int> poisson_dist(r);
-  int r_cw, r_ccw;
+  int r_cw, r_ccw, r_rem;
 
   for (size_t i_fork=0; i_fork<forks.size(); i_fork++)
     {
@@ -669,7 +670,11 @@ void btree::random_transforms_on_forks(std::vector<std::string> forks, double r)
       r_ccw = poisson_dist(rand_eng);
       // execute growth
       // std::cout << forks[i_fork] << std::endl;
-      grow_at_branch_asym(forks[i_fork],r_cw,r_ccw);
+      r_rem = grow_at_branch_asym(forks[i_fork],r_cw,r_ccw);
+      std::cout << forks[i_fork]
+		<< ", rem = "
+		<< r_rem
+		<< std::endl;
     }
   
 }
@@ -2158,9 +2163,14 @@ void btree::print_branch(node *branch)
       else
 	{
 	  max_size_t = branch->size;
-	  max_size_cw = max_size_t - branch->rho_ccw;
-	  max_size_ccw = max_size_t - branch->rho_cw;
+	  // max_size_cw = max_size_t - branch->rho_ccw;
+	  // max_size_ccw = max_size_t - branch->rho_cw;
+	  max_size_cw = max_size_t;
+	  max_size_ccw = max_size_t;
 	}
+      max_size_cw -= branch->rho_ccw;
+      max_size_ccw -= branch->rho_cw;
+      
       std::cout << gen_offset
 	   << "rho_t = "
 	   << branch->rho_t
