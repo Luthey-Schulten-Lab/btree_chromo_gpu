@@ -366,7 +366,7 @@ int btree_driver::test_paired_metacommands(std::string paired_command)
 void btree_driver::expand_repeat_metacommands()
 {
   int N_repeats;
-  size_t i_start, i_end;
+  size_t i_start=0, i_end=0;
   std::vector<std::string> temp_commands, repeated_commands;
   std::vector<std::vector<std::string>> temp_command_params, repeated_command_params;
 
@@ -463,7 +463,7 @@ void btree_driver::expand_repeat_metacommands()
 void btree_driver::expand_repeat_replicates_metacommands()
 {
   int min_rep, max_rep, N_reps, padding;
-  size_t i_start, i_end;
+  size_t i_start=0, i_end=0;
   std::vector<std::string> temp_commands, repeated_commands;
   std::vector<std::vector<std::string>> temp_command_params, repeated_command_params;
   std::vector<std::string> replicate_modified_params;
@@ -863,6 +863,19 @@ void btree_driver::prepare_command_requirements()
   t_ls.push_back(new_lock("topo_update",true));
   t_ls.push_back(new_lock("CG_update",true));
   lock_updates["random_transforms"] = t_ls;
+
+  // divide
+  // number of required parameters
+  N_param_reqs["divide"] = 0;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("btree_initialized",true));
+  lock_tests["divide"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  t_ls.push_back(new_lock("topo_update",true));
+  t_ls.push_back(new_lock("CG_update",true));
+  lock_updates["divide"] = t_ls;
 
   // regions_file
   // number of required parameters
@@ -2663,6 +2676,7 @@ int btree_driver::switch_skip_runs(std::vector<std::string> &params)
 
 int btree_driver::new_chromo(std::vector<std::string> &params)
 {
+  btree_state driver_st;
   driver_st.size = stoi(params[0]);
   driver_st.transforms.clear();
   driver_bt.prepare_state(driver_st);
@@ -2672,6 +2686,7 @@ int btree_driver::new_chromo(std::vector<std::string> &params)
 
 int btree_driver::input_state(std::vector<std::string> &params)
 {
+  btree_state driver_st;
   driver_st = driver_bt.read_state(params[0]);
   driver_bt.prepare_state(driver_st);
   return 0;
@@ -2706,6 +2721,7 @@ int btree_driver::output_state_at_timestep(std::vector<std::string> &params)
 
 int btree_driver::transforms_file(std::vector<std::string> &params)
 {
+  btree_transforms driver_tr;
   driver_tr = driver_bt.read_transforms(params[0]);
   driver_bt.apply_transforms(driver_tr);
   return 0;

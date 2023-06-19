@@ -137,7 +137,7 @@ void ellipsoid_array::set_quats(std::vector<quat> qs)
 void ellipsoid_array::set_quats_arr(double *&q, std::string order)
 {
 
-  quat p;
+  quat p = vqm.q_null();
   
   if (order == "col")
     {

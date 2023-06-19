@@ -233,8 +233,6 @@ private:
   LAMMPS_simulator driver_lmp_simulator;
 
   // internal variables for directive execution
-  btree_state driver_st; // state structure
-  btree_transforms driver_tr; // transform structure
   std::vector<chromo_region> driver_rg; // vector of chromo_regions
   CG_map driver_CG; // coarse-graining map
 

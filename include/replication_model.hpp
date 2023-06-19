@@ -9,6 +9,7 @@
 #include <memory>
 #include <cmath>
 #include <iterator>
+#include <array>
 
 #include <rxn_manipulator.hpp>
 

@@ -50,7 +50,8 @@ void loop_topology::prepare_binding_regions(std::vector<std::string> leaves, std
   int ll, ul, size; // lower limit and upper limit of indices
   bool completed;
   bool ter_crossing;
-  int mid_ll, mid_ul;
+  int mid_ll = -1;
+  int mid_ul = -1;
 
   theta_topo leaf_topo;
 

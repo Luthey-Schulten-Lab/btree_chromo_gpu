@@ -58,7 +58,7 @@ void gillespie_solver::set_V_points(std::vector<volume_point> V_points)
 void gillespie_solver::interpolate_volume(double t)
 {
   double dV, dt, V_interp;
-  size_t lo, hi;
+  size_t lo=0, hi=1;
 
   for (size_t k=0; k<V_points.size(); k++)
     {

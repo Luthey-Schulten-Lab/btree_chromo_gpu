@@ -430,7 +430,7 @@ int btree::grow_at_branch_asym(std::string loc, int r_cw, int r_ccw)
 {
   int error_code;
   node *g_branch;
-  std::array<int,2> part_growths;
+  std::array<int,2> part_growths {0, 0};
 
   error_code = branch(loc);
   if (error_code < 0)
@@ -1888,7 +1888,8 @@ void btree::prepare_bonds(int **&c, int *&t, int &N, int idx)
 void btree::prepare_angles(int **&c, int *&t, int &N, int idx)
 {
   
-  node *topo_leaf, *supp_leaf;
+  node *topo_leaf = nullptr;
+  node *supp_leaf = nullptr;
   
   N = 2*(total_size() + count_active_forks());
 
