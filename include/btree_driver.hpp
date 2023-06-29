@@ -109,6 +109,9 @@ private:
   int transform(std::vector<std::string> &params);
   int random_transforms(std::vector<std::string> &params);
 
+  // division
+  int binary_fission(std::vector<std::string> &params); 
+
   // regions
   int regions_file(std::vector<std::string> &params);
   int dump_regions(std::vector<std::string> &params);

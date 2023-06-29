@@ -59,8 +59,8 @@ void btree::prepare_state(btree_state st)
 }
 
 
-// function to dump a state of the binary tree
-btree_state btree::dump_state()
+// function to get the state of the binary tree
+btree_state btree::get_state()
 {
 
   btree_state st;
@@ -112,7 +112,7 @@ void btree::apply_transforms(btree_transforms tr)
 {
 
   int error_code;
-  btree_state st = dump_state();
+  btree_state st = get_state();
   
   for (fork_rho f_r: tr)
     {
@@ -139,7 +139,7 @@ void btree::single_transform(fork_rho f_r)
 {
 
   int error_code;
-  btree_state st = dump_state();
+  btree_state st = get_state();
   
   error_code = grow_at_branch_asym(f_r.fork,f_r.rho_cw,f_r.rho_ccw);
 
@@ -943,10 +943,40 @@ int btree::branch_size(node *branch)
 }
 
 
+// calculate size of a separable branch
+int btree::separable_branch_size(node *branch)
+{
+  int s = 0;
+
+  if (branch->parent == nullptr)
+    {
+      s += branch->size;
+    }
+  else
+    {
+      s += branch->parent->rho_t;
+      if (branch->leaf == false)
+	{
+	  s -= branch->rho_t;
+	  s += separable_branch_size(branch->left);
+	  s += separable_branch_size(branch->right);
+	}
+    }
+  
+  return s;
+}
+
+
 // calculate the maximum possible size of the system
 int btree::max_size()
 {
   return (root->size)*count_total_leaves();
+}
+
+// get the size of a single genome
+int btree::single_size()
+{
+  return root->size;
 }
 
 
@@ -2287,6 +2317,332 @@ void btree::print_tree()
     }
   std::cout << "\n\n" << std::endl;
 }
+
+std::vector<std::string> btree::get_separable_forks()
+{
+
+  std::vector<std::string> separable_forks;
+
+  // get the completed forks
+  std::vector<std::string> comp_forks = get_completed_forks();
+
+  std::cout << "completed forks" << std::endl;
+  for (std::string fork : comp_forks)
+    {
+      std::cout << fork << std::endl;
+    }
+
+
+  // reduce the set of completed forks
+  bool reduction_possible;
+  std::string l_child, r_child;
+  
+  for (size_t i=0; i<comp_forks.size(); i++)
+    {
+
+      l_child = comp_forks[i] + "l";
+      r_child = comp_forks[i] + "r";
+
+      reduction_possible = false;
+      for (size_t j=i+1; j<comp_forks.size(); j++)
+	{
+	  if (l_child == comp_forks[j])
+	    {
+	      reduction_possible = true;
+	      break;
+	    }
+	}
+
+      if (reduction_possible == false)
+	{
+	  separable_forks.push_back(l_child);
+	}
+
+      reduction_possible = false;
+      for (size_t j=i+1; j<comp_forks.size(); j++)
+	{
+	  if (r_child == comp_forks[j])
+	    {
+	      reduction_possible = true;
+	      break;
+	    }
+	}
+
+      if (reduction_possible == false)
+	{
+	  separable_forks.push_back(r_child);
+	}
+      
+    }
+
+  if (separable_forks.size() == 0) separable_forks.push_back("m");
+
+  return separable_forks;
+  
+}
+
+std::vector<std::string> btree::excluded_volume_partitioning(double alpha)
+{
+
+  std::vector<std::string> separable_forks = get_separable_forks();
+  size_t N_sep_forks = separable_forks.size();
+  std::vector<double> rel_volume(N_sep_forks,0.0);
+  std::vector<int> partitioning(N_sep_forks,0);
+  std::vector<size_t> perm(N_sep_forks);
+
+  double total_volume = 0.0;
+
+  std::cout << "separable forks" << std::endl;
+  for (size_t i=0; i<separable_forks.size(); i++)
+    {
+      rel_volume[i] = alpha*separable_branch_size(get_branch(separable_forks[i]));
+      rel_volume[i] = rel_volume[i]/single_size();
+
+      perm[i] = i;
+
+      total_volume += rel_volume[i];
+      
+      std::cout << separable_forks[i]
+		<< ","
+		<< rel_volume[i]
+		<< std::endl;
+    }
+
+  std::shuffle(perm.begin(), perm.end(), rand_eng);
+  std::uniform_real_distribution<double> u_dist(0.0,1.0);
+  int N_l, N_r;
+  double ur, p, V_l, V_r;
+  size_t i_perm, j_perm;
+
+  N_l = 0;
+  N_r = 0;
+
+  for (size_t i=0; i<N_sep_forks; i++)
+    {
+      ur = u_dist(rand_eng);
+      
+      V_l = 1.0;
+      V_r = 1.0;
+
+      i_perm = perm[i];
+
+      for (size_t j=0; j<i; j++)
+	{
+
+	  j_perm = perm[j];
+	  
+	  if (partitioning[j_perm] == -1)
+	    {
+	      V_l -= rel_volume[j_perm];
+	    }
+	  else
+	    {
+	      V_r -= rel_volume[j_perm];
+	    }
+	}
+
+      p = V_l/(V_l+V_r);
+
+      if (ur < p)
+	{
+	  partitioning[i_perm] = -1;
+	  N_l += 1;
+	}
+      else
+	{
+	  partitioning[i_perm] = 1;
+	  N_r += 1;
+	}
+    }
+
+  int daughter_select;
+
+  if (N_l == 0)
+    {
+      daughter_select = 1;
+    }
+  else
+    {
+      daughter_select = -1;
+    }
+
+  std::vector<std::string> retained_daughter_forks;
+  std::vector<std::string> discarded_daughter_forks;
+  double retained_volume, discarded_volume;
+
+  retained_volume = 0.0;
+  discarded_volume = 0.0;
+
+  for (size_t i=0; i<N_sep_forks; i++)
+    {
+      if (partitioning[i] == daughter_select)
+	{
+	  retained_daughter_forks.push_back(separable_forks[i]);
+	  retained_volume += rel_volume[i];
+	}
+      else
+	{
+	  discarded_daughter_forks.push_back(separable_forks[i]);
+	  discarded_volume += rel_volume[i];
+	}
+    }
+
+  std::cout << "retained daughter forks, V = "
+	    << retained_volume
+	    << std::endl;
+  for (std::string fork : retained_daughter_forks)
+    {
+      std::cout << fork << std::endl;
+    }
+
+  std::cout << "discarded daughter forks, V = "
+	    << discarded_volume
+	    << std::endl;
+  for (std::string fork : discarded_daughter_forks)
+    {
+      std::cout << fork << std::endl;
+    }
+
+  return retained_daughter_forks;
+  
+}
+
+
+int btree::get_generation(std::string loc)
+{
+  return get_branch(loc)->gen;
+}
+
+
+void btree::prepare_Nleaf_state(size_t N_leaves)
+{
+  int temp_size = single_size();
+  size_t branch_idx;
+  int min_gen, test_gen;
+
+  destroy_tree();
+
+  initialize_tree(temp_size);
+
+  std::vector<std::string> current_leaves = get_leaves();
+
+  while (current_leaves.size() < N_leaves)
+    {
+
+      for (size_t i=0; i<current_leaves.size(); i++)
+	{
+	  if (i == 0)
+	    {
+	      branch_idx = i;
+	      min_gen = get_generation(current_leaves[i]);
+	    }
+	  else
+	    {
+	      test_gen = get_generation(current_leaves[i]);
+	      if (test_gen < min_gen)
+		{
+		  branch_idx = i;
+		  min_gen = test_gen;
+		}
+	    }
+	}
+
+      
+      grow_at_branch_asym(current_leaves[branch_idx],
+			  temp_size,
+			  temp_size);
+	
+      current_leaves = get_leaves();
+    }
+  
+}
+
+
+std::vector<std::array<std::string,2>> btree::binary_fission(double alpha)
+{
+  
+  std::vector<std::array<std::string,2>> tree_conv;
+
+
+  std::cout << "performing binary fission" << std::endl;
+
+  // store the initial state
+  btree_state initial_state = get_state();
+
+  // partition the separable chromosomes into the daughter
+  std::vector<std::string> daughter_forks = excluded_volume_partitioning(alpha);
+
+  // reduce the transforms in the initial state to only include the partitioned daughters
+  btree_transforms temp_trans = initial_state.transforms;
+  initial_state.transforms.clear();
+
+  for (size_t i=0; i<daughter_forks.size(); i++)
+    {
+      for (size_t j=0; j<temp_trans.size(); j++)
+	{
+	  if (temp_trans[j].fork.find(daughter_forks[i]) == 0)
+	    {
+	      initial_state.transforms.push_back(temp_trans[j]);
+	    }
+	}
+    }
+
+  std::cout << "reduced transforms" << std::endl;
+  for (fork_rho f_r : initial_state.transforms)
+    {
+      std::cout << f_r.fork << ","
+		<< f_r.rho_cw  << ","
+		<< f_r.rho_ccw << std::endl;
+    }
+
+  // prepare a state with the correct number of leaves
+  prepare_Nleaf_state(daughter_forks.size());
+
+  std::vector<std::string> new_leaves = get_leaves();
+  std::array<std::string,2> t_c_element;
+
+  std::string old_branch, new_branch, new_sub_branch, temp_branch;
+
+  for (size_t i=0; i<daughter_forks.size(); i++)
+    {
+      new_branch = new_leaves[i];
+      old_branch = daughter_forks[i];
+      t_c_element[0] = old_branch;
+      t_c_element[1] = new_branch;
+
+      tree_conv.push_back(t_c_element);
+      
+      for (size_t j=0; j<initial_state.transforms.size(); j++)
+	{
+	  
+	  temp_branch = initial_state.transforms[j].fork;
+	  
+	  if (temp_branch.find(old_branch) == 0)
+	    {
+	      
+	      new_sub_branch = new_branch +
+		temp_branch.substr(old_branch.size(),temp_branch.size());
+
+	      if (temp_branch != old_branch)
+		{
+		  t_c_element[0] = temp_branch;
+		  t_c_element[1] = new_sub_branch;
+		  tree_conv.push_back(t_c_element);
+		}
+
+	      grow_at_branch_asym(new_sub_branch,
+				  initial_state.transforms[j].rho_cw,
+				  initial_state.transforms[j].rho_ccw);
+	      
+	    }
+	}
+      
+    }
+
+  return tree_conv;
+  
+}
+
 
 void btree::foo()
 {

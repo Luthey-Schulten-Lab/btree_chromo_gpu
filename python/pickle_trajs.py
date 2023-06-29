@@ -18,19 +18,27 @@ importlib.reload(r_L_D)
 
 # in_dir = '/mnt/HDD_linux/Data/btree_chromo/disentanglement_testing/woloops_wotopo/'
 # in_label = 'woloops_wotopo'
-#in_dir = '/mnt/HDD_linux/Data/btree_chromo/loop_compaction_testing/loops_25/'
+#in_dir = '/home/ben/Data/btree_chromo/loop_compaction_testing_new/loops_25/'
 #in_label = 'loops_25'
-in_dir = '/home/ben/Data/btree_chromo/small_system_Jan/'
-in_label = 'woloops_wotopo'
+#in_dir = '/home/ben/Data/btree_chromo/small_system_Jan/'
+#in_label = 'woloops_wotopo'
+#in_dir = '/home/ben/Data/btree_chromo/diffusion_noribos/'
+#in_label = 'diffusion_noribos'
+in_dir = '/home/ben/Data/btree_chromo/full_chromo_movie/'
+in_label = 'full_chromo_run0'
 min_rep = 1
-max_rep = 10
+max_rep = 1
 
 # out_dir = '/mnt/HDD_linux/Data/btree_chromo/disentanglement_testing/woloops_wotopo/'
 # out_label = 'woloops_wotopo'
-#out_dir = '/mnt/HDD_linux/Data/btree_chromo/loop_compaction_testing/loops_25/'
-#out_label = 'loops_25'
-out_dir = '/home/been/Data/btree_chromo/small_system_Jan/'
-out_label = 'woloops_wotopo'
+# out_dir = '/home/ben/Data/btree_chromo/loop_compaction_testing_new/loops_25/'
+# out_label = 'loops_25'
+# out_dir = '/home/been/Data/btree_chromo/small_system_Jan/'
+# out_label = 'woloops_wotopo'
+#out_dir = '/home/ben/Data/btree_chromo/diffusion_noribos/'
+#out_label = 'diffusion_noribos'
+out_dir = '/home/ben/Data/btree_chromo/full_chromo_movie/'
+out_label = 'full_chromo_run0'
 
 timestep_options = ['Last','FirstLast','Slices','All']
 timestep_select = timestep_options[3]

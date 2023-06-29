@@ -482,3 +482,159 @@ def plot_DoD(fig_file,DoD):
     plt.close()
 
     return
+
+def plot_DoD_big(fig_file,DoD):
+
+    cmap = colormaps.get_cmap('RdPu')
+    c_space_lower_lim = 0.5
+    c_space_upper_lim = 1.0
+    c_space = np.linspace(c_space_lower_lim,
+                          c_space_upper_lim,
+                          DoD['N_forks'])
+
+    fig_size = [174,87]
+    #fig_size = [87/1.5,87/1.5]
+
+    fig = plt.figure(figsize=(fig_size[0]*mm,fig_size[1]*mm))
+
+    ax = plt.gca()
+
+    ax.set_xlabel(r'$t$ - simulation time', fontsize=14)
+    ax.set_ylabel(r'degree of disentanglement', fontsize=14)
+
+    t_trans = DoD['t']/DoD['t'][-1]
+    
+    #ax.set_xticks(ticks=[0.0,0.5,1.0],minor=False)
+    #ax.set_xticks(ticks=[0.25,0.75],minor=True)
+
+    N_ticks = 13
+
+    tick_locs = np.linspace(0.0,1.0,N_ticks,dtype=np.float32)
+    print(tick_locs)
+
+    ax.set_xticks(ticks=tick_locs,minor=False)
+
+    tick_length = 4.0
+    tick_width = 2.0
+    ax.tick_params(labelsize=9,
+                   length=tick_length,
+                   width=tick_width,
+                   direction='out',
+                   left=True,
+                   right=False,
+                   bottom=True,
+                   top=False,
+                   which='major')
+
+    ax.tick_params(labelsize=9,
+                   length=tick_length/1.5,
+                   width=tick_width/1.5,
+                   direction='out',
+                   left=True,
+                   right=False,
+                   bottom=True,
+                   top=False,
+                   which='minor')
+
+    tick_labels = []
+
+    tick_labels.append(r'0')
+
+    for i in range(1,N_ticks-1):
+
+        if i > 1:
+            numerator = '{:d}T_f'.format(i)
+            denominator = '{:d}'.format(N_ticks-1)
+            tick_labels.append(r'$\frac{'+numerator+'}{'+denominator+'}$')
+        else:
+            numerator = 'T_f'
+            denominator = '{:d}'.format(N_ticks-1)
+            tick_labels.append(r'$\frac{'+numerator+'}{'+denominator+'}$')
+
+    tick_labels.append(r'$T_f$')
+
+    # ax.set_xticklabels(labels=[r'$0$',r'$T_f/2$',r'$T_f$'])
+
+    ax.set_xticklabels(labels=tick_labels)
+
+    #ax.spines['right'].set_visible(False)
+    #ax.spines['top'].set_visible(False)
+    ax.spines['left'].set_linewidth(2.0)
+    ax.spines['bottom'].set_linewidth(2.0)
+    ax.spines['right'].set_linewidth(2.0)
+    ax.spines['top'].set_linewidth(2.0)
+    
+
+    ax.set_xlim(xmin=0.0,xmax=t_trans[-1])
+    ax.set_ylim(ymin=0.0,ymax=1.0)
+
+
+    ax.grid(which='both',axis='both',zorder=-4)
+
+    d_means = np.mean(DoD['d_reps_forks_ts'],axis=0)
+
+    for i_fork in range(DoD['N_forks']):
+
+        temp_color = cmap(c_space[i_fork])
+
+        for i_rep in range(DoD['N_reps']):
+
+            ax.plot(t_trans,
+                    DoD['d_reps_forks_ts'][i_rep,i_fork,:],
+                    lw=1.0,
+                    alpha=0.4,
+                    ls='-',
+                    c=temp_color,
+                    zorder=-2)
+
+        ax.plot(t_trans,
+                d_means[i_fork,:],
+                lw=3.0,
+                alpha=1.0,
+                ls='-',
+                c='w',
+                zorder=1)
+            
+        ax.plot(t_trans,
+                d_means[i_fork,:],
+                lw=2.5,
+                alpha=1.0,
+                ls='-',
+                c=temp_color,
+                zorder=2)
+
+        temp_str = DoD['forks'][i_fork]
+
+        # label at start
+        
+        i_label = 0
+        for i in range(t_trans.shape[0]):
+            if d_means[i_fork,i] > 0.0:
+                break
+            else:
+                i_label = i
+
+        x_fork_label = t_trans[i_label] + 0.02
+        y_fork_label = 0.05
+
+        # label at end
+        # x_fork_label = 1.01
+        # y_fork_label = d_means[i_fork,-1]
+        
+        ax.annotate(text=r''+temp_str,
+                    xy=(x_fork_label,y_fork_label),
+                    xycoords='axes fraction',
+                    color=temp_color,
+                    va='center',
+                    ha='left',
+                    fontsize=12)
+
+        
+
+    plt.tight_layout()
+
+    fig.savefig(fig_file,dpi=300)
+
+    plt.close()
+
+    return

@@ -20,15 +20,15 @@ importlib.reload(c_s)
 
 conditions = np.array([0,25,50,100],dtype=np.int32)
 N_conditions = conditions.shape[0]
-in_base_dir = '/mnt/HDD_linux/Data/btree_chromo/loop_compaction_testing/'
+in_base_dir = '/home/ben/Data/btree_chromo/loop_compaction_testing_new/'
 in_base_label = 'loops_'
 min_rep = 1
 max_rep = 1
 
-out_dir = '/mnt/HDD_linux/Documents/svn/Minimal_Cell_Chromosome_Organization_2022/tex_figures/looping_summary/raw_plots/'
-out_label = 'loop_compaction'
+out_dir = '/home/ben/Documents/svn/Minimal_Cell_Chromosome_Organization_2022/tex_figures/looping_summary/raw_plots/'
+out_label = 'loop_compaction_v2'
 
-write_RoG = False
+write_RoG = True
 read_RoG = True
 
 if not os.path.isdir(out_dir):
@@ -36,9 +36,9 @@ if not os.path.isdir(out_dir):
 
 RoG_file = out_dir + out_label + '_RoG.pickle'
 
-ts_RoG = np.arange(0,4000000+1,100000,dtype=np.int32)
+ts_RoG = np.arange(0,4000000+1,50000,dtype=np.int32)
 print(ts_RoG)
-freq = 10
+freq = 1
 window = 100
 
 if write_RoG:

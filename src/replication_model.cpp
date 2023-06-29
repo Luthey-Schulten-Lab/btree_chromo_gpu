@@ -8,6 +8,8 @@ replication_model::replication_model()
   r_m_p.k_d = 0.0;
   r_m_p.k_hi = 0.0;
   r_m_p.k_lo = 0.0;
+  r_m_p.k_melt_bind = 0.0;
+  r_m_p.k_unbind_unmelt = 0.0;
   r_m_p.k_on = 0.0;
   r_m_p.k_off = 0.0;
   r_m_p.k_bubble = 0.0;
@@ -102,6 +104,16 @@ void replication_model::load_model(std::string rep_model_filename)
 		  else if (param == "N_fil")
 		    {
 		      r_m_p.N_fil = stoi(val);
+		    }
+
+		  else if (param == "k_melt_bind")
+		    {
+		      r_m_p.k_melt_bind = stod(val);
+		    }
+
+		  else if (param == "k_unbind_unmelt")
+		    {
+		      r_m_p.k_unbind_unmelt = stod(val);
 		    }
 
 		  else if (param == "k_on")
@@ -298,27 +310,54 @@ void replication_model::prepare_reactions()
 
       // add reactions for filamentation
       db = 0;
-      for (int j=0; j<r_m_p.N_fil; j++)
+      
+      // first filament is formed from melting and binding at low site
+      // input is L_(N_lo) site and free DnaA
+      rxn_manip.add_reaction_input(r,free_idx);
+      rxn_manip.add_reaction_input(r,df+i*N_per_leaf+c);
+      // output is F_(1)
+      rxn_manip.add_reaction_output(r,df+i*N_per_leaf+c+1);
+      rxn_manip.add_reaction_rate(r,r_m_p.k_melt_bind);
+      rxns.push_back(r);
+      rxn_manip.reset_reaction(r);
+      db += 1;
+
+      // filament is lost from unbinding and unmelting at low site
+      // input is F_(1)
+      rxn_manip.add_reaction_input(r,df+i*N_per_leaf+c+1);
+      // output is L_(N_lo) and free DnaA
+      rxn_manip.add_reaction_output(r,free_idx);
+      rxn_manip.add_reaction_output(r,df+i*N_per_leaf+c);
+      rxn_manip.add_reaction_rate(r,r_m_p.k_unbind_unmelt);
+      rxns.push_back(r);
+      rxn_manip.reset_reaction(r);
+
+      
+      // filaments grow and degrade
+      for (int j=1; j<r_m_p.N_fil; j++)
 	{
+
+	  // filamentation reaction
 	  // input is F_(i-1) site and free DnaA
 	  rxn_manip.add_reaction_input(r,free_idx);
 	  rxn_manip.add_reaction_input(r,df+i*N_per_leaf+c+j);
+	  // output is F(i)
 	  rxn_manip.add_reaction_output(r,df+i*N_per_leaf+c+j+1);
 	  rxn_manip.add_reaction_rate(r,r_m_p.k_on);
 	  rxns.push_back(r);
 	  rxn_manip.reset_reaction(r);
 	  db += 1;
+	  
 	  // defilamentation reaction
-	  if (j < r_m_p.N_fil)
-	    {
-	      // input is F_(i)
-	      rxn_manip.add_reaction_input(r,df+i*N_per_leaf+c+j+1);
-	      rxn_manip.add_reaction_output(r,free_idx);
-	      rxn_manip.add_reaction_output(r,df+i*N_per_leaf+c+j);
-	      rxn_manip.add_reaction_rate(r,r_m_p.k_off);
-	      rxns.push_back(r);
-	      rxn_manip.reset_reaction(r);
-	    }
+	  // input is F_(i+1)
+	  rxn_manip.add_reaction_input(r,df+i*N_per_leaf+c+j+1);
+	  // output is F_(i) and free DnaA
+	  rxn_manip.add_reaction_output(r,free_idx);
+	  rxn_manip.add_reaction_output(r,df+i*N_per_leaf+c+j);
+	  rxn_manip.add_reaction_rate(r,r_m_p.k_off);
+	  rxns.push_back(r);
+	  rxn_manip.reset_reaction(r);
+
 	}
 
       c += db;

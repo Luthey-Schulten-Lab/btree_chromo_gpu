@@ -256,8 +256,10 @@ void gillespie_solver::set_reaction_system(std::vector<reaction> &rxns)
   
   for (size_t j=0; j<rxns.size(); j++)
     {
+      
       // std::cout << "j = " << j << std::endl;
       // std::cout << "\tk[j] = " << rxns[j].k << std::endl;
+      
       // set the counts of reactants and products
       nreactants[j] = static_cast<int>(rxns[j].inputs.size());
       nproducts[j] = static_cast<int>(rxns[j].outputs.size());

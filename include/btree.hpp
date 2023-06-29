@@ -106,9 +106,9 @@ public:
   void initialize_tree(int s);
   int branch(std::string loc);
 
-  // prepare and dump state
+  // prepare and get state
   void prepare_state(btree_state st);
-  btree_state dump_state();
+  btree_state get_state();
 
   // read and write the state
   void write_state(std::string st_filename, btree_state st);
@@ -124,6 +124,10 @@ public:
   void random_transforms(int r);
   void random_transforms_on_forks(std::vector<std::string> forks, double r);
 
+  // division types
+  std::vector<std::array<std::string,2>> binary_fission(double alpha);
+  std::vector<std::string> excluded_volume_partitioning(double alpha);
+
   // queries about tree state
   int count_total_leaves();
   int count_total_forks();
@@ -131,6 +135,8 @@ public:
   int count_active_forks();
   int total_size();
   int max_size();
+  int single_size();
+  int get_generation(std::string loc);
 
   // solve the theta structure topology
   void solve_topology();
@@ -150,6 +156,7 @@ public:
   // get details of tree
   std::vector<std::string> get_completed_forks();
   std::vector<std::string> get_active_forks();
+  std::vector<std::string> get_separable_forks();
   std::vector<std::string> get_leaves();
 
   // create the topologies
@@ -177,6 +184,7 @@ private:
   int completed_fork_counter(node *branch);
   int active_fork_counter(node *branch);
   int branch_size(node *branch);
+  int separable_branch_size(node *branch);
 
   // used for calculating growth
   int grow_at_branch_sym(std::string loc, int r);
@@ -202,6 +210,7 @@ private:
   void initialize_branch(node *branch, int g, int s);
   void split_branch(node *branch);
   node *parse_dir(node *branch, char d);
+  void prepare_Nleaf_state(size_t N_leaves);
 
 
   // uniform_real_distribution<> u_dist;

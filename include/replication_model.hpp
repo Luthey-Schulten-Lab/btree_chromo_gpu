@@ -19,7 +19,9 @@ struct rep_model_params
 {
   double k_rep;
   double k_c, k_d;
-  double k_hi, k_lo, k_on, k_off, k_bubble;
+  double k_hi, k_lo;
+  double k_melt_bind, k_unbind_unmelt, k_on, k_off;
+  double k_bubble;
   int N_hi, N_lo, N_fil;
   int bubble_min_fil;
 };

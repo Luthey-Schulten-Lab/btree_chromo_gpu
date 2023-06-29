@@ -204,7 +204,7 @@ int mapper::prepare_mapping()
   for (int i_trans=0; i_trans<N_transforms; i_trans++)
     {
       // set the next binary tree state to the previous state
-      next_bt.prepare_state(prev_bt.dump_state());
+      next_bt.prepare_state(prev_bt.get_state());
 
       // store the fork location
       map_fork = diff_tr[i_trans].fork;
@@ -852,7 +852,7 @@ int mapper::prepare_mapping()
       // std::cout << "\n" << std::endl;
 
       // set the previous binary tree state to the next state
-      prev_bt.prepare_state(next_bt.dump_state());
+      prev_bt.prepare_state(next_bt.get_state());
 
       // solve the new topology
       prev_bt.solve_topology();

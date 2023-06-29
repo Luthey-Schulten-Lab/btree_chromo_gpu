@@ -864,18 +864,18 @@ void btree_driver::prepare_command_requirements()
   t_ls.push_back(new_lock("CG_update",true));
   lock_updates["random_transforms"] = t_ls;
 
-  // divide
+  // binary_fission
   // number of required parameters
-  N_param_reqs["divide"] = 0;
+  N_param_reqs["binary_fission"] = 1;
   // lock tests
   t_ls.clear();
   t_ls.push_back(new_lock("btree_initialized",true));
-  lock_tests["divide"] = t_ls;
+  lock_tests["binary_fission"] = t_ls;
   // lock updates
   t_ls.clear();
   t_ls.push_back(new_lock("topo_update",true));
   t_ls.push_back(new_lock("CG_update",true));
-  lock_updates["divide"] = t_ls;
+  lock_updates["binary_fission"] = t_ls;
 
   // regions_file
   // number of required parameters
@@ -2037,6 +2037,13 @@ int btree_driver::execute_single_command(std::string &command,
       error_code = random_transforms(params);
     }
 
+
+  // apply random transformations
+  else if (command == "binary_fission")
+    {
+      error_code = binary_fission(params);
+    }
+
       
   // apply state transformations from a file
   else if (command == "regions_file")
@@ -2695,7 +2702,7 @@ int btree_driver::input_state(std::vector<std::string> &params)
 
 int btree_driver::output_state(std::vector<std::string> &params)
 {
-  driver_bt.write_state(params[0],driver_bt.dump_state());
+  driver_bt.write_state(params[0],driver_bt.get_state());
   return 0;
 }
 
@@ -2738,6 +2745,22 @@ int btree_driver::transform(std::vector<std::string> &params)
 int btree_driver::random_transforms(std::vector<std::string> &params)
 {
   driver_bt.random_transforms(stoi(params[0]));
+  return 0;
+}
+
+
+int btree_driver::binary_fission(std::vector<std::string> &params)
+{
+  std::vector<std::array<std::string,2>> tree_conv;
+  tree_conv = driver_bt.binary_fission(stod(params[0]));
+
+  std::cout << "tree conversion" << std::endl;
+  for (std::array<std::string,2> t_c : tree_conv)
+    {
+      std::cout << t_c[0] << " >> " << t_c[1] << std::endl;
+    }
+  
+  
   return 0;
 }
 
@@ -3167,7 +3190,7 @@ int btree_driver::load_BD_lengths(std::vector<std::string> &params)
 
 int btree_driver::load_mono_coords(std::vector<std::string> &params)
 {
-  driver_lmp_sys.set_btree(driver_bt.dump_state());
+  driver_lmp_sys.set_btree(driver_bt.get_state());
   int e = driver_lmp_sys.read_mono_coords(params[0],params[1]);
   return e;
 }
@@ -3175,7 +3198,7 @@ int btree_driver::load_mono_coords(std::vector<std::string> &params)
 
 int btree_driver::load_mono_quats(std::vector<std::string> &params)
 {
-  driver_lmp_sys.set_btree(driver_bt.dump_state());
+  driver_lmp_sys.set_btree(driver_bt.get_state());
   int e = driver_lmp_sys.read_mono_quats(params[0],params[1]);
   return e;
 }
@@ -3239,7 +3262,7 @@ int btree_driver::write_bdry_coords(std::vector<std::string> &params)
 
 int btree_driver::write_LAMMPS_data(std::vector<std::string> &params)
 {
-  driver_lmp_sys.set_btree(driver_bt.dump_state());
+  driver_lmp_sys.set_btree(driver_bt.get_state());
   driver_lmp_sys.write_data(params[0]);
   return 0;
 }
@@ -3354,14 +3377,14 @@ int btree_driver::write_mono_xyz(std::vector<std::string> &params)
 
 int btree_driver::set_initial_state()
 {
-  driver_mapper.set_initial_state(driver_bt.dump_state());
+  driver_mapper.set_initial_state(driver_bt.get_state());
   return 0;
 }
 
 
 int btree_driver::set_final_state()
 {
-  driver_mapper.set_final_state(driver_bt.dump_state());
+  driver_mapper.set_final_state(driver_bt.get_state());
   return 0;
 }
 
@@ -3391,7 +3414,7 @@ int btree_driver::simulator_include_file(std::vector<std::string> &params)
 
 int btree_driver::sync_simulator_and_system()
 {
-  driver_lmp_sys.set_btree(driver_bt.dump_state());
+  driver_lmp_sys.set_btree(driver_bt.get_state());
   driver_lmp_simulator.sim_to_sys();
   return 0;
 }

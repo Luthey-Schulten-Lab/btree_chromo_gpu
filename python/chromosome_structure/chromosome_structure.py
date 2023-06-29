@@ -135,6 +135,9 @@ def plot_RoG(fig_file,RoG):
         temp_color = cmap(c_space[i_condition])
 
         y = np.mean(RoG['R'][i_condition,:,:],axis=0)
+
+        print(RoG['conditions'][i_condition])
+        print(y[-1])
         
         ax.plot(t_trans,y,
                 lw=2.0,
@@ -191,7 +194,7 @@ def plot_RoG(fig_file,RoG):
 
     print(fig_file)
 
-    fig.savefig(fig_file,dpi=300)
+    fig.savefig(fig_file,dpi=300,transparent=True)
 
     plt.close()
 
