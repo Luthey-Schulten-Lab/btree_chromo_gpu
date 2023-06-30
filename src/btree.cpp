@@ -2602,15 +2602,51 @@ std::vector<std::array<std::string,2>> btree::binary_fission(double alpha)
   std::array<std::string,2> t_c_element;
 
   std::string old_branch, new_branch, new_sub_branch, temp_branch;
+  std::string new_daughter;
+
+  bool found;
+
+  std::cout << "new_leaves" << std::endl;
+  for (size_t i=0; i<new_leaves.size(); i++)
+    {
+      std::cout << new_leaves[i] << std::endl;
+    }
+
+  std::cout << "daughter_forks" << std::endl;
+  for (size_t i=0; i<daughter_forks.size(); i++)
+    {
+      std::cout << daughter_forks[i] << std::endl;
+    }
+
+  std::string branch_mod;
 
   for (size_t i=0; i<daughter_forks.size(); i++)
     {
+      
       new_branch = new_leaves[i];
       old_branch = daughter_forks[i];
-      t_c_element[0] = old_branch;
-      t_c_element[1] = new_branch;
 
-      tree_conv.push_back(t_c_element);
+      std::cout << "new_branch=" << new_leaves[i] << std::endl;
+      std::cout << "old_branch=" << daughter_forks[i] << std::endl;
+
+      found = false;
+      for (size_t j=0; j<tree_conv.size(); j++)
+	{
+	  if (new_branch == tree_conv[j][1])
+	    {
+	      std::cout << "repeat found" << std::endl;
+	      found = true;
+	      break;
+	    }
+	}
+
+      if (found == false)
+	{
+	  t_c_element[0] = old_branch;
+	  t_c_element[1] = new_branch;
+	  tree_conv.push_back(t_c_element);
+	}
+      
       
       for (size_t j=0; j<initial_state.transforms.size(); j++)
 	{
@@ -2619,20 +2655,43 @@ std::vector<std::array<std::string,2>> btree::binary_fission(double alpha)
 	  
 	  if (temp_branch.find(old_branch) == 0)
 	    {
-	      
-	      new_sub_branch = new_branch +
-		temp_branch.substr(old_branch.size(),temp_branch.size());
+
+	      branch_mod = temp_branch.substr(old_branch.size(),temp_branch.size());
+	      new_sub_branch = new_branch + branch_mod;
 
 	      if (temp_branch != old_branch)
 		{
-		  t_c_element[0] = temp_branch;
-		  t_c_element[1] = new_sub_branch;
-		  tree_conv.push_back(t_c_element);
+		  found = false;
+		  for (size_t j=0; j<tree_conv.size(); j++)
+		    {
+		      if (new_sub_branch == tree_conv[j][1])
+			{
+			  std::cout << "repeat found" << std::endl;
+			  found = true;
+			  break;
+			}
+		    }
+
+		  if (found == false)
+		    {
+		      t_c_element[0] = temp_branch;
+		      t_c_element[1] = new_sub_branch;
+		      tree_conv.push_back(t_c_element);
+		    }
 		}
 
 	      grow_at_branch_asym(new_sub_branch,
 				  initial_state.transforms[j].rho_cw,
 				  initial_state.transforms[j].rho_ccw);
+
+	      t_c_element[0] = old_branch + branch_mod + "l";
+	      t_c_element[1] = new_sub_branch + "l";
+	      tree_conv.push_back(t_c_element);
+
+	      t_c_element[0] = old_branch + branch_mod + "r";
+	      t_c_element[1] = new_sub_branch + "r";
+	      tree_conv.push_back(t_c_element);
+
 	      
 	    }
 	}

@@ -1178,6 +1178,23 @@ void btree_driver::prepare_command_requirements()
   t_ls.push_back(new_lock("CG_update",true));
   lock_updates["replicator_run"] = t_ls;
 
+  // replicator_binary_fission
+  // number of required parameters
+  N_param_reqs["replicator_binary_fission"] = 1;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("btree_initialized",true));
+  t_ls.push_back(new_lock("rep_model_present",true));
+  t_ls.push_back(new_lock("rep_volume_present",true));
+  t_ls.push_back(new_lock("rep_replisomes_present",true));
+  t_ls.push_back(new_lock("rep_DnaA_present",true));
+  lock_tests["replicator_binary_fission"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  t_ls.push_back(new_lock("topo_update",true));
+  t_ls.push_back(new_lock("CG_update",true));
+  lock_updates["replicator_binary_fission"] = t_ls;
+
   // replicator_prng_seed
   // number of required parameters
   N_param_reqs["replicator_prng_seed"] = 1;
@@ -2038,7 +2055,7 @@ int btree_driver::execute_single_command(std::string &command,
     }
 
 
-  // apply random transformations
+  // binary fission of btree
   else if (command == "binary_fission")
     {
       error_code = binary_fission(params);
@@ -2222,6 +2239,13 @@ int btree_driver::execute_single_command(std::string &command,
   else if (command == "replicator_run")
     {
       error_code = replicator_run(params);
+    }
+
+
+  // binary fission of btree and replicator's contents
+  else if (command == "replicator_binary_fission")
+    {
+      error_code = replicator_binary_fission(params);
     }
 
 
@@ -2760,6 +2784,99 @@ int btree_driver::binary_fission(std::vector<std::string> &params)
       std::cout << t_c[0] << " >> " << t_c[1] << std::endl;
     }
   
+  
+  return 0;
+}
+
+
+int btree_driver::replicator_binary_fission(std::vector<std::string> &params)
+{
+
+  // get the current state of the replicator
+  std::vector<init_loc> old_init_dist = driver_replicator.get_init_dist();
+  std::vector<std::string> old_rep_forks = driver_replicator.get_replicating_forks();
+
+  // reset the replicator's state
+  driver_replicator.reset_init_dist();
+  driver_replicator.reset_replisomes();
+  
+  // get the tree conversion
+  std::vector<std::array<std::string,2>> tree_conv;
+  tree_conv = driver_bt.binary_fission(stod(params[0]));
+
+  std::cout << "tree conversion" << std::endl;
+  for (std::array<std::string,2> t_c : tree_conv)
+    {
+      std::cout << t_c[0] << " >> " << t_c[1] << std::endl;
+    }
+
+  // create the new initiator distribution
+  std::vector<init_loc> new_init_dist;
+  init_loc t_i_l;
+
+  for (init_loc i_l : old_init_dist)
+    {
+      for (std::array<std::string,2> t_c : tree_conv)
+	{
+	  if (i_l.loc == t_c[0])
+	    {
+	      t_i_l.loc = t_c[1];
+	      t_i_l.N = i_l.N;
+	      new_init_dist.push_back(t_i_l);
+	    }
+	}
+    }
+
+  std::cout << "new initiator distribution" << std::endl;
+  for (init_loc i_l : new_init_dist)
+    {
+      std::cout << i_l.loc << "," << i_l.N << std::endl;
+    }
+
+  // create the new replisome binding sites
+  std::vector<std::string> new_rep_forks;
+  
+  for (std::string fork : old_rep_forks)
+    {
+      for (std::array<std::string,2> t_c : tree_conv)
+	{
+	  if (fork == t_c[0])
+	    {
+	      new_rep_forks.push_back(t_c[1]);
+	    }
+	}
+    }
+
+  std::cout << "new rep forks" << std::endl;
+  for (std::string fork : new_rep_forks)
+    {
+      std::cout << fork << std::endl;
+    }
+
+  // prepare the DnaA
+  int n_total_DnaA = driver_replicator.partition_DnaA();
+
+  for (init_loc i_l : new_init_dist)
+    {
+      n_total_DnaA += i_l.N;
+    }
+
+  driver_replicator.set_DnaA(n_total_DnaA);
+
+  for (init_loc i_l : new_init_dist)
+    {
+      driver_replicator.bind_init(i_l.loc,i_l.N);
+    }
+
+  // prepare the replisomes
+  int n_total_replisomes = driver_replicator.partition_free_replisomes();
+  n_total_replisomes += static_cast<int>(new_rep_forks.size());
+  
+  for (std::string fork : new_rep_forks)
+    {
+      driver_replicator.bind_replisome(fork);
+    }
+
   
   return 0;
 }

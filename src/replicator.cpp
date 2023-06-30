@@ -21,6 +21,7 @@ replicator::~replicator()
 void replicator::prng_seed(int s)
 {
   solver.prng_seed(s);
+  rand_eng.seed(s);
 }
 
 
@@ -36,6 +37,13 @@ void replicator::reset_replisomes()
 {
   replicating_forks.clear();
   n_free_replisomes = n_replisomes;
+}
+
+
+// get the initiator distribution
+std::vector<init_loc> replicator::get_init_dist()
+{
+  return init_dist;
 }
 
 
@@ -220,10 +228,33 @@ int replicator::get_replisomes()
 }
 
 
+// get the number of free replisomes
+int replicator::get_free_replisomes()
+{
+  return n_free_replisomes;
+}
+
+
+// partition the free replisomes
+int replicator::partition_free_replisomes()
+{
+  std::binomial_distribution<int> p(n_free_replisomes,0.5);
+  return p(rand_eng);
+}
+
+
 // get the number of free DnaA
 int replicator::get_DnaA()
 {
   return n_DnaA;
+}
+
+
+// partition the free DnaA
+int replicator::partition_DnaA()
+{
+  std::binomial_distribution<int> p(n_DnaA,0.5);
+  return p(rand_eng);
 }
 
 

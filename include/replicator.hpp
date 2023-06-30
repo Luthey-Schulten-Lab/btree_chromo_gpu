@@ -33,10 +33,16 @@ public:
   double get_time();
   // get the free DnaA
   int get_DnaA();
+  int partition_DnaA();
   // get the replication rate
   double get_k_rep();
+  // get the replisomes
   int get_replisomes();
+  int get_free_replisomes();
+  int partition_free_replisomes();
 
+  // get the initiator distribution
+  std::vector<init_loc> get_init_dist();
   // reset the initiator distribution
   void reset_init_dist();
   // update the initiator distribution
@@ -94,6 +100,8 @@ private:
 
   gillespie_solver solver;
   replication_model rep_model;
+
+  std::mt19937 rand_eng;
 
 };
 
