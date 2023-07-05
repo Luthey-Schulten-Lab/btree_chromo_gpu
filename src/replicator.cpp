@@ -238,8 +238,10 @@ int replicator::get_free_replisomes()
 // partition the free replisomes
 int replicator::partition_free_replisomes()
 {
-  std::binomial_distribution<int> p(n_free_replisomes,0.5);
-  return p(rand_eng);
+  // std::binomial_distribution<int> p(n_free_replisomes,0.5);
+  // return p(rand_eng);
+
+  return get_replisomes();
 }
 
 

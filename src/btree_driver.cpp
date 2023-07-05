@@ -2855,14 +2855,13 @@ int btree_driver::replicator_binary_fission(std::vector<std::string> &params)
 
   // prepare the DnaA
   int n_total_DnaA = driver_replicator.partition_DnaA();
-
   for (init_loc i_l : new_init_dist)
     {
       n_total_DnaA += i_l.N;
     }
-
   driver_replicator.set_DnaA(n_total_DnaA);
 
+  // distribute the DnaA on the new leaves
   for (init_loc i_l : new_init_dist)
     {
       driver_replicator.bind_init(i_l.loc,i_l.N);
@@ -2870,13 +2869,14 @@ int btree_driver::replicator_binary_fission(std::vector<std::string> &params)
 
   // prepare the replisomes
   int n_total_replisomes = driver_replicator.partition_free_replisomes();
-  n_total_replisomes += static_cast<int>(new_rep_forks.size());
-  
+  // n_total_replisomes += static_cast<int>(new_rep_forks.size());
+  driver_replicator.set_replisomes(n_total_replisomes);
+
+  // distribute replisomes on mapped forks
   for (std::string fork : new_rep_forks)
     {
       driver_replicator.bind_replisome(fork);
     }
-
   
   return 0;
 }
