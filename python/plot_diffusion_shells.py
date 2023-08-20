@@ -18,13 +18,24 @@ sys.path.insert(1,'./diffusion_calculations')
 import diffusion_plotting as d_plot
 imp.reload(d_plot)
 
-in_dir = '/home/ben/Data/btree_chromo/diffusion_noribos/'
-in_label = 'diffusion_noribos'
-min_rep = 1
-max_rep = 14
+in_dir = '/home/ben/Data/btree_chromo/diffusion_testing_v4/'
+in_label = 'diffusion_bond_bending_twisting_v4'
 
-out_dir = '/home/ben/Documents/svn/Minimal_Cell_Chromosome_Organization_2022/tex_figures/diffusion/raw_plots/'
-out_label = 'diffusion_noribos'
+#out_dir = '/home/ben/Documents/svn/Minimal_Cell_Chromosome_Organization_2022/tex_figures/diffusion/raw_plots/'
+out_dir = '/home/ben/Data/btree_chromo/diffusion_testing_v4/'
+out_label = 'diffusion_bond_bending_twisting_v4'
+
+rep_specification = 'range'
+
+if rep_specification == 'range':
+    min_rep = 1
+    max_rep = 50
+    reps = np.arange(min_rep,max_rep+1,dtype=np.int32)
+elif rep_specification == 'manual':
+    reps = [1,2,3,4,5,6,8,9,10,11,12,13,15,16,17,18,19,20,22,23,24,25,26,27,29,30,31,32,33,34,36,37,38,39,40,41,43,44,45,46,47,48,49]
+    reps = np.array(reps,dtype=np.int32)
+
+N_reps = reps.shape[0]
 
 fig_filetype = ".png"
 
@@ -45,7 +56,9 @@ if write_shell_diff == True:
 
     rep_count = 0
 
-    for rep in range(min_rep,max_rep+1):
+    for i_rep in range(N_reps):
+
+        rep = reps[i_rep]
 
         in_file = in_dir + in_label + '_rep'+str(rep).zfill(5) + '.pkl_traj'
 
@@ -53,14 +66,14 @@ if write_shell_diff == True:
 
         traj = r_L_D.read_pickle_traj(in_file)
 
-        if rep == min_rep:
+        if i_rep == 0:
 
             shell_MSD = d_plot.new_shell_MSD(radii,
-                                             max_rep-min_rep+1,
+                                             N_reps,
                                              traj['timesteps'].shape[0],
                                              traj['timesteps'])
 
-        shell_MSD = d_plot.fill_reps_shell_MSDs(shell_MSD,traj,rep-min_rep)
+        shell_MSD = d_plot.fill_reps_shell_MSDs(shell_MSD,traj,i_rep)
 
     d_plot.write_shell_diff(shell_diff_file,shell_MSD)
 
@@ -81,12 +94,12 @@ d_plot.plot_shell_MSD_reps(shell_MSD_fig_file,
                            [50,100],
                            'DNA')
 
-# d_plot.plot_shell_MSD_reps(shell_MSD_fig_file,
-#                            fig_filetype,
-#                            shell_MSD,
-#                            dt,
-#                            [50,100],
-#                            'ribo')
+d_plot.plot_shell_MSD_reps(shell_MSD_fig_file,
+                           fig_filetype,
+                           shell_MSD,
+                           dt,
+                           [50,100],
+                           'ribo')
 
 shell_law_fig_file = out_dir + out_label + '_law'
 
@@ -97,12 +110,12 @@ d_plot.plot_shell_law_reps(shell_law_fig_file,
                            [50,100],
                            'DNA')
 
-# d_plot.plot_shell_law_reps(shell_law_fig_file,
-#                            fig_filetype,
-#                            shell_MSD,
-#                            dt,
-#                            [50,100],
-#                            'ribo')
+d_plot.plot_shell_law_reps(shell_law_fig_file,
+                           fig_filetype,
+                           shell_MSD,
+                           dt,
+                           [50,100],
+                           'ribo')
 
 shell_diff_vs_density_fig_file = out_dir + out_label + '_DiffvDensity'
 
@@ -128,14 +141,14 @@ d_plot.plot_shell_law_vs_density_reps(shell_law_vs_density_fig_file,
 #                                       shell_MSD,
 #                                       'ribo')
 
-# shell_diff_vs_diff_fig_file = out_dir + out_label + '_DiffvDiff'
+shell_diff_vs_diff_fig_file = out_dir + out_label + '_DiffvDiff'
 
-# d_plot.plot_shell_diff_vs_diff_reps(shell_diff_vs_diff_fig_file,
-#                                     fig_filetype,
-#                                     shell_MSD)
+d_plot.plot_shell_diff_vs_diff_reps(shell_diff_vs_diff_fig_file,
+                                    fig_filetype,
+                                    shell_MSD)
 
-# shell_law_vs_law_fig_file = out_dir + out_label + '_LawvLaw'
+shell_law_vs_law_fig_file = out_dir + out_label + '_LawvLaw'
 
-# d_plot.plot_shell_law_vs_law_reps(shell_law_vs_law_fig_file,
-#                                   fig_filetype,
-#                                   shell_MSD)
+d_plot.plot_shell_law_vs_law_reps(shell_law_vs_law_fig_file,
+                                  fig_filetype,
+                                  shell_MSD)

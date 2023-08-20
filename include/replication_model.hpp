@@ -46,6 +46,8 @@ public:
 
   // setter for number of leaves
   void set_N_leaves(int n);
+  // setter for the scaled size
+  void set_G(double G);
 
   // getters to access replication model details
   double get_k_rep();
@@ -81,6 +83,8 @@ private:
   int N_non_leaf, N_per_leaf;
   int N_bubble, N_binding;
   int M_non_leaf, M_per_leaf;
+
+  double G;
 
   std::vector<reaction> rxns;
   std::vector<std::array<int,2>> init_requirements;

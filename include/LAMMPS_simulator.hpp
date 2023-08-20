@@ -91,6 +91,10 @@ public:
   void run_hard_FENE(unsigned long N_steps, thermo_dump_parameters t_d_p);
   void run_topoDNA_FENE(unsigned long N_steps, thermo_dump_parameters t_d_p);
 
+  // modulate particle size
+  void expand_bdry_particles(double ds);
+  void reset_bdry_particle_expansion();
+
   // loop system
   int read_loop_params(std::string loop_param_filename);
   void set_loop_sim_params(loop_sim_params &l_sim_p);

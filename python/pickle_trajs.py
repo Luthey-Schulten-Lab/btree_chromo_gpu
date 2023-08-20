@@ -16,29 +16,40 @@ import sys
 import LAMMPS_helpers.read_LAMMPS_DNA as r_L_D
 importlib.reload(r_L_D)
 
-# in_dir = '/mnt/HDD_linux/Data/btree_chromo/disentanglement_testing/woloops_wotopo/'
-# in_label = 'woloops_wotopo'
+in_dir = '/home/ben/Data/btree_chromo/disentanglement_testing/volume_expansion/'
+in_label = 'volume_expansion'
 #in_dir = '/home/ben/Data/btree_chromo/loop_compaction_testing_new/loops_25/'
 #in_label = 'loops_25'
 #in_dir = '/home/ben/Data/btree_chromo/small_system_Jan/'
 #in_label = 'woloops_wotopo'
-#in_dir = '/home/ben/Data/btree_chromo/diffusion_noribos/'
-#in_label = 'diffusion_noribos'
-in_dir = '/home/ben/Data/btree_chromo/full_chromo_movie/'
-in_label = 'full_chromo_run0'
-min_rep = 1
-max_rep = 1
+# in_dir = '/home/ben/Data/btree_chromo/diffusion_testing_v4/'
+# in_label = 'diffusion_bond_bending_twisting_v4'
+#in_dir = '/home/ben/Data/btree_chromo/full_chromo_movie/'
+#in_label = 'full_chromo_run0'
 
-# out_dir = '/mnt/HDD_linux/Data/btree_chromo/disentanglement_testing/woloops_wotopo/'
-# out_label = 'woloops_wotopo'
+out_dir = '/home/ben/Data/btree_chromo/disentanglement_testing/volume_expansion/'
+out_label = 'volume_expansion'
 # out_dir = '/home/ben/Data/btree_chromo/loop_compaction_testing_new/loops_25/'
 # out_label = 'loops_25'
 # out_dir = '/home/been/Data/btree_chromo/small_system_Jan/'
 # out_label = 'woloops_wotopo'
-#out_dir = '/home/ben/Data/btree_chromo/diffusion_noribos/'
-#out_label = 'diffusion_noribos'
-out_dir = '/home/ben/Data/btree_chromo/full_chromo_movie/'
-out_label = 'full_chromo_run0'
+# out_dir = '/home/ben/Data/btree_chromo/diffusion_testing_v4/'
+# out_label = 'diffusion_bond_bending_twisting_v4'
+#out_dir = '/home/ben/Data/btree_chromo/full_chromo_movie/'
+#out_label = 'full_chromo_run0'
+
+rep_specification = 'range'
+
+if rep_specification == 'range':
+    min_rep = 1
+    max_rep = 5
+    reps = np.arange(min_rep,max_rep+1,dtype=np.int32)
+elif rep_specification == 'manual':
+    reps = [43]
+    reps = np.array(reps,dtype=np.int32)
+
+N_reps = reps.shape[0]
+    
 
 timestep_options = ['Last','FirstLast','Slices','All']
 timestep_select = timestep_options[3]
@@ -48,10 +59,10 @@ slices = [0,50000,100000,150000,200000,250000]
 if not os.path.isdir(out_dir):
     os.makedirs(out_dir)
 
-rep_count = 0
+for i_rep in range(N_reps):
 
-for rep in range(min_rep,max_rep+1):
-
+    rep = reps[i_rep]
+    
     rep_label = '_rep' + str(rep).zfill(5)
 
     in_file = in_dir + in_label + rep_label  + '.lammpstrj'

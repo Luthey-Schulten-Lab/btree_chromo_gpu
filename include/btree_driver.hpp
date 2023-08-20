@@ -214,6 +214,9 @@ private:
   int simulator_load_loop_params(std::vector<std::string> &params);
   int simulator_run_loops(std::vector<std::string> &params);
 
+  // simulator manipulations
+  int simulator_expand_bdry_particles(std::vector<std::string> &params);
+
   // fused commands
   int sys_write_sim_read_LAMMPS_data(std::vector<std::string> &params);
   int sys_write_sim_read_LAMMPS_data_at_timestep(std::vector<std::string> &params);

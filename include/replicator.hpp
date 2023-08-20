@@ -28,6 +28,8 @@ public:
   // set the volume or load a volume protocol
   void set_volume(double V);
   void load_volume_protocol(std::string volume_protocol_filename);
+  // set the scaled size
+  void set_G(double G);
 
   // get the time
   double get_time();
@@ -93,6 +95,7 @@ private:
   
   double t;
   double V;
+  double G;
   std::vector<volume_point> V_points;
 
   std::vector<init_loc> init_dist;

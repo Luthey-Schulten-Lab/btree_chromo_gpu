@@ -85,13 +85,24 @@ void replicator::update_init_dist(std::vector<std::string> leaves)
 // bind a number of initiators
 void replicator::bind_init(std::string leaf, int n)
 {
+  bool found = false;
   for (size_t i=0; i<init_dist.size(); i++)
     {
       if (init_dist[i].loc == leaf)
 	{
 	  n_DnaA -= (n - init_dist[i].N);
 	  init_dist[i].N = n;
+	  found = true;
 	}
+    }
+
+  if (found == false)
+    {
+      init_loc i_l;
+      i_l.loc = leaf;
+      i_l.N = n;
+      init_dist.push_back(i_l);
+      n_DnaA -= n;
     }
 }
 
@@ -136,6 +147,14 @@ void replicator::set_volume(double V)
 {
   this->V = V;
   V_protocol = false;
+}
+
+
+// set the scaled size
+void replicator::set_G(double G)
+{
+  this->G = G;
+  rep_model.set_G(G);
 }
 
 
@@ -217,7 +236,9 @@ double replicator::get_time()
 // get the replication rate
 double replicator::get_k_rep()
 {
-  return rep_model.get_k_rep();
+  double k_rep = rep_model.get_k_rep();
+  // k_rep = k_rep/(n_replisomes-n_free_replisomes);
+  return k_rep;
 }
 
 
@@ -288,7 +309,8 @@ std::string replicator::initiation_test()
 	      leaf_init = init_dist[i].loc;
 	      // return bound DnaA to pool of free DnaA
 	      n_DnaA += init_reqs[j][1];
-	      replicating_forks.push_back(leaf_init);
+	      // replicating_forks.push_back(leaf_init);
+	      bind_replisome(leaf_init);
 	      return leaf_init;
 	    }
 	}
@@ -304,7 +326,9 @@ void replicator::unbind_replisomes(std::vector<std::string> completed_forks)
   bool fork_complete;
   std::vector<std::string> temp_forks = replicating_forks;
 
-  replicating_forks.clear();
+  // replicating_forks.clear();
+
+  reset_replisomes();
 
   for (size_t i_fork=0; i_fork<temp_forks.size(); i_fork++)
     {
@@ -319,13 +343,18 @@ void replicator::unbind_replisomes(std::vector<std::string> completed_forks)
 	}
 
       // free the replisome or return it to the set of replicating forks
-      if (fork_complete == true)
+      // if (fork_complete == true)
+      // 	{
+      // 	  n_free_replisomes += 1;
+      // 	}
+      // else
+      // 	{
+      // 	  bind_replisome(temp_forks[i_fork]);
+      // 	}
+
+      if (fork_complete == false)
 	{
-	  n_free_replisomes += 1;
-	}
-      else
-	{
-	  replicating_forks.push_back(temp_forks[i_fork]);
+	  bind_replisome(temp_forks[i_fork]);
 	}
     }
 }

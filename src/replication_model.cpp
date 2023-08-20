@@ -18,6 +18,8 @@ replication_model::replication_model()
   r_m_p.N_lo = 1;
   r_m_p.N_fil = 1;
   r_m_p.bubble_min_fil = r_m_p.N_hi + r_m_p.N_lo + r_m_p.N_fil;
+
+  G = 1.0;
 }
 
 // destructor
@@ -209,6 +211,13 @@ void replication_model::set_N_leaves(int N_leaves)
 }
 
 
+// set the scaled size
+void replication_model::set_G(double G)
+{
+  this->G = G;
+}
+
+
 // set the number of species based on the replication model
 void replication_model::number_rep_species()
 {
@@ -262,12 +271,14 @@ void replication_model::prepare_reactions()
   rxn_manip.add_reaction_output(r,0); // 1 gene out
   rxn_manip.add_reaction_output(r,free_idx); // 1 free DnaA out
   rxn_manip.add_reaction_rate(r,r_m_p.k_c);
+  // rxn_manip.add_reaction_rate(r,r_m_p.k_c/G);
   rxns.push_back(r);
   rxn_manip.reset_reaction(r);
 
   // DnaA destruction
   rxn_manip.add_reaction_input(r,free_idx); // 1 free DnaA in
   rxn_manip.add_reaction_rate(r,r_m_p.k_d);
+  // rxn_manip.add_reaction_rate(r,r_m_p.k_d*G);
   rxns.push_back(r);
   rxn_manip.reset_reaction(r);
 

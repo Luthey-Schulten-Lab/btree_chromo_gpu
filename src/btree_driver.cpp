@@ -1885,6 +1885,18 @@ void btree_driver::prepare_command_requirements()
   // lock updates
   t_ls.clear();
   lock_updates["simulator_relax_progressive"] = t_ls;
+
+  // simulator_expand_bdry_particles
+  // number of required parameters
+  N_param_reqs["simulator_expand_bdry_particles"] = 4;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("simulator_prepared",true));
+  t_ls.push_back(new_lock("lmp_data_present",true));
+  lock_tests["simulator_expand_bdry_particles"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["simulator_expand_bdry_particles"] = t_ls;
   
 
   //////////////////////////////
@@ -2623,6 +2635,13 @@ int btree_driver::execute_single_command(std::string &command,
     }
 
 
+  // run a simulation with bdry particles that increase in size
+  else if (command == "simulator_expand_bdry_particles")
+    {
+      error_code = simulator_expand_bdry_particles(params);
+    }
+
+
   // switch on the Ori bdry attraction
   else if (command == "switch_Ori_bdry_attraction")
     {
@@ -2865,6 +2884,13 @@ int btree_driver::replicator_binary_fission(std::vector<std::string> &params)
   for (init_loc i_l : new_init_dist)
     {
       driver_replicator.bind_init(i_l.loc,i_l.N);
+    }
+
+  // distribute the DnaA on the new leaves
+  std::cout << "updated init_dist" << std::endl;
+  for (init_loc i_l : driver_replicator.get_init_dist())
+    {
+      std::cout << i_l.loc << "," << i_l.N << std::endl;
     }
 
   // prepare the replisomes
@@ -3222,6 +3248,9 @@ int btree_driver::replicator_run(std::vector<std::string> &params)
 
   while (dt < dt_max)
     {
+
+      // update the total DNA content
+      driver_replicator.set_G(driver_bt.scaled_size());
 
       // run the replicator until the maximum time is reached or a
       // first-passage event occurs
@@ -3863,6 +3892,62 @@ int btree_driver::simulator_relax_progressive(std::vector<std::string> &params)
     }
   // minimize with hard pairs and FENE bonds
   e += simulator_minimize<1,1>(min_params);
+  // restore the timestep
+  e += simulator_restore_timestep();
+
+  return e;
+}
+
+
+int btree_driver::simulator_expand_bdry_particles(std::vector<std::string> &params)
+{
+  int e = 0;
+  double ds;
+
+  std::vector<std::string> run_params;
+
+  double expansion_scale = stod(params[0]);
+  int N_iter = stoi(params[1]);
+  int run_steps = stoi(params[2]);
+  int thermo_freq = stoi(params[3]);
+
+  // create the parameter vector for runs
+  run_params.push_back(std::to_string(run_steps));
+  run_params.push_back(std::to_string(thermo_freq));
+  run_params.push_back("0");
+  run_params.push_back("noappend");
+  run_params.push_back("first");
+
+
+  std::cout << "expanding bdry particles by factor of "
+	    << expansion_scale << std::endl;
+  std::cout << "N_iter = "
+	    << N_iter << std::endl;
+
+  // store the current timestep
+  e += simulator_store_timestep();
+
+  // iterate over the expansion steps
+  for (int i_step=0; i_step<N_iter; i_step++)
+    {
+
+      // set the expansion step size
+      ds = ((expansion_scale-1.0)/N_iter)*(i_step+1);
+
+      // expand the bdry particles
+      driver_lmp_simulator.expand_bdry_particles(ds);
+      
+      // run the system
+      if (run_steps > 0)
+	{
+	  e += simulator_run<1,1>(run_params);
+	}
+
+    }
+
+  // reset bdry particle expansion
+  driver_lmp_simulator.reset_bdry_particle_expansion();
+
   // restore the timestep
   e += simulator_restore_timestep();
 

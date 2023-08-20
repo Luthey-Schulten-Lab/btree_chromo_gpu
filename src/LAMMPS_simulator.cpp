@@ -1213,3 +1213,46 @@ void LAMMPS_simulator::increment_Nt(unsigned long dNt)
   Nt += dNt;
   reset_timestep_to_Nt();
 }
+
+
+void LAMMPS_simulator::expand_bdry_particles(double ds)
+{
+  std::string cmd;
+  
+  cmd = "variable r_bdry_temp equal " + std::to_string(1.0+ds) + "*${r_bdry}";
+  command(cmd);
+
+  cmd = "variable sigma_mono_bdry equal ${r_mono}+${r_bdry_temp}";
+  command(cmd);
+  cmd = "variable sigma_ribo_bdry equal ${r_ribo}+${r_bdry_temp}";
+  command(cmd);
+  cmd = "variable sigma_bdry_bdry equal 2*${r_bdry_temp}";
+  command(cmd);
+
+  cmd = "variable WCA_mono_bdry equal ${cut_WCA}*${sigma_mono_bdry}";
+  command(cmd);
+  cmd = "variable WCA_ribo_bdry equal ${cut_WCA}*${sigma_ribo_bdry}";
+  command(cmd);
+  cmd = "variable WCA_bdry_bdry equal ${cut_WCA}*${sigma_bdry_bdry}";
+  command(cmd);
+}
+
+
+void LAMMPS_simulator::reset_bdry_particle_expansion()
+{
+  std::string cmd;
+
+  cmd = "variable sigma_mono_bdry equal ${r_mono}+${r_bdry}";
+  command(cmd);
+  cmd = "variable sigma_ribo_bdry equal ${r_ribo}+${r_bdry}";
+  command(cmd);
+  cmd = "variable sigma_bdry_bdry equal 2*${r_bdry}";
+  command(cmd);
+
+  cmd = "variable WCA_mono_bdry equal ${cut_WCA}*${sigma_mono_bdry}";
+  command(cmd);
+  cmd = "variable WCA_ribo_bdry equal ${cut_WCA}*${sigma_ribo_bdry}";
+  command(cmd);
+  cmd = "variable WCA_bdry_bdry equal ${cut_WCA}*${sigma_bdry_bdry}";
+  command(cmd);
+}

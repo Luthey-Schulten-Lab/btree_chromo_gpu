@@ -134,6 +134,7 @@ public:
   int count_completed_forks();
   int count_active_forks();
   int total_size();
+  double scaled_size();
   int max_size();
   int single_size();
   int get_generation(std::string loc);

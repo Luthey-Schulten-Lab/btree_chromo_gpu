@@ -18,16 +18,16 @@ importlib.reload(r_L_D)
 import segregation_calculations.partition_plotting as par_plot
 importlib.reload(par_plot)
 
-in_dir = '/mnt/HDD_linux/Data/btree_chromo/disentanglement_testing/wloops_wtopo/'
-in_label = 'wloops_wtopo'
-f_p_label = 'wloops_wtopo_f_p'
+in_dir = '/home/ben/Data/btree_chromo/disentanglement_testing/volume_expansion/'
+in_label = 'volume_expansion'
+f_p_label = 'volume_expansion_f_p'
 min_rep = 1
 max_rep = 5
 
-out_dir = '/mnt/HDD_linux/Documents/svn/Minimal_Cell_Chromosome_Organization_2022/tex_figures/partitioning/raw_plots/'
-out_label = 'wloops_wtopo'
+out_dir = '/home/ben/Data/btree_chromo/disentanglement_testing/volume_expansion/raw_plots/'
+out_label = 'volume_expansion'
 
-write_par_CoM = False
+write_par_CoM = True
 read_par_CoM = True
 
 if not os.path.isdir(out_dir):

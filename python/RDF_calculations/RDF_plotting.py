@@ -52,6 +52,211 @@ def cheb_ortho_W(N_modes):
     return W
 
 
+def new_single_shell_RDF(N_modes,Rc,radii,N_t,t):
+
+    shell_RDF = dict()
+
+    shell_RDF['N_modes'] = N_modes
+    shell_RDF['Rc'] = Rc
+    shell_RDF['local_volume'] = (4.0/3.0)*np.pi*np.power(Rc,3.0)
+
+    shell_RDF['N_t'] = N_t
+
+    N_shells = radii.shape[0]
+
+    shell_RDF['N_shells'] = N_shells
+
+    shell_lims = np.zeros((N_shells,2),dtype=np.int32)
+
+    for i_rad in range(N_shells):
+
+        if i_rad == 0:
+
+            shell_lims[i_rad,0] = 0
+            shell_lims[i_rad,1] = radii[i_rad]
+
+        else:
+
+            shell_lims[i_rad,0] = radii[i_rad-1]
+            shell_lims[i_rad,1] = radii[i_rad]
+
+    shell_RDF['t'] = t
+
+    shell_RDF['shell_lims'] = shell_lims
+
+    shell_volumes = (4.0/3.0)*np.pi*(np.power(shell_lims[:,1],3.0)-np.power(shell_lims[:,0],3.0))
+
+    shell_RDF['shell_volumes'] = shell_volumes
+    shell_RDF['total_volume'] = np.sum(shell_volumes)
+
+    shell_RDF['ribo_counts'] = np.zeros((N_shells),dtype=np.int32)
+
+    shell_RDF['coeffs'] = np.zeros((N_shells,N_t,N_modes),dtype=np.double)
+    shell_RDF['total_densities'] = np.zeros((N_t),dtype=np.double)
+    shell_RDF['local_densities'] = np.zeros((N_shells,N_t),dtype=np.double)
+
+    return shell_RDF
+
+
+def fill_shell_RDF(shell_RDF,traj):
+
+    t0 = str(shell_RDF['t'][0])
+    
+    x0_ribo = traj[t0]['ribo']['x']
+
+    x0_R2 = np.sum(np.power(x0_ribo,2),axis=1)
+
+    print(x0_R2.shape)
+
+    W = cheb_ortho_W(shell_RDF['N_modes'])
+
+    shell_assignments = []
+
+    for i_shell in range(shell_RDF['N_shells']):
+
+        shell_assignments.append(np.argwhere((x0_R2 >= np.power(shell_RDF['shell_lims'][i_shell,0],2.0)) &
+                                             (x0_R2 < np.power(shell_RDF['shell_lims'][i_shell,1],2.0))).flatten())
+
+        shell_RDF['ribo_counts'][i_shell] = shell_assignments[i_shell].shape[0]
+
+    for i_t in range(1,shell_RDF['N_t']):
+
+        t_temp = str(shell_RDF['t'][i_t])
+        x_DNA = traj[t_temp]['DNA']['x']
+        x_ribo = traj[t_temp]['ribo']['x']
+
+        rho = traj[t_temp]['DNA']['N']/shell_RDF['total_volume']
+
+        shell_RDF['total_densities'][i_t] = rho
+
+        print('rho = '+str(rho))
+
+        for i_shell in range(shell_RDF['N_shells']):
+
+            print("i_shell = "+str(i_shell))
+            
+            if shell_RDF['ribo_counts'][i_shell] > 0:
+
+                x_ribo_shell = x_ribo[shell_assignments[i_shell],:]
+
+                N_DNA_per_ribo = 0
+                N_ribo_per_shell = x_ribo_shell.shape[0]
+
+                temp_coeffs_ribo = np.zeros((shell_RDF['N_modes']),dtype=np.double)
+                
+                for i_ribo in range(N_ribo_per_shell):
+
+                    xr = x_ribo_shell[i_ribo,:]
+
+                    dx = x_DNA - xr
+
+                    rsqrd = np.sum(np.power(dx,2.0),axis=1)
+
+                    r = np.sqrt(rsqrd)
+
+                    Rc_filter = np.argwhere(r < shell_RDF['Rc'])
+
+                    r = r[Rc_filter]
+
+                    z = (2*r - shell_RDF['Rc'])/(shell_RDF['Rc'])
+                    z_denom = np.power(1.0+z,-2.0)
+
+                    w = np.reciprocal(np.sqrt(1.0-np.power(z,2.0)))
+
+                    i_N_DNA_per_ribo = r.shape[0]
+
+                    temp_coeffs_DNA = np.zeros((shell_RDF['N_modes']),dtype=np.double)
+                    
+                    for i_DNA in range(i_N_DNA_per_ribo):
+
+                        c = cheb_modes_eval(shell_RDF['N_modes'],z[i_DNA])
+
+                        c = w[i_DNA]*c
+
+                        c = z_denom[i_DNA]*c
+
+                        temp_coeffs_DNA += c
+
+                    temp_coeffs_DNA = temp_coeffs_DNA/i_N_DNA_per_ribo
+
+                    temp_coeffs_ribo += temp_coeffs_DNA
+
+                    N_DNA_per_ribo += i_N_DNA_per_ribo
+
+                N_DNA_per_ribo = N_DNA_per_ribo/N_ribo_per_shell
+                temp_coeffs_ribo = temp_coeffs_ribo/N_ribo_per_shell
+
+                local_rho = N_DNA_per_ribo/shell_RDF['local_volume']
+                print('local_rho = '+str(local_rho))
+                shell_RDF['local_densities'][i_shell,i_t] = local_rho
+
+                a = 8.0/3.0
+                a = a*(local_rho/rho)
+                temp_coeffs_ribo = a*temp_coeffs_ribo
+                temp_coeffs_ribo = np.divide(temp_coeffs_ribo,W)
+
+                shell_RDF['coeffs'][i_shell,i_t,:] = temp_coeffs_ribo
+
+    return shell_RDF
+
+
+def new_merged_shell_RDF(N_modes,Rc,radii,N_reps,N_t,t):
+
+    shell_RDF = dict()
+
+    shell_RDF['N_modes'] = N_modes
+    shell_RDF['Rc'] = Rc
+    shell_RDF['local_volume'] = (4.0/3.0)*np.pi*np.power(Rc,3.0)
+
+    shell_RDF['N_reps'] = N_reps
+    shell_RDF['N_t'] = N_t
+
+    N_shells = radii.shape[0]
+
+    shell_RDF['N_shells'] = N_shells
+
+    shell_lims = np.zeros((N_shells,2),dtype=np.int32)
+
+    for i_rad in range(N_shells):
+
+        if i_rad == 0:
+
+            shell_lims[i_rad,0] = 0
+            shell_lims[i_rad,1] = radii[i_rad]
+
+        else:
+
+            shell_lims[i_rad,0] = radii[i_rad-1]
+            shell_lims[i_rad,1] = radii[i_rad]
+
+    shell_RDF['t'] = t
+
+    shell_RDF['shell_lims'] = shell_lims
+
+    shell_volumes = (4.0/3.0)*np.pi*(np.power(shell_lims[:,1],3.0)-np.power(shell_lims[:,0],3.0))
+
+    shell_RDF['shell_volumes'] = shell_volumes
+    shell_RDF['total_volume'] = np.sum(shell_volumes)
+
+    shell_RDF['ribo_counts'] = np.zeros((N_shells,N_reps),dtype=np.int32)
+
+    shell_RDF['coeffs'] = np.zeros((N_shells,N_reps,N_t,N_modes),dtype=np.double)
+    shell_RDF['total_densities'] = np.zeros((N_reps,N_t),dtype=np.double)
+    shell_RDF['local_densities'] = np.zeros((N_shells,N_reps,N_t),dtype=np.double)
+
+    return shell_RDF
+
+
+def fill_merged_shell_RDF(merged_shell_RDF,single_shell_RDF,i_rep):
+
+    merged_shell_RDF['ribo_counts'][:,i_rep] = single_shell_RDF['ribo_counts']
+    merged_shell_RDF['coeffs'][:,i_rep,:,:] = single_shell_RDF['coeffs']
+    merged_shell_RDF['total_densities'][i_rep,:] = single_shell_RDF['total_densities']
+    merged_shell_RDF['local_densities'][:,i_rep,:] = single_shell_RDF['local_densities']
+
+    return merged_shell_RDF
+
+
 def new_shell_RDF(N_modes,Rc,radii,N_reps,N_t,t):
 
     shell_RDF = dict()
@@ -256,8 +461,11 @@ def plot_shell_RDFs(fig_file,shell_RDF,res):
     ax.spines['left'].set_linewidth(2.0)
     ax.spines['bottom'].set_linewidth(2.0)
 
-    ax.set_xlim(xmin=0.0,xmax=shell_RDF['Rc']//10)
-    ax.set_ylim(ymin=0.0,ymax=1.1)
+    # ax.set_xlim(xmin=0.0,xmax=shell_RDF['Rc']//10)
+    ax.set_xlim(xmin=0.0,xmax=40)
+    ax.set_ylim(ymin=0.0,ymax=1.1) # restore this for Figure 5
+    # ax.set_ylim(ymin=0.0,ymax=1.8)
+    
     
     for i_shell in range(shell_RDF['N_shells']):
 

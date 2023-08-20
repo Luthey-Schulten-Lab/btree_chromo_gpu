@@ -922,6 +922,14 @@ int btree::total_size()
   return branch_size(get_branch("m"));
 }
 
+// calculate the scaled size of the system
+double btree::scaled_size()
+{
+  double s = 1.0*total_size();
+  return s/single_size();
+}
+
+
 // calculate size of branch
 int btree::branch_size(node *branch)
 {
@@ -2393,7 +2401,7 @@ std::vector<std::string> btree::excluded_volume_partitioning(double alpha)
   double total_volume = 0.0;
 
   std::cout << "separable forks" << std::endl;
-  for (size_t i=0; i<separable_forks.size(); i++)
+  for (size_t i=0; i<N_sep_forks; i++)
     {
       rel_volume[i] = alpha*separable_branch_size(get_branch(separable_forks[i]));
       rel_volume[i] = rel_volume[i]/single_size();
@@ -2408,7 +2416,29 @@ std::vector<std::string> btree::excluded_volume_partitioning(double alpha)
 		<< std::endl;
     }
 
-  std::shuffle(perm.begin(), perm.end(), rand_eng);
+  // std::shuffle(perm.begin(), perm.end(), rand_eng);
+
+  for (size_t i=0; i<N_sep_forks; i++)
+    {
+      for (size_t j=i+1; j<N_sep_forks; j++)
+	{
+	  if (rel_volume[perm[i]] < rel_volume[perm[j]])
+	    {
+	      std::swap(perm[i],perm[j]);
+	    }
+	}
+    }
+
+  std::cout << "sorted separable forks" << std::endl;
+  for (size_t i=0; i<N_sep_forks; i++)
+    {
+      
+      std::cout << separable_forks[perm[i]]
+		<< ","
+		<< rel_volume[perm[i]]
+		<< std::endl;
+    }
+  
   std::uniform_real_distribution<double> u_dist(0.0,1.0);
   int N_l, N_r;
   double ur, p, V_l, V_r;
