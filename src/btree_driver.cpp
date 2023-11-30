@@ -3615,6 +3615,7 @@ int btree_driver::simulator_read_data(std::vector<std::string> &params)
   driver_lmp_simulator.reset_protocol_variables();
   driver_lmp_simulator.global_setup();
   driver_lmp_simulator.read_data(params[0]);
+  driver_lmp_simulator.prepare_fork_partition_groups(driver_bt.get_all_fork_partitions(),1);
   driver_lmp_simulator.standard_computes();
   return 0;  
 }

@@ -143,6 +143,7 @@ public:
   void solve_topology();
   void dump_topology(std::string topo_filename, int idx);
   theta_topo get_leaf_topo(std::string loc);
+  std::vector<fork_partition> get_all_fork_partitions();
   void dump_fork_partitions(std::string fork_partitions_filename, int idx);
 
   // update the coarse-graining map based on the current state
@@ -195,7 +196,6 @@ private:
   std::array<int,2> partition_growths_sym(node *branch, int proposed_r_cw, int proposed_r_ccw);
 
   // get the fork partitions about a fork
-  std::vector<fork_partition> get_all_fork_partitions();
   fork_partition get_fork_partition(std::string loc);
 
   // create centered CG maps per branch

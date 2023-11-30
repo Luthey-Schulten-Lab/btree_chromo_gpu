@@ -23,6 +23,7 @@
 
 // btree_chromo include files
 #include <LAMMPS_sys.hpp>
+#include <btree.hpp>
 
 struct thermo_dump_parameters
 {
@@ -74,6 +75,9 @@ public:
 
   // read_data
   void read_data(std::string data_file);
+
+  // prepare fork partition groups
+  void prepare_fork_partition_groups(std::vector<fork_partition> f_ps, int idx);
 
   // minimization routines
   void minimize_soft_harmonic(thermo_dump_parameters t_d_p);
