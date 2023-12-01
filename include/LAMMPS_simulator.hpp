@@ -76,8 +76,9 @@ public:
   // read_data
   void read_data(std::string data_file);
 
-  // prepare fork partition groups
+  // prepare fork partition groups and apply/remove forces
   void prepare_fork_partition_groups(std::vector<fork_partition> f_ps, int idx);
+  void switch_fork_partition_force(std::vector<fork_partition> f_ps, bool s);
 
   // minimization routines
   void minimize_soft_harmonic(thermo_dump_parameters t_d_p);

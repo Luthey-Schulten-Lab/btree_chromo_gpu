@@ -107,123 +107,6 @@ void LAMMPS_simulator::read_data(std::string data_file)
 }
 
 
-// prepare groups based on fork partitions
-void LAMMPS_simulator::prepare_fork_partition_groups(std::vector<fork_partition> f_ps, int idx)
-{
-
-  std::string temp_daughter, temp_range;
-  std::string group_cmd, variable_cmd;
-
-  std::array<std::string,3> dims = {"x","y","z"};
-  
-  for (fork_partition f_p : f_ps)
-    {
-
-      // partitioning of left daughter
-      temp_daughter = f_p.fork + "l";
-      group_cmd = "group " + temp_daughter + " id";
-
-      for (mono_range m_r : f_p.left_monos)
-	{
-	  if (m_r.wrapped == false)
-	    {
-	      temp_range = " " + std::to_string(m_r.ll+idx) + ":"
-		+ std::to_string(m_r.ul+idx);
-	      group_cmd += temp_range;
-	    }
-	  else
-	    {
-	      temp_range = " " + std::to_string(m_r.ll+idx) + ":"
-		+ std::to_string(m_r.mid_ll+idx);
-	      group_cmd += temp_range;
-	      temp_range = " " + std::to_string(m_r.mid_ul+idx) + ":"
-		+ std::to_string(m_r.ul+idx);
-	      group_cmd += temp_range;
-	    }
-	}
-
-      std::cout << group_cmd << std::endl;
-      
-      command(group_cmd);
-
-      // partitioning of right daughter
-      temp_daughter = f_p.fork + "r";
-      group_cmd = "group " + temp_daughter + " id";
-
-      for (mono_range m_r : f_p.right_monos)
-	{
-	  if (m_r.wrapped == false)
-	    {
-	      temp_range = " " + std::to_string(m_r.ll+idx) + ":"
-		+ std::to_string(m_r.ul+idx);
-	      group_cmd += temp_range;
-	    }
-	  else
-	    {
-	      temp_range = " " + std::to_string(m_r.ll+idx) + ":"
-		+ std::to_string(m_r.mid_ll+idx);
-	      group_cmd += temp_range;
-	      temp_range = " " + std::to_string(m_r.mid_ul+idx) + ":"
-		+ std::to_string(m_r.ul+idx);
-	      group_cmd += temp_range;
-	    }
-	}
-
-      std::cout << group_cmd << std::endl;
-      
-      command(group_cmd);
-
-
-      // create variables for relative vector between CoMs
-      for (size_t i=0; i<dims.size(); i++)
-	{
-	  variable_cmd = "variable d" + dims[i] + "_com_" + f_p.fork;
-	  variable_cmd += " equal ";
-	  variable_cmd += "xcm(" + f_p.fork + "l," + dims[i] + ")-";
-	  variable_cmd += "xcm(" + f_p.fork + "r," + dims[i] +")";
-
-	  std::cout << variable_cmd << std::endl;
-	  command(variable_cmd);
-	}
-
-      // create variable for distance between CoMs
-      variable_cmd = "variable d_com_" + f_p.fork + " equal ";
-      variable_cmd += "sqrt(";
-      for (size_t i=0; i<dims.size(); i++)
-	{
-	  if (i == 0)
-	    {
-	      variable_cmd += "d" + dims[i] + "_com_" + f_p.fork
-		+ "^2";
-	    }
-	  else
-	    {
-	      variable_cmd += "+d" + dims[i] + "_com_" + f_p.fork
-		+ "^2";
-	    }
-	}
-
-      variable_cmd += ")";
-
-      std::cout << variable_cmd << std::endl;
-      command(variable_cmd);
-
-      // create variables for direction between CoMs
-      for (size_t i=0; i<dims.size(); i++)
-	{
-	  variable_cmd = "variable ud" + dims[i] + "_com_" + f_p.fork;
-	  variable_cmd += " equal ";
-	  variable_cmd += "d" + dims[i] + "_com_" + f_p.fork;
-	  variable_cmd += "/d_com_" + f_p.fork;
-
-	  std::cout << variable_cmd << std::endl;
-	  command(variable_cmd);
-	}
-      
-    }
-}
-
-
 // run the global setup with packages, units, atom_style, boundary, and atom_modify
 void LAMMPS_simulator::global_setup()
 {
@@ -1372,4 +1255,197 @@ void LAMMPS_simulator::reset_bdry_particle_expansion()
   command(cmd);
   cmd = "variable WCA_bdry_bdry equal ${cut_WCA}*${sigma_bdry_bdry}";
   command(cmd);
+}
+
+
+// prepare groups based on fork partitions
+void LAMMPS_simulator::prepare_fork_partition_groups(std::vector<fork_partition> f_ps, int idx)
+{
+
+  std::string temp_daughter, temp_range;
+  std::string group_cmd, variable_cmd;
+
+  std::array<std::string,3> dims = {"x","y","z"};
+  
+  for (fork_partition f_p : f_ps)
+    {
+
+      // partitioning of left daughter
+      temp_daughter = f_p.fork + "l";
+      group_cmd = "group " + temp_daughter + " id";
+
+      for (mono_range m_r : f_p.left_monos)
+	{
+	  if (m_r.wrapped == false)
+	    {
+	      temp_range = " " + std::to_string(m_r.ll+idx) + ":"
+		+ std::to_string(m_r.ul+idx);
+	      group_cmd += temp_range;
+	    }
+	  else
+	    {
+	      temp_range = " " + std::to_string(m_r.ll+idx) + ":"
+		+ std::to_string(m_r.mid_ll+idx);
+	      group_cmd += temp_range;
+	      temp_range = " " + std::to_string(m_r.mid_ul+idx) + ":"
+		+ std::to_string(m_r.ul+idx);
+	      group_cmd += temp_range;
+	    }
+	}
+
+      std::cout << group_cmd << std::endl;
+      
+      command(group_cmd);
+
+      // partitioning of right daughter
+      temp_daughter = f_p.fork + "r";
+      group_cmd = "group " + temp_daughter + " id";
+
+      for (mono_range m_r : f_p.right_monos)
+	{
+	  if (m_r.wrapped == false)
+	    {
+	      temp_range = " " + std::to_string(m_r.ll+idx) + ":"
+		+ std::to_string(m_r.ul+idx);
+	      group_cmd += temp_range;
+	    }
+	  else
+	    {
+	      temp_range = " " + std::to_string(m_r.ll+idx) + ":"
+		+ std::to_string(m_r.mid_ll+idx);
+	      group_cmd += temp_range;
+	      temp_range = " " + std::to_string(m_r.mid_ul+idx) + ":"
+		+ std::to_string(m_r.ul+idx);
+	      group_cmd += temp_range;
+	    }
+	}
+
+      std::cout << group_cmd << std::endl;
+      
+      command(group_cmd);
+
+
+      // create variables for relative vector between CoMs
+      for (size_t i=0; i<dims.size(); i++)
+	{
+	  variable_cmd = "variable d" + dims[i] + "_com_" + f_p.fork;
+	  variable_cmd += " equal ";
+	  variable_cmd += "xcm(" + f_p.fork + "l," + dims[i] + ")-";
+	  variable_cmd += "xcm(" + f_p.fork + "r," + dims[i] +")";
+
+	  std::cout << variable_cmd << std::endl;
+	  command(variable_cmd);
+	}
+
+      // create variable for distance between CoMs
+      variable_cmd = "variable d_com_" + f_p.fork + " equal ";
+      variable_cmd += "sqrt(";
+      for (size_t i=0; i<dims.size(); i++)
+	{
+	  if (i == 0)
+	    {
+	      variable_cmd += "${d" + dims[i] + "_com_" + f_p.fork
+		+ "}^2";
+	    }
+	  else
+	    {
+	      variable_cmd += "+${d" + dims[i] + "_com_" + f_p.fork
+		+ "}^2";
+	    }
+	}
+
+      variable_cmd += ")";
+
+      std::cout << variable_cmd << std::endl;
+      command(variable_cmd);
+
+      // create variables for direction between CoMs
+      for (size_t i=0; i<dims.size(); i++)
+	{
+	  variable_cmd = "variable ud" + dims[i] + "_com_" + f_p.fork;
+	  variable_cmd += " equal ";
+	  variable_cmd += "${d" + dims[i] + "_com_" + f_p.fork + "}";
+	  variable_cmd += "/${d_com_" + f_p.fork + "}";
+
+	  std::cout << variable_cmd << std::endl;
+	  command(variable_cmd);
+	}
+      
+    }
+}
+
+
+// apply/remove forces to fork partitions
+void LAMMPS_simulator::switch_fork_partition_force(std::vector<fork_partition> f_ps, bool s)
+{
+  command("include ${DNA_model_dir}/potentials/lmp.fork_partitioning");
+
+  if (s == true)
+    {
+      std::string ld, rd;
+      std::string fix_cmd, temp_var, variable_cmd;
+
+      std::array<std::string,3> dims = {"x","y","z"};
+  
+      for (fork_partition f_p : f_ps)
+	{
+
+	  for (size_t i=0; i<dims.size(); i++)
+	    {
+	      temp_var = "f" + dims[i] + "_" + f_p.fork;
+	      variable_cmd = "variable " + temp_var + " equal ";
+	      variable_cmd += "${fork_force}*${ud" + dims[i]
+		+ "_com_" + f_p.fork + "}";
+	      std::cout << variable_cmd << std::endl;
+	      command(variable_cmd);
+	    }
+	  
+	  ld = f_p.fork + "l";
+	  rd = f_p.fork + "r";
+
+	  // apply force to left daughter and descendants
+	  fix_cmd = "fix partition_" + ld + " " + ld + " addforce";
+	  
+	  for (size_t i=0; i<dims.size(); i++)
+	    {
+	      temp_var = "f" + dims[i] + "_" + f_p.fork;
+	      fix_cmd += " ${" + temp_var + "}";
+	    }
+
+	  std::cout << fix_cmd << std::endl;
+	  command(fix_cmd);
+
+	  // apply force to right daughter and descendants
+	  fix_cmd = "fix partition_" + rd + " " + rd + " addforce";
+
+	  for (size_t i=0; i<dims.size(); i++)
+	    {
+	      temp_var = "f" + dims[i] + "_" + f_p.fork;
+	      fix_cmd += " -${" + temp_var + "}";
+	    }
+
+	  std::cout << fix_cmd << std::endl;
+	  command(fix_cmd);
+	}
+    }
+  else
+    {
+      std::string ld, rd;
+      std::string unfix_cmd;
+      
+      for (fork_partition f_p : f_ps)
+	{
+	  ld = f_p.fork + "l";
+	  rd = f_p.fork + "r";
+
+	  unfix_cmd = "unfix partition_" + ld;
+	  std::cout << unfix_cmd << std::endl;
+	  command(unfix_cmd);
+
+	  unfix_cmd = "unfix partition_" + rd;
+	  std::cout << unfix_cmd << std::endl;
+	  command(unfix_cmd);
+	  
+	}
+    }
 }

@@ -1,0 +1,1 @@
+variable fork_force equal 1.0*${kBT}/${r_mono} # [(Kcal/mol)/A]
