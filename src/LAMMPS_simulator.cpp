@@ -1179,6 +1179,12 @@ void LAMMPS_simulator::switch_extra_potential(std::string p, bool s)
 }
 
 
+bool LAMMPS_simulator::get_extra_potential_state(std::string p)
+{
+  return extra_pots[p];
+}
+
+
 void LAMMPS_simulator::extra_pots_to_sim_vars()
 {
   std::string p;
@@ -1199,6 +1205,24 @@ void LAMMPS_simulator::extra_pots_to_sim_vars()
 	  set_sim_var_int(p,0);
 	}
     }
+}
+
+
+void LAMMPS_simulator::initialize_extra_fixes()
+{
+  extra_fixes["fork_partition_repulsion"] = false;
+}
+
+
+void LAMMPS_simulator::switch_extra_fix(std::string p, bool s)
+{
+  extra_fixes[p] = s;
+}
+
+
+bool LAMMPS_simulator::get_extra_fix_state(std::string p)
+{
+  return extra_fixes[p];
 }
 
 

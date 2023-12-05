@@ -176,6 +176,8 @@ private:
   int switch_extra_potential(std::string extra_pot, std::string s);
   int switch_Ori_bdry_attraction(std::vector<std::string> &params);
   int switch_Ori_pair_repulsion(std::vector<std::string> &params);
+  int switch_extra_fix(std::string extra_fix, std::string s);
+  int switch_fork_partition_repulsion(std::vector<std::string> &params);
   // writing LAMMPS data file
   int write_LAMMPS_data(std::vector<std::string> &params);
   int write_mono_xyz(std::vector<std::string> &params);

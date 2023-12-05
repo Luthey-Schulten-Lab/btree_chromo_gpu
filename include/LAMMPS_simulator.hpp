@@ -108,6 +108,10 @@ public:
 
   // switch an extra potential on or off
   void switch_extra_potential(std::string p, bool s);
+  bool get_extra_potential_state(std::string p);
+  // switch an extra fix on or off
+  void switch_extra_fix(std::string p, bool s);
+  bool get_extra_fix_state(std::string p);
 
   unsigned long get_Nt();
   void increment_Nt(unsigned long dNt);
@@ -140,6 +144,9 @@ private:
   void initialize_extra_potentials();
   void extra_pots_to_sim_vars();
 
+  // reset extra fixes for the simulation
+  void initialize_extra_fixes();
+
   // reset the timestep
   void reset_timestep_to_Nt();
 
@@ -147,6 +154,7 @@ private:
   std::unordered_map<std::string,bool> computes; // map storing state of computes
   std::unordered_map<std::string,bool> dumps; // map storing state of dumps
   std::unordered_map<std::string,bool> extra_pots; // map storing state of extra potentials
+  std::unordered_map<std::string,bool> extra_fixes; // map storing state of extra fixes
 
   int sim_MPI_initialized, sim_MPI_finalized;
   int sim_MPI_size; // MPI size

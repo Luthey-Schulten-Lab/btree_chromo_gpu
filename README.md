@@ -169,6 +169,7 @@ See `examples` directory for a demonstration:
  - `switch_twisting_angles:(T/F)` - *enable/disable twisting angles between DNA monomers (default T), must be used prior to 'write_LAMMPS_data_file' to take effect*
  - `switch_Ori_bdry_attraction:(T/F)` - *enable/disable attraction of Ori bead to bdry using morse/cut potential (default F)*
  - `switch_Ori_pair_repulsion:(T/F)` - *enable/disable repulsion between Ori beads using harmonic/cut potential (default F)*
+ - `switch_fork_partition_repulsion:(T/F)` - *enable/disable repulsion between beads belonging to opposing daughters and their descendants (default F)*
  - `write_LAMMPS_data:LAMMPS_data_file` - *write a LAMMPS file (data.-) using the current mono, ribo, and bdry coordinates, and the current replication state for the bond/angle topology*
  - `write_mono_xyz:mono_file_xyz` - *write the current monomer coordinates as an .xyz file to load into visualization software*
 

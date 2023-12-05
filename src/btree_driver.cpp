@@ -1634,6 +1634,7 @@ void btree_driver::prepare_command_requirements()
   N_param_reqs["simulator_read_data"] = 1;
   // lock tests
   t_ls.clear();
+  t_ls.push_back(new_lock("btree_initialized",true));
   t_ls.push_back(new_lock("simulator_prepared",true));
   t_ls.push_back(new_lock("DNA_model",true));
   t_ls.push_back(new_lock("output_details",true));
@@ -1833,6 +1834,16 @@ void btree_driver::prepare_command_requirements()
   // lock updates
   t_ls.clear();
   lock_updates["switch_Ori_pair_repulsion"] = t_ls;
+
+  // switch_fork_partition_repulsion
+  // number of required parameters
+  N_param_reqs["switch_fork_partition_repulsion"] = 1;
+  // lock tests
+  t_ls.clear();
+  lock_tests["switch_fork_partition_repulsion"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["switch_fork_partition_repulsion"] = t_ls;
   
 
   /////////////////////////////////
@@ -2653,6 +2664,13 @@ int btree_driver::execute_single_command(std::string &command,
   else if (command == "switch_Ori_pair_repulsion")
     {
       error_code = switch_Ori_pair_repulsion(params);
+    }
+
+
+  // switch on the fork partition repulsion
+  else if (command == "switch_fork_partition_repulsion")
+    {
+      error_code = switch_fork_partition_repulsion(params);
     }
 
 
@@ -3514,6 +3532,49 @@ int btree_driver::switch_Ori_pair_repulsion(std::vector<std::string> &params)
 }
 
 
+int btree_driver::switch_extra_fix(std::string extra_fix, std::string s)
+{
+  if (s == "T")
+    {
+      driver_lmp_simulator.switch_extra_fix(extra_fix,true);
+    }
+  else if (s == "F")
+    {
+      driver_lmp_simulator.switch_extra_fix(extra_fix,false);
+    }
+  else
+    {
+      std::cout << "ERROR: invalid switch" << std::endl;
+      return 1;
+    }
+  return 0;
+}
+
+
+int btree_driver::switch_fork_partition_repulsion(std::vector<std::string> &params)
+{
+  bool s_old, s_new;
+  s_old = driver_lmp_simulator.get_extra_fix_state("fork_partition_repulsion");
+  s_new = s_old;
+  int e = switch_extra_fix("fork_partition_repulsion",params[0]);
+  s_new = driver_lmp_simulator.get_extra_fix_state("fork_partition_repulsion");
+
+  if (s_new != s_old)
+    {
+      if (s_new == true)
+	{
+	  driver_lmp_simulator.switch_fork_partition_force(driver_bt.get_all_fork_partitions(),true);
+	}
+      else
+	{
+	  driver_lmp_simulator.switch_fork_partition_force(driver_bt.get_all_fork_partitions(),false);
+	}
+    }
+  
+  return e;
+}
+
+
 int btree_driver::write_mono_xyz(std::vector<std::string> &params)
 {
   driver_lmp_sys.write_mono_xyz(params[0]);
@@ -3616,7 +3677,6 @@ int btree_driver::simulator_read_data(std::vector<std::string> &params)
   driver_lmp_simulator.global_setup();
   driver_lmp_simulator.read_data(params[0]);
   driver_lmp_simulator.prepare_fork_partition_groups(driver_bt.get_all_fork_partitions(),1);
-  driver_lmp_simulator.switch_fork_partition_force(driver_bt.get_all_fork_partitions(),true);
   driver_lmp_simulator.standard_computes();
   return 0;  
 }
