@@ -18,6 +18,7 @@ LAMMPS_simulator::LAMMPS_simulator()
   initialize_computes();
   initialize_dumps();
   initialize_extra_potentials();
+  initialize_extra_fixes();
   initialize_sim_vars();
 
 
@@ -137,6 +138,7 @@ void LAMMPS_simulator::clear()
   // reset all of the flags
   initialize_computes();
   initialize_dumps();
+  initialize_extra_fixes();
 }
 
 
@@ -230,6 +232,9 @@ void LAMMPS_simulator::setup_minimize(thermo_dump_parameters &t_d_p)
   // set simulator variables based on extra potentials
   extra_pots_to_sim_vars();
 
+  // store the extra fixes and disable them during minimization
+  disable_and_hold_extra_fixes();
+
   // // include compute for ids
   // compute_trigger("ids");
 
@@ -248,6 +253,17 @@ void LAMMPS_simulator::setup_minimize(thermo_dump_parameters &t_d_p)
 }
 
 
+// cleanup after minimize routines
+void LAMMPS_simulator::cleanup_minimize()
+{
+  // restore the extra fixes
+  restore_extra_fixes();
+
+  // reset the number of timesteps to Nt
+  reset_timestep_to_Nt();
+}
+
+
 // minimize with soft potentials and harmonic bonds
 void LAMMPS_simulator::minimize_soft_harmonic(thermo_dump_parameters t_d_p)
 {
@@ -260,8 +276,9 @@ void LAMMPS_simulator::minimize_soft_harmonic(thermo_dump_parameters t_d_p)
   // include minimization subroutine
   lmp->input->one("include ${DNA_model_dir}/minimize_subroutines/subroutine.min_soft_harmonic");
 
-  // reset the number of timesteps to Nt
-  reset_timestep_to_Nt();
+  // cleanup the minimization
+  cleanup_minimize();
+
 }
 
 
@@ -278,8 +295,8 @@ void LAMMPS_simulator::minimize_hard_harmonic(thermo_dump_parameters t_d_p)
   // include minimization subroutine
   lmp->input->one("include ${DNA_model_dir}/minimize_subroutines/subroutine.min_hard_harmonic");
 
-  // reset the number of timesteps to Nt
-  reset_timestep_to_Nt();
+  // cleanup the minimization
+  cleanup_minimize();
 }
 
 
@@ -295,8 +312,8 @@ void LAMMPS_simulator::minimize_topoDNA_harmonic(thermo_dump_parameters t_d_p)
   // include minimization subroutine
   lmp->input->one("include ${DNA_model_dir}/minimize_subroutines/subroutine.min_topoDNA_harmonic");
 
-  // reset the number of timesteps to Nt
-  reset_timestep_to_Nt();
+  // cleanup the minimization
+  cleanup_minimize();
 }
 
  
@@ -312,8 +329,8 @@ void LAMMPS_simulator::minimize_soft_FENE(thermo_dump_parameters t_d_p)
   // include minimization subroutine
   lmp->input->one("include ${DNA_model_dir}/minimize_subroutines/subroutine.min_soft_FENE");
 
-  // reset the number of timesteps to Nt
-  reset_timestep_to_Nt();
+  // cleanup the minimization
+  cleanup_minimize();
 }
 
 
@@ -329,8 +346,8 @@ void LAMMPS_simulator::minimize_hard_FENE(thermo_dump_parameters t_d_p)
   // include minimization subroutine
   lmp->input->one("include ${DNA_model_dir}/minimize_subroutines/subroutine.min_hard_FENE");
 
-  // reset the number of timesteps to Nt
-  reset_timestep_to_Nt();
+  // cleanup the minimization
+  cleanup_minimize();
 }
 
 
@@ -346,8 +363,8 @@ void LAMMPS_simulator::minimize_topoDNA_FENE(thermo_dump_parameters t_d_p)
   // include minimization subroutine
   lmp->input->one("include ${DNA_model_dir}/minimize_subroutines/subroutine.min_topoDNA_FENE");
 
-  // reset the number of timesteps to Nt
-  reset_timestep_to_Nt();
+  // cleanup the minimization
+  cleanup_minimize();
 }
 
 
@@ -1216,13 +1233,61 @@ void LAMMPS_simulator::initialize_extra_fixes()
 
 void LAMMPS_simulator::switch_extra_fix(std::string p, bool s)
 {
-  extra_fixes[p] = s;
+
+  bool s_old = extra_fixes[p];
+
+  if (s != s_old)
+    {
+
+      // use functions for extra fix
+      if (p == "fork_partition_repulsion")
+	{
+	  switch_fork_partition_force(s);
+	}
+
+      // switch the extra fix
+      extra_fixes[p] = s;
+      
+    }
 }
 
 
 bool LAMMPS_simulator::get_extra_fix_state(std::string p)
 {
   return extra_fixes[p];
+}
+
+
+void LAMMPS_simulator::disable_and_hold_extra_fixes()
+{
+  std::string p;
+  bool s;
+
+  // iterate over the set of extra fixes - store their state and disable
+  for (auto extra_fix=extra_fixes.begin(); extra_fix!=extra_fixes.end(); ++extra_fix)
+    {
+      p = extra_fix->first;
+      s = extra_fix->second;
+
+      extra_fixes_hold[p] = s;
+      switch_extra_fix(p,false);
+    }
+}
+
+
+void LAMMPS_simulator::restore_extra_fixes()
+{
+  std::string p;
+  bool s;
+  
+  // iterate over the set of extra fixes - store their state and disable
+  for (auto extra_fix=extra_fixes_hold.begin(); extra_fix!=extra_fixes_hold.end(); ++extra_fix)
+    {
+      p = extra_fix->first;
+      s = extra_fix->second;
+
+      switch_extra_fix(p,s);
+    }
 }
 
 
@@ -1283,36 +1348,49 @@ void LAMMPS_simulator::reset_bdry_particle_expansion()
 
 
 // prepare groups based on fork partitions
-void LAMMPS_simulator::prepare_fork_partition_groups(std::vector<fork_partition> f_ps, int idx)
+void LAMMPS_simulator::prepare_fork_partition_groups(int idx)
 {
 
-  std::string temp_daughter, temp_range;
-  std::string group_cmd, variable_cmd;
+  command("include ${DNA_model_dir}/potentials/lmp.fork_partitioning");
+
+  std::vector<fork_partition> f_ps = lmp_sys->get_all_fork_partitions();
+
+  std::string temp_range;
+  std::string mother, ld, rd;
+  std::string group_cmd, variable_cmd, region_cmd;
 
   std::array<std::string,3> dims = {"x","y","z"};
+
+  int mono_inc = 1;
   
   for (fork_partition f_p : f_ps)
     {
 
+      mother = f_p.fork;
+      ld = mother + "l";
+      rd = mother + "r";
+
       // partitioning of left daughter
-      temp_daughter = f_p.fork + "l";
-      group_cmd = "group " + temp_daughter + " id";
+      group_cmd = "group " + ld + " id";
 
       for (mono_range m_r : f_p.left_monos)
 	{
 	  if (m_r.wrapped == false)
 	    {
 	      temp_range = " " + std::to_string(m_r.ll+idx) + ":"
-		+ std::to_string(m_r.ul+idx);
+		+ std::to_string(m_r.ul+idx) + ":"
+		+ std::to_string(mono_inc);
 	      group_cmd += temp_range;
 	    }
 	  else
 	    {
 	      temp_range = " " + std::to_string(m_r.ll+idx) + ":"
-		+ std::to_string(m_r.mid_ll+idx);
+		+ std::to_string(m_r.mid_ll+idx) + ":"
+		+ std::to_string(mono_inc);
 	      group_cmd += temp_range;
 	      temp_range = " " + std::to_string(m_r.mid_ul+idx) + ":"
-		+ std::to_string(m_r.ul+idx);
+		+ std::to_string(m_r.ul+idx) + ":"
+		+ std::to_string(mono_inc);
 	      group_cmd += temp_range;
 	    }
 	}
@@ -1322,24 +1400,26 @@ void LAMMPS_simulator::prepare_fork_partition_groups(std::vector<fork_partition>
       command(group_cmd);
 
       // partitioning of right daughter
-      temp_daughter = f_p.fork + "r";
-      group_cmd = "group " + temp_daughter + " id";
+      group_cmd = "group " + rd + " id";
 
       for (mono_range m_r : f_p.right_monos)
 	{
 	  if (m_r.wrapped == false)
 	    {
 	      temp_range = " " + std::to_string(m_r.ll+idx) + ":"
-		+ std::to_string(m_r.ul+idx);
+		+ std::to_string(m_r.ul+idx) + ":"
+		+ std::to_string(mono_inc);
 	      group_cmd += temp_range;
 	    }
 	  else
 	    {
 	      temp_range = " " + std::to_string(m_r.ll+idx) + ":"
-		+ std::to_string(m_r.mid_ll+idx);
+		+ std::to_string(m_r.mid_ll+idx) + ":"
+		+ std::to_string(mono_inc);
 	      group_cmd += temp_range;
 	      temp_range = " " + std::to_string(m_r.mid_ul+idx) + ":"
-		+ std::to_string(m_r.ul+idx);
+		+ std::to_string(m_r.ul+idx) + ":"
+		+ std::to_string(mono_inc);
 	      group_cmd += temp_range;
 	    }
 	}
@@ -1352,29 +1432,65 @@ void LAMMPS_simulator::prepare_fork_partition_groups(std::vector<fork_partition>
       // create variables for relative vector between CoMs
       for (size_t i=0; i<dims.size(); i++)
 	{
-	  variable_cmd = "variable d" + dims[i] + "_com_" + f_p.fork;
+	  variable_cmd = "variable d" + dims[i] + "_com_" + mother;
 	  variable_cmd += " equal ";
-	  variable_cmd += "xcm(" + f_p.fork + "l," + dims[i] + ")-";
-	  variable_cmd += "xcm(" + f_p.fork + "r," + dims[i] +")";
+	  variable_cmd += "xcm(" + ld  + "," + dims[i] + ")-";
+	  variable_cmd += "xcm(" + rd + "," + dims[i] +")";
 
 	  std::cout << variable_cmd << std::endl;
 	  command(variable_cmd);
 	}
 
+      // create variables for count
+      variable_cmd = "variable N_" + ld;
+      variable_cmd += " equal count(" + ld  + ")";
+      std::cout << variable_cmd << std::endl;
+      command(variable_cmd);
+      variable_cmd = "variable N_" + rd;
+      variable_cmd += " equal count(" + rd  + ")";
+      std::cout << variable_cmd << std::endl;
+      command(variable_cmd);
+
+      // create variables for joint CoM
+      for (size_t i=0; i<dims.size(); i++)
+	{
+	  variable_cmd = "variable " + dims[i] + "_com_" + mother;
+	  variable_cmd += " equal ";
+	  variable_cmd += "((v_N_" + ld;
+	  variable_cmd += "*xcm(" + ld + "," + dims[i] + "))+";
+	  variable_cmd += "(v_N_" + rd;
+	  variable_cmd += "*xcm(" + rd + "," + dims[i] + ")))";
+	  variable_cmd += "/(v_N_" + ld + "+v_N_" + rd + ")";
+
+	  std::cout << variable_cmd << std::endl;
+	  command(variable_cmd);
+	}
+
+      // create spherical region around joint CoM
+      region_cmd = "region sphere_" + mother;
+      region_cmd += " sphere";
+      for (size_t i=0; i<dims.size(); i++)
+	{
+	  region_cmd += " v_" + dims[i] + "_com_" + mother;
+	}
+      region_cmd += " ${fork_cutoff}";
+      std::cout << region_cmd << std::endl;
+      command(region_cmd);
+
       // create variable for distance between CoMs
-      variable_cmd = "variable d_com_" + f_p.fork + " equal ";
+      variable_cmd = "variable d_com_" + mother + " equal ";
       variable_cmd += "sqrt(";
       for (size_t i=0; i<dims.size(); i++)
 	{
 	  if (i == 0)
 	    {
-	      variable_cmd += "${d" + dims[i] + "_com_" + f_p.fork
-		+ "}^2";
+	      variable_cmd += "v_d" + dims[i] + "_com_" + mother
+		+ "^2";
 	    }
 	  else
 	    {
-	      variable_cmd += "+${d" + dims[i] + "_com_" + f_p.fork
-		+ "}^2";
+	      variable_cmd += "+v_d" + dims[i] + "_com_" + mother
+		+ "^2";
 	    }
 	}
 
@@ -1386,10 +1502,10 @@ void LAMMPS_simulator::prepare_fork_partition_groups(std::vector<fork_partition>
       // create variables for direction between CoMs
       for (size_t i=0; i<dims.size(); i++)
 	{
-	  variable_cmd = "variable ud" + dims[i] + "_com_" + f_p.fork;
+	  variable_cmd = "variable ud" + dims[i] + "_com_" + mother;
 	  variable_cmd += " equal ";
-	  variable_cmd += "${d" + dims[i] + "_com_" + f_p.fork + "}";
-	  variable_cmd += "/${d_com_" + f_p.fork + "}";
+	  variable_cmd += "v_d" + dims[i] + "_com_" + mother;
+	  variable_cmd += "/v_d_com_" + mother;
 
 	  std::cout << variable_cmd << std::endl;
 	  command(variable_cmd);
@@ -1400,13 +1516,18 @@ void LAMMPS_simulator::prepare_fork_partition_groups(std::vector<fork_partition>
 
 
 // apply/remove forces to fork partitions
-void LAMMPS_simulator::switch_fork_partition_force(std::vector<fork_partition> f_ps, bool s)
+void LAMMPS_simulator::switch_fork_partition_force(bool s)
 {
+
+  std::vector<fork_partition> f_ps = lmp_sys->get_all_fork_partitions();
+  
   command("include ${DNA_model_dir}/potentials/lmp.fork_partitioning");
+
+  int force_freq = 1;
 
   if (s == true)
     {
-      std::string ld, rd;
+      std::string mother, ld, rd;
       std::string fix_cmd, temp_var, variable_cmd;
 
       std::array<std::string,3> dims = {"x","y","z"};
@@ -1414,27 +1535,39 @@ void LAMMPS_simulator::switch_fork_partition_force(std::vector<fork_partition> f
       for (fork_partition f_p : f_ps)
 	{
 
+	  mother = f_p.fork;
+	  ld = mother + "l";
+	  rd = mother + "r";
+
 	  for (size_t i=0; i<dims.size(); i++)
 	    {
-	      temp_var = "f" + dims[i] + "_" + f_p.fork;
+	      temp_var = "lf" + dims[i] + "_" + mother;
 	      variable_cmd = "variable " + temp_var + " equal ";
-	      variable_cmd += "${fork_force}*${ud" + dims[i]
-		+ "_com_" + f_p.fork + "}";
+	      variable_cmd += "v_fork_force*v_ud" + dims[i]
+		+ "_com_" + mother;
+	      std::cout << variable_cmd << std::endl;
+	      command(variable_cmd);
+
+	      temp_var = "rf" + dims[i] + "_" + mother;
+	      variable_cmd = "variable " + temp_var + " equal ";
+	      variable_cmd += "-v_fork_force*v_ud" + dims[i]
+		+ "_com_" + mother;
 	      std::cout << variable_cmd << std::endl;
 	      command(variable_cmd);
 	    }
 	  
-	  ld = f_p.fork + "l";
-	  rd = f_p.fork + "r";
 
 	  // apply force to left daughter and descendants
 	  fix_cmd = "fix partition_" + ld + " " + ld + " addforce";
 	  
 	  for (size_t i=0; i<dims.size(); i++)
 	    {
-	      temp_var = "f" + dims[i] + "_" + f_p.fork;
-	      fix_cmd += " ${" + temp_var + "}";
+	      temp_var = "v_lf" + dims[i] + "_" + mother;
+	      fix_cmd += " " + temp_var;
 	    }
+
+	  fix_cmd += " every " + std::to_string(force_freq);
+	  fix_cmd += " region sphere_" + mother;
 
 	  std::cout << fix_cmd << std::endl;
 	  command(fix_cmd);
@@ -1444,9 +1577,12 @@ void LAMMPS_simulator::switch_fork_partition_force(std::vector<fork_partition> f
 
 	  for (size_t i=0; i<dims.size(); i++)
 	    {
-	      temp_var = "f" + dims[i] + "_" + f_p.fork;
-	      fix_cmd += " -${" + temp_var + "}";
+	      temp_var = "v_rf" + dims[i] + "_" + mother;
+	      fix_cmd += " " + temp_var;
 	    }
+
+	  fix_cmd += " every " + std::to_string(force_freq);
+	  fix_cmd += " region sphere_" + mother;
 
 	  std::cout << fix_cmd << std::endl;
 	  command(fix_cmd);
@@ -1454,13 +1590,15 @@ void LAMMPS_simulator::switch_fork_partition_force(std::vector<fork_partition> f
     }
   else
     {
-      std::string ld, rd;
+      std::string mother, ld, rd;
       std::string unfix_cmd;
       
       for (fork_partition f_p : f_ps)
 	{
-	  ld = f_p.fork + "l";
-	  rd = f_p.fork + "r";
+
+	  mother = f_p.fork;
+	  ld = mother + "l";
+	  rd = mother + "r";
 
 	  unfix_cmd = "unfix partition_" + ld;
 	  std::cout << unfix_cmd << std::endl;

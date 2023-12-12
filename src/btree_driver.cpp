@@ -3553,24 +3553,7 @@ int btree_driver::switch_extra_fix(std::string extra_fix, std::string s)
 
 int btree_driver::switch_fork_partition_repulsion(std::vector<std::string> &params)
 {
-  bool s_old, s_new;
-  s_old = driver_lmp_simulator.get_extra_fix_state("fork_partition_repulsion");
-  s_new = s_old;
   int e = switch_extra_fix("fork_partition_repulsion",params[0]);
-  s_new = driver_lmp_simulator.get_extra_fix_state("fork_partition_repulsion");
-
-  if (s_new != s_old)
-    {
-      if (s_new == true)
-	{
-	  driver_lmp_simulator.switch_fork_partition_force(driver_bt.get_all_fork_partitions(),true);
-	}
-      else
-	{
-	  driver_lmp_simulator.switch_fork_partition_force(driver_bt.get_all_fork_partitions(),false);
-	}
-    }
-  
   return e;
 }
 
@@ -3676,7 +3659,7 @@ int btree_driver::simulator_read_data(std::vector<std::string> &params)
   driver_lmp_simulator.reset_protocol_variables();
   driver_lmp_simulator.global_setup();
   driver_lmp_simulator.read_data(params[0]);
-  driver_lmp_simulator.prepare_fork_partition_groups(driver_bt.get_all_fork_partitions(),1);
+  driver_lmp_simulator.prepare_fork_partition_groups(1);
   driver_lmp_simulator.standard_computes();
   return 0;  
 }

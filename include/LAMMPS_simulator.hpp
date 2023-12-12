@@ -77,8 +77,8 @@ public:
   void read_data(std::string data_file);
 
   // prepare fork partition groups and apply/remove forces
-  void prepare_fork_partition_groups(std::vector<fork_partition> f_ps, int idx);
-  void switch_fork_partition_force(std::vector<fork_partition> f_ps, bool s);
+  void prepare_fork_partition_groups(int idx);
+  void switch_fork_partition_force(bool s);
 
   // minimization routines
   void minimize_soft_harmonic(thermo_dump_parameters t_d_p);
@@ -133,6 +133,7 @@ private:
   // setups for runs and minimizes
   void setup_run(unsigned long N_steps, thermo_dump_parameters &t_d_p);
   void setup_minimize(thermo_dump_parameters &t_d_p);
+  void cleanup_minimize();
   
   // reset all simulation variables
   void initialize_sim_vars();
@@ -146,6 +147,8 @@ private:
 
   // reset extra fixes for the simulation
   void initialize_extra_fixes();
+  void disable_and_hold_extra_fixes();
+  void restore_extra_fixes();
 
   // reset the timestep
   void reset_timestep_to_Nt();
@@ -155,6 +158,7 @@ private:
   std::unordered_map<std::string,bool> dumps; // map storing state of dumps
   std::unordered_map<std::string,bool> extra_pots; // map storing state of extra potentials
   std::unordered_map<std::string,bool> extra_fixes; // map storing state of extra fixes
+  std::unordered_map<std::string,bool> extra_fixes_hold; // map temporarily holding state of extra fixes
 
   int sim_MPI_initialized, sim_MPI_finalized;
   int sim_MPI_size; // MPI size

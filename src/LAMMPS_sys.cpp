@@ -43,6 +43,13 @@ void LAMMPS_sys::set_btree(btree_state in_state)
 }
 
 
+// get the fork partitions
+std::vector<fork_partition> LAMMPS_sys::get_all_fork_partitions()
+{
+  return internal_btree.get_all_fork_partitions();
+}
+
+
 // concatenate atom arrays
 void LAMMPS_sys::cat_atom_array(atom_array &in_atoms, atom_array &cat_atoms)
 {

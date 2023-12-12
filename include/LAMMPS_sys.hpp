@@ -53,6 +53,9 @@ public:
   // set the btree
   void set_btree(btree_state in_state);
 
+  // get items from the internal btree
+  std::vector<fork_partition> get_all_fork_partitions();
+
   // read the Brownian dynamics lengths
   void read_BD_lengths(std::string lengths_filename);
 
