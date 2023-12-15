@@ -97,8 +97,10 @@ public:
   void run_topoDNA_FENE(unsigned long N_steps, thermo_dump_parameters t_d_p);
 
   // modulate particle size
-  void expand_bdry_particles(double ds);
-  void reset_bdry_particle_expansion();
+  void scale_bdry_particles(double ds);
+  void reset_bdry_particle_size();
+  void scale_ribo_particles(double ds);
+  void reset_ribo_particle_size();
 
   // loop system
   int read_loop_params(std::string loop_param_filename);

@@ -218,6 +218,7 @@ private:
 
   // simulator manipulations
   int simulator_expand_bdry_particles(std::vector<std::string> &params);
+  int simulator_regrow_ribo_particles(std::vector<std::string> &params);
 
   // fused commands
   int sys_write_sim_read_LAMMPS_data(std::vector<std::string> &params);

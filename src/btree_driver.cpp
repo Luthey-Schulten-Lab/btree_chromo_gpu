@@ -1908,6 +1908,18 @@ void btree_driver::prepare_command_requirements()
   // lock updates
   t_ls.clear();
   lock_updates["simulator_expand_bdry_particles"] = t_ls;
+
+  // simulator_regrow_ribo_particles
+  // number of required parameters
+  N_param_reqs["simulator_regrow_ribo_particles"] = 4;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("simulator_prepared",true));
+  t_ls.push_back(new_lock("lmp_data_present",true));
+  lock_tests["simulator_regrow_ribo_particles"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["simulator_regrow_ribo_particles"] = t_ls;
   
 
   //////////////////////////////
@@ -2650,6 +2662,13 @@ int btree_driver::execute_single_command(std::string &command,
   else if (command == "simulator_expand_bdry_particles")
     {
       error_code = simulator_expand_bdry_particles(params);
+    }
+
+
+  // run a simulation with ribo particles that regrow to their size
+  else if (command == "simulator_regrow_ribo_particles")
+    {
+      error_code = simulator_regrow_ribo_particles(params);
     }
 
 
@@ -3956,13 +3975,20 @@ int btree_driver::simulator_expand_bdry_particles(std::vector<std::string> &para
   int run_steps = stoi(params[2]);
   int thermo_freq = stoi(params[3]);
 
+  // test for a valid expansion amount
+  if ((expansion_scale < 1.0) || (expansion_scale > 3.0))
+    {
+      std::cout << "bad expansion scale" << std::endl;
+      e = 1;
+      return e;
+    }
+
   // create the parameter vector for runs
   run_params.push_back(std::to_string(run_steps));
   run_params.push_back(std::to_string(thermo_freq));
   run_params.push_back("0");
   run_params.push_back("noappend");
   run_params.push_back("first");
-
 
   std::cout << "expanding bdry particles by factor of "
 	    << expansion_scale << std::endl;
@@ -3977,10 +4003,14 @@ int btree_driver::simulator_expand_bdry_particles(std::vector<std::string> &para
     {
 
       // set the expansion step size
-      ds = ((expansion_scale-1.0)/N_iter)*(i_step+1);
+      ds = 1.0 + ((expansion_scale-1.0)/N_iter)*(i_step+1);
+
+      std::cout << "\nexpansion step = " << i_step << std::endl;
+      std::cout << "\tbdry expansion scale = " << ds
+		<< "\n" << std::endl;
 
       // expand the bdry particles
-      driver_lmp_simulator.expand_bdry_particles(ds);
+      driver_lmp_simulator.scale_bdry_particles(ds);
       
       // run the system
       if (run_steps > 0)
@@ -3991,10 +4021,84 @@ int btree_driver::simulator_expand_bdry_particles(std::vector<std::string> &para
     }
 
   // reset bdry particle expansion
-  driver_lmp_simulator.reset_bdry_particle_expansion();
+  driver_lmp_simulator.reset_bdry_particle_size();
 
   // restore the timestep
   e += simulator_restore_timestep();
 
   return e;
 }
+
+
+int btree_driver::simulator_regrow_ribo_particles(std::vector<std::string> &params)
+{
+  int e = 0;
+  double ds;
+
+  // std::vector<std::string> run_params;
+
+  double regrow_scale = stod(params[0]);
+  int N_iter = stoi(params[1]);
+  //int run_steps = stoi(params[2]);
+  //int thermo_freq = stoi(params[3]);
+
+  std::vector<std::string> relax_params;
+  relax_params.push_back(params[2]);
+  relax_params.push_back(params[3]);
+
+  // test for a valid expansion amount
+  if ((regrow_scale <= 0.0) || (regrow_scale >= 1.0))
+    {
+      std::cout << "bad regrow scale" << std::endl;
+      e = 1;
+      return e;
+    }
+
+  // create the parameter vector for runs
+  // run_params.push_back(std::to_string(run_steps));
+  // run_params.push_back(std::to_string(thermo_freq));
+  // run_params.push_back("0");
+  // run_params.push_back("noappend");
+  // run_params.push_back("first");
+
+  std::cout << "regrowing ribo particles starting from scale of "
+	    << regrow_scale << std::endl;
+  std::cout << "N_iter = "
+	    << N_iter << std::endl;
+
+  // store the current timestep
+  e += simulator_store_timestep();
+
+  // iterate over the regrowth steps
+  for (int i_step=0; i_step<(N_iter+1); i_step++)
+    {
+
+      // set the regrowth step size
+      ds = 1.0 - ((1.0-regrow_scale)/N_iter)*(N_iter-i_step);
+
+      std::cout << "\nregrowth step = " << i_step << std::endl;
+      std::cout << "\tribo regrowth scale = " << ds
+		<< "\n" << std::endl;
+
+      // expand the bdry particles
+      driver_lmp_simulator.scale_ribo_particles(ds);
+      
+      // run the system
+      // if (run_steps > 0)
+      // 	{
+      // 	  // e += simulator_run<1,1>(run_params);
+      // 	}
+
+      e += simulator_relax_progressive(relax_params);
+
+    }
+
+  // reset bdry particle expansion
+  driver_lmp_simulator.reset_ribo_particle_size();
+
+  // restore the timestep
+  e += simulator_restore_timestep();
+
+  return e;
+}
+

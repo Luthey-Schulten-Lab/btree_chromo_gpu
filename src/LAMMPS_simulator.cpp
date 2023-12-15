@@ -1304,11 +1304,11 @@ void LAMMPS_simulator::increment_Nt(unsigned long dNt)
 }
 
 
-void LAMMPS_simulator::expand_bdry_particles(double ds)
+void LAMMPS_simulator::scale_bdry_particles(double ds)
 {
   std::string cmd;
   
-  cmd = "variable r_bdry_temp equal " + std::to_string(1.0+ds) + "*${r_bdry}";
+  cmd = "variable r_bdry_temp equal " + std::to_string(ds) + "*${r_bdry}";
   command(cmd);
 
   cmd = "variable sigma_mono_bdry equal ${r_mono}+${r_bdry_temp}";
@@ -1327,7 +1327,7 @@ void LAMMPS_simulator::expand_bdry_particles(double ds)
 }
 
 
-void LAMMPS_simulator::reset_bdry_particle_expansion()
+void LAMMPS_simulator::reset_bdry_particle_size()
 {
   std::string cmd;
 
@@ -1343,6 +1343,49 @@ void LAMMPS_simulator::reset_bdry_particle_expansion()
   cmd = "variable WCA_ribo_bdry equal ${cut_WCA}*${sigma_ribo_bdry}";
   command(cmd);
   cmd = "variable WCA_bdry_bdry equal ${cut_WCA}*${sigma_bdry_bdry}";
+  command(cmd);
+}
+
+
+void LAMMPS_simulator::scale_ribo_particles(double ds)
+{
+  std::string cmd;
+  
+  cmd = "variable r_ribo_temp equal " + std::to_string(ds) + "*${r_ribo}";
+  command(cmd);
+
+  cmd = "variable sigma_mono_ribo equal ${r_mono}+${r_ribo_temp}";
+  command(cmd);
+  cmd = "variable sigma_ribo_bdry equal ${r_ribo_temp}+${r_bdry}";
+  command(cmd);
+  cmd = "variable sigma_ribo_ribo equal 2*${r_ribo_temp}";
+  command(cmd);
+
+  cmd = "variable WCA_mono_ribo equal ${cut_WCA}*${sigma_mono_ribo}";
+  command(cmd);
+  cmd = "variable WCA_ribo_bdry equal ${cut_WCA}*${sigma_ribo_bdry}";
+  command(cmd);
+  cmd = "variable WCA_ribo_ribo equal ${cut_WCA}*${sigma_ribo_ribo}";
+  command(cmd);
+}
+
+
+void LAMMPS_simulator::reset_ribo_particle_size()
+{
+  std::string cmd;
+
+  cmd = "variable sigma_mono_ribo equal ${r_mono}+${r_ribo}";
+  command(cmd);
+  cmd = "variable sigma_ribo_bdry equal ${r_ribo}+${r_bdry}";
+  command(cmd);
+  cmd = "variable sigma_ribo_ribo equal 2*${r_ribo}";
+  command(cmd);
+
+  cmd = "variable WCA_mono_ribo equal ${cut_WCA}*${sigma_mono_ribo}";
+  command(cmd);
+  cmd = "variable WCA_ribo_bdry equal ${cut_WCA}*${sigma_ribo_bdry}";
+  command(cmd);
+  cmd = "variable WCA_ribo_ribo equal ${cut_WCA}*${sigma_ribo_ribo}";
   command(cmd);
 }
 

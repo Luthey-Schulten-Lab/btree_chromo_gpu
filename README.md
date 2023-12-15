@@ -200,7 +200,8 @@ See `examples` directory for a demonstration:
  - `simulator_run_(soft/hard/topoDNA)_(harmonic/FENE):Nsteps,Tfreq,Dfreq,append_option,skip_option` - *run Brownian dynamics with the dictated potential for Nsteps, while printing thermodynamic information every Tfreq steps and dumping every Dfreq steps - append_option = noappend/append and skip_option = first/skip_first*
  - `simulator_load_loop_params:loop_params_file` - *read a file (loop_params_file) containing the parameters for the looping interactions*
  - `simulator_run_loops:Nloops,Nsteps,Tfreq,Dfreq,append_option,skip_option` - *run Brownian dynamics with the hard/FENE potential for Nsteps with Nloops randomly placed, while printing thermodynamic information every Tfreq steps and dumping every Dfreq steps - append_option = noappend/append and skip_option = first/skip_first*
- - `simulator_expand_bdry_particles:scale,Niter,Nsteps,Tfreq` - *expand the interaction radius of the boundary particles by a factor of scale, complete this over Niter increments, each of which runs Brownian dynamics with the hard/FENE potential for Nsteps while printing thermodynamic information every Tfreq steps*
+ - `simulator_expand_bdry_particles:scale,Niter,Nsteps,Tfreq` - *expand the interaction radius of the boundary particles by a factor of scale (1.0<scale<3.0), complete this over Niter increments, each of which runs Brownian dynamics with the hard/FENE potential for Nsteps while printing thermodynamic information every Tfreq steps*
+ - `simulator_regrow_ribo_particles:scale,Niter,Nsteps,Tfreq` - *regrow the interaction radius of the ribosome particles starting from a reduced scale (0.0<=scale<=1.0), complete this over Niter increments, each of which runs relax_progressive with parameters Nsteps and Tfreq*
 
 #### Fused Directives
 
