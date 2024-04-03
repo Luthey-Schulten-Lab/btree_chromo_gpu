@@ -6,7 +6,7 @@
 
 # NOTE 1: comment the ``terminate'' at the top to execute all of the commands
 
-# NOTE 2: change all directories in this file from ``/home/ben/Workspace/'' to the local repository location
+# NOTE 2: change all directories in this file from ``/home/andrew/Desktop/Projects/'' to the local repository location
 
 # NOTE 3: by default the runs will be skipped
 
@@ -33,29 +33,29 @@ new_chromo:5000
 
 
 #load the BD lengths
-load_BD_lengths:/home/ben/Workspace/btree_chromo/examples/simulating_chromosome_with_replication/BD_lengths.txt
+load_BD_lengths:/home/andrew/Desktop/Projects/btree_chromo/examples/simulating_chromosome_with_replication/BD_lengths.txt
 
 
 #commands to set up the simulator
 prepare_simulator:log.test
 simulator_set_prng_seed:10
 simulator_set_nProc:8
-simulator_set_DNA_model:/home/ben/Workspace/btree_chromo/LAMMPS_DNA_model/
+simulator_set_DNA_model:/home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model/
 simulator_set_delta_t:1.0E+5
 
 
 #set the directory and file label for the simulation output
-simulator_set_output_details:/home/ben/Workspace/btree_chromo/examples/simulating_chromosome_with_replication/,example
+simulator_set_output_details:/home/andrew/Desktop/Projects/btree_chromo/examples/simulating_chromosome_with_replication/,example
 
 
 #load the monomer coordinates and orientations
-load_mono_coords:/home/ben/Workspace/btree_chromo/examples/simulating_chromosome_with_replication/x_mono_5000mono_50ribo_bdry900A.bin,row
-load_mono_quats:/home/ben/Workspace/btree_chromo/examples/simulating_chromosome_with_replication/q_mono_5000mono_50ribo_bdry900A.bin,row
+load_mono_coords:/home/andrew/Desktop/Projects/btree_chromo/examples/simulating_chromosome_with_replication/x_mono_5000mono_50ribo_bdry900A.bin,row
+load_mono_quats:/home/andrew/Desktop/Projects/btree_chromo/examples/simulating_chromosome_with_replication/q_mono_5000mono_50ribo_bdry900A.bin,row
 
 
 #load the ribosome coordinates and orientations
-load_ribo_coords:/home/ben/Workspace/btree_chromo/examples/simulating_chromosome_with_replication/x_ribo_5000mono_50ribo_bdry900A.bin,row
-load_ribo_quats:/home/ben/Workspace/btree_chromo/examples/simulating_chromosome_with_replication/q_ribo_5000mono_50ribo_bdry900A.bin,row
+load_ribo_coords:/home/andrew/Desktop/Projects/btree_chromo/examples/simulating_chromosome_with_replication/x_ribo_5000mono_50ribo_bdry900A.bin,row
+load_ribo_quats:/home/andrew/Desktop/Projects/btree_chromo/examples/simulating_chromosome_with_replication/q_ribo_5000mono_50ribo_bdry900A.bin,row
 
 
 #generate a spherical boundary with 900A radius centered at the origin
@@ -63,7 +63,7 @@ spherical_bdry:900.0,0.0,0.0,0.0
 
 
 #write the LAMMPS data file and read it into the simulator
-sys_write_sim_read_LAMMPS_data:/home/ben/Workspace/btree_chromo/examples/simulating_chromosome_with_replication/data.example
+sys_write_sim_read_LAMMPS_data:/home/andrew/Desktop/Projects/btree_chromo/examples/simulating_chromosome_with_replication/data.example
 
 
 #relax the structure
@@ -75,7 +75,7 @@ simulator_run_hard_FENE:100000,1000,10000,noappend,first
 
 
 #begin region whose directives will be repeated twice
-repeat:2
+repeat:1
 
 
 #sync the state of the simulator with the system (system will be overwritten by simulator coordinates)
@@ -90,7 +90,7 @@ map_replication
 
 
 #write the LAMMPS data file with the now replicated monomers and read it into the simulator
-sys_write_sim_read_LAMMPS_data:/home/ben/Workspace/btree_chromo/examples/simulating_chromosome_with_replication/data.example
+sys_write_sim_read_LAMMPS_data:/home/andrew/Desktop/Projects/btree_chromo/examples/simulating_chromosome_with_replication/data.example
 
 
 #relax the structure

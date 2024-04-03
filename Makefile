@@ -16,19 +16,24 @@
 CXX      := -g++
 CXXFLAGS := -pedantic-errors -Wall -Wextra -Werror
 
+GCC_LIB := /home/andrew/anaconda3/envs/btree_chromo/lib
+OpenMPI_LIB := /home/andrew/anaconda3/envs/btree_chromo/lib
+fmt_LIB := /home/andrew/anaconda3/envs/btree_chromo/lib
+
 BASE_LDFLAGS  := -L${GCC_LIB} -lstdc++ -lm -std=c++17
 OPENMPI_LDFLAGS := -L${OpenMPI_LIB} -lmpi -pthread -Wl,-rpath -Wl,${OpenMPI_LIB} -Wl,--enable-new-dtags
 FMT_LDFLAGS := -L${fmt_LIB} -lfmt
-LAMMPS_LDFLAGS := ${LAMMPS_LIB}/liblammps_twistable_BD_OMP.so
+LAMMPS_LDFLAGS := /home/andrew/Software/Suites/LAMMPS/build_no_twist_BD_OMP/liblammps_no_twist_BD_OMP.so
 LDFLAGS := ${BASE_LDFLAGS} ${OPENMPI_LDFLAGS} ${FMT_LDFLAGS} ${LAMMPS_LDFLAGS}
 
-BASE_INCLUDE  := -Iinclude/ -I${GCC_INC}
-OPENMPI_INCLUDE := -I${OpenMPI_INC}
-FMT_INCLUDE := -I${fmt_INC}
-BOOST_INCLUDE := -I${boost_INC}
-LAMMPS_INCLUDE := -I/home/ben/Software/Suites/LAMMPS/lammps/src
+BASE_INCLUDE  := -Iinclude/ -I/home/andrew/anaconda3/envs/btree_chromo/include
+OPENMPI_INCLUDE := -I/home/andrew/anaconda3/envs/btree_chromo/include/openmpi
+FMT_INCLUDE := -I/home/andrew/anaconda3/envs/btree_chromo/include/fmt
+#BOOST_INCLUDE := -I${boost_INC}
+LAMMPS_INCLUDE := -I/home/andrew/Software/Suites/LAMMPS/lammps-2Aug2023/src
 #LAMMPS_INCLUDE := -I/home/ben/Software/Suites/LAMMPS/feature_2023_02_08/lammps-8Feb2023/src
-INCLUDE := ${BASE_INCLUDE} ${OPENMPI_INCLUDE} ${FMT_INCLUDE} ${BOOST_INCLUDE} ${LAMMPS_INCLUDE}
+#INCLUDE := ${BASE_INCLUDE} ${OPENMPI_INCLUDE} ${FMT_INCLUDE} ${BOOST_INCLUDE} ${LAMMPS_INCLUDE}
+INCLUDE := ${BASE_INCLUDE} ${OPENMPI_INCLUDE} ${FMT_INCLUDE} ${LAMMPS_INCLUDE}
 
 BUILD    := ./build
 OBJ_DIR  := $(BUILD)/objects
