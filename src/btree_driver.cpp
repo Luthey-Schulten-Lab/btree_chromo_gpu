@@ -1411,6 +1411,16 @@ void btree_driver::prepare_command_requirements()
   t_ls.clear();
   lock_updates["switch_twisting_angles"] = t_ls;
 
+  // switch_ellipsoids
+  // number of required parameters
+  N_param_reqs["switch_ellipsoids"] = 1;
+  // lock tests
+  t_ls.clear();
+  lock_tests["switch_ellipsoids"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["switch_ellipsoids"] = t_ls;
+
   // write_mono_xyz
   // number of required parameters
   N_param_reqs["write_mono_xyz"] = 1;
@@ -2413,6 +2423,13 @@ int btree_driver::execute_single_command(std::string &command,
     {
       error_code = switch_twisting_angles(params);
     }
+
+
+  // switch ellipsoids on/off
+  else if (command == "switch_ellipsoids")
+  {
+      error_code = switch_ellipsoids(params);
+  }
 
 
   // set initial state for mapper
@@ -3518,6 +3535,27 @@ int btree_driver::switch_twisting_angles(std::vector<std::string> &params)
 }
 
 
+int btree_driver::switch_ellipsoids(std::vector<std::string> &params)
+{
+    if (params[0] == "T")
+    {
+        driver_lmp_sys.switch_ellipsoids(true);
+        driver_lmp_simulator.switch_ellipsoids(true);
+    }
+    else if (params[0] == "F")
+    {
+        driver_lmp_sys.switch_ellipsoids(false);
+        driver_lmp_simulator.switch_ellipsoids(false);
+    }
+    else
+    {
+        std::cout << "ERROR: invalid switch" << std::endl;
+        return 1;
+    }
+    return 0;
+}
+
+
 int btree_driver::switch_extra_potential(std::string extra_pot, std::string s)
 {
   if (s == "T")
@@ -3625,6 +3663,7 @@ int btree_driver::sync_simulator_and_system()
 {
   driver_lmp_sys.set_btree(driver_bt.get_state());
   driver_lmp_simulator.sim_to_sys();
+  driver_lmp_sys.apply_RMF();
   return 0;
 }
 

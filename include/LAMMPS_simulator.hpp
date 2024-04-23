@@ -115,6 +115,9 @@ public:
   void switch_extra_fix(std::string p, bool s);
   bool get_extra_fix_state(std::string p);
 
+  // switch whether to use ellipsoids on or off
+  void switch_ellipsoids(bool s);
+
   unsigned long get_Nt();
   void increment_Nt(unsigned long dNt);
   

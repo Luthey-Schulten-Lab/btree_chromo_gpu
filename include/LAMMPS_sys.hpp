@@ -36,8 +36,14 @@ struct topo_switches
   bool bond;
   bool bending_angle;
   bool twisting_angle;
+  bool ellipsoid;
 };
 
+// structure defining representation switches
+struct rep_switches
+{
+    bool ellipsoid;
+};
 
 class LAMMPS_sys
 {
@@ -83,6 +89,9 @@ public:
   // apply a mapping to the monomers
   void apply_mono_mapping(std::vector<std::vector<std::array<int,3>>> map);
 
+  // apply rotation minimizing frame to the monomers
+  void apply_RMF();
+
   // write the monomer coordinates to an xyz for quick visualization
   void write_mono_xyz(std::string data_filename);
 
@@ -127,6 +136,7 @@ public:
   void switch_bonds(bool s);
   void switch_bending_angles(bool s);
   void switch_twisting_angles(bool s);
+  void switch_ellipsoids(bool s);
   
 private:
 
@@ -162,6 +172,7 @@ private:
   sys_bbox bbox;
   BD_lengths BD_l;
   topo_switches t_s;
+  rep_switches r_s;
   loop_sys_params l_sys_p;
   btree internal_btree;
   boundary_surface b_surf;

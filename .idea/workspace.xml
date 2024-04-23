@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="CMakeRunConfigurationManager">
+    <generated>
+      <config projectName="btree_chromo" targetName="release" />
+      <config projectName="btree_chromo" targetName="build" />
+      <config projectName="btree_chromo" targetName="debug" />
+      <config projectName="btree_chromo" targetName="Makefile" />
+      <config projectName="btree_chromo" targetName="all" />
+      <config projectName="btree_chromo" targetName="info" />
+    </generated>
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="31e3448d-81be-4e67-ac75-8c3395c3774f" name="Changes" comment="Made omp version of fix brownian">
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model/compute_subroutines/subroutine.compute_quats" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model/compute_subroutines/subroutine.compute_quats" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model/dump_subroutines/subroutine.dump_append_nofirst_lammpstrj" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model/dump_subroutines/subroutine.dump_append_nofirst_lammpstrj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model/dump_subroutines/subroutine.dump_noappend_first_lammpstrj" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model/dump_subroutines/subroutine.dump_noappend_first_lammpstrj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model/dump_subroutines/subroutine.dump_noappend_nofirst_lammpstrj" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model/dump_subroutines/subroutine.dump_noappend_nofirst_lammpstrj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model/protocol_subroutines/subroutine.global_setup" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model/protocol_subroutines/subroutine.global_setup" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model/run_subroutines/subroutine.BD_fixes" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model/run_subroutines/subroutine.BD_fixes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/LAMMPS_simulator.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/LAMMPS_simulator.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/LAMMPS_sys.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/LAMMPS_sys.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/btree_driver.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/btree_driver.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/LAMMPS_simulator.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/LAMMPS_simulator.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/LAMMPS_sys.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/LAMMPS_sys.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/btree_driver.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/btree_driver.cpp" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitLabMergeRequestFiltersHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPENED&quot;,
+    &quot;assignee&quot;: {
+      &quot;type&quot;: &quot;org.jetbrains.plugins.gitlab.mergerequest.ui.filters.GitLabMergeRequestsFiltersValue.MergeRequestsMemberFilterValue.MergeRequestsAssigneeFilterValue&quot;,
+      &quot;username&quot;: &quot;a2maytin&quot;,
+      &quot;fullname&quot;: &quot;Andrew Maytin&quot;
+    }
+  }
+}</component>
+  <component name="GitLabMergeRequestsSettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;first&quot;: &quot;https://gitlab.com/brg4/btree_chromo.git&quot;,
+    &quot;second&quot;: &quot;4b213c3d-4d90-4d1a-88a2-45264fbe9577&quot;
+  }
+}</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_asphere_omp.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_asphere_omp.h" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_base_omp.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/vec_quat_manipulator.cpp" root0="SKIP_INSPECTION" />
+  </component>
+  <component name="MakefileLocalSettings">
+    <option name="availableProjects">
+      <map>
+        <entry>
+          <key>
+            <ExternalProjectPojo>
+              <option name="name" value="btree_chromo" />
+              <option name="path" value="$PROJECT_DIR$" />
+            </ExternalProjectPojo>
+          </key>
+          <value>
+            <list>
+              <ExternalProjectPojo>
+                <option name="name" value="btree_chromo" />
+                <option name="path" value="$PROJECT_DIR$" />
+              </ExternalProjectPojo>
+            </list>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="projectSyncType">
+      <map>
+        <entry key="$PROJECT_DIR$" value="RE_IMPORT" />
+      </map>
+    </option>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectApplicationVersion">
+    <option name="ide" value="CLion" />
+    <option name="majorVersion" value="2023" />
+    <option name="minorVersion" value="3.4" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="2eBiDe72nsQUg1a9w0VHfd3KreO" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;rot__min__frame&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/andrew/Desktop/Projects/btree_chromo/examples/simulating_chromosome_with_replication_chunky&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/examples/simulating_chromosome_with_replication_chunky" />
+      <recent name="$PROJECT_DIR$/LAMMPS_src_additions" />
+      <recent name="$PROJECT_DIR$/LAMMPS_DNA_model_no_twist_asphere/run_subroutines" />
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Native Application.all">
+    <configuration name="Makefile" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="btree_chromo" TARGET_NAME="Makefile" CONFIG_NAME="Makefile" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="all" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="btree_chromo" TARGET_NAME="all" CONFIG_NAME="all" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="build" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="btree_chromo" TARGET_NAME="build" CONFIG_NAME="build" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="debug" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="btree_chromo" TARGET_NAME="debug" CONFIG_NAME="debug" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="info" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="btree_chromo" TARGET_NAME="info" CONFIG_NAME="info" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="release" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="btree_chromo" TARGET_NAME="release" CONFIG_NAME="release" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Native Application.all" />
+      <item itemvalue="Native Application.build" />
+      <item itemvalue="Native Application.debug" />
+      <item itemvalue="Native Application.info" />
+      <item itemvalue="Native Application.release" />
+      <item itemvalue="Native Application.Makefile" />
+    </list>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="31e3448d-81be-4e67-ac75-8c3395c3774f" name="Changes" comment="" />
+      <created>1711384254259</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1711384254259</updated>
+      <workItem from="1711384256094" duration="42480000" />
+      <workItem from="1712088020631" duration="1379000" />
+      <workItem from="1712156629427" duration="21732000" />
+      <workItem from="1712611548335" duration="1194000" />
+      <workItem from="1712950535667" duration="534000" />
+      <workItem from="1712951078714" duration="44299000" />
+      <workItem from="1713545208031" duration="20041000" />
+    </task>
+    <task id="LOCAL-00001" summary="Made omp version of fix brownian">
+      <option name="closed" value="true" />
+      <created>1712156785106</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1712156785106</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Made omp version of fix brownian" />
+    <option name="LAST_COMMIT_MESSAGE" value="Made omp version of fix brownian" />
+  </component>
+</project>

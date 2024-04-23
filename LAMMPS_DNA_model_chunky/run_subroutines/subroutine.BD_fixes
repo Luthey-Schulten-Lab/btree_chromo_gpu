@@ -1,0 +1,9 @@
+######################################
+# fix commands for Brownian dynamics #
+######################################
+
+# BD fix for DNA
+fix dnaBD DNA brownian/omp ${T} ${rng_seed} gamma_t ${gamma_t_mono}
+
+# BD fix for ribosomes
+fix ribosBD ribos brownian/omp ${T} ${rng_seed} gamma_t ${gamma_t_ribo}

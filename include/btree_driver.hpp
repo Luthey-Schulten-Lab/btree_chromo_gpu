@@ -173,6 +173,7 @@ private:
   int switch_bonds(std::vector<std::string> &params);
   int switch_bending_angles(std::vector<std::string> &params);
   int switch_twisting_angles(std::vector<std::string> &params);
+  int switch_ellipsoids(std::vector<std::string> &params);
   int switch_extra_potential(std::string extra_pot, std::string s);
   int switch_Ori_bdry_attraction(std::vector<std::string> &params);
   int switch_Ori_pair_repulsion(std::vector<std::string> &params);

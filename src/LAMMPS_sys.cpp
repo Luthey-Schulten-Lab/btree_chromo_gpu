@@ -12,6 +12,7 @@ LAMMPS_sys::LAMMPS_sys()
   t_s.bond = true;
   t_s.bending_angle = true;
   t_s.twisting_angle = true;
+  r_s.ellipsoid = true;
 }
 
 
@@ -244,6 +245,13 @@ void LAMMPS_sys::switch_twisting_angles(bool s)
 }
 
 
+// switch whether to use ellipsoids
+void LAMMPS_sys::switch_ellipsoids(bool s)
+{
+  r_s.ellipsoid = s;
+}
+
+
 // filter the bonds
 void LAMMPS_sys::filter_bonds(int t)
 {
@@ -385,7 +393,7 @@ void LAMMPS_sys::prepare_topology()
     }
 
   // filter the twisting angles
-  if (t_s.twisting_angle == false)
+  if (!(t_s.twisting_angle && r_s.ellipsoid))
     {
       filter_angles(2);
       filter_angles(4);
@@ -820,6 +828,81 @@ void LAMMPS_sys::apply_mono_mapping(std::vector<std::vector<std::array<int,3>>> 
     }
 }
 
+void LAMMPS_sys::apply_RMF()
+{
+    if (!r_s.ellipsoid)
+    {
+        std::vector<binding_region> regions = loop_topo.get_regions();
+        // loop over binding regions
+        for (binding_region b_r: regions) {
+            int N = b_r.get_size();
+            std::vector<std::vector<vec>> R(N, std::vector<vec>(3));
+            std::vector<vec> x, xm1, xm2, xp1, xp2, t;
+            vec v1, v2, pL, tL, p, s;
+            double c1, c2, t1, t2, dot;
+            for (int i = 0; i < N; i++) {
+                x.push_back(atoms.get_atom(b_r.get_mono_pos(i)).r);
+            }
+
+            for (int i = 0; i < N; i++) {
+                xm1[i] = x[(i - 1 + N) % N]; // don't need modulo operator; region index goes from 0 to N-1
+                xm2[i] = x[(i - 2 + N) %
+                           N]; // except when we have unreplicated. still shouldn't be a problem if you use function to get monomers some position away
+                xp1[i] = x[(i + 1 + N) % N];
+                xp2[i] = x[(i + 2 + N) % N];
+            }
+
+            // above only works for circular. Need to do endpoint cases.
+            // look for circular flag, to set up conditional (this is the only special case)
+            // assume you have at least 10 monomers or something. We on average have steps of like 10s of monomers
+            // If there's just a line, it will break
+
+            for (int i = 0; i < N; i++) {
+                t[i] = vqm.v_axpy(-1, vqm.v_axpy(-8.0, xp1[i], xp2[i]), vqm.v_axpy(-8.0, xm1[i], xm2[i]));
+                t[i] = vqm.v_norm(t[i]);
+            }
+
+            for (int i = 0; i < N; i++) {
+                if (i == 0) { // Initialize the first orientation randomly
+                    dot = 1.0;
+                    while (dot > 0.95) {
+                        t1 = rand() * (2 * M_PI / RAND_MAX); // Random number between 0 and 2*pi
+                        t2 = rand() * (M_PI / RAND_MAX);     // Random number between 0 and pi
+
+                        p.x = cos(t1) * sin(t2);
+                        p.y = sin(t1) * sin(t2);
+                        p.z = cos(t2);
+
+                        dot = vqm.v_dot(p, t[i]);
+                    }
+
+                    p = vqm.v_axpy(-1.0 * dot, t[i], p);
+                    p = vqm.v_norm(p);
+                } else {
+                    p = R[i - 1][0];
+                    v1 = vqm.v_axpy(-1.0, x[i], xp1[i]);
+                    c1 = vqm.v_dot(v1, v1);
+                    pL = vqm.v_axpy(-2.0 / c1 * vqm.v_dot(v1, p), v1, p);
+                    tL = vqm.v_axpy(-2.0 / c1 * vqm.v_dot(v1, t[i - 1]), v1, t[i - 1]);
+                    v2 = vqm.v_axpy(-1.0, tL, t[i]);
+                    c2 = vqm.v_dot(v2, v2);
+                    p = vqm.v_axpy(-2.0 / c2 * vqm.v_dot(v2, pL), v2, pL);
+                }
+
+                s = vqm.v_cross(t[i], p);
+                s = vqm.v_norm(s);
+
+                R[i][0] = p;
+                R[i][1] = s;
+                R[i][2] = t[i];
+
+                // set orientation of DNA monomer
+                // could also use s, just can't use t
+                ellipsoids.set_quat(b_r.get_mono_pos(i), vqm.v_to_q(R[i][0]));
+            }
+        }
+    }
+}
 
 // write the system to a data file
 void LAMMPS_sys::write_data(std::string data_filename)

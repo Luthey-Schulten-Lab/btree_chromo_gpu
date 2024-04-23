@@ -1144,6 +1144,7 @@ void LAMMPS_simulator::initialize_sim_vars()
   // initialize simulator internal variables
   sim_vars["T_freq"] = false;
   sim_vars["D_freq"] = false;
+  sim_vars["ellipsoids"] = false;
 
   // initialize internal variables for extra potentials
   std::string p;
@@ -1296,6 +1297,18 @@ unsigned long LAMMPS_simulator::get_Nt()
   return Nt;
 }
 
+
+void LAMMPS_simulator::switch_ellipsoids(bool s)
+{
+    if (s == true)
+    {
+        set_sim_var_int("ellipsoids", 1);
+    }
+    else
+    {
+        set_sim_var_int("ellipsoids", 0);
+    }
+}
 
 void LAMMPS_simulator::increment_Nt(unsigned long dNt)
 {
