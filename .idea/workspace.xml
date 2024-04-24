@@ -20,19 +20,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="31e3448d-81be-4e67-ac75-8c3395c3774f" name="Changes" comment="Made omp version of fix brownian">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model/compute_subroutines/subroutine.compute_quats" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model/compute_subroutines/subroutine.compute_quats" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model/dump_subroutines/subroutine.dump_append_nofirst_lammpstrj" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model/dump_subroutines/subroutine.dump_append_nofirst_lammpstrj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model/dump_subroutines/subroutine.dump_noappend_first_lammpstrj" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model/dump_subroutines/subroutine.dump_noappend_first_lammpstrj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model/dump_subroutines/subroutine.dump_noappend_nofirst_lammpstrj" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model/dump_subroutines/subroutine.dump_noappend_nofirst_lammpstrj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model/protocol_subroutines/subroutine.global_setup" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model/protocol_subroutines/subroutine.global_setup" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model/run_subroutines/subroutine.BD_fixes" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model/run_subroutines/subroutine.BD_fixes" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/LAMMPS_simulator.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/LAMMPS_simulator.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/LAMMPS_sys.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/LAMMPS_sys.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/btree_driver.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/btree_driver.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/LAMMPS_simulator.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/LAMMPS_simulator.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/LAMMPS_sys.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/LAMMPS_sys.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/btree_driver.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/btree_driver.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/log.test" beforeDir="false" afterPath="$PROJECT_DIR$/log.test" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -120,31 +115,31 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
-    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;rot__min__frame&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/andrew/Desktop/Projects/btree_chromo/examples/simulating_chromosome_with_replication_chunky&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "git-widget-placeholder": "rot__min__frame",
+    "last_opened_file_path": "/home/andrew/Desktop/Projects/btree_chromo",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/examples/simulating_chromosome_with_replication_chunky" />
       <recent name="$PROJECT_DIR$/LAMMPS_src_additions" />
       <recent name="$PROJECT_DIR$/LAMMPS_DNA_model_no_twist_asphere/run_subroutines" />
-      <recent name="$PROJECT_DIR$" />
     </key>
   </component>
   <component name="RunManager" selected="Native Application.all">
@@ -201,7 +196,7 @@
       <workItem from="1712611548335" duration="1194000" />
       <workItem from="1712950535667" duration="534000" />
       <workItem from="1712951078714" duration="44299000" />
-      <workItem from="1713545208031" duration="20041000" />
+      <workItem from="1713545208031" duration="32918000" />
     </task>
     <task id="LOCAL-00001" summary="Made omp version of fix brownian">
       <option name="closed" value="true" />

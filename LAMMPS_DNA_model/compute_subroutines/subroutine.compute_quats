@@ -1,4 +1,4 @@
 # compute to calculate orientations
-
-if "${ellipsoids}==1" then &
-   "compute quat DNAribos property/atom quatw quati quatj quatk"
+compute quat DNAribos property/atom quatw quati quatj quatk
+#if "${ellipsoids}==1" then &
+#   "compute quat DNAribos property/atom quatw quati quatj quatk"

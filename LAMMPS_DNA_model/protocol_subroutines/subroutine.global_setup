@@ -8,10 +8,7 @@ package omp ${nProc} neigh yes
 # real units
 units real
 # atom style
-if "${ellipsoids}==1" then &
-   "atom_style hybrid angle ellipsoid" &
-else &
-   "atom_style hybrid angle sphere"
+atom_style hybrid angle ellipsoid
 # periodic boundaries
 boundary f f f
 # atom map
