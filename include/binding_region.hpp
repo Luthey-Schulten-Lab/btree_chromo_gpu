@@ -21,7 +21,10 @@ public:
 		 bool completed,
 		 bool ter_crossing, int mid_ll, int mid_ul);
   ~binding_region();
-  
+
+  // Copy Constructor
+  binding_region(const binding_region& other);
+
   // get the region size
   int get_size();
   // get the leaf the region belongs to

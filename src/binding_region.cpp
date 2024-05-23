@@ -20,17 +20,41 @@ binding_region::binding_region(std::string leaf, int ll, int ul, int size,
 // destructor
 binding_region::~binding_region()
 {
+  std::cout << "Destroying binding region..." << std::endl;
   if (mono_idx != nullptr)
     {
+      std::cout << "Clearing mono_idx..." << std::endl;
       delete[] mono_idx;
+      std::cout << "Assigning nullptr to mono_idx..." << std::endl;
       mono_idx = nullptr;
     }
   if (proximities != nullptr)
     {
+      std::cout << "Clearing proximities..." << std::endl;
       delete[] proximities;
       proximities = nullptr;
     }
+  std::cout << "Clearing reg_idx..." << std::endl;
   reg_idx.clear();
+}
+
+// copy constructor
+binding_region::binding_region(const binding_region& other)
+        : leaf(other.leaf), ll(other.ll), ul(other.ul), size(other.size),
+          completed(other.completed), ter_crossing(other.ter_crossing),
+          mid_ll(other.mid_ll), mid_ul(other.mid_ul), reg_idx(other.reg_idx) {
+    if (other.mono_idx) {
+        mono_idx = new int[size];
+        std::copy(other.mono_idx, other.mono_idx + size, mono_idx);
+    } else {
+        mono_idx = nullptr;
+    }
+    if (other.proximities) {
+        proximities = new int[size];
+        std::copy(other.proximities, other.proximities + size, proximities);
+    } else {
+        proximities = nullptr;
+    }
 }
 
 

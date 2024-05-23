@@ -6,14 +6,14 @@
 
 # NOTE 1: comment the ``terminate'' at the top to execute all of the commands
 
-# NOTE 2: change all directories in this file from ``/home/ben/Workspace/'' to the local repository location
+# NOTE 2: change all directories in this file from ``/home/andrew/Desktop/Projects/'' to the local repository location
 
 ######################
 ######################
 ######################
 
 
-terminate
+#terminate
 
 
 #set the prng seed
@@ -29,43 +29,43 @@ print
 
 
 #output the current state
-output_state:/home/ben/Workspace/btree_chromo/examples/preparing_chromosome/chromo_state_0.dat
+output_state:/home/andrew/Desktop/Projects/btree_chromo/examples/preparing_chromosome/chromo_state_0.dat
 
 
 #replicate the mother chromosome by
 # - 100 monomers in the cw direction
 # - 200 monomers in the ccw direction
-transform:m_cw100_ccw200
+# transform:m_cw100_ccw200
 
 
 #print the current replication state
-print
+# print
 
 
 #replicate the mother's left daughter chromosome by
 # - 50 monomers in the cw direction
 # - 40 monomers in the ccw direction
-transform:ml_cw50_ccw40
+# transform:ml_cw50_ccw40
 
 
 #print the current replication state
-print
+# print
 
 
 #replicate the mother chromosome by
 # - 400 monomers in the cw direction
 # - 300 monomers in the ccw direction
 # this will fully replicate the mother
-transform:m_cw400_ccw300
+# transform:m_cw400_ccw300
 
 
 #print the current replication state
 #fork "m" will now show as completed
-print
+# print
 
 
 #reset the state by reading the previous output
-input_state:/home/ben/Workspace/btree_chromo/examples/preparing_chromosome/chromo_state_0.dat
+input_state:/home/andrew/Desktop/Projects/btree_chromo/examples/preparing_chromosome/chromo_state_0.dat
 
 
 #print the current replication state
@@ -73,7 +73,7 @@ print
 
 
 #apply a set of replication events from a file
-transforms_file:/home/ben/Workspace/btree_chromo/examples/preparing_chromosome/transforms.dat
+transforms_file:/home/andrew/Desktop/Projects/btree_chromo/examples/preparing_chromosome/transforms.dat
 
 
 #print the current replication state
@@ -81,7 +81,7 @@ print
 
 
 #randomly replicate 100 monomers across all active forks
-random_transforms:100
+#random_transforms:100
 
 
 #print the current replication state
@@ -89,4 +89,4 @@ print
 
 
 #output the final state
-output_state:/home/ben/Workspace/btree_chromo/examples/preparing_chromosome/chromo_state_1.dat
+output_state:/home/andrew/Desktop/Projects/btree_chromo/examples/preparing_chromosome/chromo_state_1.dat

@@ -256,6 +256,7 @@ void ellipsoid_array::write(std::fstream &data_file)
 		    << ellipsoids[i].q.v.x << "\t"
 		    << ellipsoids[i].q.v.y << "\t"
 		    << ellipsoids[i].q.v.z << std::endl;
+        // std::cout << "Wrote quati at i = " << i << " as " << ellipsoids[i].q.v.x << std::endl;
 	}
     }
   

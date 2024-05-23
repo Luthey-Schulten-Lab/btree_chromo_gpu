@@ -17,7 +17,7 @@
 ######################
 
 
-#terminate
+terminate
 
 
 #enable/disable the skipping of runs/minimizations for debugging of directive file
@@ -45,7 +45,7 @@ simulator_set_delta_t:1.0E+5
 
 
 #set the directory and file label for the simulation output
-simulator_set_output_details:/home/andrew/Desktop/Projects/btree_chromo/examples/simulating_chromosome_with_replication/,example
+simulator_set_output_details:/home/andrew/Desktop/Projects/btree_chromo/examples/simulating_chromosome_with_replication/,example_nobend
 
 
 #load the monomer coordinates and orientations
@@ -64,7 +64,7 @@ spherical_bdry:900.0,0.0,0.0,0.0
 
 #write the LAMMPS data file and read it into the simulator
 sys_write_sim_read_LAMMPS_data:/home/andrew/Desktop/Projects/btree_chromo/examples/simulating_chromosome_with_replication/data.example
-
+switch_bending_angles:F
 
 #relax the structure
 simulator_relax_progressive:10000,5000

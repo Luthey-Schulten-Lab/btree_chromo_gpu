@@ -95,6 +95,9 @@ public:
   // write the monomer coordinates to an xyz for quick visualization
   void write_mono_xyz(std::string data_filename);
 
+  // write the monomer orientations to an xyz for quick visualization
+  void write_mono_orientation_xyz(std::string data_filename);
+
   // write the data
   void write_data(std::string data_filename);
 
@@ -128,6 +131,7 @@ public:
 
   // loop topology
   void set_loop_sys_params(loop_sys_params &l_sys_p);
+  void prepare_loop_topo();
   void initialize_loop_topo(int N_loops);
   void update_loop_topo();
   std::vector<bond> get_loop_bonds();

@@ -131,7 +131,9 @@ def plot_initial_Lp(poly_corr,fig_file):
     ax.spines['bottom'].set_linewidth(2.0)
 
     x = poly_corr['s']
-    y = np.exp(-x*poly_corr['l_0']/poly_corr['Lp_true'])
+    #y = np.exp(-x*poly_corr['l_0']/poly_corr['Lp_true'])
+    B = 1290
+    y = np.exp(-x*poly_corr['l_0']/poly_corr['Lp_true']) * np.cos(2 * np.pi * x * poly_corr['l_0']/ B)
     ax.plot(x,y,
             linewidth=2.5,
             color='black',
@@ -170,7 +172,7 @@ def plot_initial_Lp(poly_corr,fig_file):
                 label=temp_label)
 
 
-    ax.legend(title=r'\# MC Steps',
+    ax.legend(title=r'\# minimizations',
               title_fontsize=10,
               fontsize=8)
 

@@ -41,9 +41,11 @@ void loop_topology::set_coords(std::vector<vec> coords)
 // prepare the vector of binding regions
 void loop_topology::prepare_binding_regions(std::vector<std::string> leaves, std::vector<theta_topo> leaf_topos, int *&t)
 {
-
+  std::cout << "Preparing binding regions..."<< std::endl;
+  std::cout << "regions size, pre-clear: " << regions.size() << std::endl;
   regions.clear();
-
+  std::cout << "regions sizem, post-clear: " << regions.size() << std::endl;
+  std::cout << "Finished clearing binding regions..."<< std::endl;
   std::vector<int> partitions;
 
   std::string leaf; // leaf that binding region belongs to
@@ -202,9 +204,9 @@ void loop_topology::prepare_binding_regions(std::vector<std::string> leaves, std
   //std::cout << "at end of prepare_binding_regions" << std::endl;
   for (size_t i_reg=0; i_reg<regions.size(); i_reg++)
     {
-      //std::cout << "i_reg = " << i_reg << std::endl;
+      std::cout << "i_reg = " << i_reg << std::endl;
       regions[i_reg].prepare_idx();
-      //regions[i_reg].print_region_map();
+      // regions[i_reg].print_region_map();
     }
   
 }

@@ -169,6 +169,8 @@ private:
   int spherical_bdry(std::vector<std::string> &params);
   // loading BD lengths
   int load_BD_lengths(std::vector<std::string> &params);
+  // apply rotation minimizing frame
+  int apply_RMF();
   // manipulate system interactions
   int switch_bonds(std::vector<std::string> &params);
   int switch_bending_angles(std::vector<std::string> &params);
@@ -182,7 +184,7 @@ private:
   // writing LAMMPS data file
   int write_LAMMPS_data(std::vector<std::string> &params);
   int write_mono_xyz(std::vector<std::string> &params);
-
+  int write_mono_orientation_xyz(std::vector<std::string> &params);
   // mapper
   int set_initial_state();
   int set_final_state();

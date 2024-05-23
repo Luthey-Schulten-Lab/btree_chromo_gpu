@@ -16,8 +16,8 @@ import sys
 import LAMMPS_helpers.read_LAMMPS_DNA as r_L_D
 importlib.reload(r_L_D)
 
-in_dir = '/home/ben/Data/btree_chromo/disentanglement_testing/volume_expansion/'
-in_label = 'volume_expansion'
+in_dir = '/home/andrew/Data/btree_chromo/hamiltonian_testing/'
+in_label = 'hamiltonian_bond_bending'
 #in_dir = '/home/ben/Data/btree_chromo/loop_compaction_testing_new/loops_25/'
 #in_label = 'loops_25'
 #in_dir = '/home/ben/Data/btree_chromo/small_system_Jan/'
@@ -27,8 +27,8 @@ in_label = 'volume_expansion'
 #in_dir = '/home/ben/Data/btree_chromo/full_chromo_movie/'
 #in_label = 'full_chromo_run0'
 
-out_dir = '/home/ben/Data/btree_chromo/disentanglement_testing/volume_expansion/'
-out_label = 'volume_expansion'
+out_dir = '/home/andrew/Data/btree_chromo/hamiltonian_testing/'
+out_label = 'hamiltonian_bond_bending'
 # out_dir = '/home/ben/Data/btree_chromo/loop_compaction_testing_new/loops_25/'
 # out_label = 'loops_25'
 # out_dir = '/home/been/Data/btree_chromo/small_system_Jan/'
@@ -42,7 +42,7 @@ rep_specification = 'range'
 
 if rep_specification == 'range':
     min_rep = 1
-    max_rep = 5
+    max_rep = 1
     reps = np.arange(min_rep,max_rep+1,dtype=np.int32)
 elif rep_specification == 'manual':
     reps = [43]

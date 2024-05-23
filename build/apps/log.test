@@ -1,0 +1,3391 @@
+LAMMPS (2 Aug 2023 - Update 3)
+OMP_NUM_THREADS environment is not set. Defaulting to 1 thread. (src/comm.cpp:98)
+  using 1 OpenMP thread(s) per MPI task
+variable rng_seed internal 000010
+variable nProc internal 8
+variable DNA_model_dir string /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model/
+variable delta_t internal 100000.000000
+variable ellipsoids internal 1
+variable output_dir string /home/andrew/Data/btree_chromo/RMF_testing/
+variable output_file_label string SCMINBBDBMINBBDB_BDBT_MINBT_BDBT
+variable output_file string ${output_dir}${output_file_label}
+variable output_file string /home/andrew/Data/btree_chromo/RMF_testing/${output_file_label}
+variable output_file string /home/andrew/Data/btree_chromo/RMF_testing/SCMINBBDBMINBBDB_BDBT_MINBT_BDBT
+clear
+OMP_NUM_THREADS environment is not set. Defaulting to 1 thread. (src/comm.cpp:98)
+  using 1 OpenMP thread(s) per MPI task
+variable nProc internal 8
+variable DNA_model_dir string /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model/
+variable output_dir string /home/andrew/Data/btree_chromo/RMF_testing/
+variable output_file_label string SCMINBBDBMINBBDB_BDBT_MINBT_BDBT
+variable output_file string ${output_dir}${output_file_label}
+variable output_file string /home/andrew/Data/btree_chromo/RMF_testing/${output_file_label}
+variable output_file string /home/andrew/Data/btree_chromo/RMF_testing/SCMINBBDBMINBBDB_BDBT_MINBT_BDBT
+variable rng_seed internal 000010
+variable delta_t internal 100000.000000
+include ${DNA_model_dir}/protocol_subroutines/subroutine.global_setup
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//protocol_subroutines/subroutine.global_setup
+#################################
+# prepare LAMMPS for simulation #
+#################################
+
+# OpenMP package
+package omp ${nProc} neigh yes
+package omp 8 neigh yes
+set 8 OpenMP thread(s) per MPI task
+using multi-threaded neighbor list subroutines
+
+# real units
+units real
+# atom style
+atom_style hybrid angle ellipsoid
+WARNING: Atom style hybrid defines both, per-type and per-atom masses; both must be set, but only per-atom masses will be used (src/atom_vec_hybrid.cpp:132)
+# periodic boundaries
+boundary f f f
+# atom map
+atom_modify id yes map hash
+read_data /home/andrew/Data/btree_chromo/RMF_testing/data.RMF extra/bond/per/atom 2
+Reading data file ...
+  orthogonal box = (-2451 -2451 -2451) to (2451 2451 2451)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  15242 atoms
+  5000 ellipsoids
+  scanning bonds ...
+  3 = max bonds/atom
+  scanning angles ...
+  2 = max angles/atom
+  reading bonds ...
+  5000 bonds
+  reading angles ...
+  10000 angles
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0       
+  special bond factors coul:  0        0        0       
+     2 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     4 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.005 seconds
+  read_data CPU = 0.116 seconds
+include ${DNA_model_dir}/lmp.DNA_physical_params
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//lmp.DNA_physical_params
+# variables describing temperature
+variable T internal 310.0 # temperature [K]
+variable kBoltz internal 1.98720E-3 # Boltzmann's constant [Kcal/(mol*K)]
+variable kBT equal ${kBoltz}*${T} # [Kcal/mol]
+variable kBT equal 0.0019872*${T} 
+variable kBT equal 0.0019872*310 
+
+# variables describing lengths
+variable r_mono internal 17.0 # radius of monomer [A]
+variable r_ribo internal 100.0 # radius of ribosome [A]
+variable r_sphere internal 2500.0 # radius of cell membrane [A]
+variable r_bdry equal 2.5*${r_mono} # radius of boundary particles
+variable r_bdry equal 2.5*17 
+variable sigma_mono_mono equal 2*${r_mono}
+variable sigma_mono_mono equal 2*17
+variable sigma_mono_ribo equal ${r_mono}+${r_ribo}
+variable sigma_mono_ribo equal 17+${r_ribo}
+variable sigma_mono_ribo equal 17+100
+variable sigma_ribo_ribo equal 2*${r_ribo}
+variable sigma_ribo_ribo equal 2*100
+variable sigma_mono_bdry equal ${r_mono}+${r_bdry}
+variable sigma_mono_bdry equal 17+${r_bdry}
+variable sigma_mono_bdry equal 17+42.5
+variable sigma_ribo_bdry equal ${r_ribo}+${r_bdry}
+variable sigma_ribo_bdry equal 100+${r_bdry}
+variable sigma_ribo_bdry equal 100+42.5
+variable sigma_bdry_bdry equal 2*${r_bdry}
+variable sigma_bdry_bdry equal 2*42.5
+variable cut_WCA equal 2.0^(1.0/6.0) # cutoff for WCA potentials
+variable WCA_mono_mono equal ${cut_WCA}*${sigma_mono_mono}
+variable WCA_mono_mono equal 1.12246204830937*${sigma_mono_mono}
+variable WCA_mono_mono equal 1.12246204830937*34
+variable WCA_mono_ribo equal ${cut_WCA}*${sigma_mono_ribo}
+variable WCA_mono_ribo equal 1.12246204830937*${sigma_mono_ribo}
+variable WCA_mono_ribo equal 1.12246204830937*117
+variable WCA_ribo_ribo equal ${cut_WCA}*${sigma_ribo_ribo}
+variable WCA_ribo_ribo equal 1.12246204830937*${sigma_ribo_ribo}
+variable WCA_ribo_ribo equal 1.12246204830937*200
+variable WCA_mono_bdry equal ${cut_WCA}*${sigma_mono_bdry}
+variable WCA_mono_bdry equal 1.12246204830937*${sigma_mono_bdry}
+variable WCA_mono_bdry equal 1.12246204830937*59.5
+variable WCA_ribo_bdry equal ${cut_WCA}*${sigma_ribo_bdry}
+variable WCA_ribo_bdry equal 1.12246204830937*${sigma_ribo_bdry}
+variable WCA_ribo_bdry equal 1.12246204830937*142.5
+variable WCA_bdry_bdry equal ${cut_WCA}*${sigma_bdry_bdry}
+variable WCA_bdry_bdry equal 1.12246204830937*${sigma_bdry_bdry}
+variable WCA_bdry_bdry equal 1.12246204830937*85
+
+# variables describing masses
+variable m_mono internal 6.17647E+3 # mass of monomer [g/mol]
+variable m_ribo internal 2.11170E+6 # mass of ribosome [g/mol]
+variable m_bdry internal 1.0E+9 # mass of boundary particles [g/mol]
+variable m_eT internal 1.0E-3 # mass of orientation particle [g/mol]
+variable rho_mono equal ${m_mono}/((4.0/3.0)*PI*${r_mono}^3) # density of monomer [g/(mol*A^3)]
+variable rho_mono equal 6176.47/((4.0/3.0)*PI*${r_mono}^3) 
+variable rho_mono equal 6176.47/((4.0/3.0)*PI*17^3) 
+variable rho_ribo equal ${m_ribo}/((4.0/3.0)*PI*${r_ribo}^3) # density of ribosome [g/(mol*A^3)]
+variable rho_ribo equal 2111700/((4.0/3.0)*PI*${r_ribo}^3) 
+variable rho_ribo equal 2111700/((4.0/3.0)*PI*100^3) 
+
+# variable describing damping coefficients
+# variable eta equal 1.6840E+5 # dynamic viscosity of cytoplasm [Kcal*fs/(mol*A^3)]
+variable eta internal 7.0434E+1 # dynamic viscosity of cytoplasm [(g/mol)/(fs*A)]
+#variable gamma_t_mono equal 6*PI*${eta}*${r_mono}/${m_mono} # [Kcal*fs/(g*A^2)]
+variable gamma_t_mono equal 6*PI*${eta}*${r_mono} # [(g/mol)/fs]
+variable gamma_t_mono equal 6*PI*70.434*${r_mono} 
+variable gamma_t_mono equal 6*PI*70.434*17 
+variable gamma_r_mono equal ${gamma_t_mono}*(${sigma_mono_mono}^2)/3
+variable gamma_r_mono equal 22570.0435702202*(${sigma_mono_mono}^2)/3
+variable gamma_r_mono equal 22570.0435702202*(34^2)/3
+#variable gamma_t_ribo equal 6*PI*${eta}*${r_ribo}/${m_ribo}  # [Kcal*fs/(g*A^2)]
+variable gamma_t_ribo equal 6*PI*${eta}*${r_ribo} # [(g/mol)/fs]
+variable gamma_t_ribo equal 6*PI*70.434*${r_ribo} 
+variable gamma_t_ribo equal 6*PI*70.434*100 
+variable gamma_r_ribo equal ${gamma_t_ribo}*(${sigma_ribo_ribo}^2)/3
+variable gamma_r_ribo equal 132764.962177766*(${sigma_ribo_ribo}^2)/3
+variable gamma_r_ribo equal 132764.962177766*(200^2)/3
+variable ratio_t_mono equal ${m_mono}/${gamma_t_mono}
+variable ratio_t_mono equal 6176.47/${gamma_t_mono}
+variable ratio_t_mono equal 6176.47/22570.0435702202
+variable ratio_t_ribo equal ${m_ribo}/${gamma_t_ribo}
+variable ratio_t_ribo equal 2111700/${gamma_t_ribo}
+variable ratio_t_ribo equal 2111700/132764.962177766
+
+print """
+----------------------------------
+---[[[ DNA Model Parameters ]]]---
+----------------------------------
+ --------------------------------
+ ---[ Temperature and Energy ]---
+ --------------------------------
+  T = ${T} [K]
+  kBT = ${kBT} [Kcal/mol]
+ -----------------
+ ---[ Lengths ]---
+ -----------------
+  r_mono = ${r_mono} [A]
+  r_ribo = ${r_ribo} [A]
+ ----------------
+ ---[ Masses ]---
+ ----------------
+  m_mono = ${m_mono} [g/mol]
+  m_ribo = ${m_ribo} [g/mol]
+"""
+
+----------------------------------
+---[[[ DNA Model Parameters ]]]---
+----------------------------------
+ --------------------------------
+ ---[ Temperature and Energy ]---
+ --------------------------------
+  T = 310 [K]
+  kBT = 0.616032 [Kcal/mol]
+ -----------------
+ ---[ Lengths ]---
+ -----------------
+  r_mono = 17 [A]
+  r_ribo = 100 [A]
+ ----------------
+ ---[ Masses ]---
+ ----------------
+  m_mono = 6176.47 [g/mol]
+  m_ribo = 2111700 [g/mol]
+
+
+print """
+ ------------------------------
+ ---[ Damping Coefficients ]---
+ ------------------------------
+  eta (dynamic viscosity) = ${eta} [Kcal*fs/(mol*A^3)]
+  gamma_t_mono = ${gamma_t_mono} [g/(mol*fs)]
+  gamma_r_mono = ${gamma_r_mono} [g*A/(mol*fs*rad)]
+   BD timescale (mono), m_mono/gamma_t_mono = ${ratio_t_mono} [fs]
+  gamma_t_ribo = ${gamma_t_ribo} [g/(mol*fs)]
+  gamma_r_ribo = ${gamma_r_ribo} [g*A/(mol*fs*rad)]
+   BD timescale (ribo), m_ribo/gamma_t_ribo = ${ratio_t_ribo} [fs]
+"""
+
+ ------------------------------
+ ---[ Damping Coefficients ]---
+ ------------------------------
+  eta (dynamic viscosity) = 70.434 [Kcal*fs/(mol*A^3)]
+  gamma_t_mono = 22570.0435702202 [g/(mol*fs)]
+  gamma_r_mono = 8696990.12239152 [g*A/(mol*fs*rad)]
+   BD timescale (mono), m_mono/gamma_t_mono = 0.273657867818628 [fs]
+  gamma_t_ribo = 132764.962177766 [g/(mol*fs)]
+  gamma_r_ribo = 1770199495.70355 [g*A/(mol*fs*rad)]
+   BD timescale (ribo), m_ribo/gamma_t_ribo = 15.905551926965 [fs]
+
+
+
+
+# set the mass
+print """
+ ----------------------------------
+ ---[ Setting Densities/Masses ]---
+ ----------------------------------
+"""
+
+ ----------------------------------
+ ---[ Setting Densities/Masses ]---
+ ----------------------------------
+
+
+set type 3*8 density ${m_mono}
+set type 3*8 density 6176.47
+Setting atom values ...
+  5000 settings made for density
+set type 2 density ${m_ribo}
+set type 2 density 2111700
+Setting atom values ...
+  0 settings made for density
+set type 1 density ${m_bdry}
+set type 1 density 1000000000
+Setting atom values ...
+  10242 settings made for density
+
+# create groups
+print """
+ ------------------------
+ ---[ Grouping Atoms ]---
+ ------------------------
+"""
+
+ ------------------------
+ ---[ Grouping Atoms ]---
+ ------------------------
+
+
+group bdry type 1
+10242 atoms in group bdry
+group ribos type 2
+0 atoms in group ribos
+group monos type 3
+4998 atoms in group monos
+group oris type 4
+1 atoms in group oris
+group ters type 5
+1 atoms in group ters
+group forks type 6
+0 atoms in group forks
+group anchors type 7
+0 atoms in group anchors
+group hinges type 8
+0 atoms in group hinges
+group DNA union monos oris ters forks anchors hinges
+5000 atoms in group DNA
+group DNAribos union DNA ribos
+5000 atoms in group DNAribos
+include ${DNA_model_dir}/potentials/lmp.bdry_static
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.bdry_static
+# hold boundary particles in a static position
+fix bdryStatic bdry setforce 0.0 0.0 0.0
+include ${DNA_model_dir}/potentials/lmp.fork_partitioning
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.fork_partitioning
+variable fork_force equal 5.0*${kBT}/${r_mono} # [(Kcal/mol)/A]
+variable fork_force equal 5.0*0.616032/${r_mono} 
+variable fork_force equal 5.0*0.616032/17 
+variable fork_cutoff internal  2000.0 # [A]
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_ids
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_ids
+# compute to track ids
+compute id_track all property/atom id
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_types
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_types
+# compute to track types
+compute type_track all property/atom type
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_quats
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_quats
+# compute to calculate orientations
+compute quat DNAribos property/atom quatw quati quatj quatk
+clear
+OMP_NUM_THREADS environment is not set. Defaulting to 1 thread. (src/comm.cpp:98)
+  using 1 OpenMP thread(s) per MPI task
+variable nProc internal 8
+variable DNA_model_dir string /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model/
+variable output_dir string /home/andrew/Data/btree_chromo/RMF_testing/
+variable output_file_label string SCMINBBDBMINBBDB_BDBT_MINBT_BDBT
+variable output_file string ${output_dir}${output_file_label}
+variable output_file string /home/andrew/Data/btree_chromo/RMF_testing/${output_file_label}
+variable output_file string /home/andrew/Data/btree_chromo/RMF_testing/SCMINBBDBMINBBDB_BDBT_MINBT_BDBT
+variable rng_seed internal 000010
+variable delta_t internal 100000.000000
+include ${DNA_model_dir}/protocol_subroutines/subroutine.global_setup
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//protocol_subroutines/subroutine.global_setup
+#################################
+# prepare LAMMPS for simulation #
+#################################
+
+# OpenMP package
+package omp ${nProc} neigh yes
+package omp 8 neigh yes
+set 8 OpenMP thread(s) per MPI task
+using multi-threaded neighbor list subroutines
+
+# real units
+units real
+# atom style
+atom_style hybrid angle ellipsoid
+WARNING: Atom style hybrid defines both, per-type and per-atom masses; both must be set, but only per-atom masses will be used (src/atom_vec_hybrid.cpp:132)
+# periodic boundaries
+boundary f f f
+# atom map
+atom_modify id yes map hash
+read_data /home/andrew/Data/btree_chromo/RMF_testing/data.RMF extra/bond/per/atom 2
+Reading data file ...
+  orthogonal box = (-2451 -2451 -2451) to (2451 2451 2451)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  15242 atoms
+  5000 ellipsoids
+  scanning bonds ...
+  3 = max bonds/atom
+  scanning angles ...
+  2 = max angles/atom
+  reading bonds ...
+  5000 bonds
+  reading angles ...
+  10000 angles
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0       
+  special bond factors coul:  0        0        0       
+     2 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     4 = max # of 1-4 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.005 seconds
+  read_data CPU = 0.115 seconds
+include ${DNA_model_dir}/lmp.DNA_physical_params
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//lmp.DNA_physical_params
+# variables describing temperature
+variable T internal 310.0 # temperature [K]
+variable kBoltz internal 1.98720E-3 # Boltzmann's constant [Kcal/(mol*K)]
+variable kBT equal ${kBoltz}*${T} # [Kcal/mol]
+variable kBT equal 0.0019872*${T} 
+variable kBT equal 0.0019872*310 
+
+# variables describing lengths
+variable r_mono internal 17.0 # radius of monomer [A]
+variable r_ribo internal 100.0 # radius of ribosome [A]
+variable r_sphere internal 2500.0 # radius of cell membrane [A]
+variable r_bdry equal 2.5*${r_mono} # radius of boundary particles
+variable r_bdry equal 2.5*17 
+variable sigma_mono_mono equal 2*${r_mono}
+variable sigma_mono_mono equal 2*17
+variable sigma_mono_ribo equal ${r_mono}+${r_ribo}
+variable sigma_mono_ribo equal 17+${r_ribo}
+variable sigma_mono_ribo equal 17+100
+variable sigma_ribo_ribo equal 2*${r_ribo}
+variable sigma_ribo_ribo equal 2*100
+variable sigma_mono_bdry equal ${r_mono}+${r_bdry}
+variable sigma_mono_bdry equal 17+${r_bdry}
+variable sigma_mono_bdry equal 17+42.5
+variable sigma_ribo_bdry equal ${r_ribo}+${r_bdry}
+variable sigma_ribo_bdry equal 100+${r_bdry}
+variable sigma_ribo_bdry equal 100+42.5
+variable sigma_bdry_bdry equal 2*${r_bdry}
+variable sigma_bdry_bdry equal 2*42.5
+variable cut_WCA equal 2.0^(1.0/6.0) # cutoff for WCA potentials
+variable WCA_mono_mono equal ${cut_WCA}*${sigma_mono_mono}
+variable WCA_mono_mono equal 1.12246204830937*${sigma_mono_mono}
+variable WCA_mono_mono equal 1.12246204830937*34
+variable WCA_mono_ribo equal ${cut_WCA}*${sigma_mono_ribo}
+variable WCA_mono_ribo equal 1.12246204830937*${sigma_mono_ribo}
+variable WCA_mono_ribo equal 1.12246204830937*117
+variable WCA_ribo_ribo equal ${cut_WCA}*${sigma_ribo_ribo}
+variable WCA_ribo_ribo equal 1.12246204830937*${sigma_ribo_ribo}
+variable WCA_ribo_ribo equal 1.12246204830937*200
+variable WCA_mono_bdry equal ${cut_WCA}*${sigma_mono_bdry}
+variable WCA_mono_bdry equal 1.12246204830937*${sigma_mono_bdry}
+variable WCA_mono_bdry equal 1.12246204830937*59.5
+variable WCA_ribo_bdry equal ${cut_WCA}*${sigma_ribo_bdry}
+variable WCA_ribo_bdry equal 1.12246204830937*${sigma_ribo_bdry}
+variable WCA_ribo_bdry equal 1.12246204830937*142.5
+variable WCA_bdry_bdry equal ${cut_WCA}*${sigma_bdry_bdry}
+variable WCA_bdry_bdry equal 1.12246204830937*${sigma_bdry_bdry}
+variable WCA_bdry_bdry equal 1.12246204830937*85
+
+# variables describing masses
+variable m_mono internal 6.17647E+3 # mass of monomer [g/mol]
+variable m_ribo internal 2.11170E+6 # mass of ribosome [g/mol]
+variable m_bdry internal 1.0E+9 # mass of boundary particles [g/mol]
+variable m_eT internal 1.0E-3 # mass of orientation particle [g/mol]
+variable rho_mono equal ${m_mono}/((4.0/3.0)*PI*${r_mono}^3) # density of monomer [g/(mol*A^3)]
+variable rho_mono equal 6176.47/((4.0/3.0)*PI*${r_mono}^3) 
+variable rho_mono equal 6176.47/((4.0/3.0)*PI*17^3) 
+variable rho_ribo equal ${m_ribo}/((4.0/3.0)*PI*${r_ribo}^3) # density of ribosome [g/(mol*A^3)]
+variable rho_ribo equal 2111700/((4.0/3.0)*PI*${r_ribo}^3) 
+variable rho_ribo equal 2111700/((4.0/3.0)*PI*100^3) 
+
+# variable describing damping coefficients
+# variable eta equal 1.6840E+5 # dynamic viscosity of cytoplasm [Kcal*fs/(mol*A^3)]
+variable eta internal 7.0434E+1 # dynamic viscosity of cytoplasm [(g/mol)/(fs*A)]
+#variable gamma_t_mono equal 6*PI*${eta}*${r_mono}/${m_mono} # [Kcal*fs/(g*A^2)]
+variable gamma_t_mono equal 6*PI*${eta}*${r_mono} # [(g/mol)/fs]
+variable gamma_t_mono equal 6*PI*70.434*${r_mono} 
+variable gamma_t_mono equal 6*PI*70.434*17 
+variable gamma_r_mono equal ${gamma_t_mono}*(${sigma_mono_mono}^2)/3
+variable gamma_r_mono equal 22570.0435702202*(${sigma_mono_mono}^2)/3
+variable gamma_r_mono equal 22570.0435702202*(34^2)/3
+#variable gamma_t_ribo equal 6*PI*${eta}*${r_ribo}/${m_ribo}  # [Kcal*fs/(g*A^2)]
+variable gamma_t_ribo equal 6*PI*${eta}*${r_ribo} # [(g/mol)/fs]
+variable gamma_t_ribo equal 6*PI*70.434*${r_ribo} 
+variable gamma_t_ribo equal 6*PI*70.434*100 
+variable gamma_r_ribo equal ${gamma_t_ribo}*(${sigma_ribo_ribo}^2)/3
+variable gamma_r_ribo equal 132764.962177766*(${sigma_ribo_ribo}^2)/3
+variable gamma_r_ribo equal 132764.962177766*(200^2)/3
+variable ratio_t_mono equal ${m_mono}/${gamma_t_mono}
+variable ratio_t_mono equal 6176.47/${gamma_t_mono}
+variable ratio_t_mono equal 6176.47/22570.0435702202
+variable ratio_t_ribo equal ${m_ribo}/${gamma_t_ribo}
+variable ratio_t_ribo equal 2111700/${gamma_t_ribo}
+variable ratio_t_ribo equal 2111700/132764.962177766
+
+print """
+----------------------------------
+---[[[ DNA Model Parameters ]]]---
+----------------------------------
+ --------------------------------
+ ---[ Temperature and Energy ]---
+ --------------------------------
+  T = ${T} [K]
+  kBT = ${kBT} [Kcal/mol]
+ -----------------
+ ---[ Lengths ]---
+ -----------------
+  r_mono = ${r_mono} [A]
+  r_ribo = ${r_ribo} [A]
+ ----------------
+ ---[ Masses ]---
+ ----------------
+  m_mono = ${m_mono} [g/mol]
+  m_ribo = ${m_ribo} [g/mol]
+"""
+
+----------------------------------
+---[[[ DNA Model Parameters ]]]---
+----------------------------------
+ --------------------------------
+ ---[ Temperature and Energy ]---
+ --------------------------------
+  T = 310 [K]
+  kBT = 0.616032 [Kcal/mol]
+ -----------------
+ ---[ Lengths ]---
+ -----------------
+  r_mono = 17 [A]
+  r_ribo = 100 [A]
+ ----------------
+ ---[ Masses ]---
+ ----------------
+  m_mono = 6176.47 [g/mol]
+  m_ribo = 2111700 [g/mol]
+
+
+print """
+ ------------------------------
+ ---[ Damping Coefficients ]---
+ ------------------------------
+  eta (dynamic viscosity) = ${eta} [Kcal*fs/(mol*A^3)]
+  gamma_t_mono = ${gamma_t_mono} [g/(mol*fs)]
+  gamma_r_mono = ${gamma_r_mono} [g*A/(mol*fs*rad)]
+   BD timescale (mono), m_mono/gamma_t_mono = ${ratio_t_mono} [fs]
+  gamma_t_ribo = ${gamma_t_ribo} [g/(mol*fs)]
+  gamma_r_ribo = ${gamma_r_ribo} [g*A/(mol*fs*rad)]
+   BD timescale (ribo), m_ribo/gamma_t_ribo = ${ratio_t_ribo} [fs]
+"""
+
+ ------------------------------
+ ---[ Damping Coefficients ]---
+ ------------------------------
+  eta (dynamic viscosity) = 70.434 [Kcal*fs/(mol*A^3)]
+  gamma_t_mono = 22570.0435702202 [g/(mol*fs)]
+  gamma_r_mono = 8696990.12239152 [g*A/(mol*fs*rad)]
+   BD timescale (mono), m_mono/gamma_t_mono = 0.273657867818628 [fs]
+  gamma_t_ribo = 132764.962177766 [g/(mol*fs)]
+  gamma_r_ribo = 1770199495.70355 [g*A/(mol*fs*rad)]
+   BD timescale (ribo), m_ribo/gamma_t_ribo = 15.905551926965 [fs]
+
+
+
+
+# set the mass
+print """
+ ----------------------------------
+ ---[ Setting Densities/Masses ]---
+ ----------------------------------
+"""
+
+ ----------------------------------
+ ---[ Setting Densities/Masses ]---
+ ----------------------------------
+
+
+set type 3*8 density ${m_mono}
+set type 3*8 density 6176.47
+Setting atom values ...
+  5000 settings made for density
+set type 2 density ${m_ribo}
+set type 2 density 2111700
+Setting atom values ...
+  0 settings made for density
+set type 1 density ${m_bdry}
+set type 1 density 1000000000
+Setting atom values ...
+  10242 settings made for density
+
+# create groups
+print """
+ ------------------------
+ ---[ Grouping Atoms ]---
+ ------------------------
+"""
+
+ ------------------------
+ ---[ Grouping Atoms ]---
+ ------------------------
+
+
+group bdry type 1
+10242 atoms in group bdry
+group ribos type 2
+0 atoms in group ribos
+group monos type 3
+4998 atoms in group monos
+group oris type 4
+1 atoms in group oris
+group ters type 5
+1 atoms in group ters
+group forks type 6
+0 atoms in group forks
+group anchors type 7
+0 atoms in group anchors
+group hinges type 8
+0 atoms in group hinges
+group DNA union monos oris ters forks anchors hinges
+5000 atoms in group DNA
+group DNAribos union DNA ribos
+5000 atoms in group DNAribos
+include ${DNA_model_dir}/potentials/lmp.bdry_static
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.bdry_static
+# hold boundary particles in a static position
+fix bdryStatic bdry setforce 0.0 0.0 0.0
+include ${DNA_model_dir}/potentials/lmp.fork_partitioning
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.fork_partitioning
+variable fork_force equal 5.0*${kBT}/${r_mono} # [(Kcal/mol)/A]
+variable fork_force equal 5.0*0.616032/${r_mono} 
+variable fork_force equal 5.0*0.616032/17 
+variable fork_cutoff internal  2000.0 # [A]
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_ids
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_ids
+# compute to track ids
+compute id_track all property/atom id
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_types
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_types
+# compute to track types
+compute type_track all property/atom type
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_quats
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_quats
+# compute to calculate orientations
+compute quat DNAribos property/atom quatw quati quatj quatk
+variable T_freq internal 1000
+variable D_freq internal 5000
+variable Ori_pair_repulsion internal 0
+variable Ori_bdry_attraction internal 0
+uncompute id_track
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_ids
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_ids
+# compute to track ids
+compute id_track all property/atom id
+uncompute type_track
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_types
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_types
+# compute to track types
+compute type_track all property/atom type
+uncompute quat
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_quats
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_quats
+# compute to calculate orientations
+compute quat DNAribos property/atom quatw quati quatj quatk
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_MSD
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_MSD
+###
+# computes for MSD
+###
+
+compute dnaMSD DNA msd com no average no
+compute ribosMSD ribos msd com no average no
+compute orisMSD oris msd com no average no
+compute tersMSD ters msd com no average no
+compute forksMSD forks msd com no average no
+include ${DNA_model_dir}/dump_subroutines/subroutine.MSD_thermo
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//dump_subroutines/subroutine.MSD_thermo
+# set custom thermo style
+thermo		${T_freq}
+thermo		1000
+# thermo_style custom step # epair ebond eangle c_angleE[1] c_angleE[2] c_angleE[3] # c_dnaMSD[4] c_ribosMSD[4]
+
+thermo_style custom step epair ebond eangle c_dnaMSD[4] c_ribosMSD[4]
+reset_timestep 0
+variable D_delay equal 5000
+include ${DNA_model_dir}/dump_subroutines/subroutine.dump_noappend_first_lammpstrj
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//dump_subroutines/subroutine.dump_noappend_first_lammpstrj
+# set custom dump style
+dump            d_lammpstrj all custom ${D_freq} ${output_file}.lammpstrj id type x y z c_quat[*] c_id_track c_type_track
+dump            d_lammpstrj all custom 5000 ${output_file}.lammpstrj id type x y z c_quat[*] c_id_track c_type_track
+dump            d_lammpstrj all custom 5000 /home/andrew/Data/btree_chromo/RMF_testing/SCMINBBDBMINBBDB_BDBT_MINBT_BDBT.lammpstrj id type x y z c_quat[*] c_id_track c_type_track
+dump_modify     d_lammpstrj append no first yes
+timestep ${delta_t}
+timestep 100000
+include ${DNA_model_dir}/run_subroutines/subroutine.run_hard_FENE
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//run_subroutines/subroutine.run_hard_FENE
+# include file with description of DNA polymer model with FENE bonds
+include ${DNA_model_dir}/potentials/lmp.twistable_DNA_model_FENE_omp
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.twistable_DNA_model_FENE_omp
+# variables describing energetic parameters
+variable l_equil equal 2.0*${r_mono}
+variable l_equil equal 2.0*17
+variable k_stretch_FENE equal 100*${kBT}/(${sigma_mono_mono}^2) # [Kcal/(mol*A^2)]
+variable k_stretch_FENE equal 100*0.616032/(${sigma_mono_mono}^2) 
+variable k_stretch_FENE equal 100*0.616032/(34^2) 
+variable R0_FENE equal 1.5*${sigma_mono_mono} # [A]
+variable R0_FENE equal 1.5*34 
+variable epsilon_FENE equal ${kBT} # [Kcal/mol]
+variable epsilon_FENE equal 0.616032 
+variable sigma_FENE equal ${sigma_mono_mono} # [A]
+variable sigma_FENE equal 34 
+
+include ${DNA_model_dir}/potentials/lmp.DNA_bend_twist_align_params
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.DNA_bend_twist_align_params
+#variable k_bend equal ${kBT}*(450.0/(${sigma_mono_mono})) #  [Kcal/mol]
+variable k_bend equal ${kBT}*(450.0/(${sigma_mono_mono})) #  [Kcal/mol]
+variable k_bend equal 0.616032*(450.0/(${sigma_mono_mono})) 
+variable k_bend equal 0.616032*(450.0/(34)) 
+variable k_twist equal ${kBT}*(850.0/(2*${sigma_mono_mono})) # [Kcal/mol]
+variable k_twist equal 0.616032*(850.0/(2*${sigma_mono_mono})) 
+variable k_twist equal 0.616032*(850.0/(2*34)) 
+#variable k_twist equal ${kBT}*(0.0/(2*${sigma_mono_mono})) # [Kcal/mol]
+variable k_align equal 2*${k_twist} # [Kcal/mol]
+variable k_align equal 2*7.7004 
+
+print """
+ -----------------------------------------------------
+ ---[ Twistable DNA (FENE), Energetic Parameters  ]---
+ -----------------------------------------------------
+  kBT = ${kBT} [Kcal/mol]
+  k_stretch_FENE = ${k_stretch_FENE} [Kcal/(mol*A^2)]
+  R0_FENE = ${R0_FENE} [A]
+  epsilon_FENE = ${epsilon_FENE} [Kcal/mol]
+  sigma_FENE = ${sigma_FENE} [A]
+  k_bend = ${k_bend} [Kcal/mol]
+  k_twist = ${k_twist} [Kcal/mol]
+  k_align = ${k_align} [Kcal/mol]
+"""
+
+ -----------------------------------------------------
+ ---[ Twistable DNA (FENE), Energetic Parameters  ]---
+ -----------------------------------------------------
+  kBT = 0.616032 [Kcal/mol]
+  k_stretch_FENE = 0.0532899653979239 [Kcal/(mol*A^2)]
+  R0_FENE = 51 [A]
+  epsilon_FENE = 0.616032 [Kcal/mol]
+  sigma_FENE = 34 [A]
+  k_bend = 8.15336470588235 [Kcal/mol]
+  k_twist = 7.7004 [Kcal/mol]
+  k_align = 15.4008 [Kcal/mol]
+
+
+# bond potentials
+bond_style hybrid fene/omp harmonic/omp
+bond_coeff 1 fene/omp ${k_stretch_FENE} ${R0_FENE} ${epsilon_FENE} ${sigma_FENE}
+bond_coeff 1 fene/omp 0.0532899653979239 ${R0_FENE} ${epsilon_FENE} ${sigma_FENE}
+bond_coeff 1 fene/omp 0.0532899653979239 51 ${epsilon_FENE} ${sigma_FENE}
+bond_coeff 1 fene/omp 0.0532899653979239 51 0.616032 ${sigma_FENE}
+bond_coeff 1 fene/omp 0.0532899653979239 51 0.616032 34
+include ${DNA_model_dir}/potentials/lmp.loop_bond_hybrid
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.loop_bond_hybrid
+include ${DNA_model_dir}/potentials/lmp.DNA_loops
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.DNA_loops
+variable r_loop equal 4.0*${r_mono} # [A]
+variable r_loop equal 4.0*17 
+variable k_loop equal 4.0*${kBT}/(3*50.0/4.0-${sigma_mono_mono})^2 # [(Kcal/mol)/A^2]
+variable k_loop equal 4.0*0.616032/(3*50.0/4.0-${sigma_mono_mono})^2 
+variable k_loop equal 4.0*0.616032/(3*50.0/4.0-34)^2 
+
+print """
+ -------------------------------------
+ ---[ Loops, Energetic Parameters ]---
+ -------------------------------------
+  kBT = ${kBT} [Kcal/mol]
+  k_loop = ${k_loop} [Kcal/(mol*A^2)]
+  r_loop = ${r_loop} [A]
+"""
+
+ -------------------------------------
+ ---[ Loops, Energetic Parameters ]---
+ -------------------------------------
+  kBT = 0.616032 [Kcal/mol]
+  k_loop = 0.201153306122449 [Kcal/(mol*A^2)]
+  r_loop = 68 [A]
+
+bond_coeff 2 harmonic/omp ${k_loop} ${r_loop}
+bond_coeff 2 harmonic/omp 0.201153306122449 ${r_loop}
+bond_coeff 2 harmonic/omp 0.201153306122449 68
+
+# angle potentials
+angle_style   hybrid polytorsion/omp cosine/omp harmonic/omp
+angle_coeff   1 cosine/omp ${k_bend} # primary polymer chain angles
+angle_coeff   1 cosine/omp 8.15336470588235 
+angle_coeff   2 polytorsion/omp ${k_align} ${k_twist} # primary polymer chain twist
+angle_coeff   2 polytorsion/omp 15.4008 ${k_twist} 
+angle_coeff   2 polytorsion/omp 15.4008 7.7004 
+angle_coeff   3 harmonic/omp ${k_bend} 120.0 # replication fork angles
+angle_coeff   3 harmonic/omp 8.15336470588235 120.0 
+angle_coeff   4 polytorsion/omp ${k_align} ${k_twist} # replication fork twist
+angle_coeff   4 polytorsion/omp 15.4008 ${k_twist} 
+angle_coeff   4 polytorsion/omp 15.4008 7.7004 
+
+special_bonds fene angle yes
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        1        1       
+  special bond factors coul:  0        1        1       
+     2 = max # of 1-2 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.002 seconds
+
+# include file with neighbor setup
+include ${DNA_model_dir}/protocol_subroutines/subroutine.neighbor_setup
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//protocol_subroutines/subroutine.neighbor_setup
+# 1 - bdry
+# 2 - ribo
+# 3 - DNA monomer
+# 4 - Ori
+# 5 - Ter
+# 6 - Fork
+# 7 - Anchor
+# 8 - Hinge
+
+# set the neighbor type
+neighbor ${r_ribo} bin
+neighbor 100 bin
+neigh_modify every 1 delay 5 check yes page 100000 exclude type 1 1
+
+# neighbor ${r_ribo} multi
+# neigh_modify every 1 delay 5 check yes # page 10000 # collection/type 5 # 1 1, # 1 2, # 1 3, # 1 4, # 1 5*8, ## 2 3*8, # 2 2, # 3 3*8 # 4 3*8 # 5 3*8 # 6 3*8 # 7 3*8 # 8 3*8
+# collection/type 3 # 1 2, # 3 3, # 4 5*8 # exclude type 1 1
+
+# include file with hard pair potentials
+include ${DNA_model_dir}/potentials/lmp.DNA_pair_hard_omp
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.DNA_pair_hard_omp
+# hard LJ pair potentials with WCA cutoff
+
+include ${DNA_model_dir}/potentials/lmp.DNA_pair_params
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.DNA_pair_params
+variable epsilon_soft equal 1.0*${kBT} # [Kcal/mol]
+variable epsilon_soft equal 1.0*0.616032 
+variable epsilon_LJ equal 1.0*${kBT} # [Kcal/mol]
+variable epsilon_LJ equal 1.0*0.616032 
+variable epsilon_soft_topo equal 0.1*${kBT} # [Kcal/mol]
+variable epsilon_soft_topo equal 0.1*0.616032 
+variable D_morse equal 10.0*${kBT} # [Kcal/mol]
+variable D_morse equal 10.0*0.616032 
+variable a_morse equal 1.0/(0.5*${sigma_mono_mono}) # [1/A]
+variable a_morse equal 1.0/(0.5*34) 
+variable r_morse equal 1.5*${sigma_mono_bdry} # [A]
+variable r_morse equal 1.5*59.5 
+variable rcut_morse equal 3.0*${sigma_mono_bdry} # [A]
+variable rcut_morse equal 3.0*59.5 
+variable epsilon_ori equal 10.0*${kBT}/(${sigma_mono_mono}^2.0) # [(Kcal/mol)/(A^2)]
+variable epsilon_ori equal 10.0*0.616032/(${sigma_mono_mono}^2.0) 
+variable epsilon_ori equal 10.0*0.616032/(34^2.0) 
+variable r_ori_equil equal 1000.0 # [A]
+
+print """
+ --------------------------------------------------
+ ---[LJ/cut (WCA) Pairs, Energetic Parameters  ]---
+ --------------------------------------------------
+  kBT = ${kBT} [Kcal/mol]
+  epsilon_LJ = ${epsilon_LJ} [Kcal/mol]
+"""
+
+ --------------------------------------------------
+ ---[LJ/cut (WCA) Pairs, Energetic Parameters  ]---
+ --------------------------------------------------
+  kBT = 0.616032 [Kcal/mol]
+  epsilon_LJ = 0.616032 [Kcal/mol]
+
+
+variable s_expand equal 1.0
+variable sigma_mono_mono_ex equal ${s_expand}*${sigma_mono_mono}
+variable sigma_mono_mono_ex equal 1*${sigma_mono_mono}
+variable sigma_mono_mono_ex equal 1*34
+variable WCA_mono_mono_ex equal ${s_expand}*${WCA_mono_mono}
+variable WCA_mono_mono_ex equal 1*${WCA_mono_mono}
+variable WCA_mono_mono_ex equal 1*38.1637096425186
+
+# 1 - bdry
+# 2 - ribo
+# 3 - DNA monomer
+# 4 - Ori
+# 5 - Ter
+# 6 - Fork
+# 7 - Anchor
+# 8 - Hinge
+
+variable pair_extra_pots equal ${Ori_bdry_attraction}+${Ori_pair_repulsion}
+variable pair_extra_pots equal 0+${Ori_pair_repulsion}
+variable pair_extra_pots equal 0+0
+
+if "${pair_extra_pots}>0" then    "print 'yes extra potentials'"    "variable temp_pstyle string 'pair_style hybrid'"    "variable temp_pstyle string '${temp_pstyle} lj/cut/omp 2.5'" else    "print 'no extra potentials'"    "variable temp_pstyle string 'pair_style lj/cut/omp 2.5'"
+print 'no extra potentials'
+no extra potentials
+variable temp_pstyle string 'pair_style lj/cut/omp 2.5'
+
+if "${Ori_bdry_attraction}==1" then    "variable temp_pstyle string '${temp_pstyle} morse/omp 2.5'"
+
+if "${Ori_pair_repulsion}==1" then    "variable temp_pstyle string '${temp_pstyle} harmonic/cut/omp'"
+
+print ' PAIR_STYLE: ${temp_pstyle}'
+ PAIR_STYLE: pair_style lj/cut/omp 2.5
+
+${temp_pstyle}
+pair_style lj/cut/omp 2.5
+pair_modify shift yes
+
+# basic pair potentials
+
+if "${pair_extra_pots}>0" then    "pair_coeff 3*8 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}"    "pair_coeff 2 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_ribo} ${WCA_mono_ribo}"    "pair_coeff 2 2 lj/cut/omp ${epsilon_LJ} ${sigma_ribo_ribo} ${WCA_ribo_ribo}"    "pair_coeff 1 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}"    "pair_coeff 1 2 lj/cut/omp ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}"    "pair_coeff 1 1 lj/cut/omp 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}" else    "pair_coeff 3*8 3*8 ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}"    "pair_coeff 2 3*8 ${epsilon_LJ} ${sigma_mono_ribo} ${WCA_mono_ribo}"    "pair_coeff 2 2 ${epsilon_LJ} ${sigma_ribo_ribo} ${WCA_ribo_ribo}"    "pair_coeff 1 3*8 ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}"    "pair_coeff 1 2 ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}"    "pair_coeff 1 1 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}"
+pair_coeff 3*8 3*8 ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+pair_coeff 3*8 3*8 0.616032 ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+pair_coeff 3*8 3*8 0.616032 34 ${WCA_mono_mono_ex}
+pair_coeff 3*8 3*8 0.616032 34 38.1637096425186
+pair_coeff 2 3*8 ${epsilon_LJ} ${sigma_mono_ribo} ${WCA_mono_ribo}
+pair_coeff 2 3*8 0.616032 ${sigma_mono_ribo} ${WCA_mono_ribo}
+pair_coeff 2 3*8 0.616032 117 ${WCA_mono_ribo}
+pair_coeff 2 3*8 0.616032 117 131.328059652196
+pair_coeff 2 2 ${epsilon_LJ} ${sigma_ribo_ribo} ${WCA_ribo_ribo}
+pair_coeff 2 2 0.616032 ${sigma_ribo_ribo} ${WCA_ribo_ribo}
+pair_coeff 2 2 0.616032 200 ${WCA_ribo_ribo}
+pair_coeff 2 2 0.616032 200 224.492409661874
+pair_coeff 1 3*8 ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}
+pair_coeff 1 3*8 0.616032 ${sigma_mono_bdry} ${WCA_mono_bdry}
+pair_coeff 1 3*8 0.616032 59.5 ${WCA_mono_bdry}
+pair_coeff 1 3*8 0.616032 59.5 66.7864918744075
+pair_coeff 1 2 ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}
+pair_coeff 1 2 0.616032 ${sigma_ribo_bdry} ${WCA_ribo_bdry}
+pair_coeff 1 2 0.616032 142.5 ${WCA_ribo_bdry}
+pair_coeff 1 2 0.616032 142.5 159.950841884085
+pair_coeff 1 1 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}
+pair_coeff 1 1 0.0 85 ${WCA_bdry_bdry}
+pair_coeff 1 1 0.0 85 95.4092741062964
+
+# extra pair potentials
+
+if "${Ori_bdry_attraction}==1" then    "pair_coeff 1 4 morse/omp ${D_morse} ${a_morse} ${r_morse} ${rcut_morse}"
+
+if "${Ori_pair_repulsion}==1" then    "pair_coeff 4 4 harmonic/cut/omp ${epsilon_ori} ${r_ori_equil}"
+
+# pair_style hybrid # lj/cut/omp 2.5 # morse/omp 2.5 # harmonic/cut/omp
+
+# pair_modify shift yes
+
+# # DNA
+# pair_coeff 3 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+# pair_coeff 4 4 harmonic/cut/omp ${epsilon_ori} ${r_ori_equil}
+# pair_coeff 4 5*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+# pair_coeff 5*8 5*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+# # ribosomes
+# pair_coeff 2 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_ribo} ${WCA_mono_ribo}
+# pair_coeff 2 2 lj/cut/omp ${epsilon_LJ} ${sigma_ribo_ribo} ${WCA_ribo_ribo}
+# # boundary particles
+# pair_coeff 1 3 lj/cut/omp ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}
+# pair_coeff 1 4 morse/omp ${D_morse} ${a_morse} ${r_morse} ${rcut_morse}
+# pair_coeff 1 5*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}
+# pair_coeff 1 2 lj/cut/omp ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}
+# pair_coeff 1 1 lj/cut/omp 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}
+
+
+
+# pair_style lj/cut/omp 2.5
+
+# pair_modify shift yes
+
+# # DNA
+# pair_coeff 3*8 3*8 ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+# # ribosomes
+# pair_coeff 2 3*8 ${epsilon_LJ} ${sigma_mono_ribo} ${WCA_mono_ribo}
+# pair_coeff 2 2 ${epsilon_LJ} ${sigma_ribo_ribo} ${WCA_ribo_ribo}
+# # boundary particles
+# pair_coeff 1 3*8 ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}
+# pair_coeff 1 2 ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}
+# pair_coeff 1 1 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}
+
+# include file with brownian/asphere/omp fixes
+include ${DNA_model_dir}/run_subroutines/subroutine.BD_fixes
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//run_subroutines/subroutine.BD_fixes
+######################################
+# fix commands for Brownian dynamics #
+######################################
+
+# BD fix for DNA
+fix dnaBD DNA brownian/asphere/omp ${T} ${rng_seed} gamma_r_eigen ${gamma_r_mono} ${gamma_r_mono} ${gamma_r_mono} gamma_t_eigen ${gamma_t_mono} ${gamma_t_mono} ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 ${rng_seed} gamma_r_eigen ${gamma_r_mono} ${gamma_r_mono} ${gamma_r_mono} gamma_t_eigen ${gamma_t_mono} ${gamma_t_mono} ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 10 gamma_r_eigen ${gamma_r_mono} ${gamma_r_mono} ${gamma_r_mono} gamma_t_eigen ${gamma_t_mono} ${gamma_t_mono} ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 10 gamma_r_eigen 8696990.12239152 ${gamma_r_mono} ${gamma_r_mono} gamma_t_eigen ${gamma_t_mono} ${gamma_t_mono} ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 10 gamma_r_eigen 8696990.12239152 8696990.12239152 ${gamma_r_mono} gamma_t_eigen ${gamma_t_mono} ${gamma_t_mono} ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 10 gamma_r_eigen 8696990.12239152 8696990.12239152 8696990.12239152 gamma_t_eigen ${gamma_t_mono} ${gamma_t_mono} ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 10 gamma_r_eigen 8696990.12239152 8696990.12239152 8696990.12239152 gamma_t_eigen 22570.0435702202 ${gamma_t_mono} ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 10 gamma_r_eigen 8696990.12239152 8696990.12239152 8696990.12239152 gamma_t_eigen 22570.0435702202 22570.0435702202 ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 10 gamma_r_eigen 8696990.12239152 8696990.12239152 8696990.12239152 gamma_t_eigen 22570.0435702202 22570.0435702202 22570.0435702202
+
+# BD fix for ribosomes
+fix ribosBD ribos brownian/asphere/omp ${T} ${rng_seed} gamma_r_eigen ${gamma_r_ribo} ${gamma_r_ribo} ${gamma_r_ribo} gamma_t_eigen ${gamma_t_ribo} ${gamma_t_ribo} ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 ${rng_seed} gamma_r_eigen ${gamma_r_ribo} ${gamma_r_ribo} ${gamma_r_ribo} gamma_t_eigen ${gamma_t_ribo} ${gamma_t_ribo} ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 10 gamma_r_eigen ${gamma_r_ribo} ${gamma_r_ribo} ${gamma_r_ribo} gamma_t_eigen ${gamma_t_ribo} ${gamma_t_ribo} ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 10 gamma_r_eigen 1770199495.70355 ${gamma_r_ribo} ${gamma_r_ribo} gamma_t_eigen ${gamma_t_ribo} ${gamma_t_ribo} ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 10 gamma_r_eigen 1770199495.70355 1770199495.70355 ${gamma_r_ribo} gamma_t_eigen ${gamma_t_ribo} ${gamma_t_ribo} ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 10 gamma_r_eigen 1770199495.70355 1770199495.70355 1770199495.70355 gamma_t_eigen ${gamma_t_ribo} ${gamma_t_ribo} ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 10 gamma_r_eigen 1770199495.70355 1770199495.70355 1770199495.70355 gamma_t_eigen 132764.962177766 ${gamma_t_ribo} ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 10 gamma_r_eigen 1770199495.70355 1770199495.70355 1770199495.70355 gamma_t_eigen 132764.962177766 132764.962177766 ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 10 gamma_r_eigen 1770199495.70355 1770199495.70355 1770199495.70355 gamma_t_eigen 132764.962177766 132764.962177766 132764.962177766
+run 50000
+Generated 0 of 28 mixed pair_coeff terms from geometric mixing rule
+Last active /omp style is angle_style harmonic/omp
+Neighbor list info ...
+  update: every = 1 steps, delay = 5 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 324.49241
+  ghost atom cutoff = 324.49241
+  binsize = 162.2462, bins = 31 31 31
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut/omp, perpetual
+      attributes: half, newton on, omp
+      pair build: half/bin/newton/omp
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 20.22 | 20.22 | 20.22 Mbytes
+   Step         E_pair         E_bond        E_angle      c_dnaMSD[4]   c_ribosMSD[4] 
+         0   491.07301      206758.86      77411.124      0              0            
+      1000   98.812687      185715.54      69962.552      13.331036      0            
+      2000   52.462066      182093.04      65099.042      25.609206      0            
+      3000   47.379487      180844.05      60972.232      36.156389      0            
+      4000   35.806483      180350         57140.867      45.591144      0            
+      5000   32.080081      180218.42      53892.88       54.353976      0            
+      6000   30.363774      180039.22      50890.728      62.924772      0            
+      7000   25.203804      179994.61      48110.322      70.810669      0            
+      8000   33.455545      179893.28      45605.633      79.005807      0            
+      9000   29.648913      179882.16      43296.801      87.07953       0            
+     10000   32.964896      179783.42      41192.194      94.106454      0            
+     11000   31.687437      179856.4       39360.402      101.06837      0            
+     12000   28.376028      179818.94      37628.449      107.99767      0            
+     13000   30.429169      179757.73      36010.431      114.12909      0            
+     14000   24.53517       179774.64      34485.936      119.25673      0            
+     15000   27.928147      179731.9       33184.995      126.11046      0            
+     16000   26.192708      179752.62      31919.691      132.25578      0            
+     17000   29.287828      179754.73      30885.477      137.33488      0            
+     18000   31.398845      179772.78      29841.404      142.56082      0            
+     19000   26.950032      179716.78      28927.339      147.22711      0            
+     20000   25.791191      179768.82      28034.867      153.25186      0            
+     21000   26.860063      179760.74      27354.19       158.74854      0            
+     22000   29.1556        179757.5       26668.237      164.0671       0            
+     23000   30.10467       179719.1       26069.388      168.38434      0            
+     24000   30.706264      179764.06      25475.188      172.77999      0            
+     25000   24.328726      179740.53      25055.57       176.65781      0            
+     26000   29.790252      179754.94      24643.833      181.92421      0            
+     27000   31.547711      179785.56      24219.934      186.57256      0            
+     28000   31.258542      179762.3       23836.851      190.49262      0            
+     29000   32.206661      179690.07      23549.843      194.89553      0            
+     30000   28.048933      179710.57      23276.598      198.7072       0            
+     31000   25.644642      179635.71      22947.266      201.32283      0            
+     32000   26.636382      179745.5       22647.924      205.50502      0            
+     33000   26.814218      179710.82      22329.15       209.45891      0            
+     34000   32.804302      179732.56      22061.561      212.9649       0            
+     35000   33.0527        179728.33      21803.37       216.21107      0            
+     36000   38.667988      179766.6       21586.063      218.47185      0            
+     37000   32.03615       179754.32      21424.604      221.62173      0            
+     38000   29.96298       179744.01      21164.047      225.41995      0            
+     39000   34.999308      179691.29      20972.018      229.24315      0            
+     40000   35.492787      179711.78      20794.81       233.00995      0            
+     41000   30.068903      179692.56      20653.468      235.46724      0            
+     42000   28.35228       179740.07      20428.805      238.46093      0            
+     43000   27.522441      179713.73      20353.057      241.28887      0            
+     44000   33.49811       179754.33      20190.584      244.20207      0            
+     45000   31.491775      179741.78      20023.769      247.60957      0            
+     46000   32.57344       179779.73      19891.835      251.60105      0            
+     47000   29.03127       179733.2       19813.803      254.86718      0            
+     48000   30.405901      179710.46      19660.39       257.74345      0            
+     49000   30.742258      179671.87      19600.414      259.93513      0            
+     50000   25.583709      179731.36      19516.371      262.98163      0            
+Loop time of 33.8341 on 8 procs for 50000 steps with 15242 atoms
+
+Performance: 12768185.692 ns/day, 0.000 hours/ns, 1477.799 timesteps/s, 22.525 Matom-step/s
+790.5% CPU use with 1 MPI tasks x 8 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 3.7473     | 3.7473     | 3.7473     |   0.0 | 11.08
+Bond    | 11.95      | 11.95      | 11.95      |   0.0 | 35.32
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.011959   | 0.011959   | 0.011959   |   0.0 |  0.04
+Output  | 0.42115    | 0.42115    | 0.42115    |   0.0 |  1.24
+Modify  | 15.667     | 15.667     | 15.667     |   0.0 | 46.31
+Other   |            | 2.037      |            |       |  6.02
+
+Nlocal:          15242 ave       15242 max       15242 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:              0 ave           0 max           0 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:          71380 ave       71380 max       71380 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 71380
+Ave neighs/atom = 4.6831125
+Ave special neighs/atom = 0.65608188
+Neighbor list builds = 0
+Dangerous builds = 0
+variable T_freq delete
+variable T_freq internal 5000
+variable D_freq delete
+variable D_freq internal 0
+variable Ori_pair_repulsion delete
+variable Ori_pair_repulsion internal 0
+variable Ori_bdry_attraction delete
+variable Ori_bdry_attraction internal 0
+uncompute id_track
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_ids
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_ids
+# compute to track ids
+compute id_track all property/atom id
+uncompute type_track
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_types
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_types
+# compute to track types
+compute type_track all property/atom type
+uncompute quat
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_quats
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_quats
+# compute to calculate orientations
+compute quat DNAribos property/atom quatw quati quatj quatk
+include ${DNA_model_dir}/dump_subroutines/subroutine.default_thermo
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//dump_subroutines/subroutine.default_thermo
+# default thermo style
+thermo		${T_freq}
+thermo		5000
+#thermo_style custom step emol epair ebond eangle c_angleE[1] c_angleE[2] c_angleE[3]
+thermo_style custom step emol epair ebond eangle
+undump d_lammpstrj
+include ${DNA_model_dir}/minimize_subroutines/subroutine.min_soft_harmonic
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//minimize_subroutines/subroutine.min_soft_harmonic
+# include file with springs tethering ribosomes
+include ${DNA_model_dir}/potentials/lmp.ribo_springs
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.ribo_springs
+# create springs to hold ribosomes
+variable ribos_spring equal 1.0*${kBT}
+variable ribos_spring equal 1.0*0.616032
+fix ribosSpring ribos spring/self ${ribos_spring}
+fix ribosSpring ribos spring/self 0.616032
+
+# include file with description of DNA polymer model with harmonic bonds
+include ${DNA_model_dir}/potentials/lmp.twistable_DNA_model_harmonic_omp
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.twistable_DNA_model_harmonic_omp
+# variables describing energetic parameters
+variable l_equil equal 2.0*${r_mono}-6.0
+variable l_equil equal 2.0*17-6.0
+#variable k_stretch equal 2000*${kBT}/(${sigma_mono_mono}^2) # [Kcal/(mol*A^2)]
+variable k_stretch equal 1000*${kBT}/(${sigma_mono_mono}^2) # [Kcal/(mol*A^2)]
+variable k_stretch equal 1000*0.616032/(${sigma_mono_mono}^2) 
+variable k_stretch equal 1000*0.616032/(34^2) 
+
+include ${DNA_model_dir}/potentials/lmp.DNA_bend_twist_align_params
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.DNA_bend_twist_align_params
+#variable k_bend equal ${kBT}*(450.0/(${sigma_mono_mono})) #  [Kcal/mol]
+variable k_bend equal ${kBT}*(450.0/(${sigma_mono_mono})) #  [Kcal/mol]
+variable k_bend equal 0.616032*(450.0/(${sigma_mono_mono})) 
+variable k_bend equal 0.616032*(450.0/(34)) 
+variable k_twist equal ${kBT}*(850.0/(2*${sigma_mono_mono})) # [Kcal/mol]
+variable k_twist equal 0.616032*(850.0/(2*${sigma_mono_mono})) 
+variable k_twist equal 0.616032*(850.0/(2*34)) 
+#variable k_twist equal ${kBT}*(0.0/(2*${sigma_mono_mono})) # [Kcal/mol]
+variable k_align equal 2*${k_twist} # [Kcal/mol]
+variable k_align equal 2*7.7004 
+
+print """
+ -----------------------------------------------------
+ ---[ Twistable DNA (stiff), Energetic Parameters ]---
+ -----------------------------------------------------
+  kBT = ${kBT} [Kcal/mol]
+  k_stretch = ${k_stretch} [Kcal/(mol*A^2)]
+  k_bend = ${k_bend} [Kcal/mol]
+  k_twist = ${k_twist} [Kcal/mol]
+  k_align = ${k_align} [Kcal/mol]
+"""
+
+ -----------------------------------------------------
+ ---[ Twistable DNA (stiff), Energetic Parameters ]---
+ -----------------------------------------------------
+  kBT = 0.616032 [Kcal/mol]
+  k_stretch = 0.532899653979239 [Kcal/(mol*A^2)]
+  k_bend = 8.15336470588235 [Kcal/mol]
+  k_twist = 7.7004 [Kcal/mol]
+  k_align = 15.4008 [Kcal/mol]
+
+
+# bond potentials
+bond_style harmonic/omp
+bond_coeff 1 ${k_stretch} ${l_equil}
+bond_coeff 1 0.532899653979239 ${l_equil}
+bond_coeff 1 0.532899653979239 28
+include ${DNA_model_dir}/potentials/lmp.loop_bond
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.loop_bond
+include ${DNA_model_dir}/potentials/lmp.DNA_loops
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.DNA_loops
+variable r_loop equal 4.0*${r_mono} # [A]
+variable r_loop equal 4.0*17 
+variable k_loop equal 4.0*${kBT}/(3*50.0/4.0-${sigma_mono_mono})^2 # [(Kcal/mol)/A^2]
+variable k_loop equal 4.0*0.616032/(3*50.0/4.0-${sigma_mono_mono})^2 
+variable k_loop equal 4.0*0.616032/(3*50.0/4.0-34)^2 
+
+print """
+ -------------------------------------
+ ---[ Loops, Energetic Parameters ]---
+ -------------------------------------
+  kBT = ${kBT} [Kcal/mol]
+  k_loop = ${k_loop} [Kcal/(mol*A^2)]
+  r_loop = ${r_loop} [A]
+"""
+
+ -------------------------------------
+ ---[ Loops, Energetic Parameters ]---
+ -------------------------------------
+  kBT = 0.616032 [Kcal/mol]
+  k_loop = 0.201153306122449 [Kcal/(mol*A^2)]
+  r_loop = 68 [A]
+
+bond_coeff 2 ${k_loop} ${r_loop}
+bond_coeff 2 0.201153306122449 ${r_loop}
+bond_coeff 2 0.201153306122449 68
+
+# angle potentials
+angle_style   hybrid polytorsion/omp cosine/omp harmonic/omp
+angle_coeff   1 cosine/omp ${k_bend} # primary polymer chain angles
+angle_coeff   1 cosine/omp 8.15336470588235 
+angle_coeff   2 polytorsion/omp ${k_align} ${k_twist} # primary polymer chain twist
+angle_coeff   2 polytorsion/omp 15.4008 ${k_twist} 
+angle_coeff   2 polytorsion/omp 15.4008 7.7004 
+angle_coeff   3 harmonic/omp ${k_bend} 120.0 # replication fork angles
+angle_coeff   3 harmonic/omp 8.15336470588235 120.0 
+angle_coeff   4 polytorsion/omp ${k_align} ${k_twist} # replication fork twist
+angle_coeff   4 polytorsion/omp 15.4008 ${k_twist} 
+angle_coeff   4 polytorsion/omp 15.4008 7.7004 
+
+special_bonds angle yes
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0       
+  special bond factors coul:  0        0        0       
+     2 = max # of 1-2 neighbors
+     2 = max # of 1-3 neighbors
+     4 = max # of 1-4 neighbors
+  10000 = # of 1-3 neighbors before angle trim
+  10000 = # of 1-3 neighbors after angle trim
+     6 = max # of special neighbors
+  special bonds CPU = 0.007 seconds
+
+# include file with neighbor setup
+include ${DNA_model_dir}/protocol_subroutines/subroutine.neighbor_setup
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//protocol_subroutines/subroutine.neighbor_setup
+# 1 - bdry
+# 2 - ribo
+# 3 - DNA monomer
+# 4 - Ori
+# 5 - Ter
+# 6 - Fork
+# 7 - Anchor
+# 8 - Hinge
+
+# set the neighbor type
+neighbor ${r_ribo} bin
+neighbor 100 bin
+neigh_modify every 1 delay 5 check yes page 100000 exclude type 1 1
+
+# neighbor ${r_ribo} multi
+# neigh_modify every 1 delay 5 check yes # page 10000 # collection/type 5 # 1 1, # 1 2, # 1 3, # 1 4, # 1 5*8, ## 2 3*8, # 2 2, # 3 3*8 # 4 3*8 # 5 3*8 # 6 3*8 # 7 3*8 # 8 3*8
+# collection/type 3 # 1 2, # 3 3, # 4 5*8 # exclude type 1 1
+
+# include file with soft pair potentials
+include ${DNA_model_dir}/potentials/lmp.DNA_pair_soft_omp
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.DNA_pair_soft_omp
+# soft pair potentials
+
+include ${DNA_model_dir}/potentials/lmp.DNA_pair_params
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.DNA_pair_params
+variable epsilon_soft equal 1.0*${kBT} # [Kcal/mol]
+variable epsilon_soft equal 1.0*0.616032 
+variable epsilon_LJ equal 1.0*${kBT} # [Kcal/mol]
+variable epsilon_LJ equal 1.0*0.616032 
+variable epsilon_soft_topo equal 0.1*${kBT} # [Kcal/mol]
+variable epsilon_soft_topo equal 0.1*0.616032 
+variable D_morse equal 10.0*${kBT} # [Kcal/mol]
+variable D_morse equal 10.0*0.616032 
+variable a_morse equal 1.0/(0.5*${sigma_mono_mono}) # [1/A]
+variable a_morse equal 1.0/(0.5*34) 
+variable r_morse equal 1.5*${sigma_mono_bdry} # [A]
+variable r_morse equal 1.5*59.5 
+variable rcut_morse equal 3.0*${sigma_mono_bdry} # [A]
+variable rcut_morse equal 3.0*59.5 
+variable epsilon_ori equal 10.0*${kBT}/(${sigma_mono_mono}^2.0) # [(Kcal/mol)/(A^2)]
+variable epsilon_ori equal 10.0*0.616032/(${sigma_mono_mono}^2.0) 
+variable epsilon_ori equal 10.0*0.616032/(34^2.0) 
+variable r_ori_equil equal 1000.0 # [A]
+
+print """
+ ------------------------------------------
+ ---[Soft Pairs, Energetic Parameters  ]---
+ ------------------------------------------
+  kBT = ${kBT} [Kcal/mol]
+  epsilon_soft = ${epsilon_soft} [Kcal/mol]
+  epsilon_LJ = ${epsilon_LJ} [Kcal/mol]
+"""
+
+ ------------------------------------------
+ ---[Soft Pairs, Energetic Parameters  ]---
+ ------------------------------------------
+  kBT = 0.616032 [Kcal/mol]
+  epsilon_soft = 0.616032 [Kcal/mol]
+  epsilon_LJ = 0.616032 [Kcal/mol]
+
+
+# 1 - bdry
+# 2 - ribo
+# 3 - DNA monomer
+# 4 - Ori
+# 5 - Ter
+# 6 - Fork
+# 7 - Anchor
+# 8 - Hinge
+
+variable pair_extra_pots equal ${Ori_bdry_attraction}+${Ori_pair_repulsion}
+variable pair_extra_pots equal 0+${Ori_pair_repulsion}
+variable pair_extra_pots equal 0+0
+
+variable temp_pstyle string "pair_style hybrid lj/cut/omp 2.5 soft/omp 2.5"
+
+if "${Ori_bdry_attraction}==1" then    "variable temp_pstyle string '${temp_pstyle} morse/omp 2.5'"
+
+if "${Ori_pair_repulsion}==1" then    "variable temp_pstyle string '${temp_pstyle} harmonic/cut/omp'"
+
+print ' PAIR_STYLE: ${temp_pstyle}'
+ PAIR_STYLE: pair_style hybrid lj/cut/omp 2.5 soft/omp 2.5
+
+${temp_pstyle}
+pair_style hybrid lj/cut/omp 2.5 soft/omp 2.5
+pair_modify shift yes
+
+# basic pair potentials
+
+# DNA
+pair_coeff 3*8 3*8 soft/omp ${epsilon_soft} ${sigma_mono_mono}
+pair_coeff 3*8 3*8 soft/omp 0.616032 ${sigma_mono_mono}
+pair_coeff 3*8 3*8 soft/omp 0.616032 34
+# ribosomes
+pair_coeff 2 3*8 soft/omp ${epsilon_soft} ${sigma_mono_ribo}
+pair_coeff 2 3*8 soft/omp 0.616032 ${sigma_mono_ribo}
+pair_coeff 2 3*8 soft/omp 0.616032 117
+pair_coeff 2 2 soft/omp ${epsilon_soft} ${sigma_ribo_ribo}
+pair_coeff 2 2 soft/omp 0.616032 ${sigma_ribo_ribo}
+pair_coeff 2 2 soft/omp 0.616032 200
+# boundary particles
+pair_coeff 1 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}
+pair_coeff 1 3*8 lj/cut/omp 0.616032 ${sigma_mono_bdry} ${WCA_mono_bdry}
+pair_coeff 1 3*8 lj/cut/omp 0.616032 59.5 ${WCA_mono_bdry}
+pair_coeff 1 3*8 lj/cut/omp 0.616032 59.5 66.7864918744075
+pair_coeff 1 2 lj/cut/omp ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}
+pair_coeff 1 2 lj/cut/omp 0.616032 ${sigma_ribo_bdry} ${WCA_ribo_bdry}
+pair_coeff 1 2 lj/cut/omp 0.616032 142.5 ${WCA_ribo_bdry}
+pair_coeff 1 2 lj/cut/omp 0.616032 142.5 159.950841884085
+pair_coeff 1 1 lj/cut/omp 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}
+pair_coeff 1 1 lj/cut/omp 0.0 85 ${WCA_bdry_bdry}
+pair_coeff 1 1 lj/cut/omp 0.0 85 95.4092741062964
+
+# extra pair potentials
+
+if "${Ori_bdry_attraction}==1" then    "pair_coeff 1 4 morse/omp ${D_morse} ${a_morse} ${r_morse} ${rcut_morse}"
+
+if "${Ori_pair_repulsion}==1" then    "pair_coeff 4 4 harmonic/cut/omp ${epsilon_ori} ${r_ori_equil}"
+
+# pair_style hybrid # lj/cut/omp 2.5 # soft/omp 2.5 # morse/omp 2.5 # harmonic/cut/omp
+
+# pair_modify shift yes
+
+# # DNA
+# pair_coeff 3 3*8 soft/omp ${epsilon_soft} ${sigma_mono_mono}
+# pair_coeff 4 4 harmonic/cut/omp ${epsilon_ori} ${r_ori_equil}
+# pair_coeff 4 5*8 soft/omp ${epsilon_soft} ${sigma_mono_mono}
+# pair_coeff 5*8 5*8 soft/omp ${epsilon_soft} ${sigma_mono_mono}
+# # ribosomes
+# pair_coeff 2 3*8 soft/omp ${epsilon_soft} ${sigma_mono_ribo}
+# pair_coeff 2 2 soft/omp ${epsilon_soft} ${sigma_ribo_ribo}
+# # boundary particles
+# pair_coeff 1 3 lj/cut/omp ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}
+# pair_coeff 1 4 morse/omp ${D_morse} ${a_morse} ${r_morse} ${rcut_morse}
+# pair_coeff 1 5*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}
+# pair_coeff 1 2 lj/cut/omp ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}
+# pair_coeff 1 1 lj/cut/omp 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}
+
+
+
+# pair_style hybrid # lj/cut/omp 2.5 # soft/omp 2.5
+
+# pair_modify shift yes
+
+# # DNA
+# pair_coeff 3*8 3*8 soft/omp ${epsilon_soft} ${sigma_mono_mono}
+# # ribosomes
+# pair_coeff 2 3*8 soft/omp ${epsilon_soft} ${sigma_mono_ribo}
+# pair_coeff 2 2 soft/omp ${epsilon_soft} ${sigma_ribo_ribo}
+# # boundary particles
+# pair_coeff 1 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}
+# pair_coeff 1 2 lj/cut/omp ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}
+# pair_coeff 1 1 lj/cut/omp 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}
+
+# run the minimization
+min_style cg
+minimize 1.0e-5 1.0e-7 40000 400000
+Switching to 'neigh_modify every 1 delay 0 check yes' setting during minimization
+Generated 0 of 28 mixed pair_coeff terms from geometric mixing rule
+Hybrid pair style last /omp style soft/omp
+Last active /omp style is angle_style harmonic/omp
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 300
+  ghost atom cutoff = 300
+  binsize = 150, bins = 33 33 33
+  4 neighbor lists, perpetual/occasional/extra = 4 0 0
+  (1) pair lj/cut/omp, perpetual, skip from (3)
+      attributes: half, newton on, omp, cut 259.950841884085
+      pair build: skip/omp
+      stencil: none
+      bin: none
+  (2) pair soft/omp, perpetual, skip from (4)
+      attributes: half, newton on, omp
+      pair build: skip/omp
+      stencil: none
+      bin: none
+  (3) neighbor class addition, perpetual, trim from (4)
+      attributes: half, newton on, omp, cut 259.950841884085
+      pair build: trim/omp
+      stencil: none
+      bin: none
+  (4) neighbor class addition, perpetual
+      attributes: half, newton on, omp
+      pair build: half/bin/newton/omp
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 31.58 | 31.58 | 31.58 Mbytes
+   Step         E_mol          E_pair         E_bond        E_angle    
+     50000   39268.708      0.00063744853  19752.337      19516.371    
+     51055   15009.985      4.7170693      4.1487094      15005.836    
+Loop time of 1.00746 on 8 procs for 1055 steps with 15242 atoms
+
+795.8% CPU use with 1 MPI tasks x 8 OpenMP threads
+
+Minimization stats:
+  Stopping criterion = energy tolerance
+  Energy initial, next-to-last, final = 
+      39268.7083755917   15014.7969778877   15014.7018412925
+  Force two-norm initial, final = 167.11719 0.46300728
+  Force max component initial, final = 6.9438292 0.07204159
+  Final line search alpha, max atom move = 0.70969888 0.051127835
+  Iterations, force evaluations = 1055 1113
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.085216   | 0.085216   | 0.085216   |   0.0 |  8.46
+Bond    | 0.32451    | 0.32451    | 0.32451    |   0.0 | 32.21
+Neigh   | 0.0065537  | 0.0065537  | 0.0065537  |   0.0 |  0.65
+Comm    | 0.00052167 | 0.00052167 | 0.00052167 |   0.0 |  0.05
+Output  | 0          | 0          | 0          |   0.0 |  0.00
+Modify  | 0.15939    | 0.15939    | 0.15939    |   0.0 | 15.82
+Other   |            | 0.4313     |            |       | 42.81
+
+Nlocal:          15242 ave       15242 max       15242 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:              0 ave           0 max           0 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:              0 ave           0 max           0 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 0
+Ave neighs/atom = 0
+Ave special neighs/atom = 1.9682456
+Neighbor list builds = 1
+Dangerous builds = 0
+
+# release ribosomes from springs following minimization
+unfix ribosSpring
+reset_timestep 50000
+variable T_freq delete
+variable T_freq internal 5000
+variable D_freq delete
+variable D_freq internal 0
+variable Ori_pair_repulsion delete
+variable Ori_pair_repulsion internal 0
+variable Ori_bdry_attraction delete
+variable Ori_bdry_attraction internal 0
+uncompute id_track
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_ids
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_ids
+# compute to track ids
+compute id_track all property/atom id
+uncompute type_track
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_types
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_types
+# compute to track types
+compute type_track all property/atom type
+uncompute quat
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_quats
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_quats
+# compute to calculate orientations
+compute quat DNAribos property/atom quatw quati quatj quatk
+uncompute dnaMSD
+uncompute ribosMSD
+uncompute orisMSD
+uncompute tersMSD
+uncompute forksMSD
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_MSD
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_MSD
+###
+# computes for MSD
+###
+
+compute dnaMSD DNA msd com no average no
+compute ribosMSD ribos msd com no average no
+compute orisMSD oris msd com no average no
+compute tersMSD ters msd com no average no
+compute forksMSD forks msd com no average no
+include ${DNA_model_dir}/dump_subroutines/subroutine.MSD_thermo
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//dump_subroutines/subroutine.MSD_thermo
+# set custom thermo style
+thermo		${T_freq}
+thermo		5000
+# thermo_style custom step # epair ebond eangle c_angleE[1] c_angleE[2] c_angleE[3] # c_dnaMSD[4] c_ribosMSD[4]
+
+thermo_style custom step epair ebond eangle c_dnaMSD[4] c_ribosMSD[4]
+include ${DNA_model_dir}/run_subroutines/subroutine.run_soft_harmonic
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//run_subroutines/subroutine.run_soft_harmonic
+# include file with description of DNA polymer model with harmonic bonds
+include ${DNA_model_dir}/potentials/lmp.twistable_DNA_model_harmonic_omp
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.twistable_DNA_model_harmonic_omp
+# variables describing energetic parameters
+variable l_equil equal 2.0*${r_mono}-6.0
+variable l_equil equal 2.0*17-6.0
+#variable k_stretch equal 2000*${kBT}/(${sigma_mono_mono}^2) # [Kcal/(mol*A^2)]
+variable k_stretch equal 1000*${kBT}/(${sigma_mono_mono}^2) # [Kcal/(mol*A^2)]
+variable k_stretch equal 1000*0.616032/(${sigma_mono_mono}^2) 
+variable k_stretch equal 1000*0.616032/(34^2) 
+
+include ${DNA_model_dir}/potentials/lmp.DNA_bend_twist_align_params
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.DNA_bend_twist_align_params
+#variable k_bend equal ${kBT}*(450.0/(${sigma_mono_mono})) #  [Kcal/mol]
+variable k_bend equal ${kBT}*(450.0/(${sigma_mono_mono})) #  [Kcal/mol]
+variable k_bend equal 0.616032*(450.0/(${sigma_mono_mono})) 
+variable k_bend equal 0.616032*(450.0/(34)) 
+variable k_twist equal ${kBT}*(850.0/(2*${sigma_mono_mono})) # [Kcal/mol]
+variable k_twist equal 0.616032*(850.0/(2*${sigma_mono_mono})) 
+variable k_twist equal 0.616032*(850.0/(2*34)) 
+#variable k_twist equal ${kBT}*(0.0/(2*${sigma_mono_mono})) # [Kcal/mol]
+variable k_align equal 2*${k_twist} # [Kcal/mol]
+variable k_align equal 2*7.7004 
+
+print """
+ -----------------------------------------------------
+ ---[ Twistable DNA (stiff), Energetic Parameters ]---
+ -----------------------------------------------------
+  kBT = ${kBT} [Kcal/mol]
+  k_stretch = ${k_stretch} [Kcal/(mol*A^2)]
+  k_bend = ${k_bend} [Kcal/mol]
+  k_twist = ${k_twist} [Kcal/mol]
+  k_align = ${k_align} [Kcal/mol]
+"""
+
+ -----------------------------------------------------
+ ---[ Twistable DNA (stiff), Energetic Parameters ]---
+ -----------------------------------------------------
+  kBT = 0.616032 [Kcal/mol]
+  k_stretch = 0.532899653979239 [Kcal/(mol*A^2)]
+  k_bend = 8.15336470588235 [Kcal/mol]
+  k_twist = 7.7004 [Kcal/mol]
+  k_align = 15.4008 [Kcal/mol]
+
+
+# bond potentials
+bond_style harmonic/omp
+bond_coeff 1 ${k_stretch} ${l_equil}
+bond_coeff 1 0.532899653979239 ${l_equil}
+bond_coeff 1 0.532899653979239 28
+include ${DNA_model_dir}/potentials/lmp.loop_bond
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.loop_bond
+include ${DNA_model_dir}/potentials/lmp.DNA_loops
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.DNA_loops
+variable r_loop equal 4.0*${r_mono} # [A]
+variable r_loop equal 4.0*17 
+variable k_loop equal 4.0*${kBT}/(3*50.0/4.0-${sigma_mono_mono})^2 # [(Kcal/mol)/A^2]
+variable k_loop equal 4.0*0.616032/(3*50.0/4.0-${sigma_mono_mono})^2 
+variable k_loop equal 4.0*0.616032/(3*50.0/4.0-34)^2 
+
+print """
+ -------------------------------------
+ ---[ Loops, Energetic Parameters ]---
+ -------------------------------------
+  kBT = ${kBT} [Kcal/mol]
+  k_loop = ${k_loop} [Kcal/(mol*A^2)]
+  r_loop = ${r_loop} [A]
+"""
+
+ -------------------------------------
+ ---[ Loops, Energetic Parameters ]---
+ -------------------------------------
+  kBT = 0.616032 [Kcal/mol]
+  k_loop = 0.201153306122449 [Kcal/(mol*A^2)]
+  r_loop = 68 [A]
+
+bond_coeff 2 ${k_loop} ${r_loop}
+bond_coeff 2 0.201153306122449 ${r_loop}
+bond_coeff 2 0.201153306122449 68
+
+# angle potentials
+angle_style   hybrid polytorsion/omp cosine/omp harmonic/omp
+angle_coeff   1 cosine/omp ${k_bend} # primary polymer chain angles
+angle_coeff   1 cosine/omp 8.15336470588235 
+angle_coeff   2 polytorsion/omp ${k_align} ${k_twist} # primary polymer chain twist
+angle_coeff   2 polytorsion/omp 15.4008 ${k_twist} 
+angle_coeff   2 polytorsion/omp 15.4008 7.7004 
+angle_coeff   3 harmonic/omp ${k_bend} 120.0 # replication fork angles
+angle_coeff   3 harmonic/omp 8.15336470588235 120.0 
+angle_coeff   4 polytorsion/omp ${k_align} ${k_twist} # replication fork twist
+angle_coeff   4 polytorsion/omp 15.4008 ${k_twist} 
+angle_coeff   4 polytorsion/omp 15.4008 7.7004 
+
+special_bonds angle yes
+
+# include file with neighbor setup
+include ${DNA_model_dir}/protocol_subroutines/subroutine.neighbor_setup
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//protocol_subroutines/subroutine.neighbor_setup
+# 1 - bdry
+# 2 - ribo
+# 3 - DNA monomer
+# 4 - Ori
+# 5 - Ter
+# 6 - Fork
+# 7 - Anchor
+# 8 - Hinge
+
+# set the neighbor type
+neighbor ${r_ribo} bin
+neighbor 100 bin
+neigh_modify every 1 delay 5 check yes page 100000 exclude type 1 1
+
+# neighbor ${r_ribo} multi
+# neigh_modify every 1 delay 5 check yes # page 10000 # collection/type 5 # 1 1, # 1 2, # 1 3, # 1 4, # 1 5*8, ## 2 3*8, # 2 2, # 3 3*8 # 4 3*8 # 5 3*8 # 6 3*8 # 7 3*8 # 8 3*8
+# collection/type 3 # 1 2, # 3 3, # 4 5*8 # exclude type 1 1
+
+# include file with soft pair potentials
+include ${DNA_model_dir}/potentials/lmp.DNA_pair_soft_omp
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.DNA_pair_soft_omp
+# soft pair potentials
+
+include ${DNA_model_dir}/potentials/lmp.DNA_pair_params
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.DNA_pair_params
+variable epsilon_soft equal 1.0*${kBT} # [Kcal/mol]
+variable epsilon_soft equal 1.0*0.616032 
+variable epsilon_LJ equal 1.0*${kBT} # [Kcal/mol]
+variable epsilon_LJ equal 1.0*0.616032 
+variable epsilon_soft_topo equal 0.1*${kBT} # [Kcal/mol]
+variable epsilon_soft_topo equal 0.1*0.616032 
+variable D_morse equal 10.0*${kBT} # [Kcal/mol]
+variable D_morse equal 10.0*0.616032 
+variable a_morse equal 1.0/(0.5*${sigma_mono_mono}) # [1/A]
+variable a_morse equal 1.0/(0.5*34) 
+variable r_morse equal 1.5*${sigma_mono_bdry} # [A]
+variable r_morse equal 1.5*59.5 
+variable rcut_morse equal 3.0*${sigma_mono_bdry} # [A]
+variable rcut_morse equal 3.0*59.5 
+variable epsilon_ori equal 10.0*${kBT}/(${sigma_mono_mono}^2.0) # [(Kcal/mol)/(A^2)]
+variable epsilon_ori equal 10.0*0.616032/(${sigma_mono_mono}^2.0) 
+variable epsilon_ori equal 10.0*0.616032/(34^2.0) 
+variable r_ori_equil equal 1000.0 # [A]
+
+print """
+ ------------------------------------------
+ ---[Soft Pairs, Energetic Parameters  ]---
+ ------------------------------------------
+  kBT = ${kBT} [Kcal/mol]
+  epsilon_soft = ${epsilon_soft} [Kcal/mol]
+  epsilon_LJ = ${epsilon_LJ} [Kcal/mol]
+"""
+
+ ------------------------------------------
+ ---[Soft Pairs, Energetic Parameters  ]---
+ ------------------------------------------
+  kBT = 0.616032 [Kcal/mol]
+  epsilon_soft = 0.616032 [Kcal/mol]
+  epsilon_LJ = 0.616032 [Kcal/mol]
+
+
+# 1 - bdry
+# 2 - ribo
+# 3 - DNA monomer
+# 4 - Ori
+# 5 - Ter
+# 6 - Fork
+# 7 - Anchor
+# 8 - Hinge
+
+variable pair_extra_pots equal ${Ori_bdry_attraction}+${Ori_pair_repulsion}
+variable pair_extra_pots equal 0+${Ori_pair_repulsion}
+variable pair_extra_pots equal 0+0
+
+variable temp_pstyle string "pair_style hybrid lj/cut/omp 2.5 soft/omp 2.5"
+
+if "${Ori_bdry_attraction}==1" then    "variable temp_pstyle string '${temp_pstyle} morse/omp 2.5'"
+
+if "${Ori_pair_repulsion}==1" then    "variable temp_pstyle string '${temp_pstyle} harmonic/cut/omp'"
+
+print ' PAIR_STYLE: ${temp_pstyle}'
+ PAIR_STYLE: pair_style hybrid lj/cut/omp 2.5 soft/omp 2.5
+
+${temp_pstyle}
+pair_style hybrid lj/cut/omp 2.5 soft/omp 2.5
+pair_modify shift yes
+
+# basic pair potentials
+
+# DNA
+pair_coeff 3*8 3*8 soft/omp ${epsilon_soft} ${sigma_mono_mono}
+pair_coeff 3*8 3*8 soft/omp 0.616032 ${sigma_mono_mono}
+pair_coeff 3*8 3*8 soft/omp 0.616032 34
+# ribosomes
+pair_coeff 2 3*8 soft/omp ${epsilon_soft} ${sigma_mono_ribo}
+pair_coeff 2 3*8 soft/omp 0.616032 ${sigma_mono_ribo}
+pair_coeff 2 3*8 soft/omp 0.616032 117
+pair_coeff 2 2 soft/omp ${epsilon_soft} ${sigma_ribo_ribo}
+pair_coeff 2 2 soft/omp 0.616032 ${sigma_ribo_ribo}
+pair_coeff 2 2 soft/omp 0.616032 200
+# boundary particles
+pair_coeff 1 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}
+pair_coeff 1 3*8 lj/cut/omp 0.616032 ${sigma_mono_bdry} ${WCA_mono_bdry}
+pair_coeff 1 3*8 lj/cut/omp 0.616032 59.5 ${WCA_mono_bdry}
+pair_coeff 1 3*8 lj/cut/omp 0.616032 59.5 66.7864918744075
+pair_coeff 1 2 lj/cut/omp ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}
+pair_coeff 1 2 lj/cut/omp 0.616032 ${sigma_ribo_bdry} ${WCA_ribo_bdry}
+pair_coeff 1 2 lj/cut/omp 0.616032 142.5 ${WCA_ribo_bdry}
+pair_coeff 1 2 lj/cut/omp 0.616032 142.5 159.950841884085
+pair_coeff 1 1 lj/cut/omp 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}
+pair_coeff 1 1 lj/cut/omp 0.0 85 ${WCA_bdry_bdry}
+pair_coeff 1 1 lj/cut/omp 0.0 85 95.4092741062964
+
+# extra pair potentials
+
+if "${Ori_bdry_attraction}==1" then    "pair_coeff 1 4 morse/omp ${D_morse} ${a_morse} ${r_morse} ${rcut_morse}"
+
+if "${Ori_pair_repulsion}==1" then    "pair_coeff 4 4 harmonic/cut/omp ${epsilon_ori} ${r_ori_equil}"
+
+# pair_style hybrid # lj/cut/omp 2.5 # soft/omp 2.5 # morse/omp 2.5 # harmonic/cut/omp
+
+# pair_modify shift yes
+
+# # DNA
+# pair_coeff 3 3*8 soft/omp ${epsilon_soft} ${sigma_mono_mono}
+# pair_coeff 4 4 harmonic/cut/omp ${epsilon_ori} ${r_ori_equil}
+# pair_coeff 4 5*8 soft/omp ${epsilon_soft} ${sigma_mono_mono}
+# pair_coeff 5*8 5*8 soft/omp ${epsilon_soft} ${sigma_mono_mono}
+# # ribosomes
+# pair_coeff 2 3*8 soft/omp ${epsilon_soft} ${sigma_mono_ribo}
+# pair_coeff 2 2 soft/omp ${epsilon_soft} ${sigma_ribo_ribo}
+# # boundary particles
+# pair_coeff 1 3 lj/cut/omp ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}
+# pair_coeff 1 4 morse/omp ${D_morse} ${a_morse} ${r_morse} ${rcut_morse}
+# pair_coeff 1 5*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}
+# pair_coeff 1 2 lj/cut/omp ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}
+# pair_coeff 1 1 lj/cut/omp 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}
+
+
+
+# pair_style hybrid # lj/cut/omp 2.5 # soft/omp 2.5
+
+# pair_modify shift yes
+
+# # DNA
+# pair_coeff 3*8 3*8 soft/omp ${epsilon_soft} ${sigma_mono_mono}
+# # ribosomes
+# pair_coeff 2 3*8 soft/omp ${epsilon_soft} ${sigma_mono_ribo}
+# pair_coeff 2 2 soft/omp ${epsilon_soft} ${sigma_ribo_ribo}
+# # boundary particles
+# pair_coeff 1 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}
+# pair_coeff 1 2 lj/cut/omp ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}
+# pair_coeff 1 1 lj/cut/omp 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}
+
+# include file with brownian/asphere/omp fixes
+include ${DNA_model_dir}/run_subroutines/subroutine.BD_fixes
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//run_subroutines/subroutine.BD_fixes
+######################################
+# fix commands for Brownian dynamics #
+######################################
+
+# BD fix for DNA
+fix dnaBD DNA brownian/asphere/omp ${T} ${rng_seed} gamma_r_eigen ${gamma_r_mono} ${gamma_r_mono} ${gamma_r_mono} gamma_t_eigen ${gamma_t_mono} ${gamma_t_mono} ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 ${rng_seed} gamma_r_eigen ${gamma_r_mono} ${gamma_r_mono} ${gamma_r_mono} gamma_t_eigen ${gamma_t_mono} ${gamma_t_mono} ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 10 gamma_r_eigen ${gamma_r_mono} ${gamma_r_mono} ${gamma_r_mono} gamma_t_eigen ${gamma_t_mono} ${gamma_t_mono} ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 10 gamma_r_eigen 8696990.12239152 ${gamma_r_mono} ${gamma_r_mono} gamma_t_eigen ${gamma_t_mono} ${gamma_t_mono} ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 10 gamma_r_eigen 8696990.12239152 8696990.12239152 ${gamma_r_mono} gamma_t_eigen ${gamma_t_mono} ${gamma_t_mono} ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 10 gamma_r_eigen 8696990.12239152 8696990.12239152 8696990.12239152 gamma_t_eigen ${gamma_t_mono} ${gamma_t_mono} ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 10 gamma_r_eigen 8696990.12239152 8696990.12239152 8696990.12239152 gamma_t_eigen 22570.0435702202 ${gamma_t_mono} ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 10 gamma_r_eigen 8696990.12239152 8696990.12239152 8696990.12239152 gamma_t_eigen 22570.0435702202 22570.0435702202 ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 10 gamma_r_eigen 8696990.12239152 8696990.12239152 8696990.12239152 gamma_t_eigen 22570.0435702202 22570.0435702202 22570.0435702202
+
+# BD fix for ribosomes
+fix ribosBD ribos brownian/asphere/omp ${T} ${rng_seed} gamma_r_eigen ${gamma_r_ribo} ${gamma_r_ribo} ${gamma_r_ribo} gamma_t_eigen ${gamma_t_ribo} ${gamma_t_ribo} ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 ${rng_seed} gamma_r_eigen ${gamma_r_ribo} ${gamma_r_ribo} ${gamma_r_ribo} gamma_t_eigen ${gamma_t_ribo} ${gamma_t_ribo} ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 10 gamma_r_eigen ${gamma_r_ribo} ${gamma_r_ribo} ${gamma_r_ribo} gamma_t_eigen ${gamma_t_ribo} ${gamma_t_ribo} ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 10 gamma_r_eigen 1770199495.70355 ${gamma_r_ribo} ${gamma_r_ribo} gamma_t_eigen ${gamma_t_ribo} ${gamma_t_ribo} ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 10 gamma_r_eigen 1770199495.70355 1770199495.70355 ${gamma_r_ribo} gamma_t_eigen ${gamma_t_ribo} ${gamma_t_ribo} ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 10 gamma_r_eigen 1770199495.70355 1770199495.70355 1770199495.70355 gamma_t_eigen ${gamma_t_ribo} ${gamma_t_ribo} ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 10 gamma_r_eigen 1770199495.70355 1770199495.70355 1770199495.70355 gamma_t_eigen 132764.962177766 ${gamma_t_ribo} ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 10 gamma_r_eigen 1770199495.70355 1770199495.70355 1770199495.70355 gamma_t_eigen 132764.962177766 132764.962177766 ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 10 gamma_r_eigen 1770199495.70355 1770199495.70355 1770199495.70355 gamma_t_eigen 132764.962177766 132764.962177766 132764.962177766
+timestep ${delta_t}
+timestep 100000
+run 10000
+Generated 0 of 28 mixed pair_coeff terms from geometric mixing rule
+Hybrid pair style last /omp style soft/omp
+Last active /omp style is angle_style harmonic/omp
+Neighbor list info ...
+  update: every = 1 steps, delay = 5 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 300
+  ghost atom cutoff = 300
+  binsize = 150, bins = 33 33 33
+  4 neighbor lists, perpetual/occasional/extra = 4 0 0
+  (1) pair lj/cut/omp, perpetual, skip from (3)
+      attributes: half, newton on, omp, cut 259.950841884085
+      pair build: skip/omp
+      stencil: none
+      bin: none
+  (2) pair soft/omp, perpetual, skip from (4)
+      attributes: half, newton on, omp
+      pair build: skip/omp
+      stencil: none
+      bin: none
+  (3) neighbor class addition, perpetual, trim from (4)
+      attributes: half, newton on, omp, cut 259.950841884085
+      pair build: trim/omp
+      stencil: none
+      bin: none
+  (4) neighbor class addition, perpetual
+      attributes: half, newton on, omp
+      pair build: half/bin/newton/omp
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 30.08 | 30.08 | 30.08 Mbytes
+   Step         E_pair         E_bond        E_angle      c_dnaMSD[4]   c_ribosMSD[4] 
+     50000   4.7170693      4.1487094      15005.836      0              0            
+     55000   6.2869861      1480.3443      16340.933      15.10351       0            
+     60000   7.764382       1532.9861      16244.245      26.264868      0            
+Loop time of 6.5082 on 8 procs for 10000 steps with 15242 atoms
+
+Performance: 13275552.238 ns/day, 0.000 hours/ns, 1536.522 timesteps/s, 23.420 Matom-step/s
+798.6% CPU use with 1 MPI tasks x 8 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.4975     | 0.4975     | 0.4975     |   0.0 |  7.64
+Bond    | 2.4544     | 2.4544     | 2.4544     |   0.0 | 37.71
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.0019007  | 0.0019007  | 0.0019007  |   0.0 |  0.03
+Output  | 0.00034886 | 0.00034886 | 0.00034886 |   0.0 |  0.01
+Modify  | 3.1308     | 3.1308     | 3.1308     |   0.0 | 48.11
+Other   |            | 0.4233     |            |       |  6.50
+
+Nlocal:          15242 ave       15242 max       15242 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:              0 ave           0 max           0 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:              0 ave           0 max           0 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 0
+Ave neighs/atom = 0
+Ave special neighs/atom = 1.9682456
+Neighbor list builds = 0
+Dangerous builds = 0
+variable T_freq delete
+variable T_freq internal 5000
+variable D_freq delete
+variable D_freq internal 0
+variable Ori_pair_repulsion delete
+variable Ori_pair_repulsion internal 0
+variable Ori_bdry_attraction delete
+variable Ori_bdry_attraction internal 0
+uncompute id_track
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_ids
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_ids
+# compute to track ids
+compute id_track all property/atom id
+uncompute type_track
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_types
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_types
+# compute to track types
+compute type_track all property/atom type
+uncompute quat
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_quats
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_quats
+# compute to calculate orientations
+compute quat DNAribos property/atom quatw quati quatj quatk
+include ${DNA_model_dir}/dump_subroutines/subroutine.default_thermo
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//dump_subroutines/subroutine.default_thermo
+# default thermo style
+thermo		${T_freq}
+thermo		5000
+#thermo_style custom step emol epair ebond eangle c_angleE[1] c_angleE[2] c_angleE[3]
+thermo_style custom step emol epair ebond eangle
+include ${DNA_model_dir}/minimize_subroutines/subroutine.min_hard_harmonic
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//minimize_subroutines/subroutine.min_hard_harmonic
+# create springs to hold ribosomes
+include ${DNA_model_dir}/potentials/lmp.ribo_springs
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.ribo_springs
+# create springs to hold ribosomes
+variable ribos_spring equal 1.0*${kBT}
+variable ribos_spring equal 1.0*0.616032
+fix ribosSpring ribos spring/self ${ribos_spring}
+fix ribosSpring ribos spring/self 0.616032
+
+# include file with description of DNA polymer model with harmonic bonds
+include ${DNA_model_dir}/potentials/lmp.twistable_DNA_model_harmonic_omp
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.twistable_DNA_model_harmonic_omp
+# variables describing energetic parameters
+variable l_equil equal 2.0*${r_mono}-6.0
+variable l_equil equal 2.0*17-6.0
+#variable k_stretch equal 2000*${kBT}/(${sigma_mono_mono}^2) # [Kcal/(mol*A^2)]
+variable k_stretch equal 1000*${kBT}/(${sigma_mono_mono}^2) # [Kcal/(mol*A^2)]
+variable k_stretch equal 1000*0.616032/(${sigma_mono_mono}^2) 
+variable k_stretch equal 1000*0.616032/(34^2) 
+
+include ${DNA_model_dir}/potentials/lmp.DNA_bend_twist_align_params
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.DNA_bend_twist_align_params
+#variable k_bend equal ${kBT}*(450.0/(${sigma_mono_mono})) #  [Kcal/mol]
+variable k_bend equal ${kBT}*(450.0/(${sigma_mono_mono})) #  [Kcal/mol]
+variable k_bend equal 0.616032*(450.0/(${sigma_mono_mono})) 
+variable k_bend equal 0.616032*(450.0/(34)) 
+variable k_twist equal ${kBT}*(850.0/(2*${sigma_mono_mono})) # [Kcal/mol]
+variable k_twist equal 0.616032*(850.0/(2*${sigma_mono_mono})) 
+variable k_twist equal 0.616032*(850.0/(2*34)) 
+#variable k_twist equal ${kBT}*(0.0/(2*${sigma_mono_mono})) # [Kcal/mol]
+variable k_align equal 2*${k_twist} # [Kcal/mol]
+variable k_align equal 2*7.7004 
+
+print """
+ -----------------------------------------------------
+ ---[ Twistable DNA (stiff), Energetic Parameters ]---
+ -----------------------------------------------------
+  kBT = ${kBT} [Kcal/mol]
+  k_stretch = ${k_stretch} [Kcal/(mol*A^2)]
+  k_bend = ${k_bend} [Kcal/mol]
+  k_twist = ${k_twist} [Kcal/mol]
+  k_align = ${k_align} [Kcal/mol]
+"""
+
+ -----------------------------------------------------
+ ---[ Twistable DNA (stiff), Energetic Parameters ]---
+ -----------------------------------------------------
+  kBT = 0.616032 [Kcal/mol]
+  k_stretch = 0.532899653979239 [Kcal/(mol*A^2)]
+  k_bend = 8.15336470588235 [Kcal/mol]
+  k_twist = 7.7004 [Kcal/mol]
+  k_align = 15.4008 [Kcal/mol]
+
+
+# bond potentials
+bond_style harmonic/omp
+bond_coeff 1 ${k_stretch} ${l_equil}
+bond_coeff 1 0.532899653979239 ${l_equil}
+bond_coeff 1 0.532899653979239 28
+include ${DNA_model_dir}/potentials/lmp.loop_bond
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.loop_bond
+include ${DNA_model_dir}/potentials/lmp.DNA_loops
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.DNA_loops
+variable r_loop equal 4.0*${r_mono} # [A]
+variable r_loop equal 4.0*17 
+variable k_loop equal 4.0*${kBT}/(3*50.0/4.0-${sigma_mono_mono})^2 # [(Kcal/mol)/A^2]
+variable k_loop equal 4.0*0.616032/(3*50.0/4.0-${sigma_mono_mono})^2 
+variable k_loop equal 4.0*0.616032/(3*50.0/4.0-34)^2 
+
+print """
+ -------------------------------------
+ ---[ Loops, Energetic Parameters ]---
+ -------------------------------------
+  kBT = ${kBT} [Kcal/mol]
+  k_loop = ${k_loop} [Kcal/(mol*A^2)]
+  r_loop = ${r_loop} [A]
+"""
+
+ -------------------------------------
+ ---[ Loops, Energetic Parameters ]---
+ -------------------------------------
+  kBT = 0.616032 [Kcal/mol]
+  k_loop = 0.201153306122449 [Kcal/(mol*A^2)]
+  r_loop = 68 [A]
+
+bond_coeff 2 ${k_loop} ${r_loop}
+bond_coeff 2 0.201153306122449 ${r_loop}
+bond_coeff 2 0.201153306122449 68
+
+# angle potentials
+angle_style   hybrid polytorsion/omp cosine/omp harmonic/omp
+angle_coeff   1 cosine/omp ${k_bend} # primary polymer chain angles
+angle_coeff   1 cosine/omp 8.15336470588235 
+angle_coeff   2 polytorsion/omp ${k_align} ${k_twist} # primary polymer chain twist
+angle_coeff   2 polytorsion/omp 15.4008 ${k_twist} 
+angle_coeff   2 polytorsion/omp 15.4008 7.7004 
+angle_coeff   3 harmonic/omp ${k_bend} 120.0 # replication fork angles
+angle_coeff   3 harmonic/omp 8.15336470588235 120.0 
+angle_coeff   4 polytorsion/omp ${k_align} ${k_twist} # replication fork twist
+angle_coeff   4 polytorsion/omp 15.4008 ${k_twist} 
+angle_coeff   4 polytorsion/omp 15.4008 7.7004 
+
+special_bonds angle yes
+
+# include file with neighbor setup
+include ${DNA_model_dir}/protocol_subroutines/subroutine.neighbor_setup
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//protocol_subroutines/subroutine.neighbor_setup
+# 1 - bdry
+# 2 - ribo
+# 3 - DNA monomer
+# 4 - Ori
+# 5 - Ter
+# 6 - Fork
+# 7 - Anchor
+# 8 - Hinge
+
+# set the neighbor type
+neighbor ${r_ribo} bin
+neighbor 100 bin
+neigh_modify every 1 delay 5 check yes page 100000 exclude type 1 1
+
+# neighbor ${r_ribo} multi
+# neigh_modify every 1 delay 5 check yes # page 10000 # collection/type 5 # 1 1, # 1 2, # 1 3, # 1 4, # 1 5*8, ## 2 3*8, # 2 2, # 3 3*8 # 4 3*8 # 5 3*8 # 6 3*8 # 7 3*8 # 8 3*8
+# collection/type 3 # 1 2, # 3 3, # 4 5*8 # exclude type 1 1
+
+# include file with hard pair potentials
+include ${DNA_model_dir}/potentials/lmp.DNA_pair_hard_omp
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.DNA_pair_hard_omp
+# hard LJ pair potentials with WCA cutoff
+
+include ${DNA_model_dir}/potentials/lmp.DNA_pair_params
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.DNA_pair_params
+variable epsilon_soft equal 1.0*${kBT} # [Kcal/mol]
+variable epsilon_soft equal 1.0*0.616032 
+variable epsilon_LJ equal 1.0*${kBT} # [Kcal/mol]
+variable epsilon_LJ equal 1.0*0.616032 
+variable epsilon_soft_topo equal 0.1*${kBT} # [Kcal/mol]
+variable epsilon_soft_topo equal 0.1*0.616032 
+variable D_morse equal 10.0*${kBT} # [Kcal/mol]
+variable D_morse equal 10.0*0.616032 
+variable a_morse equal 1.0/(0.5*${sigma_mono_mono}) # [1/A]
+variable a_morse equal 1.0/(0.5*34) 
+variable r_morse equal 1.5*${sigma_mono_bdry} # [A]
+variable r_morse equal 1.5*59.5 
+variable rcut_morse equal 3.0*${sigma_mono_bdry} # [A]
+variable rcut_morse equal 3.0*59.5 
+variable epsilon_ori equal 10.0*${kBT}/(${sigma_mono_mono}^2.0) # [(Kcal/mol)/(A^2)]
+variable epsilon_ori equal 10.0*0.616032/(${sigma_mono_mono}^2.0) 
+variable epsilon_ori equal 10.0*0.616032/(34^2.0) 
+variable r_ori_equil equal 1000.0 # [A]
+
+print """
+ --------------------------------------------------
+ ---[LJ/cut (WCA) Pairs, Energetic Parameters  ]---
+ --------------------------------------------------
+  kBT = ${kBT} [Kcal/mol]
+  epsilon_LJ = ${epsilon_LJ} [Kcal/mol]
+"""
+
+ --------------------------------------------------
+ ---[LJ/cut (WCA) Pairs, Energetic Parameters  ]---
+ --------------------------------------------------
+  kBT = 0.616032 [Kcal/mol]
+  epsilon_LJ = 0.616032 [Kcal/mol]
+
+
+variable s_expand equal 1.0
+variable sigma_mono_mono_ex equal ${s_expand}*${sigma_mono_mono}
+variable sigma_mono_mono_ex equal 1*${sigma_mono_mono}
+variable sigma_mono_mono_ex equal 1*34
+variable WCA_mono_mono_ex equal ${s_expand}*${WCA_mono_mono}
+variable WCA_mono_mono_ex equal 1*${WCA_mono_mono}
+variable WCA_mono_mono_ex equal 1*38.1637096425186
+
+# 1 - bdry
+# 2 - ribo
+# 3 - DNA monomer
+# 4 - Ori
+# 5 - Ter
+# 6 - Fork
+# 7 - Anchor
+# 8 - Hinge
+
+variable pair_extra_pots equal ${Ori_bdry_attraction}+${Ori_pair_repulsion}
+variable pair_extra_pots equal 0+${Ori_pair_repulsion}
+variable pair_extra_pots equal 0+0
+
+if "${pair_extra_pots}>0" then    "print 'yes extra potentials'"    "variable temp_pstyle string 'pair_style hybrid'"    "variable temp_pstyle string '${temp_pstyle} lj/cut/omp 2.5'" else    "print 'no extra potentials'"    "variable temp_pstyle string 'pair_style lj/cut/omp 2.5'"
+print 'no extra potentials'
+no extra potentials
+variable temp_pstyle string 'pair_style lj/cut/omp 2.5'
+
+if "${Ori_bdry_attraction}==1" then    "variable temp_pstyle string '${temp_pstyle} morse/omp 2.5'"
+
+if "${Ori_pair_repulsion}==1" then    "variable temp_pstyle string '${temp_pstyle} harmonic/cut/omp'"
+
+print ' PAIR_STYLE: ${temp_pstyle}'
+ PAIR_STYLE: pair_style lj/cut/omp 2.5
+
+${temp_pstyle}
+pair_style lj/cut/omp 2.5
+pair_modify shift yes
+
+# basic pair potentials
+
+if "${pair_extra_pots}>0" then    "pair_coeff 3*8 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}"    "pair_coeff 2 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_ribo} ${WCA_mono_ribo}"    "pair_coeff 2 2 lj/cut/omp ${epsilon_LJ} ${sigma_ribo_ribo} ${WCA_ribo_ribo}"    "pair_coeff 1 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}"    "pair_coeff 1 2 lj/cut/omp ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}"    "pair_coeff 1 1 lj/cut/omp 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}" else    "pair_coeff 3*8 3*8 ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}"    "pair_coeff 2 3*8 ${epsilon_LJ} ${sigma_mono_ribo} ${WCA_mono_ribo}"    "pair_coeff 2 2 ${epsilon_LJ} ${sigma_ribo_ribo} ${WCA_ribo_ribo}"    "pair_coeff 1 3*8 ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}"    "pair_coeff 1 2 ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}"    "pair_coeff 1 1 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}"
+pair_coeff 3*8 3*8 ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+pair_coeff 3*8 3*8 0.616032 ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+pair_coeff 3*8 3*8 0.616032 34 ${WCA_mono_mono_ex}
+pair_coeff 3*8 3*8 0.616032 34 38.1637096425186
+pair_coeff 2 3*8 ${epsilon_LJ} ${sigma_mono_ribo} ${WCA_mono_ribo}
+pair_coeff 2 3*8 0.616032 ${sigma_mono_ribo} ${WCA_mono_ribo}
+pair_coeff 2 3*8 0.616032 117 ${WCA_mono_ribo}
+pair_coeff 2 3*8 0.616032 117 131.328059652196
+pair_coeff 2 2 ${epsilon_LJ} ${sigma_ribo_ribo} ${WCA_ribo_ribo}
+pair_coeff 2 2 0.616032 ${sigma_ribo_ribo} ${WCA_ribo_ribo}
+pair_coeff 2 2 0.616032 200 ${WCA_ribo_ribo}
+pair_coeff 2 2 0.616032 200 224.492409661874
+pair_coeff 1 3*8 ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}
+pair_coeff 1 3*8 0.616032 ${sigma_mono_bdry} ${WCA_mono_bdry}
+pair_coeff 1 3*8 0.616032 59.5 ${WCA_mono_bdry}
+pair_coeff 1 3*8 0.616032 59.5 66.7864918744075
+pair_coeff 1 2 ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}
+pair_coeff 1 2 0.616032 ${sigma_ribo_bdry} ${WCA_ribo_bdry}
+pair_coeff 1 2 0.616032 142.5 ${WCA_ribo_bdry}
+pair_coeff 1 2 0.616032 142.5 159.950841884085
+pair_coeff 1 1 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}
+pair_coeff 1 1 0.0 85 ${WCA_bdry_bdry}
+pair_coeff 1 1 0.0 85 95.4092741062964
+
+# extra pair potentials
+
+if "${Ori_bdry_attraction}==1" then    "pair_coeff 1 4 morse/omp ${D_morse} ${a_morse} ${r_morse} ${rcut_morse}"
+
+if "${Ori_pair_repulsion}==1" then    "pair_coeff 4 4 harmonic/cut/omp ${epsilon_ori} ${r_ori_equil}"
+
+# pair_style hybrid # lj/cut/omp 2.5 # morse/omp 2.5 # harmonic/cut/omp
+
+# pair_modify shift yes
+
+# # DNA
+# pair_coeff 3 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+# pair_coeff 4 4 harmonic/cut/omp ${epsilon_ori} ${r_ori_equil}
+# pair_coeff 4 5*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+# pair_coeff 5*8 5*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+# # ribosomes
+# pair_coeff 2 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_ribo} ${WCA_mono_ribo}
+# pair_coeff 2 2 lj/cut/omp ${epsilon_LJ} ${sigma_ribo_ribo} ${WCA_ribo_ribo}
+# # boundary particles
+# pair_coeff 1 3 lj/cut/omp ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}
+# pair_coeff 1 4 morse/omp ${D_morse} ${a_morse} ${r_morse} ${rcut_morse}
+# pair_coeff 1 5*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}
+# pair_coeff 1 2 lj/cut/omp ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}
+# pair_coeff 1 1 lj/cut/omp 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}
+
+
+
+# pair_style lj/cut/omp 2.5
+
+# pair_modify shift yes
+
+# # DNA
+# pair_coeff 3*8 3*8 ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+# # ribosomes
+# pair_coeff 2 3*8 ${epsilon_LJ} ${sigma_mono_ribo} ${WCA_mono_ribo}
+# pair_coeff 2 2 ${epsilon_LJ} ${sigma_ribo_ribo} ${WCA_ribo_ribo}
+# # boundary particles
+# pair_coeff 1 3*8 ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}
+# pair_coeff 1 2 ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}
+# pair_coeff 1 1 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}
+
+# run the minimization
+min_style cg
+minimize 1.0e-5 1.0e-7 40000 400000
+Switching to 'neigh_modify every 1 delay 0 check yes' setting during minimization
+Generated 0 of 28 mixed pair_coeff terms from geometric mixing rule
+Last active /omp style is angle_style harmonic/omp
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 324.49241
+  ghost atom cutoff = 324.49241
+  binsize = 162.2462, bins = 31 31 31
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut/omp, perpetual
+      attributes: half, newton on, omp
+      pair build: half/bin/newton/omp
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 21.65 | 21.65 | 21.65 Mbytes
+   Step         E_mol          E_pair         E_bond        E_angle    
+     60000   17777.232      492122.24      1532.9861      16244.245    
+     60552   13549.022      2.7780308      4.8387684      13544.184    
+Loop time of 0.536627 on 8 procs for 552 steps with 15242 atoms
+
+800.9% CPU use with 1 MPI tasks x 8 OpenMP threads
+
+Minimization stats:
+  Stopping criterion = energy tolerance
+  Energy initial, next-to-last, final = 
+      509899.466931039   13551.9173276627   13551.8004233115
+  Force two-norm initial, final = 472516.92 0.63786897
+  Force max component initial, final = 300442.57 0.12023397
+  Final line search alpha, max atom move = 0.82851776 0.099615979
+  Iterations, force evaluations = 552 557
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.050973   | 0.050973   | 0.050973   |   0.0 |  9.50
+Bond    | 0.15796    | 0.15796    | 0.15796    |   0.0 | 29.44
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.00011714 | 0.00011714 | 0.00011714 |   0.0 |  0.02
+Output  | 0          | 0          | 0          |   0.0 |  0.00
+Modify  | 0.085717   | 0.085717   | 0.085717   |   0.0 | 15.97
+Other   |            | 0.2419     |            |       | 45.07
+
+Nlocal:          15242 ave       15242 max       15242 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:              0 ave           0 max           0 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:          62428 ave       62428 max       62428 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 62428
+Ave neighs/atom = 4.095788
+Ave special neighs/atom = 1.9682456
+Neighbor list builds = 0
+Dangerous builds = 0
+
+# release ribosomes from springs following minimization
+unfix ribosSpring
+reset_timestep 60000
+variable T_freq delete
+variable T_freq internal 5000
+variable D_freq delete
+variable D_freq internal 0
+variable Ori_pair_repulsion delete
+variable Ori_pair_repulsion internal 0
+variable Ori_bdry_attraction delete
+variable Ori_bdry_attraction internal 0
+uncompute id_track
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_ids
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_ids
+# compute to track ids
+compute id_track all property/atom id
+uncompute type_track
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_types
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_types
+# compute to track types
+compute type_track all property/atom type
+uncompute quat
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_quats
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_quats
+# compute to calculate orientations
+compute quat DNAribos property/atom quatw quati quatj quatk
+uncompute dnaMSD
+uncompute ribosMSD
+uncompute orisMSD
+uncompute tersMSD
+uncompute forksMSD
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_MSD
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_MSD
+###
+# computes for MSD
+###
+
+compute dnaMSD DNA msd com no average no
+compute ribosMSD ribos msd com no average no
+compute orisMSD oris msd com no average no
+compute tersMSD ters msd com no average no
+compute forksMSD forks msd com no average no
+include ${DNA_model_dir}/dump_subroutines/subroutine.MSD_thermo
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//dump_subroutines/subroutine.MSD_thermo
+# set custom thermo style
+thermo		${T_freq}
+thermo		5000
+# thermo_style custom step # epair ebond eangle c_angleE[1] c_angleE[2] c_angleE[3] # c_dnaMSD[4] c_ribosMSD[4]
+
+thermo_style custom step epair ebond eangle c_dnaMSD[4] c_ribosMSD[4]
+include ${DNA_model_dir}/run_subroutines/subroutine.run_hard_harmonic
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//run_subroutines/subroutine.run_hard_harmonic
+# include file with description of DNA polymer model with harmonic bonds
+include ${DNA_model_dir}/potentials/lmp.twistable_DNA_model_harmonic_omp
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.twistable_DNA_model_harmonic_omp
+# variables describing energetic parameters
+variable l_equil equal 2.0*${r_mono}-6.0
+variable l_equil equal 2.0*17-6.0
+#variable k_stretch equal 2000*${kBT}/(${sigma_mono_mono}^2) # [Kcal/(mol*A^2)]
+variable k_stretch equal 1000*${kBT}/(${sigma_mono_mono}^2) # [Kcal/(mol*A^2)]
+variable k_stretch equal 1000*0.616032/(${sigma_mono_mono}^2) 
+variable k_stretch equal 1000*0.616032/(34^2) 
+
+include ${DNA_model_dir}/potentials/lmp.DNA_bend_twist_align_params
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.DNA_bend_twist_align_params
+#variable k_bend equal ${kBT}*(450.0/(${sigma_mono_mono})) #  [Kcal/mol]
+variable k_bend equal ${kBT}*(450.0/(${sigma_mono_mono})) #  [Kcal/mol]
+variable k_bend equal 0.616032*(450.0/(${sigma_mono_mono})) 
+variable k_bend equal 0.616032*(450.0/(34)) 
+variable k_twist equal ${kBT}*(850.0/(2*${sigma_mono_mono})) # [Kcal/mol]
+variable k_twist equal 0.616032*(850.0/(2*${sigma_mono_mono})) 
+variable k_twist equal 0.616032*(850.0/(2*34)) 
+#variable k_twist equal ${kBT}*(0.0/(2*${sigma_mono_mono})) # [Kcal/mol]
+variable k_align equal 2*${k_twist} # [Kcal/mol]
+variable k_align equal 2*7.7004 
+
+print """
+ -----------------------------------------------------
+ ---[ Twistable DNA (stiff), Energetic Parameters ]---
+ -----------------------------------------------------
+  kBT = ${kBT} [Kcal/mol]
+  k_stretch = ${k_stretch} [Kcal/(mol*A^2)]
+  k_bend = ${k_bend} [Kcal/mol]
+  k_twist = ${k_twist} [Kcal/mol]
+  k_align = ${k_align} [Kcal/mol]
+"""
+
+ -----------------------------------------------------
+ ---[ Twistable DNA (stiff), Energetic Parameters ]---
+ -----------------------------------------------------
+  kBT = 0.616032 [Kcal/mol]
+  k_stretch = 0.532899653979239 [Kcal/(mol*A^2)]
+  k_bend = 8.15336470588235 [Kcal/mol]
+  k_twist = 7.7004 [Kcal/mol]
+  k_align = 15.4008 [Kcal/mol]
+
+
+# bond potentials
+bond_style harmonic/omp
+bond_coeff 1 ${k_stretch} ${l_equil}
+bond_coeff 1 0.532899653979239 ${l_equil}
+bond_coeff 1 0.532899653979239 28
+include ${DNA_model_dir}/potentials/lmp.loop_bond
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.loop_bond
+include ${DNA_model_dir}/potentials/lmp.DNA_loops
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.DNA_loops
+variable r_loop equal 4.0*${r_mono} # [A]
+variable r_loop equal 4.0*17 
+variable k_loop equal 4.0*${kBT}/(3*50.0/4.0-${sigma_mono_mono})^2 # [(Kcal/mol)/A^2]
+variable k_loop equal 4.0*0.616032/(3*50.0/4.0-${sigma_mono_mono})^2 
+variable k_loop equal 4.0*0.616032/(3*50.0/4.0-34)^2 
+
+print """
+ -------------------------------------
+ ---[ Loops, Energetic Parameters ]---
+ -------------------------------------
+  kBT = ${kBT} [Kcal/mol]
+  k_loop = ${k_loop} [Kcal/(mol*A^2)]
+  r_loop = ${r_loop} [A]
+"""
+
+ -------------------------------------
+ ---[ Loops, Energetic Parameters ]---
+ -------------------------------------
+  kBT = 0.616032 [Kcal/mol]
+  k_loop = 0.201153306122449 [Kcal/(mol*A^2)]
+  r_loop = 68 [A]
+
+bond_coeff 2 ${k_loop} ${r_loop}
+bond_coeff 2 0.201153306122449 ${r_loop}
+bond_coeff 2 0.201153306122449 68
+
+# angle potentials
+angle_style   hybrid polytorsion/omp cosine/omp harmonic/omp
+angle_coeff   1 cosine/omp ${k_bend} # primary polymer chain angles
+angle_coeff   1 cosine/omp 8.15336470588235 
+angle_coeff   2 polytorsion/omp ${k_align} ${k_twist} # primary polymer chain twist
+angle_coeff   2 polytorsion/omp 15.4008 ${k_twist} 
+angle_coeff   2 polytorsion/omp 15.4008 7.7004 
+angle_coeff   3 harmonic/omp ${k_bend} 120.0 # replication fork angles
+angle_coeff   3 harmonic/omp 8.15336470588235 120.0 
+angle_coeff   4 polytorsion/omp ${k_align} ${k_twist} # replication fork twist
+angle_coeff   4 polytorsion/omp 15.4008 ${k_twist} 
+angle_coeff   4 polytorsion/omp 15.4008 7.7004 
+
+special_bonds angle yes
+
+# include file with neighbor setup
+include ${DNA_model_dir}/protocol_subroutines/subroutine.neighbor_setup
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//protocol_subroutines/subroutine.neighbor_setup
+# 1 - bdry
+# 2 - ribo
+# 3 - DNA monomer
+# 4 - Ori
+# 5 - Ter
+# 6 - Fork
+# 7 - Anchor
+# 8 - Hinge
+
+# set the neighbor type
+neighbor ${r_ribo} bin
+neighbor 100 bin
+neigh_modify every 1 delay 5 check yes page 100000 exclude type 1 1
+
+# neighbor ${r_ribo} multi
+# neigh_modify every 1 delay 5 check yes # page 10000 # collection/type 5 # 1 1, # 1 2, # 1 3, # 1 4, # 1 5*8, ## 2 3*8, # 2 2, # 3 3*8 # 4 3*8 # 5 3*8 # 6 3*8 # 7 3*8 # 8 3*8
+# collection/type 3 # 1 2, # 3 3, # 4 5*8 # exclude type 1 1
+
+# include file with hard pair potentials
+include ${DNA_model_dir}/potentials/lmp.DNA_pair_hard_omp
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.DNA_pair_hard_omp
+# hard LJ pair potentials with WCA cutoff
+
+include ${DNA_model_dir}/potentials/lmp.DNA_pair_params
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.DNA_pair_params
+variable epsilon_soft equal 1.0*${kBT} # [Kcal/mol]
+variable epsilon_soft equal 1.0*0.616032 
+variable epsilon_LJ equal 1.0*${kBT} # [Kcal/mol]
+variable epsilon_LJ equal 1.0*0.616032 
+variable epsilon_soft_topo equal 0.1*${kBT} # [Kcal/mol]
+variable epsilon_soft_topo equal 0.1*0.616032 
+variable D_morse equal 10.0*${kBT} # [Kcal/mol]
+variable D_morse equal 10.0*0.616032 
+variable a_morse equal 1.0/(0.5*${sigma_mono_mono}) # [1/A]
+variable a_morse equal 1.0/(0.5*34) 
+variable r_morse equal 1.5*${sigma_mono_bdry} # [A]
+variable r_morse equal 1.5*59.5 
+variable rcut_morse equal 3.0*${sigma_mono_bdry} # [A]
+variable rcut_morse equal 3.0*59.5 
+variable epsilon_ori equal 10.0*${kBT}/(${sigma_mono_mono}^2.0) # [(Kcal/mol)/(A^2)]
+variable epsilon_ori equal 10.0*0.616032/(${sigma_mono_mono}^2.0) 
+variable epsilon_ori equal 10.0*0.616032/(34^2.0) 
+variable r_ori_equil equal 1000.0 # [A]
+
+print """
+ --------------------------------------------------
+ ---[LJ/cut (WCA) Pairs, Energetic Parameters  ]---
+ --------------------------------------------------
+  kBT = ${kBT} [Kcal/mol]
+  epsilon_LJ = ${epsilon_LJ} [Kcal/mol]
+"""
+
+ --------------------------------------------------
+ ---[LJ/cut (WCA) Pairs, Energetic Parameters  ]---
+ --------------------------------------------------
+  kBT = 0.616032 [Kcal/mol]
+  epsilon_LJ = 0.616032 [Kcal/mol]
+
+
+variable s_expand equal 1.0
+variable sigma_mono_mono_ex equal ${s_expand}*${sigma_mono_mono}
+variable sigma_mono_mono_ex equal 1*${sigma_mono_mono}
+variable sigma_mono_mono_ex equal 1*34
+variable WCA_mono_mono_ex equal ${s_expand}*${WCA_mono_mono}
+variable WCA_mono_mono_ex equal 1*${WCA_mono_mono}
+variable WCA_mono_mono_ex equal 1*38.1637096425186
+
+# 1 - bdry
+# 2 - ribo
+# 3 - DNA monomer
+# 4 - Ori
+# 5 - Ter
+# 6 - Fork
+# 7 - Anchor
+# 8 - Hinge
+
+variable pair_extra_pots equal ${Ori_bdry_attraction}+${Ori_pair_repulsion}
+variable pair_extra_pots equal 0+${Ori_pair_repulsion}
+variable pair_extra_pots equal 0+0
+
+if "${pair_extra_pots}>0" then    "print 'yes extra potentials'"    "variable temp_pstyle string 'pair_style hybrid'"    "variable temp_pstyle string '${temp_pstyle} lj/cut/omp 2.5'" else    "print 'no extra potentials'"    "variable temp_pstyle string 'pair_style lj/cut/omp 2.5'"
+print 'no extra potentials'
+no extra potentials
+variable temp_pstyle string 'pair_style lj/cut/omp 2.5'
+
+if "${Ori_bdry_attraction}==1" then    "variable temp_pstyle string '${temp_pstyle} morse/omp 2.5'"
+
+if "${Ori_pair_repulsion}==1" then    "variable temp_pstyle string '${temp_pstyle} harmonic/cut/omp'"
+
+print ' PAIR_STYLE: ${temp_pstyle}'
+ PAIR_STYLE: pair_style lj/cut/omp 2.5
+
+${temp_pstyle}
+pair_style lj/cut/omp 2.5
+pair_modify shift yes
+
+# basic pair potentials
+
+if "${pair_extra_pots}>0" then    "pair_coeff 3*8 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}"    "pair_coeff 2 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_ribo} ${WCA_mono_ribo}"    "pair_coeff 2 2 lj/cut/omp ${epsilon_LJ} ${sigma_ribo_ribo} ${WCA_ribo_ribo}"    "pair_coeff 1 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}"    "pair_coeff 1 2 lj/cut/omp ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}"    "pair_coeff 1 1 lj/cut/omp 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}" else    "pair_coeff 3*8 3*8 ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}"    "pair_coeff 2 3*8 ${epsilon_LJ} ${sigma_mono_ribo} ${WCA_mono_ribo}"    "pair_coeff 2 2 ${epsilon_LJ} ${sigma_ribo_ribo} ${WCA_ribo_ribo}"    "pair_coeff 1 3*8 ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}"    "pair_coeff 1 2 ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}"    "pair_coeff 1 1 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}"
+pair_coeff 3*8 3*8 ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+pair_coeff 3*8 3*8 0.616032 ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+pair_coeff 3*8 3*8 0.616032 34 ${WCA_mono_mono_ex}
+pair_coeff 3*8 3*8 0.616032 34 38.1637096425186
+pair_coeff 2 3*8 ${epsilon_LJ} ${sigma_mono_ribo} ${WCA_mono_ribo}
+pair_coeff 2 3*8 0.616032 ${sigma_mono_ribo} ${WCA_mono_ribo}
+pair_coeff 2 3*8 0.616032 117 ${WCA_mono_ribo}
+pair_coeff 2 3*8 0.616032 117 131.328059652196
+pair_coeff 2 2 ${epsilon_LJ} ${sigma_ribo_ribo} ${WCA_ribo_ribo}
+pair_coeff 2 2 0.616032 ${sigma_ribo_ribo} ${WCA_ribo_ribo}
+pair_coeff 2 2 0.616032 200 ${WCA_ribo_ribo}
+pair_coeff 2 2 0.616032 200 224.492409661874
+pair_coeff 1 3*8 ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}
+pair_coeff 1 3*8 0.616032 ${sigma_mono_bdry} ${WCA_mono_bdry}
+pair_coeff 1 3*8 0.616032 59.5 ${WCA_mono_bdry}
+pair_coeff 1 3*8 0.616032 59.5 66.7864918744075
+pair_coeff 1 2 ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}
+pair_coeff 1 2 0.616032 ${sigma_ribo_bdry} ${WCA_ribo_bdry}
+pair_coeff 1 2 0.616032 142.5 ${WCA_ribo_bdry}
+pair_coeff 1 2 0.616032 142.5 159.950841884085
+pair_coeff 1 1 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}
+pair_coeff 1 1 0.0 85 ${WCA_bdry_bdry}
+pair_coeff 1 1 0.0 85 95.4092741062964
+
+# extra pair potentials
+
+if "${Ori_bdry_attraction}==1" then    "pair_coeff 1 4 morse/omp ${D_morse} ${a_morse} ${r_morse} ${rcut_morse}"
+
+if "${Ori_pair_repulsion}==1" then    "pair_coeff 4 4 harmonic/cut/omp ${epsilon_ori} ${r_ori_equil}"
+
+# pair_style hybrid # lj/cut/omp 2.5 # morse/omp 2.5 # harmonic/cut/omp
+
+# pair_modify shift yes
+
+# # DNA
+# pair_coeff 3 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+# pair_coeff 4 4 harmonic/cut/omp ${epsilon_ori} ${r_ori_equil}
+# pair_coeff 4 5*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+# pair_coeff 5*8 5*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+# # ribosomes
+# pair_coeff 2 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_ribo} ${WCA_mono_ribo}
+# pair_coeff 2 2 lj/cut/omp ${epsilon_LJ} ${sigma_ribo_ribo} ${WCA_ribo_ribo}
+# # boundary particles
+# pair_coeff 1 3 lj/cut/omp ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}
+# pair_coeff 1 4 morse/omp ${D_morse} ${a_morse} ${r_morse} ${rcut_morse}
+# pair_coeff 1 5*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}
+# pair_coeff 1 2 lj/cut/omp ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}
+# pair_coeff 1 1 lj/cut/omp 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}
+
+
+
+# pair_style lj/cut/omp 2.5
+
+# pair_modify shift yes
+
+# # DNA
+# pair_coeff 3*8 3*8 ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+# # ribosomes
+# pair_coeff 2 3*8 ${epsilon_LJ} ${sigma_mono_ribo} ${WCA_mono_ribo}
+# pair_coeff 2 2 ${epsilon_LJ} ${sigma_ribo_ribo} ${WCA_ribo_ribo}
+# # boundary particles
+# pair_coeff 1 3*8 ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}
+# pair_coeff 1 2 ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}
+# pair_coeff 1 1 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}
+
+# include file with brownian/asphere/omp fixes
+include ${DNA_model_dir}/run_subroutines/subroutine.BD_fixes
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//run_subroutines/subroutine.BD_fixes
+######################################
+# fix commands for Brownian dynamics #
+######################################
+
+# BD fix for DNA
+fix dnaBD DNA brownian/asphere/omp ${T} ${rng_seed} gamma_r_eigen ${gamma_r_mono} ${gamma_r_mono} ${gamma_r_mono} gamma_t_eigen ${gamma_t_mono} ${gamma_t_mono} ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 ${rng_seed} gamma_r_eigen ${gamma_r_mono} ${gamma_r_mono} ${gamma_r_mono} gamma_t_eigen ${gamma_t_mono} ${gamma_t_mono} ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 10 gamma_r_eigen ${gamma_r_mono} ${gamma_r_mono} ${gamma_r_mono} gamma_t_eigen ${gamma_t_mono} ${gamma_t_mono} ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 10 gamma_r_eigen 8696990.12239152 ${gamma_r_mono} ${gamma_r_mono} gamma_t_eigen ${gamma_t_mono} ${gamma_t_mono} ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 10 gamma_r_eigen 8696990.12239152 8696990.12239152 ${gamma_r_mono} gamma_t_eigen ${gamma_t_mono} ${gamma_t_mono} ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 10 gamma_r_eigen 8696990.12239152 8696990.12239152 8696990.12239152 gamma_t_eigen ${gamma_t_mono} ${gamma_t_mono} ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 10 gamma_r_eigen 8696990.12239152 8696990.12239152 8696990.12239152 gamma_t_eigen 22570.0435702202 ${gamma_t_mono} ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 10 gamma_r_eigen 8696990.12239152 8696990.12239152 8696990.12239152 gamma_t_eigen 22570.0435702202 22570.0435702202 ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 10 gamma_r_eigen 8696990.12239152 8696990.12239152 8696990.12239152 gamma_t_eigen 22570.0435702202 22570.0435702202 22570.0435702202
+
+# BD fix for ribosomes
+fix ribosBD ribos brownian/asphere/omp ${T} ${rng_seed} gamma_r_eigen ${gamma_r_ribo} ${gamma_r_ribo} ${gamma_r_ribo} gamma_t_eigen ${gamma_t_ribo} ${gamma_t_ribo} ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 ${rng_seed} gamma_r_eigen ${gamma_r_ribo} ${gamma_r_ribo} ${gamma_r_ribo} gamma_t_eigen ${gamma_t_ribo} ${gamma_t_ribo} ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 10 gamma_r_eigen ${gamma_r_ribo} ${gamma_r_ribo} ${gamma_r_ribo} gamma_t_eigen ${gamma_t_ribo} ${gamma_t_ribo} ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 10 gamma_r_eigen 1770199495.70355 ${gamma_r_ribo} ${gamma_r_ribo} gamma_t_eigen ${gamma_t_ribo} ${gamma_t_ribo} ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 10 gamma_r_eigen 1770199495.70355 1770199495.70355 ${gamma_r_ribo} gamma_t_eigen ${gamma_t_ribo} ${gamma_t_ribo} ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 10 gamma_r_eigen 1770199495.70355 1770199495.70355 1770199495.70355 gamma_t_eigen ${gamma_t_ribo} ${gamma_t_ribo} ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 10 gamma_r_eigen 1770199495.70355 1770199495.70355 1770199495.70355 gamma_t_eigen 132764.962177766 ${gamma_t_ribo} ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 10 gamma_r_eigen 1770199495.70355 1770199495.70355 1770199495.70355 gamma_t_eigen 132764.962177766 132764.962177766 ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 10 gamma_r_eigen 1770199495.70355 1770199495.70355 1770199495.70355 gamma_t_eigen 132764.962177766 132764.962177766 132764.962177766
+timestep ${delta_t}
+timestep 100000
+run 10000
+Generated 0 of 28 mixed pair_coeff terms from geometric mixing rule
+Last active /omp style is angle_style harmonic/omp
+Per MPI rank memory allocation (min/avg/max) = 20.15 | 20.15 | 20.15 Mbytes
+   Step         E_pair         E_bond        E_angle      c_dnaMSD[4]   c_ribosMSD[4] 
+     60000   2.7780308      4.8387684      13544.184      0              0            
+     65000   17.665325      1500.4727      15162.402      14.739292      0            
+     70000   20.452646      1549.1542      15252.193      25.463115      0            
+Loop time of 6.63573 on 8 procs for 10000 steps with 15242 atoms
+
+Performance: 13020416.246 ns/day, 0.000 hours/ns, 1506.993 timesteps/s, 22.970 Matom-step/s
+798.9% CPU use with 1 MPI tasks x 8 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.67471    | 0.67471    | 0.67471    |   0.0 | 10.17
+Bond    | 2.2874     | 2.2874     | 2.2874     |   0.0 | 34.47
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.0017851  | 0.0017851  | 0.0017851  |   0.0 |  0.03
+Output  | 0.00025032 | 0.00025032 | 0.00025032 |   0.0 |  0.00
+Modify  | 3.2542     | 3.2542     | 3.2542     |   0.0 | 49.04
+Other   |            | 0.4174     |            |       |  6.29
+
+Nlocal:          15242 ave       15242 max       15242 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:              0 ave           0 max           0 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:          61546 ave       61546 max       61546 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 61546
+Ave neighs/atom = 4.0379215
+Ave special neighs/atom = 1.9682456
+Neighbor list builds = 0
+Dangerous builds = 0
+variable T_freq delete
+variable T_freq internal 5000
+variable D_freq delete
+variable D_freq internal 0
+variable Ori_pair_repulsion delete
+variable Ori_pair_repulsion internal 0
+variable Ori_bdry_attraction delete
+variable Ori_bdry_attraction internal 0
+uncompute id_track
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_ids
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_ids
+# compute to track ids
+compute id_track all property/atom id
+uncompute type_track
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_types
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_types
+# compute to track types
+compute type_track all property/atom type
+uncompute quat
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_quats
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_quats
+# compute to calculate orientations
+compute quat DNAribos property/atom quatw quati quatj quatk
+include ${DNA_model_dir}/dump_subroutines/subroutine.default_thermo
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//dump_subroutines/subroutine.default_thermo
+# default thermo style
+thermo		${T_freq}
+thermo		5000
+#thermo_style custom step emol epair ebond eangle c_angleE[1] c_angleE[2] c_angleE[3]
+thermo_style custom step emol epair ebond eangle
+include ${DNA_model_dir}/minimize_subroutines/subroutine.min_hard_FENE
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//minimize_subroutines/subroutine.min_hard_FENE
+# create springs to hold ribosomes
+include ${DNA_model_dir}/potentials/lmp.ribo_springs
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.ribo_springs
+# create springs to hold ribosomes
+variable ribos_spring equal 1.0*${kBT}
+variable ribos_spring equal 1.0*0.616032
+fix ribosSpring ribos spring/self ${ribos_spring}
+fix ribosSpring ribos spring/self 0.616032
+
+# include file with description of DNA polymer model with FENE bonds
+include ${DNA_model_dir}/potentials/lmp.twistable_DNA_model_FENE_omp
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.twistable_DNA_model_FENE_omp
+# variables describing energetic parameters
+variable l_equil equal 2.0*${r_mono}
+variable l_equil equal 2.0*17
+variable k_stretch_FENE equal 100*${kBT}/(${sigma_mono_mono}^2) # [Kcal/(mol*A^2)]
+variable k_stretch_FENE equal 100*0.616032/(${sigma_mono_mono}^2) 
+variable k_stretch_FENE equal 100*0.616032/(34^2) 
+variable R0_FENE equal 1.5*${sigma_mono_mono} # [A]
+variable R0_FENE equal 1.5*34 
+variable epsilon_FENE equal ${kBT} # [Kcal/mol]
+variable epsilon_FENE equal 0.616032 
+variable sigma_FENE equal ${sigma_mono_mono} # [A]
+variable sigma_FENE equal 34 
+
+include ${DNA_model_dir}/potentials/lmp.DNA_bend_twist_align_params
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.DNA_bend_twist_align_params
+#variable k_bend equal ${kBT}*(450.0/(${sigma_mono_mono})) #  [Kcal/mol]
+variable k_bend equal ${kBT}*(450.0/(${sigma_mono_mono})) #  [Kcal/mol]
+variable k_bend equal 0.616032*(450.0/(${sigma_mono_mono})) 
+variable k_bend equal 0.616032*(450.0/(34)) 
+variable k_twist equal ${kBT}*(850.0/(2*${sigma_mono_mono})) # [Kcal/mol]
+variable k_twist equal 0.616032*(850.0/(2*${sigma_mono_mono})) 
+variable k_twist equal 0.616032*(850.0/(2*34)) 
+#variable k_twist equal ${kBT}*(0.0/(2*${sigma_mono_mono})) # [Kcal/mol]
+variable k_align equal 2*${k_twist} # [Kcal/mol]
+variable k_align equal 2*7.7004 
+
+print """
+ -----------------------------------------------------
+ ---[ Twistable DNA (FENE), Energetic Parameters  ]---
+ -----------------------------------------------------
+  kBT = ${kBT} [Kcal/mol]
+  k_stretch_FENE = ${k_stretch_FENE} [Kcal/(mol*A^2)]
+  R0_FENE = ${R0_FENE} [A]
+  epsilon_FENE = ${epsilon_FENE} [Kcal/mol]
+  sigma_FENE = ${sigma_FENE} [A]
+  k_bend = ${k_bend} [Kcal/mol]
+  k_twist = ${k_twist} [Kcal/mol]
+  k_align = ${k_align} [Kcal/mol]
+"""
+
+ -----------------------------------------------------
+ ---[ Twistable DNA (FENE), Energetic Parameters  ]---
+ -----------------------------------------------------
+  kBT = 0.616032 [Kcal/mol]
+  k_stretch_FENE = 0.0532899653979239 [Kcal/(mol*A^2)]
+  R0_FENE = 51 [A]
+  epsilon_FENE = 0.616032 [Kcal/mol]
+  sigma_FENE = 34 [A]
+  k_bend = 8.15336470588235 [Kcal/mol]
+  k_twist = 7.7004 [Kcal/mol]
+  k_align = 15.4008 [Kcal/mol]
+
+
+# bond potentials
+bond_style hybrid fene/omp harmonic/omp
+bond_coeff 1 fene/omp ${k_stretch_FENE} ${R0_FENE} ${epsilon_FENE} ${sigma_FENE}
+bond_coeff 1 fene/omp 0.0532899653979239 ${R0_FENE} ${epsilon_FENE} ${sigma_FENE}
+bond_coeff 1 fene/omp 0.0532899653979239 51 ${epsilon_FENE} ${sigma_FENE}
+bond_coeff 1 fene/omp 0.0532899653979239 51 0.616032 ${sigma_FENE}
+bond_coeff 1 fene/omp 0.0532899653979239 51 0.616032 34
+include ${DNA_model_dir}/potentials/lmp.loop_bond_hybrid
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.loop_bond_hybrid
+include ${DNA_model_dir}/potentials/lmp.DNA_loops
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.DNA_loops
+variable r_loop equal 4.0*${r_mono} # [A]
+variable r_loop equal 4.0*17 
+variable k_loop equal 4.0*${kBT}/(3*50.0/4.0-${sigma_mono_mono})^2 # [(Kcal/mol)/A^2]
+variable k_loop equal 4.0*0.616032/(3*50.0/4.0-${sigma_mono_mono})^2 
+variable k_loop equal 4.0*0.616032/(3*50.0/4.0-34)^2 
+
+print """
+ -------------------------------------
+ ---[ Loops, Energetic Parameters ]---
+ -------------------------------------
+  kBT = ${kBT} [Kcal/mol]
+  k_loop = ${k_loop} [Kcal/(mol*A^2)]
+  r_loop = ${r_loop} [A]
+"""
+
+ -------------------------------------
+ ---[ Loops, Energetic Parameters ]---
+ -------------------------------------
+  kBT = 0.616032 [Kcal/mol]
+  k_loop = 0.201153306122449 [Kcal/(mol*A^2)]
+  r_loop = 68 [A]
+
+bond_coeff 2 harmonic/omp ${k_loop} ${r_loop}
+bond_coeff 2 harmonic/omp 0.201153306122449 ${r_loop}
+bond_coeff 2 harmonic/omp 0.201153306122449 68
+
+# angle potentials
+angle_style   hybrid polytorsion/omp cosine/omp harmonic/omp
+angle_coeff   1 cosine/omp ${k_bend} # primary polymer chain angles
+angle_coeff   1 cosine/omp 8.15336470588235 
+angle_coeff   2 polytorsion/omp ${k_align} ${k_twist} # primary polymer chain twist
+angle_coeff   2 polytorsion/omp 15.4008 ${k_twist} 
+angle_coeff   2 polytorsion/omp 15.4008 7.7004 
+angle_coeff   3 harmonic/omp ${k_bend} 120.0 # replication fork angles
+angle_coeff   3 harmonic/omp 8.15336470588235 120.0 
+angle_coeff   4 polytorsion/omp ${k_align} ${k_twist} # replication fork twist
+angle_coeff   4 polytorsion/omp 15.4008 ${k_twist} 
+angle_coeff   4 polytorsion/omp 15.4008 7.7004 
+
+special_bonds fene angle yes
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        1        1       
+  special bond factors coul:  0        1        1       
+     2 = max # of 1-2 neighbors
+     6 = max # of special neighbors
+  special bonds CPU = 0.003 seconds
+
+# include file with neighbor setup
+include ${DNA_model_dir}/protocol_subroutines/subroutine.neighbor_setup
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//protocol_subroutines/subroutine.neighbor_setup
+# 1 - bdry
+# 2 - ribo
+# 3 - DNA monomer
+# 4 - Ori
+# 5 - Ter
+# 6 - Fork
+# 7 - Anchor
+# 8 - Hinge
+
+# set the neighbor type
+neighbor ${r_ribo} bin
+neighbor 100 bin
+neigh_modify every 1 delay 5 check yes page 100000 exclude type 1 1
+
+# neighbor ${r_ribo} multi
+# neigh_modify every 1 delay 5 check yes # page 10000 # collection/type 5 # 1 1, # 1 2, # 1 3, # 1 4, # 1 5*8, ## 2 3*8, # 2 2, # 3 3*8 # 4 3*8 # 5 3*8 # 6 3*8 # 7 3*8 # 8 3*8
+# collection/type 3 # 1 2, # 3 3, # 4 5*8 # exclude type 1 1
+
+# include file with hard pair potentials
+include ${DNA_model_dir}/potentials/lmp.DNA_pair_hard_omp
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.DNA_pair_hard_omp
+# hard LJ pair potentials with WCA cutoff
+
+include ${DNA_model_dir}/potentials/lmp.DNA_pair_params
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.DNA_pair_params
+variable epsilon_soft equal 1.0*${kBT} # [Kcal/mol]
+variable epsilon_soft equal 1.0*0.616032 
+variable epsilon_LJ equal 1.0*${kBT} # [Kcal/mol]
+variable epsilon_LJ equal 1.0*0.616032 
+variable epsilon_soft_topo equal 0.1*${kBT} # [Kcal/mol]
+variable epsilon_soft_topo equal 0.1*0.616032 
+variable D_morse equal 10.0*${kBT} # [Kcal/mol]
+variable D_morse equal 10.0*0.616032 
+variable a_morse equal 1.0/(0.5*${sigma_mono_mono}) # [1/A]
+variable a_morse equal 1.0/(0.5*34) 
+variable r_morse equal 1.5*${sigma_mono_bdry} # [A]
+variable r_morse equal 1.5*59.5 
+variable rcut_morse equal 3.0*${sigma_mono_bdry} # [A]
+variable rcut_morse equal 3.0*59.5 
+variable epsilon_ori equal 10.0*${kBT}/(${sigma_mono_mono}^2.0) # [(Kcal/mol)/(A^2)]
+variable epsilon_ori equal 10.0*0.616032/(${sigma_mono_mono}^2.0) 
+variable epsilon_ori equal 10.0*0.616032/(34^2.0) 
+variable r_ori_equil equal 1000.0 # [A]
+
+print """
+ --------------------------------------------------
+ ---[LJ/cut (WCA) Pairs, Energetic Parameters  ]---
+ --------------------------------------------------
+  kBT = ${kBT} [Kcal/mol]
+  epsilon_LJ = ${epsilon_LJ} [Kcal/mol]
+"""
+
+ --------------------------------------------------
+ ---[LJ/cut (WCA) Pairs, Energetic Parameters  ]---
+ --------------------------------------------------
+  kBT = 0.616032 [Kcal/mol]
+  epsilon_LJ = 0.616032 [Kcal/mol]
+
+
+variable s_expand equal 1.0
+variable sigma_mono_mono_ex equal ${s_expand}*${sigma_mono_mono}
+variable sigma_mono_mono_ex equal 1*${sigma_mono_mono}
+variable sigma_mono_mono_ex equal 1*34
+variable WCA_mono_mono_ex equal ${s_expand}*${WCA_mono_mono}
+variable WCA_mono_mono_ex equal 1*${WCA_mono_mono}
+variable WCA_mono_mono_ex equal 1*38.1637096425186
+
+# 1 - bdry
+# 2 - ribo
+# 3 - DNA monomer
+# 4 - Ori
+# 5 - Ter
+# 6 - Fork
+# 7 - Anchor
+# 8 - Hinge
+
+variable pair_extra_pots equal ${Ori_bdry_attraction}+${Ori_pair_repulsion}
+variable pair_extra_pots equal 0+${Ori_pair_repulsion}
+variable pair_extra_pots equal 0+0
+
+if "${pair_extra_pots}>0" then    "print 'yes extra potentials'"    "variable temp_pstyle string 'pair_style hybrid'"    "variable temp_pstyle string '${temp_pstyle} lj/cut/omp 2.5'" else    "print 'no extra potentials'"    "variable temp_pstyle string 'pair_style lj/cut/omp 2.5'"
+print 'no extra potentials'
+no extra potentials
+variable temp_pstyle string 'pair_style lj/cut/omp 2.5'
+
+if "${Ori_bdry_attraction}==1" then    "variable temp_pstyle string '${temp_pstyle} morse/omp 2.5'"
+
+if "${Ori_pair_repulsion}==1" then    "variable temp_pstyle string '${temp_pstyle} harmonic/cut/omp'"
+
+print ' PAIR_STYLE: ${temp_pstyle}'
+ PAIR_STYLE: pair_style lj/cut/omp 2.5
+
+${temp_pstyle}
+pair_style lj/cut/omp 2.5
+pair_modify shift yes
+
+# basic pair potentials
+
+if "${pair_extra_pots}>0" then    "pair_coeff 3*8 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}"    "pair_coeff 2 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_ribo} ${WCA_mono_ribo}"    "pair_coeff 2 2 lj/cut/omp ${epsilon_LJ} ${sigma_ribo_ribo} ${WCA_ribo_ribo}"    "pair_coeff 1 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}"    "pair_coeff 1 2 lj/cut/omp ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}"    "pair_coeff 1 1 lj/cut/omp 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}" else    "pair_coeff 3*8 3*8 ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}"    "pair_coeff 2 3*8 ${epsilon_LJ} ${sigma_mono_ribo} ${WCA_mono_ribo}"    "pair_coeff 2 2 ${epsilon_LJ} ${sigma_ribo_ribo} ${WCA_ribo_ribo}"    "pair_coeff 1 3*8 ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}"    "pair_coeff 1 2 ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}"    "pair_coeff 1 1 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}"
+pair_coeff 3*8 3*8 ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+pair_coeff 3*8 3*8 0.616032 ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+pair_coeff 3*8 3*8 0.616032 34 ${WCA_mono_mono_ex}
+pair_coeff 3*8 3*8 0.616032 34 38.1637096425186
+pair_coeff 2 3*8 ${epsilon_LJ} ${sigma_mono_ribo} ${WCA_mono_ribo}
+pair_coeff 2 3*8 0.616032 ${sigma_mono_ribo} ${WCA_mono_ribo}
+pair_coeff 2 3*8 0.616032 117 ${WCA_mono_ribo}
+pair_coeff 2 3*8 0.616032 117 131.328059652196
+pair_coeff 2 2 ${epsilon_LJ} ${sigma_ribo_ribo} ${WCA_ribo_ribo}
+pair_coeff 2 2 0.616032 ${sigma_ribo_ribo} ${WCA_ribo_ribo}
+pair_coeff 2 2 0.616032 200 ${WCA_ribo_ribo}
+pair_coeff 2 2 0.616032 200 224.492409661874
+pair_coeff 1 3*8 ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}
+pair_coeff 1 3*8 0.616032 ${sigma_mono_bdry} ${WCA_mono_bdry}
+pair_coeff 1 3*8 0.616032 59.5 ${WCA_mono_bdry}
+pair_coeff 1 3*8 0.616032 59.5 66.7864918744075
+pair_coeff 1 2 ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}
+pair_coeff 1 2 0.616032 ${sigma_ribo_bdry} ${WCA_ribo_bdry}
+pair_coeff 1 2 0.616032 142.5 ${WCA_ribo_bdry}
+pair_coeff 1 2 0.616032 142.5 159.950841884085
+pair_coeff 1 1 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}
+pair_coeff 1 1 0.0 85 ${WCA_bdry_bdry}
+pair_coeff 1 1 0.0 85 95.4092741062964
+
+# extra pair potentials
+
+if "${Ori_bdry_attraction}==1" then    "pair_coeff 1 4 morse/omp ${D_morse} ${a_morse} ${r_morse} ${rcut_morse}"
+
+if "${Ori_pair_repulsion}==1" then    "pair_coeff 4 4 harmonic/cut/omp ${epsilon_ori} ${r_ori_equil}"
+
+# pair_style hybrid # lj/cut/omp 2.5 # morse/omp 2.5 # harmonic/cut/omp
+
+# pair_modify shift yes
+
+# # DNA
+# pair_coeff 3 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+# pair_coeff 4 4 harmonic/cut/omp ${epsilon_ori} ${r_ori_equil}
+# pair_coeff 4 5*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+# pair_coeff 5*8 5*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+# # ribosomes
+# pair_coeff 2 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_ribo} ${WCA_mono_ribo}
+# pair_coeff 2 2 lj/cut/omp ${epsilon_LJ} ${sigma_ribo_ribo} ${WCA_ribo_ribo}
+# # boundary particles
+# pair_coeff 1 3 lj/cut/omp ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}
+# pair_coeff 1 4 morse/omp ${D_morse} ${a_morse} ${r_morse} ${rcut_morse}
+# pair_coeff 1 5*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}
+# pair_coeff 1 2 lj/cut/omp ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}
+# pair_coeff 1 1 lj/cut/omp 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}
+
+
+
+# pair_style lj/cut/omp 2.5
+
+# pair_modify shift yes
+
+# # DNA
+# pair_coeff 3*8 3*8 ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+# # ribosomes
+# pair_coeff 2 3*8 ${epsilon_LJ} ${sigma_mono_ribo} ${WCA_mono_ribo}
+# pair_coeff 2 2 ${epsilon_LJ} ${sigma_ribo_ribo} ${WCA_ribo_ribo}
+# # boundary particles
+# pair_coeff 1 3*8 ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}
+# pair_coeff 1 2 ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}
+# pair_coeff 1 1 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}
+
+# run the minimization
+min_style cg
+minimize 1.0e-5 1.0e-7 40000 400000
+Switching to 'neigh_modify every 1 delay 0 check yes' setting during minimization
+Generated 0 of 28 mixed pair_coeff terms from geometric mixing rule
+Last active /omp style is angle_style harmonic/omp
+Per MPI rank memory allocation (min/avg/max) = 21.72 | 21.72 | 21.72 Mbytes
+   Step         E_mol          E_pair         E_bond        E_angle    
+     70000   235739.03      34828898       220486.83      15252.193    
+     70632   191235.91      22.138299      178173.36      13062.556    
+Loop time of 0.595317 on 8 procs for 632 steps with 15242 atoms
+
+798.5% CPU use with 1 MPI tasks x 8 OpenMP threads
+
+Minimization stats:
+  Stopping criterion = energy tolerance
+  Energy initial, next-to-last, final = 
+      35064637.3495477     191259.9585581   191258.050465976
+  Force two-norm initial, final = 66896536 1.3197292
+  Force max component initial, final = 42631244 0.24683233
+  Final line search alpha, max atom move = 0.46203562 0.11404533
+  Iterations, force evaluations = 632 632
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.063999   | 0.063999   | 0.063999   |   0.0 | 10.75
+Bond    | 0.16637    | 0.16637    | 0.16637    |   0.0 | 27.95
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.00012599 | 0.00012599 | 0.00012599 |   0.0 |  0.02
+Output  | 0          | 0          | 0          |   0.0 |  0.00
+Modify  | 0.10837    | 0.10837    | 0.10837    |   0.0 | 18.20
+Other   |            | 0.2565     |            |       | 43.08
+
+Nlocal:          15242 ave       15242 max       15242 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:              0 ave           0 max           0 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:          71615 ave       71615 max       71615 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 71615
+Ave neighs/atom = 4.6985304
+Ave special neighs/atom = 0.65608188
+Neighbor list builds = 0
+Dangerous builds = 0
+
+# release ribosomes from springs following minimization
+unfix ribosSpring
+reset_timestep 70000
+reset_timestep 50000
+variable T_freq delete
+variable T_freq internal 1000
+variable D_freq delete
+variable D_freq internal 5000
+variable Ori_pair_repulsion delete
+variable Ori_pair_repulsion internal 0
+variable Ori_bdry_attraction delete
+variable Ori_bdry_attraction internal 0
+uncompute id_track
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_ids
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_ids
+# compute to track ids
+compute id_track all property/atom id
+uncompute type_track
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_types
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_types
+# compute to track types
+compute type_track all property/atom type
+uncompute quat
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_quats
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_quats
+# compute to calculate orientations
+compute quat DNAribos property/atom quatw quati quatj quatk
+uncompute dnaMSD
+uncompute ribosMSD
+uncompute orisMSD
+uncompute tersMSD
+uncompute forksMSD
+include ${DNA_model_dir}/compute_subroutines/subroutine.compute_MSD
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//compute_subroutines/subroutine.compute_MSD
+###
+# computes for MSD
+###
+
+compute dnaMSD DNA msd com no average no
+compute ribosMSD ribos msd com no average no
+compute orisMSD oris msd com no average no
+compute tersMSD ters msd com no average no
+compute forksMSD forks msd com no average no
+include ${DNA_model_dir}/dump_subroutines/subroutine.MSD_thermo
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//dump_subroutines/subroutine.MSD_thermo
+# set custom thermo style
+thermo		${T_freq}
+thermo		1000
+# thermo_style custom step # epair ebond eangle c_angleE[1] c_angleE[2] c_angleE[3] # c_dnaMSD[4] c_ribosMSD[4]
+
+thermo_style custom step epair ebond eangle c_dnaMSD[4] c_ribosMSD[4]
+reset_timestep 50000
+variable D_delay equal 55000
+include ${DNA_model_dir}/dump_subroutines/subroutine.dump_append_nofirst_lammpstrj
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//dump_subroutines/subroutine.dump_append_nofirst_lammpstrj
+# set custom dump style
+dump            d_lammpstrj all custom ${D_freq} ${output_file}.lammpstrj id type x y z c_quat[*] c_id_track c_type_track
+dump            d_lammpstrj all custom 5000 ${output_file}.lammpstrj id type x y z c_quat[*] c_id_track c_type_track
+dump            d_lammpstrj all custom 5000 /home/andrew/Data/btree_chromo/RMF_testing/SCMINBBDBMINBBDB_BDBT_MINBT_BDBT.lammpstrj id type x y z c_quat[*] c_id_track c_type_track
+dump_modify     d_lammpstrj append yes first no delay ${D_delay}
+dump_modify     d_lammpstrj append yes first no delay 55000
+#dump_modify     dumplammpstrj append yes first no skip v_skip_condition
+timestep ${delta_t}
+timestep 100000
+include ${DNA_model_dir}/run_subroutines/subroutine.run_hard_FENE
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//run_subroutines/subroutine.run_hard_FENE
+# include file with description of DNA polymer model with FENE bonds
+include ${DNA_model_dir}/potentials/lmp.twistable_DNA_model_FENE_omp
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.twistable_DNA_model_FENE_omp
+# variables describing energetic parameters
+variable l_equil equal 2.0*${r_mono}
+variable l_equil equal 2.0*17
+variable k_stretch_FENE equal 100*${kBT}/(${sigma_mono_mono}^2) # [Kcal/(mol*A^2)]
+variable k_stretch_FENE equal 100*0.616032/(${sigma_mono_mono}^2) 
+variable k_stretch_FENE equal 100*0.616032/(34^2) 
+variable R0_FENE equal 1.5*${sigma_mono_mono} # [A]
+variable R0_FENE equal 1.5*34 
+variable epsilon_FENE equal ${kBT} # [Kcal/mol]
+variable epsilon_FENE equal 0.616032 
+variable sigma_FENE equal ${sigma_mono_mono} # [A]
+variable sigma_FENE equal 34 
+
+include ${DNA_model_dir}/potentials/lmp.DNA_bend_twist_align_params
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.DNA_bend_twist_align_params
+#variable k_bend equal ${kBT}*(450.0/(${sigma_mono_mono})) #  [Kcal/mol]
+variable k_bend equal ${kBT}*(450.0/(${sigma_mono_mono})) #  [Kcal/mol]
+variable k_bend equal 0.616032*(450.0/(${sigma_mono_mono})) 
+variable k_bend equal 0.616032*(450.0/(34)) 
+variable k_twist equal ${kBT}*(850.0/(2*${sigma_mono_mono})) # [Kcal/mol]
+variable k_twist equal 0.616032*(850.0/(2*${sigma_mono_mono})) 
+variable k_twist equal 0.616032*(850.0/(2*34)) 
+#variable k_twist equal ${kBT}*(0.0/(2*${sigma_mono_mono})) # [Kcal/mol]
+variable k_align equal 2*${k_twist} # [Kcal/mol]
+variable k_align equal 2*7.7004 
+
+print """
+ -----------------------------------------------------
+ ---[ Twistable DNA (FENE), Energetic Parameters  ]---
+ -----------------------------------------------------
+  kBT = ${kBT} [Kcal/mol]
+  k_stretch_FENE = ${k_stretch_FENE} [Kcal/(mol*A^2)]
+  R0_FENE = ${R0_FENE} [A]
+  epsilon_FENE = ${epsilon_FENE} [Kcal/mol]
+  sigma_FENE = ${sigma_FENE} [A]
+  k_bend = ${k_bend} [Kcal/mol]
+  k_twist = ${k_twist} [Kcal/mol]
+  k_align = ${k_align} [Kcal/mol]
+"""
+
+ -----------------------------------------------------
+ ---[ Twistable DNA (FENE), Energetic Parameters  ]---
+ -----------------------------------------------------
+  kBT = 0.616032 [Kcal/mol]
+  k_stretch_FENE = 0.0532899653979239 [Kcal/(mol*A^2)]
+  R0_FENE = 51 [A]
+  epsilon_FENE = 0.616032 [Kcal/mol]
+  sigma_FENE = 34 [A]
+  k_bend = 8.15336470588235 [Kcal/mol]
+  k_twist = 7.7004 [Kcal/mol]
+  k_align = 15.4008 [Kcal/mol]
+
+
+# bond potentials
+bond_style hybrid fene/omp harmonic/omp
+bond_coeff 1 fene/omp ${k_stretch_FENE} ${R0_FENE} ${epsilon_FENE} ${sigma_FENE}
+bond_coeff 1 fene/omp 0.0532899653979239 ${R0_FENE} ${epsilon_FENE} ${sigma_FENE}
+bond_coeff 1 fene/omp 0.0532899653979239 51 ${epsilon_FENE} ${sigma_FENE}
+bond_coeff 1 fene/omp 0.0532899653979239 51 0.616032 ${sigma_FENE}
+bond_coeff 1 fene/omp 0.0532899653979239 51 0.616032 34
+include ${DNA_model_dir}/potentials/lmp.loop_bond_hybrid
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.loop_bond_hybrid
+include ${DNA_model_dir}/potentials/lmp.DNA_loops
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.DNA_loops
+variable r_loop equal 4.0*${r_mono} # [A]
+variable r_loop equal 4.0*17 
+variable k_loop equal 4.0*${kBT}/(3*50.0/4.0-${sigma_mono_mono})^2 # [(Kcal/mol)/A^2]
+variable k_loop equal 4.0*0.616032/(3*50.0/4.0-${sigma_mono_mono})^2 
+variable k_loop equal 4.0*0.616032/(3*50.0/4.0-34)^2 
+
+print """
+ -------------------------------------
+ ---[ Loops, Energetic Parameters ]---
+ -------------------------------------
+  kBT = ${kBT} [Kcal/mol]
+  k_loop = ${k_loop} [Kcal/(mol*A^2)]
+  r_loop = ${r_loop} [A]
+"""
+
+ -------------------------------------
+ ---[ Loops, Energetic Parameters ]---
+ -------------------------------------
+  kBT = 0.616032 [Kcal/mol]
+  k_loop = 0.201153306122449 [Kcal/(mol*A^2)]
+  r_loop = 68 [A]
+
+bond_coeff 2 harmonic/omp ${k_loop} ${r_loop}
+bond_coeff 2 harmonic/omp 0.201153306122449 ${r_loop}
+bond_coeff 2 harmonic/omp 0.201153306122449 68
+
+# angle potentials
+angle_style   hybrid polytorsion/omp cosine/omp harmonic/omp
+angle_coeff   1 cosine/omp ${k_bend} # primary polymer chain angles
+angle_coeff   1 cosine/omp 8.15336470588235 
+angle_coeff   2 polytorsion/omp ${k_align} ${k_twist} # primary polymer chain twist
+angle_coeff   2 polytorsion/omp 15.4008 ${k_twist} 
+angle_coeff   2 polytorsion/omp 15.4008 7.7004 
+angle_coeff   3 harmonic/omp ${k_bend} 120.0 # replication fork angles
+angle_coeff   3 harmonic/omp 8.15336470588235 120.0 
+angle_coeff   4 polytorsion/omp ${k_align} ${k_twist} # replication fork twist
+angle_coeff   4 polytorsion/omp 15.4008 ${k_twist} 
+angle_coeff   4 polytorsion/omp 15.4008 7.7004 
+
+special_bonds fene angle yes
+
+# include file with neighbor setup
+include ${DNA_model_dir}/protocol_subroutines/subroutine.neighbor_setup
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//protocol_subroutines/subroutine.neighbor_setup
+# 1 - bdry
+# 2 - ribo
+# 3 - DNA monomer
+# 4 - Ori
+# 5 - Ter
+# 6 - Fork
+# 7 - Anchor
+# 8 - Hinge
+
+# set the neighbor type
+neighbor ${r_ribo} bin
+neighbor 100 bin
+neigh_modify every 1 delay 5 check yes page 100000 exclude type 1 1
+
+# neighbor ${r_ribo} multi
+# neigh_modify every 1 delay 5 check yes # page 10000 # collection/type 5 # 1 1, # 1 2, # 1 3, # 1 4, # 1 5*8, ## 2 3*8, # 2 2, # 3 3*8 # 4 3*8 # 5 3*8 # 6 3*8 # 7 3*8 # 8 3*8
+# collection/type 3 # 1 2, # 3 3, # 4 5*8 # exclude type 1 1
+
+# include file with hard pair potentials
+include ${DNA_model_dir}/potentials/lmp.DNA_pair_hard_omp
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.DNA_pair_hard_omp
+# hard LJ pair potentials with WCA cutoff
+
+include ${DNA_model_dir}/potentials/lmp.DNA_pair_params
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//potentials/lmp.DNA_pair_params
+variable epsilon_soft equal 1.0*${kBT} # [Kcal/mol]
+variable epsilon_soft equal 1.0*0.616032 
+variable epsilon_LJ equal 1.0*${kBT} # [Kcal/mol]
+variable epsilon_LJ equal 1.0*0.616032 
+variable epsilon_soft_topo equal 0.1*${kBT} # [Kcal/mol]
+variable epsilon_soft_topo equal 0.1*0.616032 
+variable D_morse equal 10.0*${kBT} # [Kcal/mol]
+variable D_morse equal 10.0*0.616032 
+variable a_morse equal 1.0/(0.5*${sigma_mono_mono}) # [1/A]
+variable a_morse equal 1.0/(0.5*34) 
+variable r_morse equal 1.5*${sigma_mono_bdry} # [A]
+variable r_morse equal 1.5*59.5 
+variable rcut_morse equal 3.0*${sigma_mono_bdry} # [A]
+variable rcut_morse equal 3.0*59.5 
+variable epsilon_ori equal 10.0*${kBT}/(${sigma_mono_mono}^2.0) # [(Kcal/mol)/(A^2)]
+variable epsilon_ori equal 10.0*0.616032/(${sigma_mono_mono}^2.0) 
+variable epsilon_ori equal 10.0*0.616032/(34^2.0) 
+variable r_ori_equil equal 1000.0 # [A]
+
+print """
+ --------------------------------------------------
+ ---[LJ/cut (WCA) Pairs, Energetic Parameters  ]---
+ --------------------------------------------------
+  kBT = ${kBT} [Kcal/mol]
+  epsilon_LJ = ${epsilon_LJ} [Kcal/mol]
+"""
+
+ --------------------------------------------------
+ ---[LJ/cut (WCA) Pairs, Energetic Parameters  ]---
+ --------------------------------------------------
+  kBT = 0.616032 [Kcal/mol]
+  epsilon_LJ = 0.616032 [Kcal/mol]
+
+
+variable s_expand equal 1.0
+variable sigma_mono_mono_ex equal ${s_expand}*${sigma_mono_mono}
+variable sigma_mono_mono_ex equal 1*${sigma_mono_mono}
+variable sigma_mono_mono_ex equal 1*34
+variable WCA_mono_mono_ex equal ${s_expand}*${WCA_mono_mono}
+variable WCA_mono_mono_ex equal 1*${WCA_mono_mono}
+variable WCA_mono_mono_ex equal 1*38.1637096425186
+
+# 1 - bdry
+# 2 - ribo
+# 3 - DNA monomer
+# 4 - Ori
+# 5 - Ter
+# 6 - Fork
+# 7 - Anchor
+# 8 - Hinge
+
+variable pair_extra_pots equal ${Ori_bdry_attraction}+${Ori_pair_repulsion}
+variable pair_extra_pots equal 0+${Ori_pair_repulsion}
+variable pair_extra_pots equal 0+0
+
+if "${pair_extra_pots}>0" then    "print 'yes extra potentials'"    "variable temp_pstyle string 'pair_style hybrid'"    "variable temp_pstyle string '${temp_pstyle} lj/cut/omp 2.5'" else    "print 'no extra potentials'"    "variable temp_pstyle string 'pair_style lj/cut/omp 2.5'"
+print 'no extra potentials'
+no extra potentials
+variable temp_pstyle string 'pair_style lj/cut/omp 2.5'
+
+if "${Ori_bdry_attraction}==1" then    "variable temp_pstyle string '${temp_pstyle} morse/omp 2.5'"
+
+if "${Ori_pair_repulsion}==1" then    "variable temp_pstyle string '${temp_pstyle} harmonic/cut/omp'"
+
+print ' PAIR_STYLE: ${temp_pstyle}'
+ PAIR_STYLE: pair_style lj/cut/omp 2.5
+
+${temp_pstyle}
+pair_style lj/cut/omp 2.5
+pair_modify shift yes
+
+# basic pair potentials
+
+if "${pair_extra_pots}>0" then    "pair_coeff 3*8 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}"    "pair_coeff 2 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_ribo} ${WCA_mono_ribo}"    "pair_coeff 2 2 lj/cut/omp ${epsilon_LJ} ${sigma_ribo_ribo} ${WCA_ribo_ribo}"    "pair_coeff 1 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}"    "pair_coeff 1 2 lj/cut/omp ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}"    "pair_coeff 1 1 lj/cut/omp 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}" else    "pair_coeff 3*8 3*8 ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}"    "pair_coeff 2 3*8 ${epsilon_LJ} ${sigma_mono_ribo} ${WCA_mono_ribo}"    "pair_coeff 2 2 ${epsilon_LJ} ${sigma_ribo_ribo} ${WCA_ribo_ribo}"    "pair_coeff 1 3*8 ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}"    "pair_coeff 1 2 ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}"    "pair_coeff 1 1 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}"
+pair_coeff 3*8 3*8 ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+pair_coeff 3*8 3*8 0.616032 ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+pair_coeff 3*8 3*8 0.616032 34 ${WCA_mono_mono_ex}
+pair_coeff 3*8 3*8 0.616032 34 38.1637096425186
+pair_coeff 2 3*8 ${epsilon_LJ} ${sigma_mono_ribo} ${WCA_mono_ribo}
+pair_coeff 2 3*8 0.616032 ${sigma_mono_ribo} ${WCA_mono_ribo}
+pair_coeff 2 3*8 0.616032 117 ${WCA_mono_ribo}
+pair_coeff 2 3*8 0.616032 117 131.328059652196
+pair_coeff 2 2 ${epsilon_LJ} ${sigma_ribo_ribo} ${WCA_ribo_ribo}
+pair_coeff 2 2 0.616032 ${sigma_ribo_ribo} ${WCA_ribo_ribo}
+pair_coeff 2 2 0.616032 200 ${WCA_ribo_ribo}
+pair_coeff 2 2 0.616032 200 224.492409661874
+pair_coeff 1 3*8 ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}
+pair_coeff 1 3*8 0.616032 ${sigma_mono_bdry} ${WCA_mono_bdry}
+pair_coeff 1 3*8 0.616032 59.5 ${WCA_mono_bdry}
+pair_coeff 1 3*8 0.616032 59.5 66.7864918744075
+pair_coeff 1 2 ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}
+pair_coeff 1 2 0.616032 ${sigma_ribo_bdry} ${WCA_ribo_bdry}
+pair_coeff 1 2 0.616032 142.5 ${WCA_ribo_bdry}
+pair_coeff 1 2 0.616032 142.5 159.950841884085
+pair_coeff 1 1 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}
+pair_coeff 1 1 0.0 85 ${WCA_bdry_bdry}
+pair_coeff 1 1 0.0 85 95.4092741062964
+
+# extra pair potentials
+
+if "${Ori_bdry_attraction}==1" then    "pair_coeff 1 4 morse/omp ${D_morse} ${a_morse} ${r_morse} ${rcut_morse}"
+
+if "${Ori_pair_repulsion}==1" then    "pair_coeff 4 4 harmonic/cut/omp ${epsilon_ori} ${r_ori_equil}"
+
+# pair_style hybrid # lj/cut/omp 2.5 # morse/omp 2.5 # harmonic/cut/omp
+
+# pair_modify shift yes
+
+# # DNA
+# pair_coeff 3 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+# pair_coeff 4 4 harmonic/cut/omp ${epsilon_ori} ${r_ori_equil}
+# pair_coeff 4 5*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+# pair_coeff 5*8 5*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+# # ribosomes
+# pair_coeff 2 3*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_ribo} ${WCA_mono_ribo}
+# pair_coeff 2 2 lj/cut/omp ${epsilon_LJ} ${sigma_ribo_ribo} ${WCA_ribo_ribo}
+# # boundary particles
+# pair_coeff 1 3 lj/cut/omp ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}
+# pair_coeff 1 4 morse/omp ${D_morse} ${a_morse} ${r_morse} ${rcut_morse}
+# pair_coeff 1 5*8 lj/cut/omp ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}
+# pair_coeff 1 2 lj/cut/omp ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}
+# pair_coeff 1 1 lj/cut/omp 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}
+
+
+
+# pair_style lj/cut/omp 2.5
+
+# pair_modify shift yes
+
+# # DNA
+# pair_coeff 3*8 3*8 ${epsilon_LJ} ${sigma_mono_mono_ex} ${WCA_mono_mono_ex}
+# # ribosomes
+# pair_coeff 2 3*8 ${epsilon_LJ} ${sigma_mono_ribo} ${WCA_mono_ribo}
+# pair_coeff 2 2 ${epsilon_LJ} ${sigma_ribo_ribo} ${WCA_ribo_ribo}
+# # boundary particles
+# pair_coeff 1 3*8 ${epsilon_LJ} ${sigma_mono_bdry} ${WCA_mono_bdry}
+# pair_coeff 1 2 ${epsilon_LJ} ${sigma_ribo_bdry} ${WCA_ribo_bdry}
+# pair_coeff 1 1 0.0 ${sigma_bdry_bdry} ${WCA_bdry_bdry}
+
+# include file with brownian/asphere/omp fixes
+include ${DNA_model_dir}/run_subroutines/subroutine.BD_fixes
+include /home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model//run_subroutines/subroutine.BD_fixes
+######################################
+# fix commands for Brownian dynamics #
+######################################
+
+# BD fix for DNA
+fix dnaBD DNA brownian/asphere/omp ${T} ${rng_seed} gamma_r_eigen ${gamma_r_mono} ${gamma_r_mono} ${gamma_r_mono} gamma_t_eigen ${gamma_t_mono} ${gamma_t_mono} ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 ${rng_seed} gamma_r_eigen ${gamma_r_mono} ${gamma_r_mono} ${gamma_r_mono} gamma_t_eigen ${gamma_t_mono} ${gamma_t_mono} ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 10 gamma_r_eigen ${gamma_r_mono} ${gamma_r_mono} ${gamma_r_mono} gamma_t_eigen ${gamma_t_mono} ${gamma_t_mono} ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 10 gamma_r_eigen 8696990.12239152 ${gamma_r_mono} ${gamma_r_mono} gamma_t_eigen ${gamma_t_mono} ${gamma_t_mono} ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 10 gamma_r_eigen 8696990.12239152 8696990.12239152 ${gamma_r_mono} gamma_t_eigen ${gamma_t_mono} ${gamma_t_mono} ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 10 gamma_r_eigen 8696990.12239152 8696990.12239152 8696990.12239152 gamma_t_eigen ${gamma_t_mono} ${gamma_t_mono} ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 10 gamma_r_eigen 8696990.12239152 8696990.12239152 8696990.12239152 gamma_t_eigen 22570.0435702202 ${gamma_t_mono} ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 10 gamma_r_eigen 8696990.12239152 8696990.12239152 8696990.12239152 gamma_t_eigen 22570.0435702202 22570.0435702202 ${gamma_t_mono}
+fix dnaBD DNA brownian/asphere/omp 310 10 gamma_r_eigen 8696990.12239152 8696990.12239152 8696990.12239152 gamma_t_eigen 22570.0435702202 22570.0435702202 22570.0435702202
+
+# BD fix for ribosomes
+fix ribosBD ribos brownian/asphere/omp ${T} ${rng_seed} gamma_r_eigen ${gamma_r_ribo} ${gamma_r_ribo} ${gamma_r_ribo} gamma_t_eigen ${gamma_t_ribo} ${gamma_t_ribo} ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 ${rng_seed} gamma_r_eigen ${gamma_r_ribo} ${gamma_r_ribo} ${gamma_r_ribo} gamma_t_eigen ${gamma_t_ribo} ${gamma_t_ribo} ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 10 gamma_r_eigen ${gamma_r_ribo} ${gamma_r_ribo} ${gamma_r_ribo} gamma_t_eigen ${gamma_t_ribo} ${gamma_t_ribo} ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 10 gamma_r_eigen 1770199495.70355 ${gamma_r_ribo} ${gamma_r_ribo} gamma_t_eigen ${gamma_t_ribo} ${gamma_t_ribo} ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 10 gamma_r_eigen 1770199495.70355 1770199495.70355 ${gamma_r_ribo} gamma_t_eigen ${gamma_t_ribo} ${gamma_t_ribo} ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 10 gamma_r_eigen 1770199495.70355 1770199495.70355 1770199495.70355 gamma_t_eigen ${gamma_t_ribo} ${gamma_t_ribo} ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 10 gamma_r_eigen 1770199495.70355 1770199495.70355 1770199495.70355 gamma_t_eigen 132764.962177766 ${gamma_t_ribo} ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 10 gamma_r_eigen 1770199495.70355 1770199495.70355 1770199495.70355 gamma_t_eigen 132764.962177766 132764.962177766 ${gamma_t_ribo}
+fix ribosBD ribos brownian/asphere/omp 310 10 gamma_r_eigen 1770199495.70355 1770199495.70355 1770199495.70355 gamma_t_eigen 132764.962177766 132764.962177766 132764.962177766
+run 50000
+Generated 0 of 28 mixed pair_coeff terms from geometric mixing rule
+Last active /omp style is angle_style harmonic/omp
+Per MPI rank memory allocation (min/avg/max) = 20.22 | 20.22 | 20.22 Mbytes
+   Step         E_pair         E_bond        E_angle      c_dnaMSD[4]   c_ribosMSD[4] 
+     50000   22.138299      178173.36      13062.556      0              0            
+     51000   49.32435       179626.13      13798.19       4.3284623      0            
+     52000   53.173396      179767.46      14238.175      7.5992239      0            
+     53000   47.699041      179711.44      14541.44       10.458563      0            
+     54000   41.535062      179741.03      14630.497      13.169613      0            
+     55000   51.857384      179694.5       14801.076      15.711249      0            
+     56000   47.885475      179751.55      14825.74       18.238245      0            
+     57000   55.685467      179684.77      14878.832      20.264717      0            
+     58000   47.577705      179763.25      14979.129      22.536047      0            
+     59000   53.313645      179754.47      15017.889      24.818162      0            
+     60000   52.99927       179769.21      15111.614      26.797949      0            
+     61000   43.558649      179735.77      15075.035      28.634726      0            
+     62000   41.799158      179737.71      15063.985      31.124747      0            
+     63000   46.948036      179700.41      15091.207      33.284445      0            
+     64000   48.532241      179702.15      15083.204      35.704259      0            
+     65000   56.682566      179717.89      15080.142      37.768916      0            
+     66000   58.711718      179704.53      15033.557      39.591042      0            
+     67000   56.01229       179781.06      14992.139      41.537714      0            
+     68000   50.996448      179676.34      14989.913      43.243328      0            
+     69000   44.381839      179754.28      15061.708      45.558156      0            
+     70000   45.959965      179701.39      15043.587      47.699743      0            
+     71000   39.976264      179689.26      15026.913      49.66697       0            
+     72000   46.558723      179633.35      14960.051      51.750199      0            
+     73000   45.194046      179733.47      14881.791      53.82033       0            
+     74000   40.146375      179751.04      14856.475      55.265789      0            
+     75000   43.233093      179719.29      14907.399      56.65172       0            
+     76000   49.636305      179719.43      14835.867      58.775536      0            
+     77000   45.256584      179718.28      14814.696      60.862282      0            
+     78000   43.840664      179802.55      14794.926      62.537142      0            
+     79000   52.842171      179712.65      14758.567      64.359134      0            
+     80000   37.260663      179702.31      14735.427      66.038313      0            
+     81000   38.396297      179728.09      14725.612      67.744129      0            
+     82000   39.909435      179686.88      14709.109      69.707354      0            
+     83000   44.12678       179686.05      14757.573      71.759904      0            
+     84000   47.446767      179702.89      14803.215      73.567847      0            
+     85000   46.418419      179714.84      14773.943      75.028684      0            
+     86000   52.967537      179780.01      14768.522      76.986458      0            
+     87000   48.260622      179745.79      14707.144      78.50485       0            
+     88000   41.50532       179713.32      14735.709      80.088311      0            
+     89000   44.8198        179711.52      14619.557      81.585361      0            
+     90000   49.351321      179730.71      14633.73       83.795628      0            
+     91000   47.870259      179700.02      14613.585      86.278031      0            
+     92000   39.686393      179771.88      14597.832      88.314027      0            
+     93000   40.052235      179734.14      14584.964      89.965522      0            
+     94000   49.377428      179704.79      14562.12       92.03731       0            
+     95000   41.151128      179705.85      14597.818      93.304239      0            
+     96000   50.046315      179730.97      14610.575      95.171369      0            
+     97000   47.311792      179734.38      14578.176      96.809159      0            
+     98000   45.705216      179668.26      14526.619      98.358715      0            
+     99000   42.755637      179763.19      14482.385      100.75736      0            
+    100000   33.744962      179749.72      14503.66       102.58182      0            
+Loop time of 32.7512 on 8 procs for 50000 steps with 15242 atoms
+
+Performance: 13190338.936 ns/day, 0.000 hours/ns, 1526.660 timesteps/s, 23.269 Matom-step/s
+790.3% CPU use with 1 MPI tasks x 8 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 3.6043     | 3.6043     | 3.6043     |   0.0 | 11.01
+Bond    | 9.4533     | 9.4533     | 9.4533     |   0.0 | 28.86
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.0094697  | 0.0094697  | 0.0094697  |   0.0 |  0.03
+Output  | 0.42208    | 0.42208    | 0.42208    |   0.0 |  1.29
+Modify  | 17.219     | 17.219     | 17.219     |   0.0 | 52.58
+Other   |            | 2.043      |            |       |  6.24
+
+Nlocal:          15242 ave       15242 max       15242 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:              0 ave           0 max           0 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:          68793 ave       68793 max       68793 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 68793
+Ave neighs/atom = 4.5133841
+Ave special neighs/atom = 0.65608188
+Neighbor list builds = 0
+Dangerous builds = 0
+Total wall time: 0:01:25

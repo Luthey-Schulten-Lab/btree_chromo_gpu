@@ -6,14 +6,14 @@
 
 # NOTE 1: comment the ``terminate'' at the top to execute all of the commands
 
-# NOTE 2: change all directories in this file from ``/home/ben/Workspace/'' to the local repository location
+# NOTE 2: change all directories in this file from ``/home/andrew/Desktop/Projects/'' to the local repository location
 
 ######################
 ######################
 ######################
 
 
-terminate
+#terminate
 
 
 #set the prng seed
@@ -25,21 +25,21 @@ new_chromo:5000
 
 
 #load the BD lengths
-load_BD_lengths:/home/ben/Workspace/btree_chromo/examples/preparing_physical_structure/BD_lengths.txt
+load_BD_lengths:/home/andrew/Desktop/Projects/btree_chromo/examples/preparing_physical_structure/BD_lengths.txt
 
 
 #load the monomer coordinates and orientations
-load_mono_coords:/home/ben/Workspace/btree_chromo/examples/preparing_physical_structure/x_mono_5000mono_50ribo_bdry900A.bin,row
-load_mono_quats:/home/ben/Workspace/btree_chromo/examples/preparing_physical_structure/q_mono_5000mono_50ribo_bdry900A.bin,row
+load_mono_coords:/home/andrew/Desktop/Projects/btree_chromo/examples/preparing_physical_structure/x_mono_5000mono_50ribo_bdry900A.bin,row
+load_mono_quats:/home/andrew/Desktop/Projects/btree_chromo/examples/preparing_physical_structure/q_mono_5000mono_50ribo_bdry900A.bin,row
 
 
 #load the ribosome coordinates and orientations
-load_ribo_coords:/home/ben/Workspace/btree_chromo/examples/preparing_physical_structure/x_ribo_5000mono_50ribo_bdry900A.bin,row
-load_ribo_quats:/home/ben/Workspace/btree_chromo/examples/preparing_physical_structure/q_ribo_5000mono_50ribo_bdry900A.bin,row
+load_ribo_coords:/home/andrew/Desktop/Projects/btree_chromo/examples/preparing_physical_structure/x_ribo_5000mono_50ribo_bdry900A.bin,row
+load_ribo_quats:/home/andrew/Desktop/Projects/btree_chromo/examples/preparing_physical_structure/q_ribo_5000mono_50ribo_bdry900A.bin,row
 
 
 #load the boundary coordinates
-load_bdry_coords:/home/ben/Workspace/btree_chromo/examples/preparing_physical_structure/x_bdry_5000mono_50ribo_bdry900A.bin,row
+load_bdry_coords:/home/andrew/Desktop/Projects/btree_chromo/examples/preparing_physical_structure/x_bdry_5000mono_50ribo_bdry900A.bin,row
 
 
 #alternatively, generate a spherical boundary with 900A radius centered at the origin
@@ -47,11 +47,11 @@ spherical_bdry:900.0,0.0,0.0,0.0
 
 
 #write a LAMMPS data file with the current system for subsequent simulations
-write_LAMMPS_data:/home/ben/Workspace/btree_chromo/examples/preparing_physical_structure/data.unreplicated
+write_LAMMPS_data:/home/andrew/Desktop/Projects/btree_chromo/examples/preparing_physical_structure/data.unreplicated
 
 
 #write a xyz file of the monomer coordinates for quick visualization
-write_mono_xyz:/home/ben/Workspace/btree_chromo/examples/preparing_physical_structure/mono_unreplicated.xyz
+write_mono_xyz:/home/andrew/Desktop/Projects/btree_chromo/examples/preparing_physical_structure/mono_unreplicated.xyz
 
 
 #set the initial state of the mapper
@@ -71,26 +71,26 @@ map_replication
 
 
 #write the now replicate state of the chromosome
-output_state:/home/ben/Workspace/btree_chromo/examples/preparing_physical_structure/replicated_chromo.dat
+output_state:/home/andrew/Desktop/Projects/btree_chromo/examples/preparing_physical_structure/replicated_chromo.dat
 
 
 #write a LAMMPS data file with the current system for subsequent simulations
-write_LAMMPS_data:/home/ben/Workspace/btree_chromo/examples/preparing_physical_structure/data.replicated
+write_LAMMPS_data:/home/andrew/Desktop/Projects/btree_chromo/examples/preparing_physical_structure/data.replicated
 
 
 #write a xyz file of the monomer coordinates for quick visualization
-write_mono_xyz:/home/ben/Workspace/btree_chromo/examples/preparing_physical_structure/mono_replicated.xyz
+write_mono_xyz:/home/andrew/Desktop/Projects/btree_chromo/examples/preparing_physical_structure/mono_replicated.xyz
 
 
 #write the monomer coordinates and orientations
-write_mono_coords:/home/ben/Workspace/btree_chromo/examples/preparing_physical_structure/x_mono_replicated.bin,row
-write_mono_quats:/home/ben/Workspace/btree_chromo/examples/preparing_physical_structure/q_mono_replicated.bin,row
+write_mono_coords:/home/andrew/Desktop/Projects/btree_chromo/examples/preparing_physical_structure/x_mono_replicated.bin,row
+write_mono_quats:/home/andrew/Desktop/Projects/btree_chromo/examples/preparing_physical_structure/q_mono_replicated.bin,row
 
 
 #write the ribosome coordinates and orientations
-write_ribo_coords:/home/ben/Workspace/btree_chromo/examples/preparing_physical_structure/x_ribo_replicated.bin,row
-write_ribo_quats:/home/ben/Workspace/btree_chromo/examples/preparing_physical_structure/q_ribo_replicated.bin,row
+write_ribo_coords:/home/andrew/Desktop/Projects/btree_chromo/examples/preparing_physical_structure/x_ribo_replicated.bin,row
+write_ribo_quats:/home/andrew/Desktop/Projects/btree_chromo/examples/preparing_physical_structure/q_ribo_replicated.bin,row
 
 
 #write the boundary coordinates
-write_bdry_coords:/home/ben/Workspace/btree_chromo/examples/preparing_physical_structure/x_bdry_replicated.bin,row
+write_bdry_coords:/home/andrew/Desktop/Projects/btree_chromo/examples/preparing_physical_structure/x_bdry_replicated.bin,row

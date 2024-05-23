@@ -147,7 +147,7 @@ def read_traj(filename,in_timesteps=None,slices=None):
                 traj[t]['DNA']['q'][offset_DNA_id[i],:] = \
                     temp_q[DNA_idx[i],:]
 
-            # get DNA orientations
+            # get DNA type
             traj[t]['DNA']['type'] = np.zeros((N_DNA),dtype=np.int32)
             for i in range(N_DNA):
                 traj[t]['DNA']['type'][offset_DNA_id[i]] = \

@@ -3,18 +3,11 @@
 ######################################
 
 # BD fix for DNA
-if "${ellipsoids}==1" then &
-   "fix dnaBD DNA brownian/asphere/omp ${T} ${rng_seed} &
-   gamma_r_eigen ${gamma_r_mono} ${gamma_r_mono} ${gamma_r_mono} &
-   gamma_t_eigen ${gamma_t_mono} ${gamma_t_mono} ${gamma_t_mono}" &
-else &
-   "fix dnaBD DNA brownian/omp ${T} ${rng_seed} gamma_t ${gamma_t_mono}"
-
+fix dnaBD DNA brownian/asphere/omp ${T} ${rng_seed} &
+gamma_r_eigen ${gamma_r_mono} ${gamma_r_mono} ${gamma_r_mono} &
+gamma_t_eigen ${gamma_t_mono} ${gamma_t_mono} ${gamma_t_mono}
 
 # BD fix for ribosomes
-if "${ellipsoids}==1" then &
-    "fix ribosBD ribos brownian/asphere/omp ${T} ${rng_seed} &
-    gamma_r_eigen ${gamma_r_ribo} ${gamma_r_ribo} ${gamma_r_ribo} &
-    gamma_t_eigen ${gamma_t_ribo} ${gamma_t_ribo} ${gamma_t_ribo}" &
-else &
-    "fix ribosBD ribos brownian/omp ${T} ${rng_seed} gamma_t ${gamma_t_ribo}"
+fix ribosBD ribos brownian/asphere/omp ${T} ${rng_seed} &
+gamma_r_eigen ${gamma_r_ribo} ${gamma_r_ribo} ${gamma_r_ribo} &
+gamma_t_eigen ${gamma_t_ribo} ${gamma_t_ribo} ${gamma_t_ribo}

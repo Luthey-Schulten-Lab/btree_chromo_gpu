@@ -395,6 +395,8 @@ void LAMMPS_sys::prepare_topology()
   // filter the twisting angles
   if (!(t_s.twisting_angle && r_s.ellipsoid))
     {
+
+      std::cout << "Filtering the twisting angles... " << std::endl;
       filter_angles(2);
       filter_angles(4);
     }
@@ -830,84 +832,104 @@ void LAMMPS_sys::apply_mono_mapping(std::vector<std::vector<std::array<int,3>>> 
 
 void LAMMPS_sys::apply_RMF()
 {
-    if (!r_s.ellipsoid)
-    {
-        std::vector<binding_region> regions = loop_topo.get_regions();
-        // loop over binding regions
-        for (binding_region b_r: regions) {
-            int N = b_r.get_size();
-            std::vector<std::vector<vec>> R(N, std::vector<vec>(3));
-            std::vector<vec> x, xm1, xm2, xp1, xp2, t;
-            vec v1, v2, pL, tL, p, s;
-            double c1, c2, t1, t2, dot;
-            for (int i = 0; i < N; i++) {
-                x.push_back(atoms.get_atom(b_r.get_mono_pos(i)).r);
-            }
+    // if (!r_s.ellipsoid)
+    std::cout << "Setting up the loop topology..." << std::endl;
+    prepare_loop_topo();
+    std::cout << "Calculating the RMF..." << std::endl;
+    // loop over binding regions
+    std::vector<binding_region> b_rs = loop_topo.get_regions();
+    size_t N_reg = b_rs.size();
 
-            for (int i = 0; i < N; i++) {
-                xm1[i] = x[(i - 1 + N) % N]; // don't need modulo operator; region index goes from 0 to N-1
-                xm2[i] = x[(i - 2 + N) %
-                           N]; // except when we have unreplicated. still shouldn't be a problem if you use function to get monomers some position away
-                xp1[i] = x[(i + 1 + N) % N];
-                xp2[i] = x[(i + 2 + N) % N];
-            }
+    for (size_t i_reg=0; i_reg<N_reg; i_reg++)
+    {
+        std::cout << "Getting size of binding region..." << std::endl;
+        int N = b_rs[i_reg].get_size();
+        std::vector<std::vector<vec>> R(N, std::vector<vec>(3));
+        std::vector<vec> x(N), xm1(N), xm2(N), xp1(N), xp2(N), t(N);
+        vec v1, v2, pL, tL, p, s;
+        double c1, c2, t1, t2, dot;
+
+        std::cout << "Creating array of monomer positions..." << std::endl;
+        for (int i = 0; i < N; i++)
+        {
+            x[i] = atoms.get_atom(b_rs[i_reg].get_mono_pos(i)).r;
+        }
+
+        std::cout << "Creating array of nearest and next nearest neighbors..." << std::endl;
+        for (int i = 0; i < N; i++)
+        {
+            xm1[i] = x[(i - 1 + N) % N]; // don't need modulo operator; region index goes from 0 to N-1
+            xm2[i] = x[(i - 2 + N) % N]; // except when we have unreplicated. still shouldn't be a problem if you use function to get monomers some position away
+            xp1[i] = x[(i + 1) % N];
+            xp2[i] = x[(i + 2) % N];
+            //xm1[i] = x[i - 1]; // out of bound access?? But it seems to work.
+            //xm2[i] = x[i - 2];
+            //xp1[i] = x[i + 1];
+            //xp2[i] = x[i + 2];
+            // std::cout << "xm1_x = " << xm1[i].x << std::endl;
 
             // above only works for circular. Need to do endpoint cases.
             // look for circular flag, to set up conditional (this is the only special case)
             // assume you have at least 10 monomers or something. We on average have steps of like 10s of monomers
             // If there's just a line, it will break
+        }
 
-            for (int i = 0; i < N; i++) {
-                t[i] = vqm.v_axpy(-1, vqm.v_axpy(-8.0, xp1[i], xp2[i]), vqm.v_axpy(-8.0, xm1[i], xm2[i]));
-                t[i] = vqm.v_norm(t[i]);
-            }
+        std::cout << "Calculating the tangent vectors..." << std::endl;
+        for (int i = 0; i < N; i++)
+        {
+            t[i] = vqm.v_axpy(-1, vqm.v_axpy(-8.0, xp1[i], xp2[i]), vqm.v_axpy(-8.0, xm1[i], xm2[i]));
+            t[i] = vqm.v_norm(t[i]);
+        }
 
-            for (int i = 0; i < N; i++) {
-                if (i == 0) { // Initialize the first orientation randomly
-                    dot = 1.0;
-                    while (dot > 0.95) {
-                        t1 = rand() * (2 * M_PI / RAND_MAX); // Random number between 0 and 2*pi
-                        t2 = rand() * (M_PI / RAND_MAX);     // Random number between 0 and pi
+        std::cout << "Calculating the p and s vectors..." << std::endl;
+        for (int i = 0; i < N; i++)
+        {
+            if (i == 0) { // Initialize the first orientation randomly
+                dot = 1.0;
+                while (dot > 0.95)
+                {
+                    t1 = rand() * (2 * M_PI / RAND_MAX); // Random number between 0 and 2*pi
+                    t2 = rand() * (M_PI / RAND_MAX);     // Random number between 0 and pi
 
-                        p.x = cos(t1) * sin(t2);
-                        p.y = sin(t1) * sin(t2);
-                        p.z = cos(t2);
+                    p.x = cos(t1) * sin(t2);
+                    p.y = sin(t1) * sin(t2);
+                    p.z = cos(t2);
 
-                        dot = vqm.v_dot(p, t[i]);
-                    }
-
-                    p = vqm.v_axpy(-1.0 * dot, t[i], p);
-                    p = vqm.v_norm(p);
-                } else {
-                    p = R[i - 1][0];
-                    v1 = vqm.v_axpy(-1.0, x[i], xp1[i]);
-                    c1 = vqm.v_dot(v1, v1);
-                    pL = vqm.v_axpy(-2.0 / c1 * vqm.v_dot(v1, p), v1, p);
-                    tL = vqm.v_axpy(-2.0 / c1 * vqm.v_dot(v1, t[i - 1]), v1, t[i - 1]);
-                    v2 = vqm.v_axpy(-1.0, tL, t[i]);
-                    c2 = vqm.v_dot(v2, v2);
-                    p = vqm.v_axpy(-2.0 / c2 * vqm.v_dot(v2, pL), v2, pL);
+                    dot = vqm.v_dot(p, t[i]);
                 }
 
-                s = vqm.v_cross(t[i], p);
-                s = vqm.v_norm(s);
-
-                R[i][0] = p;
-                R[i][1] = s;
-                R[i][2] = t[i];
-
-                // set orientation of DNA monomer
-                // could also use s, just can't use t
-                ellipsoids.set_quat(b_r.get_mono_pos(i), vqm.v_to_q(R[i][0]));
+                p = vqm.v_axpy(-1.0 * dot, t[i], p);
+                p = vqm.v_norm(p);
+            } else {
+                // p = R[i - 1][0];
+                p = R[(i - 1 + N) % N][0]; // didn't fix it...
+                v1 = vqm.v_axpy(-1.0, x[i], xp1[i]);
+                c1 = vqm.v_dot(v1, v1);
+                pL = vqm.v_axpy(-2.0 / c1 * vqm.v_dot(v1, p), v1, p);
+                tL = vqm.v_axpy(-2.0 / c1 * vqm.v_dot(v1, t[i - 1]), v1, t[i - 1]);
+                v2 = vqm.v_axpy(-1.0, tL, t[i]);
+                c2 = vqm.v_dot(v2, v2);
+                p = vqm.v_axpy(-2.0 / c2 * vqm.v_dot(v2, pL), v2, pL);
             }
+
+            s = vqm.v_cross(t[i], p);
+            s = vqm.v_norm(s);
+
+            R[i][0] = p;
+            R[i][1] = s;
+            R[i][2] = t[i];
+
+            // set orientation of DNA monomer
+            int reg_pos = b_rs[i_reg].get_mono_pos(i);
+            mono_ellipsoids.set_quat(reg_pos, vqm.v_to_q(R[i][0]));
         }
     }
+    std::cout << "Done calculating RMF for all binding regions..." << std::endl;
 }
 
 // write the system to a data file
 void LAMMPS_sys::write_data(std::string data_filename)
 {
-
   // internal_btree.print_tree();
 
   // prepare_test_data();
@@ -915,7 +937,6 @@ void LAMMPS_sys::write_data(std::string data_filename)
 
   // finalize the system before printing
   finalize_system();
-
   
   // begin writing data file
   
@@ -970,6 +991,59 @@ void LAMMPS_sys::write_data(std::string data_filename)
 void LAMMPS_sys::write_mono_xyz(std::string data_filename)
 {
   mono_atoms.write_xyz(data_filename);
+}
+
+// write an xyz file with the orientation vector endpoints as atoms
+void LAMMPS_sys::write_mono_orientation_xyz(std::string data_filename)
+{
+    // std::cout << "Setting up the loop topology..." << std::endl;
+    prepare_loop_topo();
+
+    std::vector<binding_region> b_rs = loop_topo.get_regions();
+    size_t N_reg = b_rs.size();
+    int N = 0;
+
+    // create a first loop where you iterate over the binding regions and calculate the total size of p_atoms, N
+    for (size_t i_reg=0; i_reg<N_reg; i_reg++)
+    {
+        N += b_rs[i_reg].get_size();
+    }
+
+    // define p_atoms here and then set N
+    std::cout << "Making atom arrays for p, s and t..." << std::endl;
+    atom_array p_atoms;
+    p_atoms.set_N(N);
+
+    // create a second loop over the binding regions
+    //  within the loop over binding regions, then iterate over the atoms within that binding region
+    //      set the coordinates within p_atoms as you do that iteration
+    for (size_t i_reg=0; i_reg<N_reg; i_reg++)
+    {
+
+        std::cout << "Getting size of binding region..." << std::endl;
+        int M = b_rs[i_reg].get_size();
+
+        // Write the RMF vector endpoints to xyz files
+        // Here, we create monomers 3.4 nm away from origin of RMF (DNA monomer position) in directions of p, s, and t
+
+        // iterate over the monomers within the ith binding region
+        for (int i = 0; i < M; i++)
+        {
+            // std::cout << "Getting monomer coordinates..." << std::endl;
+            vec x = atoms.get_atom(b_rs[i_reg].get_mono_pos(i)).r;
+            // std::cout << "Getting orientations..." << std::endl;
+            vec p = vqm.q_to_v(mono_ellipsoids.get_ellipsoid(i).q);
+            // std::cout << "Calculating orientation atom coordinates..." << std::endl;
+            vec p_coord;
+            p_coord = vqm.v_axpy(BD_l.mono_shape.x, p, x);
+            // std::cout << "Setting orientation atom coordinates..." << std::endl;
+            p_atoms.set_coord(i, p_coord);
+        }
+
+    }
+
+    std::cout << "Writing orientation atom coordinates..." << std::endl;
+    p_atoms.write_xyz(data_filename);
 }
 
 
@@ -1115,40 +1189,45 @@ void LAMMPS_sys::sync_subarrays()
 }
 
 
+void LAMMPS_sys::prepare_loop_topo()
+{
+    std::vector<std::string> leaves = internal_btree.get_leaves();
+    std::vector<theta_topo> leaf_topos;
+
+    for (std::string leaf : leaves)
+    {
+        leaf_topos.push_back(internal_btree.get_leaf_topo(leaf));
+    }
+
+    int *t, N;
+
+    N = get_N_mono();
+    t = new int[N];
+
+    for (int i=0; i<N; i++)
+    {
+        t[i] = mono_atoms.get_atom(i).type;
+    }
+
+    // prepare the possible binding regions
+    loop_topo.prepare_binding_regions(leaves,leaf_topos,t);
+
+    // std::vector<binding_region> regions = loop_topo.get_regions();
+
+    // std::cout << "BINDING REGIONS" << std::endl;
+    // for (binding_region b_r : regions)
+    //   {
+    //     std::cout << b_r.get_leaf() << " " << b_r.get_size() << std::endl;
+    //   }
+
+    delete[] t;
+}
+
 // initialize the loop topology
 void LAMMPS_sys::initialize_loop_topo(int N_loops)
 {
 
-  std::vector<std::string> leaves = internal_btree.get_leaves();
-  std::vector<theta_topo> leaf_topos;
-
-  for (std::string leaf : leaves)
-    {
-      leaf_topos.push_back(internal_btree.get_leaf_topo(leaf));
-    }
-
-  int *t, N;
-
-  N = get_N_mono();
-  t = new int[N];
-
-  for (int i=0; i<N; i++)
-    {
-      t[i] = mono_atoms.get_atom(i).type;
-    }
-
-  // prepare the possible binding regions
-  loop_topo.prepare_binding_regions(leaves,leaf_topos,t);
-
-  // std::vector<binding_region> regions = loop_topo.get_regions();
-
-  // std::cout << "BINDING REGIONS" << std::endl;
-  // for (binding_region b_r : regions)
-  //   {
-  //     std::cout << b_r.get_leaf() << " " << b_r.get_size() << std::endl;
-  //   }
-
-  delete[] t;
+  prepare_loop_topo();
   
   loop_topo.initialize_loops(N_loops,l_sys_p.min_dist);
 }

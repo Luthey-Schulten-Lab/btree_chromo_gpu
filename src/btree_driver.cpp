@@ -1381,6 +1381,17 @@ void btree_driver::prepare_command_requirements()
   t_ls.clear();
   lock_updates["spherical_bdry"] = t_ls;
 
+
+  // apply_RMF
+  // number of required parameters
+  N_param_reqs["apply_RMF"] = 0;
+  // lock tests
+  t_ls.clear();
+  lock_tests["apply_RMF"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["apply_RMF"] = t_ls;
+
   // switch_bonds
   // number of required parameters
   N_param_reqs["switch_bonds"] = 1;
@@ -1431,6 +1442,18 @@ void btree_driver::prepare_command_requirements()
   // lock updates
   t_ls.clear();
   lock_updates["write_mono_xyz"] = t_ls;
+
+  // write_mono_orientation_xyz
+  // number of required parameters
+  N_param_reqs["write_mono_orientation_xyz"] = 1;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("btree_initialized",true));
+  t_ls.push_back(new_lock("BD_lengths_present",true));
+  lock_tests["write_mono_orientation_xyz"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["write_mono_orientation_xyz"] = t_ls;
 
   
   /////////////////////////////////
@@ -2403,8 +2426,15 @@ int btree_driver::execute_single_command(std::string &command,
       error_code = load_BD_lengths(params);
     }
 
+  // apply rotation minimizing frame
+  else if (command == "apply_RMF")
+  {
+      error_code = apply_RMF();
+  }
 
-  // switch bonds on/off
+
+
+      // switch bonds on/off
   else if (command == "switch_bonds")
     {
       error_code = switch_bonds(params);
@@ -2465,6 +2495,12 @@ int btree_driver::execute_single_command(std::string &command,
     {
       error_code = write_mono_xyz(params);
     }
+
+  // write the LAMMPS system data
+  else if (command == "write_mono_orientation_xyz")
+  {
+      error_code = write_mono_orientation_xyz(params);
+  }
 
       
   ////////////////////////
@@ -3539,11 +3575,13 @@ int btree_driver::switch_ellipsoids(std::vector<std::string> &params)
 {
     if (params[0] == "T")
     {
+        std::cout << "Switching the ellipsoids on..." << std::endl;
         driver_lmp_sys.switch_ellipsoids(true);
         driver_lmp_simulator.switch_ellipsoids(true);
     }
     else if (params[0] == "F")
     {
+        std::cout << "Switching the ellipsoids off..." << std::endl;
         driver_lmp_sys.switch_ellipsoids(false);
         driver_lmp_simulator.switch_ellipsoids(false);
     }
@@ -3621,6 +3659,12 @@ int btree_driver::write_mono_xyz(std::vector<std::string> &params)
   return 0;
 }
 
+int btree_driver::write_mono_orientation_xyz(std::vector<std::string> &params)
+{
+    driver_lmp_sys.write_mono_orientation_xyz(params[0]);
+    return 0;
+}
+
 
 int btree_driver::set_initial_state()
 {
@@ -3663,10 +3707,16 @@ int btree_driver::sync_simulator_and_system()
 {
   driver_lmp_sys.set_btree(driver_bt.get_state());
   driver_lmp_simulator.sim_to_sys();
-  driver_lmp_sys.apply_RMF();
+  //driver_lmp_sys.apply_RMF();
+  //std::cout << "Done applying the RMF..." << std::endl;
   return 0;
 }
 
+int btree_driver::apply_RMF()
+{
+    driver_lmp_sys.apply_RMF();
+    return 0;
+}
 
 int btree_driver::clear_simulator()
 {

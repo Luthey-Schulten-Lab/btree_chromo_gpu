@@ -14,15 +14,16 @@ import sys
 import mechanical_calculations.initial_persistence_length_plotting as i_Lp
 importlib.reload(i_Lp)
 
-in_dir = '/home/ben/Data/sc_chains/lp_testing/'
-in_label = 'x_chain_lp_test_alt'
+in_dir = '/home/andrew/Data/btree_chromo/hamiltonian_testing/'
+in_label = 'hamiltonian_bond_bending_then_twisting_sequence_RMF'
 
 MC_steps = [0,1000,10000,50000,100000,250000,500000,1000000]
+MC_steps = [0, 1]
 MC_steps = np.array(MC_steps,dtype=np.int32)
 N_MC = MC_steps.shape[0]
 
 min_rep = 1
-max_rep = 20
+max_rep = 1
 N_reps = max_rep - min_rep + 1
 
 s_min = 0
@@ -30,8 +31,9 @@ s_max = 25
 Lp_true = 450.0
 l_0 = 34.0
 
-out_dir = '/home/ben/Documents/svn/Minimal_Cell_Chromosome_Organization_2022/tex_figures/sc_chain_Lp/raw_plots/'
-out_label = 'Lp_MC_normal_alt'
+out_dir = '/home/andrew/Documents/Minimization_Mystery/tex_figures/DNA_mechanical_properties/raw_plots/'
+#out_label = 'persistence_lengths'
+out_label = in_label
 
 if not os.path.isdir(out_dir):
     os.makedirs(out_dir)
@@ -51,14 +53,14 @@ if write_corr_flag == True:
                                                       Lp_true,l_0)
     for i_MC in range(N_MC):
 
-        MC_label = '_' + str(MC_steps[i_MC]) + 'MC'
+        MC_label = '_' + str(MC_steps[i_MC]) #+ 'MC'
 
         rep_count = 0
 
         for rep in range(min_rep,max_rep+1):
 
             rep_label = '_rep' + str(rep).zfill(5)
-
+            rep_label = '_coords'
             in_file = in_dir + in_label + MC_label + rep_label + '.bin'
 
             print(in_file)
