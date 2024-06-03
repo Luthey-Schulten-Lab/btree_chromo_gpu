@@ -1381,6 +1381,17 @@ void btree_driver::prepare_command_requirements()
   t_ls.clear();
   lock_updates["spherical_bdry"] = t_ls;
 
+  // cylindrical_bdry
+  // number of required parameters
+  N_param_reqs["cylindrical_bdry"] = 4;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("BD_lengths_present",true));
+  lock_tests["cylindrical_bdry"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["cylindrical_bdry"] = t_ls;
+
 
   // apply_RMF
   // number of required parameters
@@ -2413,11 +2424,17 @@ int btree_driver::execute_single_command(std::string &command,
     }
 
 
-  // write file containing the boundary coordinates
+  // write file containing the spherical boundary coordinates
   else if (command == "spherical_bdry")
     {
       error_code = spherical_bdry(params);
     }
+
+  // write file containing the cylindrical boundary coordinates
+  else if (command == "cylindrical_bdry")
+  {
+      error_code = cylindrical_bdry(params);
+  }
 
 
   // load file containing length-scales for BD simulations
@@ -3511,6 +3528,16 @@ int btree_driver::spherical_bdry(std::vector<std::string> &params)
 					 stod(params[2]),
 					 stod(params[3]));
   return 0;
+}
+
+
+int btree_driver::cylindrical_bdry(std::vector<std::string> &params)
+{
+    driver_lmp_sys.generate_cylindrical_bdry(stod(params[0]),
+                                           stod(params[1]),
+                                           stod(params[2]),
+                                           stod(params[3]));
+    return 0;
 }
 
 

@@ -38,6 +38,7 @@ binding_region::~binding_region()
   reg_idx.clear();
 }
 
+
 // copy constructor
 binding_region::binding_region(const binding_region& other)
         : leaf(other.leaf), ll(other.ll), ul(other.ul), size(other.size),

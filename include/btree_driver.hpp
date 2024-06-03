@@ -167,6 +167,7 @@ private:
   int write_bdry_coords(std::vector<std::string> &params);
   // manual boundary specification
   int spherical_bdry(std::vector<std::string> &params);
+  int cylindrical_bdry(std::vector<std::string> &params);
   // loading BD lengths
   int load_BD_lengths(std::vector<std::string> &params);
   // apply rotation minimizing frame

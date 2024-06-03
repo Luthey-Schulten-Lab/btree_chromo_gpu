@@ -34,6 +34,7 @@ public:
 
   // surface preparation
   void generate_sphere(double R, double r);
+  void generate_cylinder(double R, double r);
   
   // surface-wide operations
   void project_to_sphere();

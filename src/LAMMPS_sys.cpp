@@ -446,6 +446,28 @@ void LAMMPS_sys::generate_spherical_bdry(double r, double x0, double y0, double 
   bdry_atoms.set_coords(bdry_coords);
 }
 
+void LAMMPS_sys::generate_cylindrical_bdry(double r, double x0, double y0, double z0)
+{
+    // generate a spherical boundary from an interpolated set of triangulated mesh
+    b_surf.generate_cylinder(r,BD_l.r_bdry);
+
+    // size the bdry_atoms
+    bdry_atoms.set_N(b_surf.get_N_verts());
+
+    std::vector<vec> bdry_coords = b_surf.get_coords();
+
+    vec r0 = vqm.v_new(x0,y0,z0);
+
+    // translate the boundary
+    for (size_t i=0; i<bdry_coords.size(); i++)
+    {
+        bdry_coords[i] = vqm.v_xpy(bdry_coords[i],r0);
+    }
+
+    // set the bdry_atoms to the coordinates
+    bdry_atoms.set_coords(bdry_coords);
+}
+
 
 // merge the system components
 void LAMMPS_sys::merge_system_components()
@@ -849,6 +871,12 @@ void LAMMPS_sys::apply_RMF()
         vec v1, v2, pL, tL, p, s;
         double c1, c2, t1, t2, dot;
 
+        std::cout << "Making atom arrays for p, s, and t..." << std::endl;
+        atom_array p_atoms, s_atoms, t_atoms;
+        p_atoms.set_N(N);
+        s_atoms.set_N(N);
+        t_atoms.set_N(N);
+
         std::cout << "Creating array of monomer positions..." << std::endl;
         for (int i = 0; i < N; i++)
         {
@@ -903,13 +931,14 @@ void LAMMPS_sys::apply_RMF()
             } else {
                 // p = R[i - 1][0];
                 p = R[(i - 1 + N) % N][0]; // didn't fix it...
-                v1 = vqm.v_axpy(-1.0, x[i], xp1[i]);
+                v1 = vqm.v_axpy(-1.0, xm1[i], x[i]); // instead of x and xp1
                 c1 = vqm.v_dot(v1, v1);
                 pL = vqm.v_axpy(-2.0 / c1 * vqm.v_dot(v1, p), v1, p);
                 tL = vqm.v_axpy(-2.0 / c1 * vqm.v_dot(v1, t[i - 1]), v1, t[i - 1]);
                 v2 = vqm.v_axpy(-1.0, tL, t[i]);
                 c2 = vqm.v_dot(v2, v2);
                 p = vqm.v_axpy(-2.0 / c2 * vqm.v_dot(v2, pL), v2, pL);
+                p = vqm.v_norm(p);
             }
 
             s = vqm.v_cross(t[i], p);
@@ -921,8 +950,24 @@ void LAMMPS_sys::apply_RMF()
 
             // set orientation of DNA monomer
             int reg_pos = b_rs[i_reg].get_mono_pos(i);
-            mono_ellipsoids.set_quat(reg_pos, vqm.v_to_q(R[i][0]));
+            mono_ellipsoids.set_quat(reg_pos, vqm.v_to_q(R[i][1])); // use s or p
+
+            vec s2 = vqm.q_to_v(mono_ellipsoids.get_ellipsoid(i).q);
+            s2 = vqm.v_norm(s2); // normalize!
+
+            vec p_coord, s_coord, t_coord;
+            p_coord = vqm.v_axpy(BD_l.mono_shape.x, p, x[i]);
+            s_coord = vqm.v_axpy(BD_l.mono_shape.x, s2, x[i]);
+            t_coord = vqm.v_axpy(BD_l.mono_shape.x, t[i], x[i]);
+            // std::cout << "Setting orientation atom coordinates..." << std::endl;
+            p_atoms.set_coord(i, p_coord);
+            s_atoms.set_coord(i, s_coord);
+            t_atoms.set_coord(i, t_coord);
         }
+        std::cout << "Writing p, s, and t atom coordinates..." << std::endl;
+        p_atoms.write_xyz("/home/andrew/Data/btree_chromo/p.xyz");
+        s_atoms.write_xyz("/home/andrew/Data/btree_chromo/s.xyz");
+        t_atoms.write_xyz("/home/andrew/Data/btree_chromo/t.xyz");
     }
     std::cout << "Done calculating RMF for all binding regions..." << std::endl;
 }
@@ -1010,7 +1055,7 @@ void LAMMPS_sys::write_mono_orientation_xyz(std::string data_filename)
     }
 
     // define p_atoms here and then set N
-    std::cout << "Making atom arrays for p, s and t..." << std::endl;
+    std::cout << "Making atom arrays for p..." << std::endl;
     atom_array p_atoms;
     p_atoms.set_N(N);
 
@@ -1033,6 +1078,7 @@ void LAMMPS_sys::write_mono_orientation_xyz(std::string data_filename)
             vec x = atoms.get_atom(b_rs[i_reg].get_mono_pos(i)).r;
             // std::cout << "Getting orientations..." << std::endl;
             vec p = vqm.q_to_v(mono_ellipsoids.get_ellipsoid(i).q);
+            p = vqm.v_norm(p); // normalize!
             // std::cout << "Calculating orientation atom coordinates..." << std::endl;
             vec p_coord;
             p_coord = vqm.v_axpy(BD_l.mono_shape.x, p, x);
