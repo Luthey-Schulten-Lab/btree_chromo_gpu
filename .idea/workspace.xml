@@ -20,35 +20,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="31e3448d-81be-4e67-ac75-8c3395c3774f" name="Changes" comment="Made omp version of fix brownian">
-      <change afterPath="$PROJECT_DIR$/build/apps/t.xyz" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/apps/btree_chromo" beforeDir="false" afterPath="$PROJECT_DIR$/build/apps/btree_chromo" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/apps/log.test" beforeDir="false" afterPath="$PROJECT_DIR$/build/apps/log.test" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/LAMMPS_simulator.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/LAMMPS_simulator.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/LAMMPS_sys.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/LAMMPS_sys.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/angle_array.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/angle_array.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/atom_array.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/atom_array.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/binding_region.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/binding_region.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/bond_array.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/bond_array.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/boundary_surface.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/boundary_surface.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/btree.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/btree.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/btree_chromo.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/btree_chromo.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/btree_driver.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/btree_driver.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/ellipsoid_array.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/ellipsoid_array.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/gillespie_solver.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/gillespie_solver.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/intra_step_distribution.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/intra_step_distribution.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/loop.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/loop.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/loop_topology.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/loop_topology.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/mapper.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/mapper.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/replication_model.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/replication_model.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/replicator.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/replicator.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/rxn_manipulator.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/rxn_manipulator.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/vec_quat_manipulator.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/vec_quat_manipulator.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/simulating_chromosome_with_replication/data.example" beforeDir="false" afterPath="$PROJECT_DIR$/examples/simulating_chromosome_with_replication/data.example" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include/LAMMPS_sys.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/LAMMPS_sys.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include/boundary_surface.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/boundary_surface.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include/btree_driver.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/btree_driver.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/LAMMPS_sys.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/LAMMPS_sys.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/binding_region.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/binding_region.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/boundary_surface.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/boundary_surface.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/btree_driver.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/btree_driver.cpp" afterDir="false" />
     </list>
@@ -204,7 +182,7 @@
       <workItem from="1715784281054" duration="117000" />
       <workItem from="1715784409288" duration="94000" />
       <workItem from="1715784512793" duration="184000" />
-      <workItem from="1715784698296" duration="85005000" />
+      <workItem from="1715784698296" duration="91090000" />
     </task>
     <task id="LOCAL-00001" summary="Made omp version of fix brownian">
       <option name="closed" value="true" />

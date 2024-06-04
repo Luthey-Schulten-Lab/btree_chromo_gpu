@@ -446,10 +446,32 @@ void LAMMPS_sys::generate_spherical_bdry(double r, double x0, double y0, double 
   bdry_atoms.set_coords(bdry_coords);
 }
 
-void LAMMPS_sys::generate_cylindrical_bdry(double r, double x0, double y0, double z0)
+void LAMMPS_sys::generate_cylindrical_bdry(double l, double r, double x0, double y0, double z0)
 {
     // generate a spherical boundary from an interpolated set of triangulated mesh
-    b_surf.generate_cylinder(r,BD_l.r_bdry);
+    b_surf.generate_cylinder(l, r,BD_l.r_bdry);
+
+    // size the bdry_atoms
+    bdry_atoms.set_N(b_surf.get_N_verts());
+
+    std::vector<vec> bdry_coords = b_surf.get_coords();
+
+    vec r0 = vqm.v_new(x0,y0,z0);
+
+    // translate the boundary
+    for (size_t i=0; i<bdry_coords.size(); i++)
+    {
+        bdry_coords[i] = vqm.v_xpy(bdry_coords[i],r0);
+    }
+
+    // set the bdry_atoms to the coordinates
+    bdry_atoms.set_coords(bdry_coords);
+}
+
+void LAMMPS_sys::generate_spherocylindrical_bdry(double l, double r, double x0, double y0, double z0)
+{
+    // generate a spherical boundary from an interpolated set of triangulated mesh
+    b_surf.generate_spherocylinder(l, r,BD_l.r_bdry);
 
     // size the bdry_atoms
     bdry_atoms.set_N(b_surf.get_N_verts());

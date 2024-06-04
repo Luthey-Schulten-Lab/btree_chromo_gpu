@@ -67,7 +67,8 @@ public:
 
   // generate a spherical boundary
   void generate_spherical_bdry(double r, double x0, double y0, double z0);
-  void generate_cylindrical_bdry(double r, double x0, double y0, double z0);
+  void generate_cylindrical_bdry(double l, double r, double x0, double y0, double z0);
+  void generate_spherocylindrical_bdry(double l, double r, double x0, double y0, double z0);
 
   // read the monomer coordinates and quaternions
   int read_mono_coords(std::string coords_filename, std::string order);
