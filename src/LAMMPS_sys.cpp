@@ -908,26 +908,58 @@ void LAMMPS_sys::apply_RMF()
         std::cout << "Creating array of nearest and next nearest neighbors..." << std::endl;
         for (int i = 0; i < N; i++)
         {
-            xm1[i] = x[(i - 1 + N) % N]; // don't need modulo operator; region index goes from 0 to N-1
-            xm2[i] = x[(i - 2 + N) % N]; // except when we have unreplicated. still shouldn't be a problem if you use function to get monomers some position away
-            xp1[i] = x[(i + 1) % N];
-            xp2[i] = x[(i + 2) % N];
-            //xm1[i] = x[i - 1]; // out of bound access?? But it seems to work.
-            //xm2[i] = x[i - 2];
-            //xp1[i] = x[i + 1];
-            //xp2[i] = x[i + 2];
-            // std::cout << "xm1_x = " << xm1[i].x << std::endl;
-
-            // above only works for circular. Need to do endpoint cases.
-            // look for circular flag, to set up conditional (this is the only special case)
-            // assume you have at least 10 monomers or something. We on average have steps of like 10s of monomers
-            // If there's just a line, it will break
+            // special case: circular chromosome
+            if (b_rs[i_reg].get_completed()) {
+                xm1[i] = x[(i - 1 + N) % N];
+                xm2[i] = x[(i - 2 + N) % N];
+                xp1[i] = x[(i + 1) % N];
+                xp2[i] = x[(i + 2) % N];
+            }
+            else {
+                // special case: start of region
+                if (i == 0 || i == 1 || i == N-2 || i == N-1) {
+                    xm1[i] = vqm.v_null(); // Won't be needing these.
+                    xm2[i] = vqm.v_null();
+                    xp1[i] = vqm.v_null();
+                    xp2[i] = vqm.v_null();
+                }
+                else {
+                    xm1[i] = x[i - 1];
+                    xm2[i] = x[i - 2];
+                    xp1[i] = x[i + 1];
+                    xp2[i] = x[i + 2];
+                }
+            }
         }
 
         std::cout << "Calculating the tangent vectors..." << std::endl;
         for (int i = 0; i < N; i++)
         {
-            t[i] = vqm.v_axpy(-1, vqm.v_axpy(-8.0, xp1[i], xp2[i]), vqm.v_axpy(-8.0, xm1[i], xm2[i]));
+            // special case: circular chromosome
+            if (b_rs[i_reg].get_completed()) {
+                t[i] = vqm.v_axpy(-1, vqm.v_axpy(-8.0, xp1[i], xp2[i]), vqm.v_axpy(-8.0, xm1[i], xm2[i]));
+            }
+            else {
+                // special case: start of region
+                if (i == 0) {
+                    t[i] = vqm.v_axpy(-25, x[0], vqm.v_axpy(48, x[1], vqm.v_axpy(-36, x[2], vqm.v_axpy(16, x[3], vqm.v_ax(-3, x[4])))));
+                }
+                // special case: neighbor of start of region
+                else if (i == 1) {
+                    t[i] = vqm.v_axpy(-3, x[0], vqm.v_axpy(-10, x[1], vqm.v_axpy(18, x[2], vqm.v_axpy(-6, x[3], vqm.v_ax(1, x[4])))));
+                }
+                // special case: neighbor of end of region
+                else if (i == N - 2) {
+                    t[i] = vqm.v_axpy(3, x[N-1], vqm.v_axpy(10, x[N-2], vqm.v_axpy(-18, x[N-3], vqm.v_axpy(6, x[N-4], vqm.v_ax(-1, x[N-5])))));
+                }
+                // special case: end of region
+                else if (i == N - 1) {
+                    t[i] = vqm.v_axpy(25, x[N-1], vqm.v_axpy(-48, x[N-2], vqm.v_axpy(36, x[N-3], vqm.v_axpy(-16, x[N-4], vqm.v_ax(3, x[N-5])))));
+                }
+                else {
+                    t[i] = vqm.v_axpy(-1, vqm.v_axpy(-8.0, xp1[i], xp2[i]), vqm.v_axpy(-8.0, xm1[i], xm2[i]));
+                }
+            }
             t[i] = vqm.v_norm(t[i]);
         }
 

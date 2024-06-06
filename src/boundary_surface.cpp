@@ -284,8 +284,8 @@ void boundary_surface::generate_cylinder(double L, double R, double r)
         for (int j = 0; j < N_ring; j++) {
             vec coord;
             coord.x = -L/2 + i * r;
-            coord.y = R * cos(2 * M_PI * j / N_ring);
-            coord.z = R * sin(2 * M_PI * j / N_ring);
+            coord.y = (R+r) * cos(2 * M_PI * j / N_ring);
+            coord.z = (R+r) * sin(2 * M_PI * j / N_ring);
             coords.push_back(coord);
         }
     }
@@ -295,13 +295,13 @@ void boundary_surface::generate_cylinder(double L, double R, double r)
 void boundary_surface::generate_spherocylinder(double L, double R, double r)
 {
     generate_sphere(R, r);
-    for (vec coord : coords)
+    for (size_t i = 0; i < coords.size(); i++)
     {
-        if (coord.x < 0) {
-            coord.x = coord.x - L/2;
+        if (coords[i].x < 0) {
+            coords[i].x = coords[i].x - L/2;
         }
         else {
-            coord.x = coord.x + L/2;
+            coords[i].x = coords[i].x + L/2;
         }
     }
     generate_cylinder(L, R, r);

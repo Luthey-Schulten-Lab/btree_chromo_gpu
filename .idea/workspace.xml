@@ -21,12 +21,16 @@
   <component name="ChangeListManager">
     <list default="true" id="31e3448d-81be-4e67-ac75-8c3395c3774f" name="Changes" comment="Made omp version of fix brownian">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/apps/btree_chromo" beforeDir="false" afterPath="$PROJECT_DIR$/build/apps/btree_chromo" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/apps/log.test" beforeDir="false" afterPath="$PROJECT_DIR$/build/apps/log.test" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/LAMMPS_sys.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/LAMMPS_sys.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/boundary_surface.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/boundary_surface.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/btree_driver.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/btree_driver.o" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/examples/simulating_chromosome_with_replication/data.example" beforeDir="false" afterPath="$PROJECT_DIR$/examples/simulating_chromosome_with_replication/data.example" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/LAMMPS_sys.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/LAMMPS_sys.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/boundary_surface.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/boundary_surface.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/btree_driver.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/btree_driver.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/binding_region.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/binding_region.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/python/pythonProject/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/python/pythonProject/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/LAMMPS_sys.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/LAMMPS_sys.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/binding_region.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/binding_region.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/boundary_surface.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/boundary_surface.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/btree_driver.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/btree_driver.cpp" afterDir="false" />
     </list>
@@ -182,7 +186,7 @@
       <workItem from="1715784281054" duration="117000" />
       <workItem from="1715784409288" duration="94000" />
       <workItem from="1715784512793" duration="184000" />
-      <workItem from="1715784698296" duration="91090000" />
+      <workItem from="1715784698296" duration="97306000" />
     </task>
     <task id="LOCAL-00001" summary="Made omp version of fix brownian">
       <option name="closed" value="true" />

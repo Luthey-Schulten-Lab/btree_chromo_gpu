@@ -46,6 +46,9 @@ public:
   std::vector<int> get_and_filter_intra_candidates(int ext_max, int h_mono_pos, int dir);
   std::vector<int> get_inter_candidates();
 
+  // is the region a closed circle?
+  bool get_completed();
+
   // add an unordered_map and an array of indices, then use these in all functions
   void prepare_idx();
   void print_region_map();

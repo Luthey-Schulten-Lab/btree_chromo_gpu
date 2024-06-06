@@ -2,74 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2421723f-2365-4efe-b943-0cbde5cfcc19" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/compute_subroutines/subroutine.compute_MSD" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/compute_subroutines/subroutine.compute_angleE" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/compute_subroutines/subroutine.compute_ids" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/compute_subroutines/subroutine.compute_quats" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/compute_subroutines/subroutine.compute_types" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/dump_subroutines/subroutine.MSD_logging" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/dump_subroutines/subroutine.MSD_thermo" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/dump_subroutines/subroutine.default_thermo" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/dump_subroutines/subroutine.dump_append_nofirst_lammpstrj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/dump_subroutines/subroutine.dump_noappend_first_lammpstrj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/dump_subroutines/subroutine.dump_noappend_nofirst_lammpstrj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/lmp.DNA_physical_params" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/minimize_subroutines/subroutine.min_hard_FENE" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/minimize_subroutines/subroutine.min_hard_harmonic" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/minimize_subroutines/subroutine.min_soft_FENE" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/minimize_subroutines/subroutine.min_soft_harmonic" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/minimize_subroutines/subroutine.min_topoDNA_FENE" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/minimize_subroutines/subroutine.min_topoDNA_harmonic" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/potentials/lmp.DNA_bend_twist_align_params" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/potentials/lmp.DNA_loops" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/potentials/lmp.DNA_pair_hard_omp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/potentials/lmp.DNA_pair_params" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/potentials/lmp.DNA_pair_soft_omp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/potentials/lmp.DNA_pair_topo_omp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/potentials/lmp.bdry_springs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/potentials/lmp.bdry_static" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/potentials/lmp.fork_partitioning" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/potentials/lmp.loop_bond" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/potentials/lmp.loop_bond_hybrid" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/potentials/lmp.ribo_springs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/potentials/lmp.twistable_DNA_model_FENE_omp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/potentials/lmp.twistable_DNA_model_harmonic_omp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/potentials/lmp.twistable_DNA_model_omp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/protocol_subroutines/subroutine.global_setup" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/protocol_subroutines/subroutine.neighbor_setup" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/run_subroutines/subroutine.BD_fixes" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/run_subroutines/subroutine.run_hard_FENE" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/run_subroutines/subroutine.run_hard_harmonic" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/run_subroutines/subroutine.run_soft_FENE" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/run_subroutines/subroutine.run_soft_harmonic" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/run_subroutines/subroutine.run_topoDNA_FENE" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/run_subroutines/subroutine.run_topoDNA_harmonic" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/subroutine.min_HarmonicSoft_HarmonicWCA" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model_ellipsoid_switch/subroutine.min_HarmonicSoft_HarmonicWCA_FENEWCA" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../.idea/shelf/Uncommitted_changes_before_Merge_at_4_22_24_1_24_PM_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../.idea/shelf/Uncommitted_changes_before_Merge_at_4_22_24_1_24_PM__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../../.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../LAMMPS_DNA_model/compute_subroutines/subroutine.compute_quats" beforeDir="false" afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model/compute_subroutines/subroutine.compute_quats" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../LAMMPS_DNA_model/dump_subroutines/subroutine.dump_append_nofirst_lammpstrj" beforeDir="false" afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model/dump_subroutines/subroutine.dump_append_nofirst_lammpstrj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../LAMMPS_DNA_model/dump_subroutines/subroutine.dump_noappend_first_lammpstrj" beforeDir="false" afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model/dump_subroutines/subroutine.dump_noappend_first_lammpstrj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../LAMMPS_DNA_model/dump_subroutines/subroutine.dump_noappend_nofirst_lammpstrj" beforeDir="false" afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model/dump_subroutines/subroutine.dump_noappend_nofirst_lammpstrj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../LAMMPS_DNA_model/potentials/lmp.DNA_bend_twist_align_params" beforeDir="false" afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model/potentials/lmp.DNA_bend_twist_align_params" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../LAMMPS_DNA_model/run_subroutines/subroutine.BD_fixes" beforeDir="false" afterPath="$PROJECT_DIR$/../../LAMMPS_DNA_model/run_subroutines/subroutine.BD_fixes" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../examples/preparing_chromosome/chromo_state_1.dat" beforeDir="false" afterPath="$PROJECT_DIR$/../../examples/preparing_chromosome/chromo_state_1.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../examples/preparing_chromosome/preparing_chromosome_directives.inp" beforeDir="false" afterPath="$PROJECT_DIR$/../../examples/preparing_chromosome/preparing_chromosome_directives.inp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../examples/preparing_chromosome/transforms.dat" beforeDir="false" afterPath="$PROJECT_DIR$/../../examples/preparing_chromosome/transforms.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../examples/preparing_physical_structure/data.replicated" beforeDir="false" afterPath="$PROJECT_DIR$/../../examples/preparing_physical_structure/data.replicated" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../examples/preparing_physical_structure/data.unreplicated" beforeDir="false" afterPath="$PROJECT_DIR$/../../examples/preparing_physical_structure/data.unreplicated" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../examples/preparing_physical_structure/preparing_physical_structure_directives.inp" beforeDir="false" afterPath="$PROJECT_DIR$/../../examples/preparing_physical_structure/preparing_physical_structure_directives.inp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../examples/preparing_physical_structure/q_mono_replicated.bin" beforeDir="false" afterPath="$PROJECT_DIR$/../../examples/preparing_physical_structure/q_mono_replicated.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../examples/preparing_physical_structure/q_ribo_replicated.bin" beforeDir="false" afterPath="$PROJECT_DIR$/../../examples/preparing_physical_structure/q_ribo_replicated.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../examples/preparing_physical_structure/x_bdry_replicated.bin" beforeDir="false" afterPath="$PROJECT_DIR$/../../examples/preparing_physical_structure/x_bdry_replicated.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../examples/simulating_chromosome/data.example" beforeDir="false" afterPath="$PROJECT_DIR$/../../examples/simulating_chromosome/data.example" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../examples/simulating_chromosome/example.lammpstrj" beforeDir="false" afterPath="$PROJECT_DIR$/../../examples/simulating_chromosome/example.lammpstrj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../examples/simulating_chromosome/simulating_chromosome_directives.inp" beforeDir="false" afterPath="$PROJECT_DIR$/../../examples/simulating_chromosome/simulating_chromosome_directives.inp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../build/apps/btree_chromo" beforeDir="false" afterPath="$PROJECT_DIR$/../../build/apps/btree_chromo" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../build/apps/log.test" beforeDir="false" afterPath="$PROJECT_DIR$/../../build/apps/log.test" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../build/objects/src/LAMMPS_sys.o" beforeDir="false" afterPath="$PROJECT_DIR$/../../build/objects/src/LAMMPS_sys.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../build/objects/src/boundary_surface.o" beforeDir="false" afterPath="$PROJECT_DIR$/../../build/objects/src/boundary_surface.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../build/objects/src/btree_driver.o" beforeDir="false" afterPath="$PROJECT_DIR$/../../build/objects/src/btree_driver.o" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../examples/simulating_chromosome_with_replication/data.example" beforeDir="false" afterPath="$PROJECT_DIR$/../../examples/simulating_chromosome_with_replication/data.example" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../examples/simulating_chromosome_with_replication/simulating_chromosome_with_replication_directives.inp" beforeDir="false" afterPath="$PROJECT_DIR$/../../examples/simulating_chromosome_with_replication/simulating_chromosome_with_replication_directives.inp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../log.test" beforeDir="false" afterPath="$PROJECT_DIR$/../../log.test" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/boundary_surface.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/boundary_surface.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/btree_driver.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/btree_driver.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -79,23 +20,23 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 1
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
   <component name="ProjectId" id="2gSuGDVQUhRzVUUe68QXqIqPIuc" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "rot__min__frame",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;rot__min__frame&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -112,6 +53,7 @@
       <option name="presentableId" value="Default" />
       <updated>1715703201375</updated>
       <workItem from="1715703203060" duration="23000" />
+      <workItem from="1717528609874" duration="5000" />
     </task>
     <servers />
   </component>

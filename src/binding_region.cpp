@@ -341,3 +341,8 @@ std::vector<int> binding_region::get_inter_candidates()
   
   return inter_candidates;
 }
+
+bool binding_region::get_completed()
+{
+    return completed;
+}

@@ -1394,7 +1394,7 @@ void btree_driver::prepare_command_requirements()
 
   // spherocylindrical_bdry
   // number of required parameters
-  N_param_reqs["spherocylindrical_bdry"] = 4;
+  N_param_reqs["spherocylindrical_bdry"] = 5;
   // lock tests
   t_ls.clear();
   t_ls.push_back(new_lock("BD_lengths_present",true));
