@@ -1004,7 +1004,7 @@ void LAMMPS_sys::apply_RMF()
 
             // set orientation of DNA monomer
             int reg_pos = b_rs[i_reg].get_mono_pos(i);
-            mono_ellipsoids.set_quat(reg_pos, vqm.v_to_q(R[i][1])); // use s or p
+            mono_ellipsoids.set_quat(reg_pos, vqm.R_to_q(R[i]));
 
             vec s2 = vqm.q_to_v(mono_ellipsoids.get_ellipsoid(i).q);
             s2 = vqm.v_norm(s2); // normalize!
@@ -1131,7 +1131,7 @@ void LAMMPS_sys::write_mono_orientation_xyz(std::string data_filename)
             // std::cout << "Getting monomer coordinates..." << std::endl;
             vec x = atoms.get_atom(b_rs[i_reg].get_mono_pos(i)).r;
             // std::cout << "Getting orientations..." << std::endl;
-            vec p = vqm.q_to_v(mono_ellipsoids.get_ellipsoid(i).q);
+            vec p = vqm.q_to_R(mono_ellipsoids.get_ellipsoid(i).q)[0];
             p = vqm.v_norm(p); // normalize!
             // std::cout << "Calculating orientation atom coordinates..." << std::endl;
             vec p_coord;

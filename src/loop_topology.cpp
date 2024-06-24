@@ -315,7 +315,7 @@ void loop_topology::initialize_loops(int N_loops, int min_dist)
 }
 
 
-// prepare the vector of binding regions
+// update the loops
 void loop_topology::update_loops(int ext_max, int min_dist, double p_unbinding, double r_g)
 {
 

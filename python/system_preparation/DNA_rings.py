@@ -86,6 +86,12 @@ def initialize_ring(r, R, compaction, ntwists, a, b):
 
         oris[i, :] = qMult(q2[i, :], q1[i, :])
 
+    # for i in range(n):
+    #     oris[i, 2] = oris[i, 3]
+    #     oris[i, 3] = oris[i, 0]
+    #     oris[i, 0] = 0
+
+    print(oris)
     return n, positions, oris
 
 # function to generate a circular ring of monomers in a plane

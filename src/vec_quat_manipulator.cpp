@@ -199,3 +199,67 @@ vec vec_quat_manipulator::q_to_v(quat q)
 {
   return q.v;
 }
+
+quat vec_quat_manipulator::R_to_q(std::vector<vec> R)
+{
+    quat q;
+    vec p=R[0], s=R[1], t=R[2];
+    double trace = p.x + s.y + t.z;
+    if (trace > 0) {
+        double S = std::sqrt(trace + 1.0) * 2; // S=4*q.w
+        q.w = 0.25 * S;
+        q.v.x = (t.y - s.z) / S;
+        q.v.y = (p.z - t.x) / S;
+        q.v.z = (s.x - p.y) / S;
+    } else {
+        if (p.x > s.y && p.x > t.z) {
+            double S = std::sqrt(1.0 + p.x - s.y - t.z) * 2; // S=4*q.v.x
+            q.w = (t.y - s.z) / S;
+            q.v.x = 0.25 * S;
+            q.v.y = (p.y + s.x) / S;
+            q.v.z = (p.z + t.x) / S;
+        } else if (s.y > t.z) {
+            double S = std::sqrt(1.0 + s.y - p.x - t.z) * 2; // S=4*q.v.y
+            q.w = (p.z - t.x) / S;
+            q.v.x = (p.y + s.x) / S;
+            q.v.y = 0.25 * S;
+            q.v.z = (s.z + t.y) / S;
+        } else {
+            double S = std::sqrt(1.0 + t.z - p.x - s.y) * 2; // S=4*q.v.z
+            q.w = (s.x - p.y) / S;
+            q.v.x = (p.z + t.x) / S;
+            q.v.y = (s.z + t.y) / S;
+            q.v.z = 0.25 * S;
+        }
+    }
+
+    return q;
+}
+
+std::vector<vec> vec_quat_manipulator::q_to_R(quat q)
+{
+    double q0 = q.w, q1 = q.v.x, q2 = q.v.y, q3 = q.v.z;
+    vec p, s, t; // aka f, v, u
+    std::vector<vec> R;
+
+    // fI vector (first column of rotation matrix)
+    p.x = q0 * q0 + q1 * q1 - q2 * q2 - q3 * q3;
+    p.y = 2.0 * (q1 * q2 + q0 * q3);
+    p.z = 2.0 * (q1 * q3 - q0 * q2);
+
+    // vI vector (second column of rotation matrix)
+    s.x = 2.0 * (q1 * q2 - q0 * q3);
+    s.y = q0 * q0 - q1 * q1 + q2 * q2 - q3 * q3;
+    s.z = 2.0 * (q2 * q3 + q0 * q1);
+
+    // uI vector (third column of rotation matrix)
+    t.x = 2.0 * (q1 * q3 + q0 * q2);
+    t.y = 2.0 * (q2 * q3 - q0 * q1);
+    t.z = q0 * q0 - q1 * q1 - q2 * q2 + q3 * q3;
+
+    R[0] = p;
+    R[1] = s;
+    R[2] = t;
+
+    return R;
+}

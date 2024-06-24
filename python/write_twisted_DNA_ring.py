@@ -5,17 +5,17 @@
 
 import numpy as np
 
-import time
-import os
+# import time
+# import os
 
-import imp
-import sys
+# import importlib
+# import sys
 
-sys.path.insert(1,'./system_preparation')
-import DNA_rings as D_r
-imp.reload(D_r)
+# sys.path.insert(1,'./system_preparation')
+from system_preparation import DNA_rings as D_r
+# imp.reload(D_r)
 
-out_dir = '/home/ben/Data/btree_chromo/theta_example/'
+out_dir = '/home/andrew/Data/btree_chromo/twist_testing/'
 out_label = 'initial_ring'
 
 # r = 17.0
@@ -23,8 +23,9 @@ out_label = 'initial_ring'
 # c = 0.91
 r = 17.0
 R = 275.0
-c = 2.0
-n, x, q = D_r.initialize_ring(r,R,c,0.0,1.0,1.0)
+c = 1.0
+ntwists = 0
+n, x, q = D_r.initialize_ring(r,R,c,ntwists,1.0,1.0)
 # r = 17.0
 # R = 300.0
 # c = 14.0
@@ -51,3 +52,7 @@ quat_file = out_dir + 'q_mono_' + out_label + '.bin'
 with open(quat_file,'wb') as f:
     q.tofile(f)
 
+with open(quat_file,'rb') as f:
+    newq = np.fromfile(quat_file, dtype=np.double)
+    newq = np.reshape(newq, q.shape, 'C')
+    print(newq)

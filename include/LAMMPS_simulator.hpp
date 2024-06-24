@@ -106,7 +106,7 @@ public:
   int read_loop_params(std::string loop_param_filename);
   void set_loop_sim_params(loop_sim_params &l_sim_p);
   void update_loop_bonds(bool new_bonds);
-  void run_loops(int N_loops, unsigned long N_steps, thermo_dump_parameters t_d_p);
+  void run_loops(bool topo_always_on, int N_loops, unsigned long N_steps, thermo_dump_parameters t_d_p);
 
   // switch an extra potential on or off
   void switch_extra_potential(std::string p, bool s);

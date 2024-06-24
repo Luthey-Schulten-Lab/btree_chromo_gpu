@@ -54,6 +54,9 @@ public:
   quat v_to_q(vec v);
   vec q_to_v(quat q);
 
+  quat R_to_q(std::vector<vec> R);
+  std::vector<vec> q_to_R(quat q);
+
 private:
   
 };
