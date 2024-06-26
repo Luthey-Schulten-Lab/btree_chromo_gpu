@@ -20,23 +20,65 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="31e3448d-81be-4e67-ac75-8c3395c3774f" name="Changes" comment="Made omp version of fix brownian">
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/compute_subroutines/subroutine.compute_MSD" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/compute_subroutines/subroutine.compute_angleE" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/compute_subroutines/subroutine.compute_ids" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/compute_subroutines/subroutine.compute_quats" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/compute_subroutines/subroutine.compute_types" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/dump_subroutines/subroutine.MSD_logging" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/dump_subroutines/subroutine.MSD_thermo" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/dump_subroutines/subroutine.default_thermo" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/dump_subroutines/subroutine.dump_append_nofirst_lammpstrj" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/dump_subroutines/subroutine.dump_noappend_first_lammpstrj" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/dump_subroutines/subroutine.dump_noappend_nofirst_lammpstrj" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/lmp.DNA_physical_params" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_hard_FENE" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_hard_harmonic" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_soft_FENE" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_soft_harmonic" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_topoDNA_FENE" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_topoDNA_harmonic" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.DNA_bend_twist_align_params" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.DNA_loops" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.DNA_pair_hard_kk" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.DNA_pair_hard_omp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.DNA_pair_params" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.DNA_pair_soft_omp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.DNA_pair_topo_omp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.bdry_springs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.bdry_static" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.fork_partitioning" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.loop_bond" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.loop_bond_hybrid" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.ribo_springs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.twistable_DNA_model_FENE_omp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.twistable_DNA_model_harmonic_kk" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.twistable_DNA_model_harmonic_omp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.twistable_DNA_model_omp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/protocol_subroutines/subroutine.global_setup" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/protocol_subroutines/subroutine.neighbor_setup" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.BD_fixes" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_hard_FENE" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_hard_harmonic" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_soft_FENE" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_soft_harmonic" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_topoDNA_FENE" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_topoDNA_harmonic" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/subroutine.min_HarmonicSoft_HarmonicWCA" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/subroutine.min_HarmonicSoft_HarmonicWCA_FENEWCA" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_basic_input_scripts/in.lj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/apps/btree_chromo" beforeDir="false" afterPath="$PROJECT_DIR$/build/apps/btree_chromo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/apps/log.test" beforeDir="false" afterPath="$PROJECT_DIR$/build/apps/log.test" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/apps/log.test" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/apps/t.xyz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/build/objects/src/LAMMPS_simulator.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/LAMMPS_simulator.o" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/objects/src/LAMMPS_sys.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/LAMMPS_sys.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/binding_region.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/binding_region.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/btree_driver.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/btree_driver.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/vec_quat_manipulator.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/vec_quat_manipulator.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/LAMMPS_simulator.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/LAMMPS_simulator.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/vec_quat_manipulator.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/vec_quat_manipulator.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/python/system_preparation/DNA_rings.py" beforeDir="false" afterPath="$PROJECT_DIR$/python/system_preparation/DNA_rings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/python/write_twisted_DNA_ring.py" beforeDir="false" afterPath="$PROJECT_DIR$/python/write_twisted_DNA_ring.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/atom_array.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/atom_array.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/atom_array.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/atom_array.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/LAMMPS_simulator.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/LAMMPS_simulator.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/LAMMPS_sys.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/LAMMPS_sys.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/btree_driver.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/btree_driver.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/loop_topology.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/loop_topology.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vec_quat_manipulator.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/vec_quat_manipulator.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/atom_array.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/atom_array.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -190,7 +232,7 @@
       <workItem from="1715784281054" duration="117000" />
       <workItem from="1715784409288" duration="94000" />
       <workItem from="1715784512793" duration="184000" />
-      <workItem from="1715784698296" duration="148025000" />
+      <workItem from="1715784698296" duration="171034000" />
     </task>
     <task id="LOCAL-00001" summary="Made omp version of fix brownian">
       <option name="closed" value="true" />

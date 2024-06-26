@@ -23,6 +23,7 @@ fmt_LIB := /home/andrew/anaconda3/envs/btree_chromo/lib
 BASE_LDFLAGS  := -L${GCC_LIB} -lstdc++ -lm -std=c++17
 OPENMPI_LDFLAGS := -L${OpenMPI_LIB} -lmpi -pthread -Wl,-rpath -Wl,${OpenMPI_LIB} -Wl,--enable-new-dtags
 FMT_LDFLAGS := -L${fmt_LIB} -lfmt
+# LAMMPS_LDFLAGS := /home/andrew/Software/Suites/LAMMPS/build_twistable_OMP_GPU_Kokkos/liblammps_twistable_OMP_GPU_Kokkos.so
 LAMMPS_LDFLAGS := /home/andrew/Software/Suites/LAMMPS/build_twistable_BD_OMP/liblammps_twistable_BD_OMP.so
 LDFLAGS := ${BASE_LDFLAGS} ${OPENMPI_LDFLAGS} ${FMT_LDFLAGS} ${LAMMPS_LDFLAGS}
 

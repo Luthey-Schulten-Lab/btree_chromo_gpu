@@ -51,7 +51,7 @@ public:
   atom get_atom(int i);
 
   // write atom data
-  void write(std::fstream &data_file);
+  void write(std::fstream &data_file, bool ellipsoids);
   int write_xyz(std::string data_filename);
   int write_bin(std::string data_filename, std::string order);
 

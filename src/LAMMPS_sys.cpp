@@ -1049,38 +1049,69 @@ void LAMMPS_sys::write_data(std::string data_filename)
     }
   else
     {
+      if (r_s.ellipsoid) {
+          // write system summary
+          data_file << "# LAMMPS data file for replicating chromosomes formed of rigid body monomers\n" << std::endl;
 
-      // write system summary
-      data_file << "# LAMMPS data file for replicating chromosomes formed of rigid body monomers\n" << std::endl;
+          data_file << atoms.get_N() << "\t\tatoms" << std::endl;
+          data_file << N_atom_types << "\t\tatom types" << std::endl;
+          data_file << ellipsoids.get_N() << "\t\tellipsoids" << std::endl;
+          data_file << bonds.get_N() << "\t\tbonds" << std::endl;
+          data_file << N_bond_types << "\t\tbond types" << std::endl;
+          data_file << angles.get_N() << "\t\tangles" << std::endl;
+          data_file << N_angle_types << "\t\tangle types" << std::endl;
 
-      data_file << atoms.get_N() << "\t\tatoms" << std::endl;
-      data_file << N_atom_types << "\t\tatom types" << std::endl;
-      data_file << ellipsoids.get_N() << "\t\tellipsoids" << std::endl;
-      data_file << bonds.get_N() << "\t\tbonds" << std::endl;
-      data_file << N_bond_types << "\t\tbond types" << std::endl;
-      data_file << angles.get_N() << "\t\tangles" << std::endl;
-      data_file << N_angle_types << "\t\tangle types" << std::endl;
+          data_file << "\n" << std::endl;
 
-      data_file << "\n" << std::endl;
+          data_file << bbox.r_min.x << "\t" << bbox.r_max.x << "\txlo xhi" << std::endl;
+          data_file << bbox.r_min.y << "\t" << bbox.r_max.y << "\tylo yhi" << std::endl;
+          data_file << bbox.r_min.z << "\t" << bbox.r_max.z << "\tzlo zhi" << std::endl;
 
-      data_file << bbox.r_min.x << "\t" << bbox.r_max.x << "\txlo xhi" << std::endl;
-      data_file << bbox.r_min.y << "\t" << bbox.r_max.y << "\tylo yhi" << std::endl;
-      data_file << bbox.r_min.z << "\t" << bbox.r_max.z << "\tzlo zhi" << std::endl;
-      
-      // write atom information
-      atoms.write(data_file);
+          // write atom information
+          atoms.write(data_file, r_s.ellipsoid);
 
-      // write ellipsoid information
-      ellipsoids.write(data_file);
+          // write ellipsoid information
+          ellipsoids.write(data_file);
 
-      // write bond information
-      bonds.write(data_file);
+          // write bond information
+          bonds.write(data_file);
 
-      // write angle information
-      angles.write(data_file);
+          // write angle information
+          angles.write(data_file);
 
 
-      data_file.close();
+          data_file.close();
+      }
+      else {
+          // write system summary
+          data_file << "# LAMMPS data file for replicating chromosomes formed of rigid body monomers\n" << std::endl;
+
+          data_file << atoms.get_N() << "\t\tatoms" << std::endl;
+          data_file << N_atom_types << "\t\tatom types" << std::endl;
+          data_file << bonds.get_N() << "\t\tbonds" << std::endl;
+          data_file << N_bond_types << "\t\tbond types" << std::endl;
+          data_file << angles.get_N() << "\t\tangles" << std::endl;
+          data_file << N_angle_types << "\t\tangle types" << std::endl;
+
+          data_file << "\n" << std::endl;
+
+          data_file << bbox.r_min.x << "\t" << bbox.r_max.x << "\txlo xhi" << std::endl;
+          data_file << bbox.r_min.y << "\t" << bbox.r_max.y << "\tylo yhi" << std::endl;
+          data_file << bbox.r_min.z << "\t" << bbox.r_max.z << "\tzlo zhi" << std::endl;
+
+          // write atom information
+          atoms.write(data_file, r_s.ellipsoid);
+
+          // write bond information
+          bonds.write(data_file);
+
+          // write angle information
+          angles.write(data_file);
+
+
+          data_file.close();
+      }
+
     }
   
 }

@@ -271,21 +271,39 @@ int atom_array::read_bin_coords(std::string data_filename, std::string order, bo
 
 
 // write to stream
-void atom_array::write(std::fstream &data_file)
+void atom_array::write(std::fstream &data_file, bool ellipsoid)
 {
-  data_file << "\nAtoms # atom-ID atom-type x y z molecule-ID ellipsoid-flag density\n" << std::endl;
+  if (ellipsoid){
+      data_file << "\nAtoms # atom-ID atom-type x y z molecule-ID ellipsoid-flag density\n" << std::endl;
 
-  for (int i=0; i<N; i++)
-    {
-      data_file << atoms[i].id << "\t"
-		<< atoms[i].type << "\t"
-		<< atoms[i].r.x << "  \t"
-		<< atoms[i].r.y << "  \t"
-		<< atoms[i].r.z << "  \t"
-		<< atoms[i].mol_id << "\t"
-		<< atoms[i].ellipsoid_flag << "\t"
-		<< atoms[i].density << std::endl;
-    }
+      for (int i=0; i<N; i++)
+      {
+          data_file << atoms[i].id << "\t"
+                    << atoms[i].type << "\t"
+                    << atoms[i].r.x << "  \t"
+                    << atoms[i].r.y << "  \t"
+                    << atoms[i].r.z << "  \t"
+                    << atoms[i].mol_id << "\t"
+                    << atoms[i].ellipsoid_flag << "\t"
+                    << atoms[i].density << std::endl;
+      }
+  }
+  else {
+      data_file << "\nAtoms # atom-ID atom-type x y z molecule-ID diameter density\n" << std::endl;
+
+      for (int i=0; i<N; i++)
+      {
+          data_file << atoms[i].id << "\t"
+                    << atoms[i].type << "\t"
+                    << atoms[i].r.x << "  \t"
+                    << atoms[i].r.y << "  \t"
+                    << atoms[i].r.z << "  \t"
+                    << atoms[i].mol_id << "\t"
+                    << 34 << "\t"
+                    << atoms[i].density << std::endl;
+      }
+  }
+
   
 }
 

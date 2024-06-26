@@ -41,11 +41,6 @@ LAMMPS_simulator::~LAMMPS_simulator()
 void LAMMPS_simulator::LAMMPS_initialize(std::string logfile)
 {
   
-  // int argc;
-  // char **argv;
-  // argc = 0;
-  // argv = nullptr;
-  
   // set up MPI instance
   // MPI_Init(&argc,&argv);
   MPI_Initialized(&sim_MPI_initialized);
@@ -55,6 +50,8 @@ void LAMMPS_simulator::LAMMPS_initialize(std::string logfile)
 
   // custom argument vector for LAMMPS library
   const char *lmpargv[] {"liblammps", "-log", logfile.c_str()};
+  //const char *lmpargv[] {"liblammps", "-log", logfile.c_str(), "-k", "on", "g", "1", "-sf", "kk"};
+  //const char *lmpargv[] {"liblammps", "-log", logfile.c_str(), "-k", "on", "g", "1"};
   int lmpargc = sizeof(lmpargv)/sizeof(const char *);
 
   lmp = new LAMMPS_NS::LAMMPS(lmpargc, (char **)lmpargv, MPI_COMM_WORLD);
@@ -98,7 +95,9 @@ void LAMMPS_simulator::command(std::string command)
 void LAMMPS_simulator::read_data(std::string data_file)
 {
   // read the data
+
   lmp->input->one(("read_data " + data_file + " extra/bond/per/atom 2").c_str());
+
 
   // include the physical parameterization of the DNA polymer model
   lmp->input->one("include ${DNA_model_dir}/lmp.DNA_physical_params");
@@ -123,9 +122,14 @@ void LAMMPS_simulator::standard_computes()
 
   // include compute for types
   compute_trigger("types");
-  
-  // include compute for quats
-  compute_trigger("quats");
+
+
+  if (sim_vars["ellipsoids"]) {
+      std::cout << "Compute trigger for quats" << std::endl;
+      // include compute for quats
+      compute_trigger("quats");
+  }
+
 }
 
 
@@ -1308,13 +1312,14 @@ unsigned long LAMMPS_simulator::get_Nt()
 
 void LAMMPS_simulator::switch_ellipsoids(bool s)
 {
-    if (s == true)
+    if (s)
     {
         set_sim_var_int("ellipsoids", 1);
     }
     else
     {
         set_sim_var_int("ellipsoids", 0);
+        sim_vars["ellipsoids"] = false;
     }
 }
 
