@@ -10,16 +10,16 @@ build/objects/src/btree_driver.o: src/btree_driver.cpp \
  include/LAMMPS_simulator.hpp \
  /home/andrew/anaconda3/envs/btree_chromo/include/mpi.h \
  /home/andrew/anaconda3/envs/btree_chromo/include/mpi_portable_platform.h \
- /home/andrew/Software/Suites/LAMMPS/lammps-2Aug2023/src/lammps.h \
- /home/andrew/Software/Suites/LAMMPS/lammps-2Aug2023/src/domain.h \
- /home/andrew/Software/Suites/LAMMPS/lammps-2Aug2023/src/pointers.h \
- /home/andrew/Software/Suites/LAMMPS/lammps-2Aug2023/src/lmptype.h \
- /home/andrew/Software/Suites/LAMMPS/lammps-2Aug2023/src/fmt/format.h \
- /home/andrew/Software/Suites/LAMMPS/lammps-2Aug2023/src/fmt/core.h \
- /home/andrew/Software/Suites/LAMMPS/lammps-2Aug2023/src/lammps.h \
- /home/andrew/Software/Suites/LAMMPS/lammps-2Aug2023/src/platform.h \
- /home/andrew/Software/Suites/LAMMPS/lammps-2Aug2023/src/utils.h \
- /home/andrew/Software/Suites/LAMMPS/lammps-2Aug2023/src/group.h \
- /home/andrew/Software/Suites/LAMMPS/lammps-2Aug2023/src/input.h \
- /home/andrew/Software/Suites/LAMMPS/lammps-2Aug2023/src/atom.h \
- /home/andrew/Software/Suites/LAMMPS/lammps-2Aug2023/src/library.h
+ /home/andrew/Software/Suites/LAMMPS/lammps-27Jun2024/src/lammps.h \
+ /home/andrew/Software/Suites/LAMMPS/lammps-27Jun2024/src/domain.h \
+ /home/andrew/Software/Suites/LAMMPS/lammps-27Jun2024/src/pointers.h \
+ /home/andrew/Software/Suites/LAMMPS/lammps-27Jun2024/src/lmptype.h \
+ /home/andrew/Software/Suites/LAMMPS/lammps-27Jun2024/src/fmt/format.h \
+ /home/andrew/Software/Suites/LAMMPS/lammps-27Jun2024/src/fmt/core.h \
+ /home/andrew/Software/Suites/LAMMPS/lammps-27Jun2024/src/lammps.h \
+ /home/andrew/Software/Suites/LAMMPS/lammps-27Jun2024/src/platform.h \
+ /home/andrew/Software/Suites/LAMMPS/lammps-27Jun2024/src/utils.h \
+ /home/andrew/Software/Suites/LAMMPS/lammps-27Jun2024/src/group.h \
+ /home/andrew/Software/Suites/LAMMPS/lammps-27Jun2024/src/input.h \
+ /home/andrew/Software/Suites/LAMMPS/lammps-27Jun2024/src/atom.h \
+ /home/andrew/Software/Suites/LAMMPS/lammps-27Jun2024/src/library.h

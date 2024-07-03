@@ -49,13 +49,13 @@ void LAMMPS_simulator::LAMMPS_initialize(std::string logfile)
   MPI_Comm_rank(MPI_COMM_WORLD,&sim_MPI_rank); // current MPI rank
 
   // custom argument vector for LAMMPS library
-  const char *lmpargv[] {"liblammps", "-log", logfile.c_str()};
-  //const char *lmpargv[] {"liblammps", "-log", logfile.c_str(), "-k", "on", "g", "1", "-sf", "kk"};
+  //const char *lmpargv[] {"liblammps", "-log", logfile.c_str()};
+  const char *lmpargv[] {"liblammps", "-log", logfile.c_str(), "-k", "on", "g", "1", "-sf", "kk", "-pk","kokkos"};
   //const char *lmpargv[] {"liblammps", "-log", logfile.c_str(), "-k", "on", "g", "1"};
   int lmpargc = sizeof(lmpargv)/sizeof(const char *);
 
   lmp = new LAMMPS_NS::LAMMPS(lmpargc, (char **)lmpargv, MPI_COMM_WORLD);
-  
+
 }
 
 
@@ -95,6 +95,7 @@ void LAMMPS_simulator::command(std::string command)
 void LAMMPS_simulator::read_data(std::string data_file)
 {
   // read the data
+  // lmp->input->one("newton off"); // Andrew's jank method of turning newton bond value on, 070124
 
   lmp->input->one(("read_data " + data_file + " extra/bond/per/atom 2").c_str());
 

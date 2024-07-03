@@ -76,6 +76,22 @@ print """
    BD timescale (ribo), m_ribo/gamma_t_ribo = ${ratio_t_ribo} [fs]
 """
 
+# set the mass
+print """
+ ----------------------------------
+ ---[ Setting Densities/Masses ]---
+ ----------------------------------
+"""
+
+mass 8 ${m_mono}
+mass 7 ${m_mono}
+mass 6 ${m_mono}
+mass 5 ${m_mono}
+mass 4 ${m_mono}
+mass 3 ${m_mono}
+mass 2 ${m_ribo}
+mass 1 ${m_bdry}
+
 # create groups
 print """
  ------------------------

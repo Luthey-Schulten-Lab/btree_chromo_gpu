@@ -20,64 +20,38 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="31e3448d-81be-4e67-ac75-8c3395c3774f" name="Changes" comment="Made omp version of fix brownian">
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/compute_subroutines/subroutine.compute_MSD" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/compute_subroutines/subroutine.compute_angleE" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/compute_subroutines/subroutine.compute_ids" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/compute_subroutines/subroutine.compute_quats" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/compute_subroutines/subroutine.compute_types" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/dump_subroutines/subroutine.MSD_logging" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/dump_subroutines/subroutine.MSD_thermo" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/dump_subroutines/subroutine.default_thermo" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/dump_subroutines/subroutine.dump_append_nofirst_lammpstrj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/dump_subroutines/subroutine.dump_noappend_first_lammpstrj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/dump_subroutines/subroutine.dump_noappend_nofirst_lammpstrj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/lmp.DNA_physical_params" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_hard_FENE" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_hard_harmonic" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_soft_FENE" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_soft_harmonic" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_topoDNA_FENE" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_topoDNA_harmonic" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.DNA_bend_twist_align_params" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.DNA_loops" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.DNA_pair_hard_kk" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.DNA_pair_hard_omp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.DNA_pair_params" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.DNA_pair_soft_omp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.DNA_pair_topo_omp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.bdry_springs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.bdry_static" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.fork_partitioning" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.loop_bond" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.loop_bond_hybrid" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.ribo_springs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.twistable_DNA_model_FENE_omp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.twistable_DNA_model_harmonic_kk" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.twistable_DNA_model_harmonic_omp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.twistable_DNA_model_omp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/protocol_subroutines/subroutine.global_setup" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/protocol_subroutines/subroutine.neighbor_setup" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.BD_fixes" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_hard_FENE" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_hard_harmonic" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_soft_FENE" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_soft_harmonic" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_topoDNA_FENE" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_topoDNA_harmonic" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/subroutine.min_HarmonicSoft_HarmonicWCA" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/subroutine.min_HarmonicSoft_HarmonicWCA_FENEWCA" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_basic_input_scripts/in.lj" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.DNA_pair_soft_kk" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/lmp.DNA_physical_params" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/lmp.DNA_physical_params" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_soft_harmonic" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_soft_harmonic" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.twistable_DNA_model_harmonic_kk" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.twistable_DNA_model_harmonic_kk" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/protocol_subroutines/subroutine.global_setup" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/protocol_subroutines/subroutine.global_setup" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/apps/btree_chromo" beforeDir="false" afterPath="$PROJECT_DIR$/build/apps/btree_chromo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/apps/log.test" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/apps/t.xyz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/LAMMPS_simulator.d" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/LAMMPS_simulator.d" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/objects/src/LAMMPS_simulator.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/LAMMPS_simulator.o" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/objects/src/LAMMPS_sys.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/LAMMPS_sys.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/angle_array.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/angle_array.o" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/objects/src/atom_array.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/atom_array.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/atom_array.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/atom_array.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/binding_region.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/binding_region.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/bond_array.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/bond_array.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/boundary_surface.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/boundary_surface.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/btree.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/btree.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/btree_chromo.d" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/btree_chromo.d" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/btree_chromo.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/btree_chromo.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/btree_driver.d" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/btree_driver.d" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/btree_driver.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/btree_driver.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/ellipsoid_array.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/ellipsoid_array.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/gillespie_solver.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/gillespie_solver.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/intra_step_distribution.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/intra_step_distribution.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/loop.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/loop.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/loop_topology.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/loop_topology.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/mapper.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/mapper.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/replication_model.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/replication_model.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/replicator.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/replicator.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/rxn_manipulator.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/rxn_manipulator.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/vec_quat_manipulator.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/vec_quat_manipulator.o" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/LAMMPS_simulator.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/LAMMPS_simulator.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/LAMMPS_sys.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/LAMMPS_sys.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/atom_array.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/atom_array.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -96,7 +70,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="no_twist" />
+        <entry key="$PROJECT_DIR$" value="rot_min_frame" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -152,7 +126,7 @@
     "RunOnceActivity.readMode.enableVisualFormatting": "true",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "rot__min__frame",
+    "git-widget-placeholder": "gpu__kokkos",
     "last_opened_file_path": "/home/andrew/Desktop/Projects/btree_chromo/examples/simulating_chromosome",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
