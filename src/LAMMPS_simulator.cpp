@@ -238,7 +238,7 @@ void LAMMPS_simulator::setup_minimize(thermo_dump_parameters &t_d_p)
   extra_pots_to_sim_vars();
 
   // store the extra fixes and disable them during minimization
-  disable_and_hold_extra_fixes();
+  // disable_and_hold_extra_fixes(); // AKM change 7/13
 
   // // include compute for ids
   // compute_trigger("ids");
@@ -262,7 +262,7 @@ void LAMMPS_simulator::setup_minimize(thermo_dump_parameters &t_d_p)
 void LAMMPS_simulator::cleanup_minimize()
 {
   // restore the extra fixes
-  restore_extra_fixes();
+  // restore_extra_fixes();  // AKM change 7/13
 
   // reset the number of timesteps to Nt
   reset_timestep_to_Nt();
@@ -273,7 +273,7 @@ void LAMMPS_simulator::cleanup_minimize()
 void LAMMPS_simulator::minimize_soft_harmonic(thermo_dump_parameters t_d_p)
 {
 
-  // std::cout << "---[ minimizing SOFT_HARMONIC ]---" << std::endl;
+  std::cout << "---[ minimizing SOFT_HARMONIC ]---" << std::endl;
 
   // setup the minimization
   setup_minimize(t_d_p);
@@ -309,7 +309,7 @@ void LAMMPS_simulator::minimize_hard_harmonic(thermo_dump_parameters t_d_p)
 void LAMMPS_simulator::minimize_topoDNA_harmonic(thermo_dump_parameters t_d_p)
 {
 
-  // std::cout << "---[ minimizing topoDNA_HARMONIC ]---" << std::endl;
+  std::cout << "---[ minimizing topoDNA_HARMONIC ]---" << std::endl;
   
   // setup the minimization
   setup_minimize(t_d_p);
@@ -448,6 +448,8 @@ void LAMMPS_simulator::run_hard_harmonic(unsigned long N_steps, thermo_dump_para
 // run with soft (topoisomerase) potentials and harmonic bonds
 void LAMMPS_simulator::run_topoDNA_harmonic(unsigned long N_steps, thermo_dump_parameters t_d_p)
 {
+
+  std::cout << "---[ running TOPODNA_HARMONIC ]---" << std::endl;
   // setup for run
   setup_run(N_steps,t_d_p);
 
@@ -522,6 +524,25 @@ void LAMMPS_simulator::run_topoDNA_FENE(unsigned long N_steps, thermo_dump_param
 
   // increment Nt
   Nt += N_steps;
+}
+
+// run with soft (topoisomerase) potentials and FENE bonds
+void LAMMPS_simulator::run_donothing(unsigned long N_steps, thermo_dump_parameters t_d_p)
+{
+    // setup for run
+    setup_run(N_steps,t_d_p);
+
+    // set the timestep
+    lmp->input->one("timestep ${delta_t}");
+
+    // include run subroutine
+    lmp->input->one("include ${DNA_model_dir}/run_subroutines/subroutine.run_donothing");
+
+    // run for N_steps
+    lmp->input->one(("run " + std::to_string(N_steps)).c_str());
+
+    // increment Nt
+    Nt += N_steps;
 }
 
 
@@ -732,44 +753,44 @@ void LAMMPS_simulator::sim_to_sys()
 	  coords = nullptr;
 	}
 
-      // copy the quaternions to the system state
-
-      // get the quats from a compute
-      void *quats_p;
-      // 1 for LMP_STYLE_ATOM, 2 for LMP_TYPE_ARRAY
-      quats_p = lammps_extract_compute(lmp,const_cast<char*>("quat"),1,2);
-      double **quats_2d{static_cast<double**>(quats_p)};
-
-      // get the ids to match up the quats
-      void *ids_p;
-      // 1 for LMP_STYLE_ATOM, 1 for LMP_TYPE_VECTOR
-      ids_p = lammps_extract_compute(lmp,const_cast<char*>("id_track"),1,1);
-      double *ids{static_cast<double*>(ids_p)};
-
-      double *quats = nullptr;
-      if (quats == nullptr) quats = new double[4*N_mono_ribo];
-
-      int id;
-      for (int i=0; i<N; i++)
-	{
-	  id = int(ids[i]);
-	  if (id <= N_mono_ribo)
-	    {
-	      for (int j=0; j<4; j++)
-		{
-		  quats[4*(id-1)+j] = quats_2d[i][j];
-		}
-	    }
-	}
-
-      lmp_sys->set_quats_arr_total(quats,"row");
-
-      // free the quaternion array
-      if (quats != nullptr)
-	{
-	  delete[] quats;
-	  quats = nullptr;
-	}
+//      // copy the quaternions to the system state
+//
+//      // get the quats from a compute
+//      void *quats_p;
+//      // 1 for LMP_STYLE_ATOM, 2 for LMP_TYPE_ARRAY
+//      quats_p = lammps_extract_compute(lmp,const_cast<char*>("quat"),1,2);
+//      double **quats_2d{static_cast<double**>(quats_p)};
+//
+//      // get the ids to match up the quats
+//      void *ids_p;
+//      // 1 for LMP_STYLE_ATOM, 1 for LMP_TYPE_VECTOR
+//      ids_p = lammps_extract_compute(lmp,const_cast<char*>("id_track"),1,1);
+//      double *ids{static_cast<double*>(ids_p)};
+//
+//      double *quats = nullptr;
+//      if (quats == nullptr) quats = new double[4*N_mono_ribo];
+//
+//      int id;
+//      for (int i=0; i<N; i++)
+//	{
+//	  id = int(ids[i]);
+//	  if (id <= N_mono_ribo)
+//	    {
+//	      for (int j=0; j<4; j++)
+//		{
+//		  quats[4*(id-1)+j] = quats_2d[i][j];
+//		}
+//	    }
+//	}
+//
+//      lmp_sys->set_quats_arr_total(quats,"row");
+//
+//      // free the quaternion array
+//      if (quats != nullptr)
+//	{
+//	  delete[] quats;
+//	  quats = nullptr;
+//	}
 
       // sync the subarrays with the total array
       
@@ -1033,18 +1054,18 @@ void LAMMPS_simulator::run_loops(bool topo_always_on, int N_loops, unsigned long
 	  // store the timestep
 	  Nt_pre_topo = Nt;
 
-      if (!topo_always_on) {
-          // minimize with topoisomerase pair potentials
-          minimize_topoDNA_harmonic(t_d_p_topo);
-          minimize_topoDNA_FENE(t_d_p_topo);
 
-          // run the system while allowing strand crossings
-          run_topoDNA_FENE(l_sim_p.dNt_topo, t_d_p_topo);
+      // minimize with topoisomerase pair potentials
+      // minimize_topoDNA_harmonic(t_d_p_topo);
+      // minimize_topoDNA_FENE(t_d_p_topo);
 
-          // step the pair potentials back to full strength of hard pairs
-          minimize_soft_harmonic(t_d_p_topo);
-          minimize_soft_FENE(t_d_p_topo);
-      }
+      // run the system while allowing strand crossings
+      // run_topoDNA_FENE(l_sim_p.dNt_topo, t_d_p_topo);
+
+      // step the pair potentials back to full strength of hard pairs
+      // minimize_soft_harmonic(t_d_p_topo);
+      // minimize_soft_FENE(t_d_p_topo);
+
 	  // reset the timestep to before the topoisomerase action
 	  reset_Nt(Nt_pre_topo);
 
@@ -1054,10 +1075,11 @@ void LAMMPS_simulator::run_loops(bool topo_always_on, int N_loops, unsigned long
 
       if (topo_always_on) {
           // minimize with soft pair potentials
+          // minimize_soft_harmonic(t_d_p_topo);
           minimize_topoDNA_harmonic(t_d_p_topo);
-          minimize_topoDNA_FENE(t_d_p_topo);
           // run the looped system
-          run_topoDNA_FENE(step_increment, t_d_p_iter);
+          // run_topoDNA_FENE(step_increment, t_d_p_iter);
+          run_donothing(step_increment, t_d_p_iter);
       } else {
           // minimize with hard pair potentials
           minimize_hard_harmonic(t_d_p_topo);
@@ -1597,11 +1619,16 @@ void LAMMPS_simulator::switch_fork_partition_force(bool s)
 
   if (s == true)
     {
+
       std::string mother, ld, rd;
-      std::string fix_cmd, temp_var, variable_cmd;
+      std::string fix_cmd, temp_var, variable_cmd, energy_cmd;
 
       std::array<std::string,3> dims = {"x","y","z"};
-  
+
+      energy_cmd = "variable PE equal pe";
+      //std::cout << energy_cmd << std::endl;
+      // command (energy_cmd);
+
       for (fork_partition f_p : f_ps)
 	{
 
@@ -1636,6 +1663,8 @@ void LAMMPS_simulator::switch_fork_partition_force(bool s)
 	      fix_cmd += " " + temp_var;
 	    }
 
+      // fix_cmd += " energy v_PE";
+
 	  fix_cmd += " every " + std::to_string(force_freq);
 	  fix_cmd += " region sphere_" + mother;
 
@@ -1650,6 +1679,8 @@ void LAMMPS_simulator::switch_fork_partition_force(bool s)
 	      temp_var = "v_rf" + dims[i] + "_" + mother;
 	      fix_cmd += " " + temp_var;
 	    }
+
+      // fix_cmd += " energy v_PE";
 
 	  fix_cmd += " every " + std::to_string(force_freq);
 	  fix_cmd += " region sphere_" + mother;

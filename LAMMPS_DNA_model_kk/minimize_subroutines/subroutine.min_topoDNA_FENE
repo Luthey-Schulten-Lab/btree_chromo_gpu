@@ -2,13 +2,13 @@
 include ${DNA_model_dir}/potentials/lmp.ribo_springs
 
 # include file with description of DNA polymer model with FENE bonds
-include ${DNA_model_dir}/potentials/lmp.twistable_DNA_model_FENE_omp
+include ${DNA_model_dir}/potentials/lmp.twistable_DNA_model_FENE_kk
 
 # include file with neighbor setup
 include ${DNA_model_dir}/protocol_subroutines/subroutine.neighbor_setup
 
 # include file with soft (topoisomerase) pair potentials
-include ${DNA_model_dir}/potentials/lmp.DNA_pair_topo_omp
+include ${DNA_model_dir}/potentials/lmp.DNA_pair_topo_kk
 
 # run the minimization
 min_style cg

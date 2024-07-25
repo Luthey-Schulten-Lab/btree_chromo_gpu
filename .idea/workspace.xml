@@ -20,39 +20,54 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="31e3448d-81be-4e67-ac75-8c3395c3774f" name="Changes" comment="Made omp version of fix brownian">
-      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.DNA_pair_soft_kk" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.DNA_pair_topo_kk" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.twistable_DNA_model_FENE_kk" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_donothing" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_bd.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_bd.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_base.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_base.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_kokkos.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_kokkos.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_langevin.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_langevin.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_langevin_kokkos.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_langevin_kokkos.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_langevin_kokkos_original.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_nve.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_nve.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_nve_kokkos.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_nve_kokkos.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_nve_kokkos_original.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_nve_kokkos_original.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_nve_sphere_kokkos.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_nve_sphere_kokkos.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/lmp.DNA_physical_params" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/lmp.DNA_physical_params" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_soft_harmonic" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_soft_harmonic" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.twistable_DNA_model_harmonic_kk" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.twistable_DNA_model_harmonic_kk" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/protocol_subroutines/subroutine.global_setup" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/protocol_subroutines/subroutine.global_setup" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/dump_subroutines/subroutine.dump_append_nofirst_lammpstrj" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/dump_subroutines/subroutine.dump_append_nofirst_lammpstrj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/dump_subroutines/subroutine.dump_noappend_first_lammpstrj" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/dump_subroutines/subroutine.dump_noappend_first_lammpstrj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/dump_subroutines/subroutine.dump_noappend_nofirst_lammpstrj" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/dump_subroutines/subroutine.dump_noappend_nofirst_lammpstrj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_hard_FENE" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_hard_FENE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_soft_FENE" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_soft_FENE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_topoDNA_FENE" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_topoDNA_FENE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_topoDNA_harmonic" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_topoDNA_harmonic" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.loop_bond_hybrid" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.loop_bond_hybrid" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.twistable_DNA_model_harmonic_omp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.BD_fixes" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.BD_fixes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_hard_FENE" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_hard_FENE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_hard_harmonic" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_hard_harmonic" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_soft_FENE" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_soft_FENE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_soft_harmonic" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_soft_harmonic" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_topoDNA_FENE" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_topoDNA_FENE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_topoDNA_harmonic" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_topoDNA_harmonic" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/apps/btree_chromo" beforeDir="false" afterPath="$PROJECT_DIR$/build/apps/btree_chromo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/LAMMPS_simulator.d" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/LAMMPS_simulator.d" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/objects/src/LAMMPS_simulator.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/LAMMPS_simulator.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/LAMMPS_sys.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/LAMMPS_sys.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/angle_array.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/angle_array.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/atom_array.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/atom_array.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/binding_region.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/binding_region.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/bond_array.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/bond_array.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/boundary_surface.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/boundary_surface.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/btree.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/btree.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/btree_chromo.d" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/btree_chromo.d" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/objects/src/btree_chromo.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/btree_chromo.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/btree_driver.d" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/btree_driver.d" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/objects/src/btree_driver.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/btree_driver.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/ellipsoid_array.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/ellipsoid_array.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/gillespie_solver.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/gillespie_solver.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/intra_step_distribution.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/intra_step_distribution.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/loop.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/loop.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/loop_topology.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/loop_topology.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/mapper.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/mapper.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/replication_model.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/replication_model.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/replicator.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/replicator.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/rxn_manipulator.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/rxn_manipulator.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/vec_quat_manipulator.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/vec_quat_manipulator.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/simulating_replication_kinetics/simulating_replication_kinetics_directives.inp" beforeDir="false" afterPath="$PROJECT_DIR$/examples/simulating_replication_kinetics/simulating_replication_kinetics_directives.inp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/LAMMPS_simulator.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/LAMMPS_simulator.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/LAMMPS_simulator.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/LAMMPS_simulator.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/atom_array.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/atom_array.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -92,9 +107,30 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_bd.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_bd.h" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian.h" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_asphere_omp.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_asphere_omp.h" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_base.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_base.h" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_base_omp.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_base_omp.h" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_kokkos.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_kokkos.h" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_omp.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_langevin.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_langevin.h" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_langevin_kokkos.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_langevin_kokkos.h" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_langevin_kokkos_original.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_nve.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_nve.h" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_nve_kokkos.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_nve_kokkos.h" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_nve_kokkos_original.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_nve_kokkos_original.h" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/vec_quat_manipulator.cpp" root0="SKIP_INSPECTION" />
   </component>
   <component name="MarkdownSettingsMigration">
@@ -116,34 +152,34 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "gpu__kokkos",
-    "last_opened_file_path": "/home/andrew/Desktop/Projects/btree_chromo/examples/simulating_chromosome",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "configurable.group.appearance",
-    "structure.view.defaults.are.configured": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;gpu__kokkos&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/andrew/Desktop/Projects/btree_chromo/LAMMPS_src_additions&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;configurable.group.appearance&quot;,
+    &quot;structure.view.defaults.are.configured&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/LAMMPS_src_additions" />
       <recent name="$PROJECT_DIR$/examples/simulating_chromosome" />
       <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/examples/simulating_chromosome_with_replication_chunky" />
-      <recent name="$PROJECT_DIR$/LAMMPS_src_additions" />
       <recent name="$PROJECT_DIR$/LAMMPS_DNA_model_no_twist_asphere/run_subroutines" />
     </key>
   </component>
@@ -179,12 +215,12 @@
       </method>
     </configuration>
     <list>
+      <item itemvalue="Native Application.Makefile" />
       <item itemvalue="Native Application.all" />
       <item itemvalue="Native Application.build" />
       <item itemvalue="Native Application.debug" />
       <item itemvalue="Native Application.info" />
       <item itemvalue="Native Application.release" />
-      <item itemvalue="Native Application.Makefile" />
     </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -207,6 +243,9 @@
       <workItem from="1715784409288" duration="94000" />
       <workItem from="1715784512793" duration="184000" />
       <workItem from="1715784698296" duration="171034000" />
+      <workItem from="1720807461582" duration="39300000" />
+      <workItem from="1721242796931" duration="38684000" />
+      <workItem from="1721935666022" duration="41000" />
     </task>
     <task id="LOCAL-00001" summary="Made omp version of fix brownian">
       <option name="closed" value="true" />

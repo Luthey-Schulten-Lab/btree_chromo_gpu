@@ -95,6 +95,7 @@ public:
   void run_soft_FENE(unsigned long N_steps, thermo_dump_parameters t_d_p);
   void run_hard_FENE(unsigned long N_steps, thermo_dump_parameters t_d_p);
   void run_topoDNA_FENE(unsigned long N_steps, thermo_dump_parameters t_d_p);
+  void run_donothing(unsigned long N_steps, thermo_dump_parameters t_d_p);
 
   // modulate particle size
   void scale_bdry_particles(double ds);
