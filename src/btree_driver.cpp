@@ -1859,7 +1859,7 @@ void btree_driver::prepare_command_requirements()
 
   // simulator_run_loops
   // number of required parameters
-  N_param_reqs["simulator_run_loops"] = 7;
+  N_param_reqs["simulator_run_loops"] = 6;
   // lock tests
   t_ls.clear();
   t_ls.push_back(new_lock("simulator_prepared",true));
@@ -3952,12 +3952,12 @@ int btree_driver::simulator_run_loops(std::vector<std::string> &params)
 
   t_d_p.append = false;
   t_d_p.write_first = true;
-  if (params[5] == "append")
+  if (params[4] == "append")
     {
       t_d_p.append = true;
       t_d_p.write_first = false;
     }
-  if (params[6] == "skip_first") t_d_p.write_first = false;
+  if (params[5] == "skip_first") t_d_p.write_first = false;
   t_d_p.dump_freq = stoi(params[4]);
   t_d_p.thermo_freq = stoi(params[3]);
 
@@ -3969,18 +3969,9 @@ int btree_driver::simulator_run_loops(std::vector<std::string> &params)
       return 0;
     }
 
-  bool topo_always_on;
-  if (params[0] == "T") {
-      topo_always_on = true;
-  }
-  else if (params[0] == "F") {
-      topo_always_on = false;
-  }
-
-  driver_lmp_simulator.run_loops(topo_always_on,
-				 stoi(params[1]),
-                 stoul(params[2]),
-				 t_d_p);
+  driver_lmp_simulator.run_loops(stoi(params[0]),
+                                 stoul(params[1]),
+                                 t_d_p);
 
   return 0;
 }

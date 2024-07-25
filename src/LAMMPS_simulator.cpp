@@ -997,7 +997,7 @@ void LAMMPS_simulator::update_loop_bonds(bool new_bonds)
 
 
 // run a system with loops
-void LAMMPS_simulator::run_loops(bool topo_always_on, int N_loops, unsigned long N_steps, thermo_dump_parameters t_d_p)
+void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump_parameters t_d_p)
 {
 
   unsigned long step_counter = 0;
@@ -1056,15 +1056,15 @@ void LAMMPS_simulator::run_loops(bool topo_always_on, int N_loops, unsigned long
 
 
       // minimize with topoisomerase pair potentials
-      // minimize_topoDNA_harmonic(t_d_p_topo);
-      // minimize_topoDNA_FENE(t_d_p_topo);
+      minimize_topoDNA_harmonic(t_d_p_topo);
+      minimize_topoDNA_FENE(t_d_p_topo);
 
       // run the system while allowing strand crossings
-      // run_topoDNA_FENE(l_sim_p.dNt_topo, t_d_p_topo);
+      run_topoDNA_FENE(l_sim_p.dNt_topo, t_d_p_topo);
 
       // step the pair potentials back to full strength of hard pairs
-      // minimize_soft_harmonic(t_d_p_topo);
-      // minimize_soft_FENE(t_d_p_topo);
+      minimize_soft_harmonic(t_d_p_topo);
+      minimize_soft_FENE(t_d_p_topo);
 
 	  // reset the timestep to before the topoisomerase action
 	  reset_Nt(Nt_pre_topo);
@@ -1073,20 +1073,10 @@ void LAMMPS_simulator::run_loops(bool topo_always_on, int N_loops, unsigned long
 	  step_prev_topo = step_counter + step_increment;
 	}
 
-      if (topo_always_on) {
-          // minimize with soft pair potentials
-          // minimize_soft_harmonic(t_d_p_topo);
-          minimize_topoDNA_harmonic(t_d_p_topo);
-          // run the looped system
-          // run_topoDNA_FENE(step_increment, t_d_p_iter);
-          run_donothing(step_increment, t_d_p_iter);
-      } else {
-          // minimize with hard pair potentials
-          minimize_hard_harmonic(t_d_p_topo);
-          minimize_hard_FENE(t_d_p_topo);
-          // run the looped system
-          run_hard_FENE(step_increment,t_d_p_iter);
-      }
+      minimize_hard_harmonic(t_d_p_topo);
+      minimize_hard_FENE(t_d_p_topo);
+      // run the looped system
+      run_hard_FENE(step_increment,t_d_p_iter);
 
       // advance the step counter
       step_counter += step_increment;
