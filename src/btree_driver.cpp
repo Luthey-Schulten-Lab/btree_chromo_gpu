@@ -3958,8 +3958,8 @@ int btree_driver::simulator_run_loops(std::vector<std::string> &params)
       t_d_p.write_first = false;
     }
   if (params[5] == "skip_first") t_d_p.write_first = false;
-  t_d_p.dump_freq = stoi(params[4]);
-  t_d_p.thermo_freq = stoi(params[3]);
+  t_d_p.dump_freq = stoi(params[3]);
+  t_d_p.thermo_freq = stoi(params[2]);
 
   // skip the run if skipping runs
   if (skip_runs == true)
