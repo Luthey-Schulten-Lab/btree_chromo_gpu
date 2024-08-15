@@ -1,3 +1,0 @@
-# create springs to hold the boundary
-variable bdry_spring equal 10.0*${kBT}
-fix bdrySpring bdry spring/self ${bdry_spring}

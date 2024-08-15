@@ -19,37 +19,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="31e3448d-81be-4e67-ac75-8c3395c3774f" name="Changes" comment="Made omp version of fix brownian">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_addforce.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_addforce.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_bd.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_bd.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_base.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_base.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_omp.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_omp.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_langevin.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_langevin.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_langevin_kokkos.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_langevin_kokkos.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_langevin_kokkos_original.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_nve.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_nve.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_nve_kokkos.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_nve_kokkos.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_nve_kokkos_original.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_nve_kokkos_original.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_nve_sphere_kokkos.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_nve_sphere_kokkos.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_setforce.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_setforce.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_setforce_kokkos.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_setforce_kokkos.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/installation.txt" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_src_additions/installation.txt" afterDir="false" />
-    </list>
+    <list default="true" id="31e3448d-81be-4e67-ac75-8c3395c3774f" name="Changes" comment="Made omp version of fix brownian" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -210,7 +180,7 @@
       <workItem from="1720807461582" duration="39300000" />
       <workItem from="1721242796931" duration="38684000" />
       <workItem from="1721935666022" duration="1856000" />
-      <workItem from="1723567075798" duration="36902000" />
+      <workItem from="1723567075798" duration="37224000" />
     </task>
     <task id="LOCAL-00001" summary="Made omp version of fix brownian">
       <option name="closed" value="true" />

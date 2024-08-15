@@ -1,2 +1,0 @@
-variable fork_force equal 5.0*${kBT}/${r_mono} # [(Kcal/mol)/A]
-variable fork_cutoff internal  2000.0 # [A]
