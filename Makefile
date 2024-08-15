@@ -16,26 +16,28 @@
 CXX      := -g++
 CXXFLAGS := -pedantic-errors -Wall -Wextra -Werror
 
-GCC_LIB := /home/andrew/anaconda3/envs/btree_chromo/lib
-OpenMPI_LIB := /home/andrew/anaconda3/envs/btree_chromo/lib
-fmt_LIB := /home/andrew/anaconda3/envs/btree_chromo/lib
+GCC_LIB := /usr/local/Compilers/GCC/12.1.0/lib
+OpenMPI_LIB := /usr/local/Libraries/OpenMPI/4.1.4/lib
+fmt_LIB := /usr/local/Libraries/fmt/9.1.0/lib
+LAMMPS_LIB := /usr/local/Software/LAMMPS/OMP_GPU_Kokkos/lib
+
+GCC_INC := /usr/local/Compilers/GCC/12.1.0/include
+OpenMPI_INC := /usr/local/Libraries/OpenMPI/4.1.4/include
+fmt_INC := /usr/local/Libraries/fmt/9.1.0/include
+boost_INC := /usr/local/Libraries/boost/1.82.0/include
 
 BASE_LDFLAGS  := -L${GCC_LIB} -lstdc++ -lm -std=c++17
 OPENMPI_LDFLAGS := -L${OpenMPI_LIB} -lmpi -pthread -Wl,-rpath -Wl,${OpenMPI_LIB} -Wl,--enable-new-dtags
 FMT_LDFLAGS := -L${fmt_LIB} -lfmt
-LAMMPS_LDFLAGS := /home/andrew/Software/Suites/LAMMPS/build_twistable_OMP_GPU_Kokkos/liblammps_twistable_OMP_GPU_Kokkos.so
-# LAMMPS_LDFLAGS := /home/andrew/Software/Suites/LAMMPS/build_twistable_BD_OMP/liblammps_twistable_BD_OMP.so
+LAMMPS_LDFLAGS := ${LAMMPS_LIB}/liblammps_OMP_GPU_Kokkos.so
 LDFLAGS := ${BASE_LDFLAGS} ${OPENMPI_LDFLAGS} ${FMT_LDFLAGS} ${LAMMPS_LDFLAGS}
 
-BASE_INCLUDE  := -Iinclude/ -I/home/andrew/anaconda3/envs/btree_chromo/include
-OPENMPI_INCLUDE := -I/home/andrew/anaconda3/envs/btree_chromo/include/openmpi
-FMT_INCLUDE := -I/home/andrew/anaconda3/envs/btree_chromo/include/fmt
-#BOOST_INCLUDE := -I${boost_INC}
-#LAMMPS_INCLUDE := -I/home/andrew/Software/Suites/LAMMPS/lammps-2Aug2023/src
+BASE_INCLUDE  := -Iinclude/ -I${GCC_INC}
+OPENMPI_INCLUDE := -I${OpenMPI_INC}
+FMT_INCLUDE := -I${fmt_INC}
+BOOST_INCLUDE := -I${boost_INC}
 LAMMPS_INCLUDE := -I/home/andrew/Software/Suites/LAMMPS/lammps-27Jun2024/src
-#LAMMPS_INCLUDE := -I/home/ben/Software/Suites/LAMMPS/feature_2023_02_08/lammps-8Feb2023/src
-#INCLUDE := ${BASE_INCLUDE} ${OPENMPI_INCLUDE} ${FMT_INCLUDE} ${BOOST_INCLUDE} ${LAMMPS_INCLUDE}
-INCLUDE := ${BASE_INCLUDE} ${OPENMPI_INCLUDE} ${FMT_INCLUDE} ${LAMMPS_INCLUDE}
+INCLUDE := ${BASE_INCLUDE} ${OPENMPI_INCLUDE} ${FMT_INCLUDE} ${BOOST_INCLUDE} ${LAMMPS_INCLUDE}
 
 BUILD    := ./build
 OBJ_DIR  := $(BUILD)/objects

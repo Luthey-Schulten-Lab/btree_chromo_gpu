@@ -238,7 +238,7 @@ void LAMMPS_simulator::setup_minimize(thermo_dump_parameters &t_d_p)
   extra_pots_to_sim_vars();
 
   // store the extra fixes and disable them during minimization
-  // disable_and_hold_extra_fixes(); // AKM change 7/13
+  disable_and_hold_extra_fixes();
 
   // // include compute for ids
   // compute_trigger("ids");
@@ -254,7 +254,7 @@ void LAMMPS_simulator::setup_minimize(thermo_dump_parameters &t_d_p)
 
   // include dump
   prepare_dump(0,t_d_p);
-  
+
 }
 
 
@@ -262,7 +262,7 @@ void LAMMPS_simulator::setup_minimize(thermo_dump_parameters &t_d_p)
 void LAMMPS_simulator::cleanup_minimize()
 {
   // restore the extra fixes
-  // restore_extra_fixes();  // AKM change 7/13
+  restore_extra_fixes();
 
   // reset the number of timesteps to Nt
   reset_timestep_to_Nt();
@@ -293,7 +293,7 @@ void LAMMPS_simulator::minimize_hard_harmonic(thermo_dump_parameters t_d_p)
 {
 
   // std::cout << "---[ minimizing HARD_HARMONIC ]---" << std::endl;
-  
+
   // setup the minimization
   setup_minimize(t_d_p);
 
@@ -310,7 +310,7 @@ void LAMMPS_simulator::minimize_topoDNA_harmonic(thermo_dump_parameters t_d_p)
 {
 
   std::cout << "---[ minimizing topoDNA_HARMONIC ]---" << std::endl;
-  
+
   // setup the minimization
   setup_minimize(t_d_p);
 
@@ -321,13 +321,13 @@ void LAMMPS_simulator::minimize_topoDNA_harmonic(thermo_dump_parameters t_d_p)
   cleanup_minimize();
 }
 
- 
+
 // minimize with soft potentials and FENE bonds
 void LAMMPS_simulator::minimize_soft_FENE(thermo_dump_parameters t_d_p)
 {
 
   // std::cout << "---[ minimizing SOFT_FENE ]---" << std::endl;
-  
+
   // setup the minimization
   setup_minimize(t_d_p);
 
@@ -344,7 +344,7 @@ void LAMMPS_simulator::minimize_hard_FENE(thermo_dump_parameters t_d_p)
 {
 
   // std::cout << "---[ minimizing HARD_FENE ]---" << std::endl;
-  
+
   // setup the minimization
   setup_minimize(t_d_p);
 
@@ -361,7 +361,7 @@ void LAMMPS_simulator::minimize_topoDNA_FENE(thermo_dump_parameters t_d_p)
 {
 
   // std::cout << "---[ minimizing topoDNA_FENE ]---" << std::endl;
-  
+
   // setup the minimization
   setup_minimize(t_d_p);
 
@@ -416,7 +416,7 @@ void LAMMPS_simulator::run_soft_harmonic(unsigned long N_steps, thermo_dump_para
 
   // set the timestep
   lmp->input->one("timestep ${delta_t}");
-  
+
   // run for N_steps
   lmp->input->one(("run " + std::to_string(N_steps)).c_str());
 
@@ -489,7 +489,7 @@ void LAMMPS_simulator::run_soft_FENE(unsigned long N_steps, thermo_dump_paramete
 
 // run with hard potentials and FENE bonds
 void LAMMPS_simulator::run_hard_FENE(unsigned long N_steps, thermo_dump_parameters t_d_p)
-{  
+{
   // setup for run
   setup_run(N_steps,t_d_p);
 
@@ -509,7 +509,7 @@ void LAMMPS_simulator::run_hard_FENE(unsigned long N_steps, thermo_dump_paramete
 
 // run with soft (topoisomerase) potentials and FENE bonds
 void LAMMPS_simulator::run_topoDNA_FENE(unsigned long N_steps, thermo_dump_parameters t_d_p)
-{  
+{
   // setup for run
   setup_run(N_steps,t_d_p);
 
@@ -551,7 +551,7 @@ void LAMMPS_simulator::prepare_dump(unsigned long N_steps, thermo_dump_parameter
 {
   std::string dump_cmd;
   std::string dump_label = "lammpstrj";
-  
+
   undump(dump_label);
 
   // std::cout << "dump_freq = " << t_d_p.dump_freq << std::endl;
@@ -565,7 +565,7 @@ void LAMMPS_simulator::prepare_dump(unsigned long N_steps, thermo_dump_parameter
 
       // delay by an amount corresponding to when the previous dump occurred
       lmp->input->one(("variable D_delay equal "+ std::to_string(prev_dump_Nt + t_d_p.dump_freq)).c_str());
-  
+
       // include dump
       if (t_d_p.append == true)
 	{
@@ -611,7 +611,7 @@ void LAMMPS_simulator::reset_timestep_to_Nt()
     {
       undump(dump.first);
     }
-  
+
   // reset the number of timesteps to Nt
   lmp->input->one(("reset_timestep " + std::to_string(Nt)).c_str());
 }
@@ -650,7 +650,7 @@ void LAMMPS_simulator::restore_Nt()
 // get atom counts from the simulator and resize the system
 void LAMMPS_simulator::sim_to_sys_atom_counts()
 {
-  
+
   double Nd = lammps_get_natoms(lmp);
   int N = int(Nd);
   std::cout << "Nd = " << Nd << std::endl;
@@ -709,16 +709,16 @@ void LAMMPS_simulator::sim_to_sys_atom_counts()
   lmp_sys->set_N_total_ellipsoids(N_mono_ribo);
   lmp_sys->set_N_mono_ellipsoids(N_mono);
   lmp_sys->set_N_ribo_ellipsoids(N_ribo);
-  
+
 }
 
 
 // dump the simulation state to the system state
 void LAMMPS_simulator::sim_to_sys()
 {
-  
+
   // sim_to_sys_atom_counts();
-  
+
   int N = lmp_sys->get_N_total();
   int N_mono = lmp_sys->get_N_mono();
   int N_ribo = lmp_sys->get_N_ribo();
@@ -737,7 +737,7 @@ void LAMMPS_simulator::sim_to_sys()
     {
 
       // copy the coordinates to the system state
-      
+
       double *coords = nullptr;
       if (coords == nullptr) coords = new double[3*N];
 
@@ -793,9 +793,9 @@ void LAMMPS_simulator::sim_to_sys()
 //	}
 
       // sync the subarrays with the total array
-      
+
       lmp_sys->sync_subarrays();
-      
+
     }
 }
 
@@ -808,7 +808,7 @@ int LAMMPS_simulator::read_loop_params(std::string loop_param_filename)
 
   std::string param_delim, param, val;
   int delim;
-  
+
   std::string line;
 
   loop_sim_params l_sim_p;
@@ -829,7 +829,7 @@ int LAMMPS_simulator::read_loop_params(std::string loop_param_filename)
 	{
 	  loop_param_file >> line;
 	  if (loop_param_file.eof()) break;
-	  
+
 
 	  if ((line.length() > 0) &&
 	      (line.find("#") != 0))
@@ -869,7 +869,7 @@ int LAMMPS_simulator::read_loop_params(std::string loop_param_filename)
 		    {
 		      l_sys_p.p_unbinding = stod(val);
 		    }
-		  
+
 		  else if (param == "r_g")
 		    {
 		      l_sys_p.r_g = stod(val);
@@ -901,9 +901,9 @@ int LAMMPS_simulator::read_loop_params(std::string loop_param_filename)
 		    }
 
 		}
-	      	      
+
 	    }
-	      
+
      	} // end while loop
 
       loop_param_file.close();
@@ -912,7 +912,7 @@ int LAMMPS_simulator::read_loop_params(std::string loop_param_filename)
       lmp_sys->set_loop_sys_params(l_sys_p);
 
       return 0;
-  
+
     }
 
 }
@@ -946,15 +946,15 @@ void LAMMPS_simulator::update_loop_bonds(bool new_bonds)
 
   if (new_bonds == false)
     {
-      
+
       lmp_sys->update_loop_topo();
-      
+
     }
 
 
   // get the loop bonds
   std::vector<bond> loop_bonds = lmp_sys->get_loop_bonds();
-  
+
   // add the updated loop bonds
   std::string temp_bond_command = "create_bonds single/bond";
   std::string bond_command;
@@ -975,7 +975,7 @@ void LAMMPS_simulator::update_loop_bonds(bool new_bonds)
 	}
 
       std::cout << i_loop << " " << bond_command << std::endl;
-      
+
       lmp->input->one(bond_command);
 
       if ((types[loop_bonds[i_loop].i-1] != 4) && (types[loop_bonds[i_loop].i-1] != 5))
@@ -991,7 +991,7 @@ void LAMMPS_simulator::update_loop_bonds(bool new_bonds)
   // scatter the now modified atom types
   // 0 for integer type, 1 for per-atom count
   lammps_scatter_atoms(lmp, const_cast<char*>("type"), 0, 1, types);
-  
+
   delete[] types;
 }
 
@@ -1006,7 +1006,7 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
   thermo_dump_parameters t_d_p_topo = t_d_p;
   unsigned long Nt_pre_topo, step_prev_topo;
   bool first_iteration, new_bonds;
-  
+
   // flag for first iteration
   first_iteration = true;
 
@@ -1039,7 +1039,7 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
 	  t_d_p_iter.write_first = false;
 	  t_d_p_iter.append = true;
 	}
-      
+
       // update the loop bonds
       update_loop_bonds(new_bonds);
 
@@ -1050,7 +1050,7 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
       if ((step_counter + step_increment) >=
 	  (step_prev_topo + l_sim_p.freq_topo))
 	{
-	  
+
 	  // store the timestep
 	  Nt_pre_topo = Nt;
 
@@ -1080,7 +1080,7 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
 
       // advance the step counter
       step_counter += step_increment;
-      
+
     }
 
 }
@@ -1143,7 +1143,7 @@ void LAMMPS_simulator::compute_trigger(std::string compute_label)
 
   // switch the state of the compute
   computes[compute_label] = true;
-  
+
 }
 
 
@@ -1273,7 +1273,7 @@ void LAMMPS_simulator::switch_extra_fix(std::string p, bool s)
 
       // switch the extra fix
       extra_fixes[p] = s;
-      
+
     }
 }
 
@@ -1305,7 +1305,7 @@ void LAMMPS_simulator::restore_extra_fixes()
 {
   std::string p;
   bool s;
-  
+
   // iterate over the set of extra fixes - store their state and disable
   for (auto extra_fix=extra_fixes_hold.begin(); extra_fix!=extra_fixes_hold.end(); ++extra_fix)
     {
@@ -1346,7 +1346,7 @@ void LAMMPS_simulator::increment_Nt(unsigned long dNt)
 void LAMMPS_simulator::scale_bdry_particles(double ds)
 {
   std::string cmd;
-  
+
   cmd = "variable r_bdry_temp equal " + std::to_string(ds) + "*${r_bdry}";
   command(cmd);
 
@@ -1389,7 +1389,7 @@ void LAMMPS_simulator::reset_bdry_particle_size()
 void LAMMPS_simulator::scale_ribo_particles(double ds)
 {
   std::string cmd;
-  
+
   cmd = "variable r_ribo_temp equal " + std::to_string(ds) + "*${r_ribo}";
   command(cmd);
 
@@ -1444,7 +1444,7 @@ void LAMMPS_simulator::prepare_fork_partition_groups(int idx)
   std::array<std::string,3> dims = {"x","y","z"};
 
   int mono_inc = 1;
-  
+
   for (fork_partition f_p : f_ps)
     {
 
@@ -1478,7 +1478,7 @@ void LAMMPS_simulator::prepare_fork_partition_groups(int idx)
 	}
 
       std::cout << group_cmd << std::endl;
-      
+
       command(group_cmd);
 
       // partitioning of right daughter
@@ -1507,7 +1507,7 @@ void LAMMPS_simulator::prepare_fork_partition_groups(int idx)
 	}
 
       std::cout << group_cmd << std::endl;
-      
+
       command(group_cmd);
 
 
@@ -1592,7 +1592,7 @@ void LAMMPS_simulator::prepare_fork_partition_groups(int idx)
 	  std::cout << variable_cmd << std::endl;
 	  command(variable_cmd);
 	}
-      
+
     }
 }
 
@@ -1602,10 +1602,10 @@ void LAMMPS_simulator::switch_fork_partition_force(bool s)
 {
 
   std::vector<fork_partition> f_ps = lmp_sys->get_all_fork_partitions();
-  
+
   command("include ${DNA_model_dir}/potentials/lmp.fork_partitioning");
 
-  int force_freq = 1;
+  //int force_freq = 1;
 
   if (s == true)
     {
@@ -1642,21 +1642,21 @@ void LAMMPS_simulator::switch_fork_partition_force(bool s)
 	      std::cout << variable_cmd << std::endl;
 	      command(variable_cmd);
 	    }
-	  
+
 
 	  // apply force to left daughter and descendants
 	  fix_cmd = "fix partition_" + ld + " " + ld + " addforce";
-	  
+
 	  for (size_t i=0; i<dims.size(); i++)
 	    {
-	      temp_var = "v_lf" + dims[i] + "_" + mother;
+	      temp_var = "${lf" + dims[i] + "_" + mother + "}";
 	      fix_cmd += " " + temp_var;
 	    }
 
       // fix_cmd += " energy v_PE";
 
-	  fix_cmd += " every " + std::to_string(force_freq);
-	  fix_cmd += " region sphere_" + mother;
+	  //fix_cmd += " every " + std::to_string(force_freq);
+	  //fix_cmd += " region sphere_" + mother;
 
 	  std::cout << fix_cmd << std::endl;
 	  command(fix_cmd);
@@ -1666,14 +1666,14 @@ void LAMMPS_simulator::switch_fork_partition_force(bool s)
 
 	  for (size_t i=0; i<dims.size(); i++)
 	    {
-	      temp_var = "v_rf" + dims[i] + "_" + mother;
+	      temp_var = "${rf" + dims[i] + "_" + mother + "}";
 	      fix_cmd += " " + temp_var;
 	    }
 
       // fix_cmd += " energy v_PE";
 
-	  fix_cmd += " every " + std::to_string(force_freq);
-	  fix_cmd += " region sphere_" + mother;
+	  //fix_cmd += " every " + std::to_string(force_freq);
+	  //fix_cmd += " region sphere_" + mother;
 
 	  std::cout << fix_cmd << std::endl;
 	  command(fix_cmd);

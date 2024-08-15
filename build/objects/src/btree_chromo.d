@@ -8,8 +8,8 @@ build/objects/src/btree_chromo.o: src/btree_chromo.cpp \
  include/angle_array.hpp include/loop_topology.hpp include/loop.hpp \
  include/binding_region.hpp include/intra_step_distribution.hpp \
  include/LAMMPS_simulator.hpp \
- /home/andrew/anaconda3/envs/btree_chromo/include/mpi.h \
- /home/andrew/anaconda3/envs/btree_chromo/include/mpi_portable_platform.h \
+ /usr/local/Libraries/OpenMPI/4.1.4/include/mpi.h \
+ /usr/local/Libraries/OpenMPI/4.1.4/include/mpi_portable_platform.h \
  /home/andrew/Software/Suites/LAMMPS/lammps-27Jun2024/src/lammps.h \
  /home/andrew/Software/Suites/LAMMPS/lammps-27Jun2024/src/domain.h \
  /home/andrew/Software/Suites/LAMMPS/lammps-27Jun2024/src/pointers.h \

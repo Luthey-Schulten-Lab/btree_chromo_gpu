@@ -1,7 +1,7 @@
 build/objects/src/LAMMPS_simulator.o: src/LAMMPS_simulator.cpp \
  include/LAMMPS_simulator.hpp \
- /home/andrew/anaconda3/envs/btree_chromo/include/mpi.h \
- /home/andrew/anaconda3/envs/btree_chromo/include/mpi_portable_platform.h \
+ /usr/local/Libraries/OpenMPI/4.1.4/include/mpi.h \
+ /usr/local/Libraries/OpenMPI/4.1.4/include/mpi_portable_platform.h \
  /home/andrew/Software/Suites/LAMMPS/lammps-27Jun2024/src/lammps.h \
  /home/andrew/Software/Suites/LAMMPS/lammps-27Jun2024/src/domain.h \
  /home/andrew/Software/Suites/LAMMPS/lammps-27Jun2024/src/pointers.h \
