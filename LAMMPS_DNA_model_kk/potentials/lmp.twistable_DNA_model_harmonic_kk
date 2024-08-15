@@ -22,25 +22,10 @@ bond_coeff 1 ${k_stretch} ${l_equil}
 include ${DNA_model_dir}/potentials/lmp.loop_bond
 
 # angle potentials
-#angle_style   hybrid polytorsion/omp cosine/omp harmonic/omp
-#angle_coeff   1 cosine/omp ${k_bend} # primary polymer chain angles
-#angle_coeff   2 polytorsion/omp ${k_align} ${k_twist} # primary polymer chain twist
-#angle_coeff   3 harmonic/omp ${k_bend} 120.0 # replication fork angles
-#angle_coeff   4 polytorsion/omp ${k_align} ${k_twist} # replication fork twist
-
-# angle potentials
 angle_style   cosine/kk
 angle_coeff   1 ${k_bend} # primary polymer chain angles
 angle_coeff   2 ${k_bend} # primary polymer chain twist (placeholder)
 angle_coeff   3 ${k_bend} # replication fork angles (placeholder)
 angle_coeff   4 ${k_bend} # replication fork twist (placeholder)
-
-# angle potentials
-#angle_style   hybrid cosine/kk harmonic/kk
-#angle_coeff   1 cosine/kk ${k_bend} # primary polymer chain angles
-#angle_coeff   2 cosine/kk ${k_bend} # primary polymer chain twist (placeholder)
-#angle_coeff   3 harmonic/kk ${k_bend} 120 # replication fork angles (placeholder)
-#angle_coeff   4 cosine/kk ${k_bend} # replication fork twist (placeholder)
-
 
 special_bonds angle yes

@@ -1,13 +1,9 @@
 ######################################
-# fix commands for Langevin dynamics #
+# fix commands for Brownian dynamics #
 ######################################
 
-# Langevin fix for DNA
-#fix dnaLangevin DNA langevin/kk ${T} ${T} ${ratio_t_mono} ${rng_seed}
-#fix dnaNVE DNA nve/kk
+# Brownian fix for DNA
 fix dnaBD DNA brownian/kk ${T} ${rng_seed} gamma_t ${gamma_t_mono}
 
-# Langevin fix for ribosomes
-#fix ribosLangevin ribos langevin/kk ${T} ${T} ${ratio_t_ribo} ${rng_seed}
-#fix ribosNVE ribos nve/kk
+# Brownian fix for ribosomes
 fix ribosBD ribos brownian/kk ${T} ${rng_seed} gamma_t ${gamma_t_ribo}
