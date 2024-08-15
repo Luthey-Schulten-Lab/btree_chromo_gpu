@@ -1,6 +1,0 @@
-Beginning in the directory with the LAMMPS source code (./lammps), copy the following files to the listed directories
-
-angle_polytorsion.cpp
-angle_polytorsion.h
-angle_polytorsion_end.cpp
-angle_polytorsion_end.h

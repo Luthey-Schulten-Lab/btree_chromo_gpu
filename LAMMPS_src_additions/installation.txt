@@ -1,4 +1,6 @@
-This file provides an explanation of how to modify the LAMMPS source code to run the twistable polymer model using multi-threaded versions of the angle_styles in Brackley et al. 2014 and the defaut Brownian dynamics integrator for aspherical particles.
+This file provides an explanation of how to modify the LAMMPS source code to run the twistable polymer model using multi-threaded versions of the angle_styles in Brackley et al. 2014 and the default Brownian dynamics integrator for aspherical particles.
+
+It also provides an explanation of how to add KOKKOS versions of fix brownian (Brownian dynamics integrator) and fix addforce (adds a force to atoms during timestepping).
 
 1) Beginning in the directory with the LAMMPS source code (./lammps), copy the following files to the listed directories.
 
@@ -24,6 +26,14 @@ This file provides an explanation of how to modify the LAMMPS source code to run
 ./lammps/cmake/Modules/Packages
 
  - OPENMP.cmake
+
+
+ ./lammps/src/KOKKOS
+
+ - fix_brownian_kokkos.cpp
+ - fix_brownian_kokkos.h
+ - fix_addforce_kokkos.cpp
+ - fix_addforce_kokkos.h
  
 
 2) Recompile LAMMPS using the cmake command in "cmake_command.txt".
@@ -37,3 +47,5 @@ This file provides an explanation of how to modify the LAMMPS source code to run
 
    Fixes:
     - fix_brownian_asphere_omp (new multi-threaded version of "fix_brownian_asphere")
+    - fix_brownian_kokkos (new KOKKOS version of "fix_brownian")
+    - fix_addforce_kokkos (new KOKKOS version of "fix_addforce")

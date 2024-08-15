@@ -20,39 +20,35 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="31e3448d-81be-4e67-ac75-8c3395c3774f" name="Changes" comment="Made omp version of fix brownian">
-      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_addforce.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_addforce.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_addforce_kokkos.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_addforce_kokkos.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_setforce.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_setforce.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_setforce_kokkos.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAMMPS_src_additions/fix_setforce_kokkos.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.BD_fixes" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.BD_fixes" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/apps/btree_chromo" beforeDir="false" afterPath="$PROJECT_DIR$/build/apps/btree_chromo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/LAMMPS_simulator.d" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/LAMMPS_simulator.d" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/LAMMPS_simulator.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/LAMMPS_simulator.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/btree_chromo.d" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/btree_chromo.d" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/btree_chromo.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/btree_chromo.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/btree_driver.d" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/btree_driver.d" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/btree_driver.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/btree_driver.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/simulating_chromosome/example.lammpstrj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/simulating_chromosome/example_longm.lammpstrj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/simulating_chromosome/example_lp_4500A.lammpstrj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/simulating_chromosome/example_lp_45A.lammpstrj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/simulating_chromosome/example_no_bending_angles.lammpstrj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/simulating_chromosome/example_no_bending_or_twisting_angles.lammpstrj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/simulating_chromosome/example_no_twisting_angles.lammpstrj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/simulating_chromosome_with_loops_and_topo/example.lammpstrj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/simulating_chromosome_with_replication/example.lammpstrj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/simulating_chromosome_with_replication/example_nobend.lammpstrj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/simulating_ensemble_protocols/output/example_rep00001.lammpstrj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/simulating_ensemble_protocols/output/example_rep00002.lammpstrj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/simulating_ensemble_protocols/output/example_rep00003.lammpstrj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/LAMMPS_simulator.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/LAMMPS_simulator.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/btree_driver.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/btree_driver.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_addforce.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_addforce.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_bd.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_bd.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_base.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_base.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_omp.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_omp.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_langevin.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_langevin.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_langevin_kokkos.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_langevin_kokkos.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_langevin_kokkos_original.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_nve.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_nve.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_nve_kokkos.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_nve_kokkos.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_nve_kokkos_original.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_nve_kokkos_original.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_nve_sphere_kokkos.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_nve_sphere_kokkos.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_setforce.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_setforce.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_setforce_kokkos.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/fix_setforce_kokkos.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_src_additions/installation.txt" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_src_additions/installation.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -93,32 +89,12 @@
 }</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_addforce_kokkos.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_bd.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_bd.h" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian.h" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_asphere_omp.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_asphere_omp.h" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_base.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_base.h" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_base_omp.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_base_omp.h" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_kokkos.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_kokkos.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_kokkos.h" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_omp.cpp" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_langevin.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_langevin.h" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_langevin_kokkos.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_langevin_kokkos.h" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_langevin_kokkos_original.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_nve.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_nve.h" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_nve_kokkos.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_nve_kokkos.h" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_nve_kokkos_original.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_nve_kokkos_original.h" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_setforce_kokkos.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/vec_quat_manipulator.cpp" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -234,7 +210,7 @@
       <workItem from="1720807461582" duration="39300000" />
       <workItem from="1721242796931" duration="38684000" />
       <workItem from="1721935666022" duration="1856000" />
-      <workItem from="1723567075798" duration="34734000" />
+      <workItem from="1723567075798" duration="36902000" />
     </task>
     <task id="LOCAL-00001" summary="Made omp version of fix brownian">
       <option name="closed" value="true" />
