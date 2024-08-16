@@ -39,7 +39,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="rot_min_frame" />
+        <entry key="$PROJECT_DIR$" value="gpu_kokkos" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -99,7 +99,7 @@
     "RunOnceActivity.readMode.enableVisualFormatting": "true",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "gpu__kokkos",
+    "git-widget-placeholder": "loop__no__min",
     "last_opened_file_path": "/home/andrew/Desktop/Projects/btree_chromo",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -183,7 +183,7 @@
       <workItem from="1720807461582" duration="39300000" />
       <workItem from="1721242796931" duration="38684000" />
       <workItem from="1721935666022" duration="1856000" />
-      <workItem from="1723567075798" duration="58430000" />
+      <workItem from="1723567075798" duration="58631000" />
     </task>
     <task id="LOCAL-00001" summary="Made omp version of fix brownian">
       <option name="closed" value="true" />
