@@ -220,11 +220,9 @@ See `examples` directory for a demonstration:
  - `repeat_replicates:min_rep,max_rep,label_padding` - *begin a region of directives that will be repeated for replicates ranging inclusively from (min_rep) to (max_rep), all I/O directives within the region will be modified to include a replicate label of the form '_rep0000X', where (label_padding) specifies the number of zeros*
  - `end_repeat_replicates` - *must follow a 'repeat_replicates' and terminates the region of directives that will be repeated with replicate identifiers*
 
-## Considerations when using with KOKKOS package
+## Considerations when using btree_chromo with KOKKOS
 
-*As of 8/16/24, using btree_chromo with LAMMPS with Kokkos enabled works. However, there are some important considerations one must take into account, which are detailed below.*
-
-### Using btree_chromo with KOKKOS
+*As of 8/16/24, using btree_chromo with LAMMPS with Kokkos enabled works. However, there are some important considerations one must take into account, which are listed below.*
 
 1) **Using the newest feature release of LAMMPS**: You need to use the newest feature release of LAMMPS, which right now is from 27 Jun 2024. It added Kokkos versions of bond_style hybrid and pair_style soft which are both required for our simulations. You can download it at https://www.lammps.org/download.html.
 2) **Adding files from LAMMPS_src_additions**: There are no official Kokkos versions of fix brownian or fix addforce in LAMMPS, so we wrote them ourselves. The files and directions for adding those files are in /LAMMPS_src_additions and /LAMMPS_src_additions/installation.txt, respectively.

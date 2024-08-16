@@ -21,12 +21,7 @@
   <component name="ChangeListManager">
     <list default="true" id="31e3448d-81be-4e67-ac75-8c3395c3774f" name="Changes" comment="Made omp version of fix brownian">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.DNA_loops" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.DNA_loops" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/protocol_subroutines/subroutine.global_setup" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/protocol_subroutines/subroutine.global_setup" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/apps/btree_chromo" beforeDir="false" afterPath="$PROJECT_DIR$/build/apps/btree_chromo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/objects/src/LAMMPS_simulator.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/LAMMPS_simulator.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/LAMMPS_simulator.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/LAMMPS_simulator.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -188,7 +183,7 @@
       <workItem from="1720807461582" duration="39300000" />
       <workItem from="1721242796931" duration="38684000" />
       <workItem from="1721935666022" duration="1856000" />
-      <workItem from="1723567075798" duration="56954000" />
+      <workItem from="1723567075798" duration="57084000" />
     </task>
     <task id="LOCAL-00001" summary="Made omp version of fix brownian">
       <option name="closed" value="true" />
