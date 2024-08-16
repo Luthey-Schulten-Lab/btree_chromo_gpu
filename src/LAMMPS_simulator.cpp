@@ -50,8 +50,8 @@ void LAMMPS_simulator::LAMMPS_initialize(std::string logfile)
 
   // custom argument vector for LAMMPS library
   // const char *lmpargv[] {"liblammps", "-log", logfile.c_str()};
-  // const char *lmpargv[] {"liblammps", "-log", logfile.c_str(), "-k", "on", "g", "1", "-sf", "kk", "-pk","kokkos"};
-  const char *lmpargv[] {"liblammps", "-log", logfile.c_str(), "-k", "on", "g", "1"};
+  const char *lmpargv[] {"liblammps", "-log", logfile.c_str(), "-k", "on", "g", "1", "-sf", "kk", "-pk","kokkos"};
+  // const char *lmpargv[] {"liblammps", "-log", logfile.c_str(), "-k", "on", "g", "1"};
   int lmpargc = sizeof(lmpargv)/sizeof(const char *);
 
   lmp = new LAMMPS_NS::LAMMPS(lmpargc, (char **)lmpargv, MPI_COMM_WORLD);
