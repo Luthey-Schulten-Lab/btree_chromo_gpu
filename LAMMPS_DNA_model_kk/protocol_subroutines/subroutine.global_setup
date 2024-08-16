@@ -5,8 +5,9 @@
 # OpenMP package
 # package omp ${nProc} neigh yes
 
-# Kokkos package (can also do -pk kokkos in LAMMPS_initialize)
-# package kokkos neigh full
+# Kokkos package
+package kokkos
+suffix kk
 
 # real units
 units real

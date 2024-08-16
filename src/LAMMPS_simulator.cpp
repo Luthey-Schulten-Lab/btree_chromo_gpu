@@ -49,9 +49,9 @@ void LAMMPS_simulator::LAMMPS_initialize(std::string logfile)
   MPI_Comm_rank(MPI_COMM_WORLD,&sim_MPI_rank); // current MPI rank
 
   // custom argument vector for LAMMPS library
-  //const char *lmpargv[] {"liblammps", "-log", logfile.c_str()};
-  const char *lmpargv[] {"liblammps", "-log", logfile.c_str(), "-k", "on", "g", "1", "-sf", "kk", "-pk","kokkos"};
-  //const char *lmpargv[] {"liblammps", "-log", logfile.c_str(), "-k", "on", "g", "1"};
+  // const char *lmpargv[] {"liblammps", "-log", logfile.c_str()};
+  // const char *lmpargv[] {"liblammps", "-log", logfile.c_str(), "-k", "on", "g", "1", "-sf", "kk", "-pk","kokkos"};
+  const char *lmpargv[] {"liblammps", "-log", logfile.c_str(), "-k", "on", "g", "1"};
   int lmpargc = sizeof(lmpargv)/sizeof(const char *);
 
   lmp = new LAMMPS_NS::LAMMPS(lmpargc, (char **)lmpargv, MPI_COMM_WORLD);
@@ -1003,7 +1003,7 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
   unsigned long step_counter = 0;
   unsigned long step_increment;
   thermo_dump_parameters t_d_p_iter = t_d_p;
-  thermo_dump_parameters t_d_p_topo = t_d_p;
+  // thermo_dump_parameters t_d_p_topo = t_d_p;
   unsigned long Nt_pre_topo, step_prev_topo;
   bool first_iteration, new_bonds;
 
@@ -1014,7 +1014,7 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
   step_prev_topo = step_counter;
 
   // prepare the dummy thermo and dump info
-  t_d_p_topo.dump_freq = 0;
+  // t_d_p_topo.dump_freq = 0;
 
   // repeat until the final number of steps is reached
   while (step_counter < N_steps)
@@ -1050,21 +1050,25 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
       if ((step_counter + step_increment) >=
 	  (step_prev_topo + l_sim_p.freq_topo))
 	{
-
+      std::cout << "Simulating topoisomerase action... " << std::endl;
+      	std::cout << "step_counter: " << step_counter << std::endl;
+      	std::cout << "step_increment: " << step_increment << std::endl;
+      	std::cout << "step_prev_topo: " << step_prev_topo << std::endl;
+      	std::cout << "freq_topo: " << l_sim_p.freq_topo << std::endl;
 	  // store the timestep
 	  Nt_pre_topo = Nt;
 
 
       // minimize with topoisomerase pair potentials
-      minimize_topoDNA_harmonic(t_d_p_topo);
-      minimize_topoDNA_FENE(t_d_p_topo);
+      //minimize_topoDNA_harmonic(t_d_p_topo);
+      //minimize_topoDNA_FENE(t_d_p_topo);
 
       // run the system while allowing strand crossings
-      run_topoDNA_FENE(l_sim_p.dNt_topo, t_d_p_topo);
+      // run_topoDNA_FENE(l_sim_p.dNt_topo, t_d_p_topo);
 
       // step the pair potentials back to full strength of hard pairs
-      minimize_soft_harmonic(t_d_p_topo);
-      minimize_soft_FENE(t_d_p_topo);
+      //minimize_soft_harmonic(t_d_p_topo);
+      //minimize_soft_FENE(t_d_p_topo);
 
 	  // reset the timestep to before the topoisomerase action
 	  reset_Nt(Nt_pre_topo);
@@ -1073,10 +1077,12 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
 	  step_prev_topo = step_counter + step_increment;
 	}
 
-      minimize_hard_harmonic(t_d_p_topo);
-      minimize_hard_FENE(t_d_p_topo);
+      //minimize_hard_harmonic(t_d_p_topo);
+      //minimize_hard_FENE(t_d_p_topo);
       // run the looped system
-      run_hard_FENE(step_increment,t_d_p_iter);
+      // run_hard_FENE(step_increment,t_d_p_iter);
+  	  run_topoDNA_harmonic(step_increment,t_d_p_iter);
+      // run_topoDNA_FENE(step_increment,t_d_p_iter);
 
       // advance the step counter
       step_counter += step_increment;

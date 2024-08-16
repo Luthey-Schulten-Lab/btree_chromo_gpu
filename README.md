@@ -153,7 +153,10 @@ See `examples` directory for a demonstration:
 #### Spatial System for Simulations
 
  - `load_BD_lengths:BD_length_file` - *reads lengths for Brownian dynamics simulation*
+ - `apply_RMF` - *applies rotation minimizing frame to spatial system, still in development*
  - `spherical_bdry:R,x0,y0,z0` - *generates bdry particles forming a sphere of radius R centered at (x0,y0,z0)*
+ - `cylindrical_bdry:L,R,x0,y0,z0` - *generates bdry particles forming a cylinder of length L and radius R centered at (x0,y0,z0), oriented in the x direction*
+ - `spherocylindrical_bdry:L,R,x0,y0,z0` - *generates bdry particles forming a cylinder of length L and radius R centered at (x0,y0,z0), oriented in the x direction, with hemispherical caps*
  - `load_mono_coords:coords_file,order` - *reads binary file with monomer coordinates (doubles) using data ordering convention (row/col)*
  - `load_mono_quats:quats_file,order` - *reads binary file with monomer quaternions (doubles) using data ordering convention (row/col)*
  - `load_ribo_coords:coords_file,order` - *reads binary file with ribosome coordinates (doubles) using data ordering convention (row/col)*
@@ -167,6 +170,7 @@ See `examples` directory for a demonstration:
  - `switch_bonds:(T/F)` - *enable/disable bonds between DNA monomers (default T), must be used prior to 'write_LAMMPS_data_file' to take effect*
  - `switch_bending_angles:(T/F)` - *enable/disable bending angles between DNA monomers (default T), must be used prior to 'write_LAMMPS_data_file' to take effect*
  - `switch_twisting_angles:(T/F)` - *enable/disable twisting angles between DNA monomers (default T), must be used prior to 'write_LAMMPS_data_file' to take effect*
+ - `switch_ellipsoids:(T/F)` - *enable/disable ellipsoid representation of DNA monomers (default T), must be used prior to 'write_LAMMPS_data_file' to take effect, must be disabled if using KOKKOS*
  - `switch_Ori_bdry_attraction:(T/F)` - *enable/disable attraction of Ori bead to bdry using morse/cut potential (default F)*
  - `switch_Ori_pair_repulsion:(T/F)` - *enable/disable repulsion between Ori beads using harmonic/cut potential (default F)*
  - `switch_fork_partition_repulsion:(T/F)` - *enable/disable repulsion between beads belonging to opposing daughters and their descendants (default F)*
@@ -215,6 +219,18 @@ See `examples` directory for a demonstration:
  - `end_repeat` - *must follow a 'repeat' and terminates the region of directives that will be repeated*
  - `repeat_replicates:min_rep,max_rep,label_padding` - *begin a region of directives that will be repeated for replicates ranging inclusively from (min_rep) to (max_rep), all I/O directives within the region will be modified to include a replicate label of the form '_rep0000X', where (label_padding) specifies the number of zeros*
  - `end_repeat_replicates` - *must follow a 'repeat_replicates' and terminates the region of directives that will be repeated with replicate identifiers*
+
+## Considerations when using with KOKKOS package
+
+*As of 8/16/24, using btree_chromo with LAMMPS with Kokkos enabled works. However, there are some important considerations one must take into account, which are detailed below.*
+
+### Using btree_chromo with KOKKOS
+
+1) **Using the newest feature release of LAMMPS**: You need to use the newest feature release of LAMMPS, which right now is from 27 Jun 2024. It added Kokkos versions of bond_style hybrid and pair_style soft which are both required for our simulations. You can download it at https://www.lammps.org/download.html.
+2) **Adding files from LAMMPS_src_additions**: There are no official Kokkos versions of fix brownian or fix addforce in LAMMPS, so we wrote them ourselves. The files and directions for adding those files are in /LAMMPS_src_additions and /LAMMPS_src_additions/installation.txt, respectively.
+3) **Compiling LAMMPS with the correct cmake command**: Please use the command in the file /LAMMPS_src_additions/cmake_command.txt under the heading "# corrected for Kokkos" as a template. Besides names for your build, installation path, and path to the vmd/plugins/include folder, you will need to change your CPU architecture (e.g. -DKokkos_ARCH_HOSTARCH=ZEN3) and GPU architecture (-DGPU_ARCH=sm_86, etc.) to match those appropriate for the machine you will be running on.
+2) **Calling LAMMPS_DNA_model_kk**: In order to perform minimizations and dynamics with Kokkos, one should call LAMMPS_DNA_model_kk instead of LAMMPS_DNA_model. Doing so ensures that one calls the kk versions of pair_style lj/cut, pair_style soft, bond_style fene, bond_style harmonic, and angle_style cosine. It also removes atom_style ellipsoid, and replaces angle_style harmonic at replication forks with angle_style cosine.
+3) **btree_chromo directives required to run with Kokkos**: Besides doing `simulator_set_DNA_model:/path/to/LAMMPS_DNA_model_kk`, one must also be sure to use the command `switch_ellipsoids:F`, prior to doing `write_LAMMPS_data_file`.
 
 ## Visualization
 
