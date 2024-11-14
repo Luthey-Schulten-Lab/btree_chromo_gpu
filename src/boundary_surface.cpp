@@ -179,82 +179,77 @@ int boundary_surface::vert_from_edge(std::array<int,2> &e, std::vector<edge_map>
   return -1;
 }
 
+// AKM edit 111424
+#include <unordered_set>
+#include <functional>
 
-// interpolate along the current surfaces
+// Helper function to get a unique hash for an edge
+struct EdgeHash {
+    std::size_t operator()(const std::array<int, 2>& edge) const {
+        int a = edge[0], b = edge[1];
+        return std::hash<int>()(std::min(a, b)) ^ std::hash<int>()(std::max(a, b));
+    }
+};
+
+// Helper function to compare two edges (ignores order)
+struct EdgeEqual {
+    bool operator()(const std::array<int, 2>& edge1, const std::array<int, 2>& edge2) const {
+        return (edge1[0] == edge2[0] && edge1[1] == edge2[1]) ||
+               (edge1[0] == edge2[1] && edge1[1] == edge2[0]);
+    }
+};
+
 void boundary_surface::interpolate_surface()
 {
+    const int perm_edges[3][2] = {{0, 1}, {1, 2}, {2, 0}};
+    std::vector<tri_face> old_tri_surf = tri_surf;
+    tri_surf.clear();
 
-  const int perm_edges[3][2] = {{0,1},{1,2},{2,0}};
-  std::vector<tri_face> old_tri_surf = tri_surf;
-  tri_surf.clear();
+    // Using unordered_set to store unique edges
+    std::unordered_set<std::array<int, 2>, EdgeHash, EdgeEqual> unique_edges;
 
-  // determine the set of unique edges between vertices
-  std::vector<std::array<int,2>> unique_edges;
-  bool new_edge;
-  std::array<int,2> temp_edge;
-
-  unique_edges.clear();
-
-  // loop over old faces
-  for (tri_face t_f : old_tri_surf)
+    // Loop over old faces
+    for (const tri_face& t_f : old_tri_surf)
     {
+        // Loop over edges in the face of the old surface
+        for (int j = 0; j < 3; j++)
+        {
+            std::array<int, 2> temp_edge = {
+                std::min(t_f.verts[perm_edges[j][0]], t_f.verts[perm_edges[j][1]]),
+                std::max(t_f.verts[perm_edges[j][0]], t_f.verts[perm_edges[j][1]])
+            };
 
-      // std::cout << t_f.verts[0] << "," << t_f.verts[1] << "," << t_f.verts[2] << std::endl;
-      // loop over edges in face of old surface
-      for (int j=0; j<3; j++)
-	{
-	  
-	  temp_edge[0] = t_f.verts[perm_edges[j][0]];
-	  temp_edge[1] = t_f.verts[perm_edges[j][1]];
-
-	  // loop over set of unique edges
-	  new_edge = true;
-	  for (std::array<int,2> edge : unique_edges)
-	    {
-	      if (edge_equiv(temp_edge,edge) == true)
-		{
-		  new_edge = false;
-		  break;
-		}
-	    }
-
-	  // add edge if unique
-	  if (new_edge == true)
-	    {
-	      unique_edges.push_back(temp_edge);
-	      // std::cout << temp_edge[0] << " " << temp_edge[1] << std::endl;
-	    }
-	  
-	}
-    }
-  edge_map temp_e_m;
-  std::vector<edge_map> edge_mapping;
-
-  edge_mapping.clear();
-  
-  for (std::array<int,2> edge : unique_edges)
-    {
-      // std::cout << edge[0] << "," << edge[1] << std::endl;
-      coords.push_back((vqm.v_linterp(0.5,
-				      coords[edge[0]],
-				      coords[edge[1]])));
-      temp_e_m.vert = coords.size() - 1;
-      temp_e_m.edge = edge;
-      edge_mapping.push_back(temp_e_m);
+            // Insert edge into the set (automatically handles duplicates)
+            unique_edges.insert(temp_edge);
+        }
     }
 
-  // std::cout << "number old_tri_surfs = " << old_tri_surf.size() << std::endl;
-  
-  for (tri_face t_f : old_tri_surf)
+    edge_map temp_e_m;
+    std::vector<edge_map> edge_mapping;
+    edge_mapping.reserve(unique_edges.size()); // Reserve space for edge mapping
+
+    // Process each unique edge
+    for (const auto& edge : unique_edges)
     {
-      // std::cout << t_f.verts[0] << "," << t_f.verts[1] << "," << t_f.verts[2] << std::endl;
-      interpolate_face(t_f,edge_mapping);
-      // std::cout << tri_surf.size() << std::endl;
+        // Linear interpolation of the midpoint
+        coords.push_back(vqm.v_linterp(0.5, coords[edge[0]], coords[edge[1]]));
+
+        // Create edge map entry
+        temp_e_m.vert = coords.size() - 1;
+        temp_e_m.edge = edge;
+        edge_mapping.push_back(temp_e_m);
     }
 
-  // std::cout << "number tri_surfs = " << tri_surf.size() << std::endl;
-  
+    // Reserve space for the resulting tri_surf to avoid repeated reallocations
+    tri_surf.reserve(old_tri_surf.size() * 4); // Assuming splitting each triangle into 4 smaller ones
+
+    // Interpolate faces using edge mapping
+    for (const tri_face& t_f : old_tri_surf)
+    {
+        interpolate_face(t_f, edge_mapping);
+    }
 }
+
 
 
 void boundary_surface::generate_sphere(double R, double r)
@@ -292,21 +287,76 @@ void boundary_surface::generate_cylinder(double L, double R, double r)
 
 }
 
-void boundary_surface::generate_spherocylinder(double L, double R, double r)
+void boundary_surface::generate_overlapping_spheres(double h, double R, double r, double u, double v, double w)
 {
-    generate_sphere(R, r);
-    for (size_t i = 0; i < coords.size(); i++)
-    {
-        if (coords[i].x < 0) {
-            coords[i].x = coords[i].x - L/2;
-        }
-        else {
-            coords[i].x = coords[i].x + L/2;
-        }
+  std::vector<vec> coords1, coords2;
+
+  // Generate the sphere coordinates only once
+  generate_sphere(R, r);
+  coords1 = coords;  // Copy the generated coordinates
+  coords2 = coords;
+
+  // Center points of the two spheres
+  vec center1 = {-h * u, -h * v, -h * w};
+  vec center2 = {h * u, h * v, h * w};
+
+  // Shift the spheres without modifying the original coords vectors
+  for (auto &pt : coords1) {
+    pt.x += center1.x;
+    pt.y += center1.y;
+    pt.z += center1.z;
+  }
+  for (auto &pt : coords2) {
+    pt.x += center2.x;
+    pt.y += center2.y;
+    pt.z += center2.z;
+  }
+
+  // Prepare the final filtered coordinates vector
+  std::vector<vec> filtered_coords;
+  double epsilon = 1e-6;
+
+  // Filter beads from coords1 that are not inside the second sphere
+  for (const auto &pt : coords1) {
+    if (!is_inside_sphere(pt, center2, R + r + epsilon)) {
+      filtered_coords.push_back(pt);
     }
-    generate_cylinder(L, R, r);
+  }
+
+  // Filter beads from coords2 that are not inside the first sphere
+  for (const auto &pt : coords2) {
+    if (!is_inside_sphere(pt, center1, R + r - epsilon)) {
+      filtered_coords.push_back(pt);
+    }
+  }
+
+  // Assign the final filtered list to coords
+  coords = std::move(filtered_coords);
 }
 
+
+bool boundary_surface::is_inside_sphere(vec point, vec center, double R) {
+  double dx = point.x - center.x;
+  double dy = point.y - center.y;
+  double dz = point.z - center.z;
+  double distance_squared = dx * dx + dy * dy + dz * dz;
+  return distance_squared < R * R;
+}
+
+void boundary_surface::generate_spherocylinder(double L, double R, double r)
+{
+  generate_sphere(R, r);
+  for (size_t i = 0; i < coords.size(); i++)
+  {
+    if (coords[i].x < 0) {
+      coords[i].x = coords[i].x - L/2;
+    }
+    else {
+      coords[i].x = coords[i].x + L/2;
+    }
+  }
+  generate_cylinder(L, R, r);
+}
 
 // getter for coordinates
 std::vector<vec> boundary_surface::get_coords()

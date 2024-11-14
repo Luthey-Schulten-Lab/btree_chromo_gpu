@@ -20,8 +20,47 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="31e3448d-81be-4e67-ac75-8c3395c3774f" name="Changes" comment="Made omp version of fix brownian">
+      <change afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/protocol_subroutines/subroutine.group_setup" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/btree_chromo.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/btree_chromo.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/lmp.DNA_physical_params" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/lmp.DNA_physical_params" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_hard_FENE" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_hard_FENE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_hard_harmonic" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_hard_harmonic" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_soft_FENE" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_soft_FENE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_soft_harmonic" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_soft_harmonic" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_topoDNA_FENE" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_topoDNA_FENE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_topoDNA_harmonic" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/minimize_subroutines/subroutine.min_topoDNA_harmonic" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.DNA_pair_hard_kk" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.DNA_pair_hard_kk" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.DNA_pair_soft_kk" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.DNA_pair_soft_kk" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.twistable_DNA_model_FENE_kk" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.twistable_DNA_model_FENE_kk" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.twistable_DNA_model_harmonic_kk" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/potentials/lmp.twistable_DNA_model_harmonic_kk" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/protocol_subroutines/subroutine.global_setup" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/protocol_subroutines/subroutine.global_setup" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.BD_fixes" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.BD_fixes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_donothing" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_donothing" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_hard_FENE" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_hard_FENE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_hard_harmonic" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_hard_harmonic" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_soft_FENE" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_soft_FENE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_soft_harmonic" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_soft_harmonic" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_topoDNA_FENE" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_topoDNA_FENE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_topoDNA_harmonic" beforeDir="false" afterPath="$PROJECT_DIR$/LAMMPS_DNA_model_kk/run_subroutines/subroutine.run_topoDNA_harmonic" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/apps/btree_chromo" beforeDir="false" afterPath="$PROJECT_DIR$/build/apps/btree_chromo" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/LAMMPS_simulator.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/LAMMPS_simulator.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/LAMMPS_sys.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/LAMMPS_sys.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/atom_array.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/atom_array.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/boundary_surface.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/boundary_surface.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/btree_chromo.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/btree_chromo.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/objects/src/btree_driver.o" beforeDir="false" afterPath="$PROJECT_DIR$/build/objects/src/btree_driver.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/LAMMPS_sys.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/LAMMPS_sys.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/boundary_surface.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/boundary_surface.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/btree_driver.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/btree_driver.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/python/LAMMPS_helpers/read_LAMMPS_DNA.py" beforeDir="false" afterPath="$PROJECT_DIR$/python/LAMMPS_helpers/read_LAMMPS_DNA.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/python/loop_compaction.py" beforeDir="false" afterPath="$PROJECT_DIR$/python/loop_compaction.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/python/pickle_trajs.py" beforeDir="false" afterPath="$PROJECT_DIR$/python/pickle_trajs.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/LAMMPS_simulator.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/LAMMPS_simulator.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/LAMMPS_sys.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/LAMMPS_sys.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/atom_array.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/atom_array.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/boundary_surface.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/boundary_surface.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/btree_driver.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/btree_driver.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,12 +101,17 @@
 }</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_addforce_kokkos.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_asphere_omp.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_asphere_omp.h" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_base_omp.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_base_omp.h" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_asphere_omp.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_asphere_omp.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_base_omp.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_base_omp.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_kokkos.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/LAMMPS_src_additions/fix_brownian_kokkos.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/include/LAMMPS_sys.hpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/LAMMPS_sys.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/bond_array.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/btree_driver.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/loop_topology.cpp" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -88,29 +132,51 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.RadMigrateCodeStyle": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "loop__no__min",
-    "last_opened_file_path": "/home/andrew/Desktop/Projects/btree_chromo",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "configurable.group.appearance",
-    "structure.view.defaults.are.configured": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.RadMigrateCodeStyle&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;loop__no__min&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/ben/anaconda3/bin/conda&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;PyConsoleConfigurable.Python Console&quot;,
+    &quot;structure.view.defaults.are.configured&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
+  <component name="PyConsoleOptionsProvider">
+    <option name="myPythonConsoleState">
+      <console-settings module-name="btree_chromo" sdk-home="$PROJECT_DIR$/../../../../ben/anaconda3/envs/LAMMPS/bin/python">
+        <envs>
+          <env key="PYTHONPATH" value="$PROJECT_DIR$/../../../../ben/anaconda3/envs/LAMMPS/lib/python3.9/site-packages" />
+        </envs>
+        <option name="sdk">
+          <Sdk />
+        </option>
+        <option name="mySdkHome" value="$PROJECT_DIR$/../../../../ben/anaconda3/envs/LAMMPS/bin/python" />
+        <option name="mySdk">
+          <Sdk />
+        </option>
+        <option name="myModuleName" value="btree_chromo" />
+        <option name="myEnvs">
+          <map>
+            <entry key="PYTHONPATH" value="$PROJECT_DIR$/../../../../ben/anaconda3/envs/LAMMPS/lib/python3.9/site-packages" />
+          </map>
+        </option>
+      </console-settings>
+    </option>
+  </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
@@ -152,12 +218,12 @@
       </method>
     </configuration>
     <list>
+      <item itemvalue="Native Application.Makefile" />
       <item itemvalue="Native Application.all" />
       <item itemvalue="Native Application.build" />
       <item itemvalue="Native Application.debug" />
       <item itemvalue="Native Application.info" />
       <item itemvalue="Native Application.release" />
-      <item itemvalue="Native Application.Makefile" />
     </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -183,7 +249,11 @@
       <workItem from="1720807461582" duration="39300000" />
       <workItem from="1721242796931" duration="38684000" />
       <workItem from="1721935666022" duration="1856000" />
-      <workItem from="1723567075798" duration="58903000" />
+      <workItem from="1723567075798" duration="297650000" />
+      <workItem from="1728849725107" duration="909000" />
+      <workItem from="1728850635647" duration="21000" />
+      <workItem from="1730143805915" duration="1773000" />
+      <workItem from="1731356438364" duration="19135000" />
     </task>
     <task id="LOCAL-00001" summary="Made omp version of fix brownian">
       <option name="closed" value="true" />

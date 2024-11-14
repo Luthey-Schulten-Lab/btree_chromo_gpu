@@ -41,6 +41,9 @@ if "${Ori_bdry_attraction}==1" then &
 if "${Ori_pair_repulsion}==1" then &
    "variable temp_pstyle string '${temp_pstyle} harmonic/cut/kk'"
 
+#variable temp_pstyle string "pair_style hybrid/kk lj/cut/kk 2.5 soft/kk 2.5"
+#variable temp_pstyle string "pair_style hybrid lj/cut/kk 2.5 soft/kk 2.5"
+
 print ' PAIR_STYLE: ${temp_pstyle}'
    
 ${temp_pstyle}
@@ -70,6 +73,9 @@ if "${Ori_bdry_attraction}==1" then &
 
 if "${Ori_pair_repulsion}==1" then &
    "pair_coeff 4 4 harmonic/cut/kk ${epsilon_ori} ${r_ori_equil}"
+
+# repulsion from anchors (AKM TESTING 8/23/24)
+pair_coeff 3*6 7 ${epsilon_LJ} ${sigma_ribo_ribo} ${WCA_ribo_ribo}
 
 # pair_style hybrid &
 # lj/cut/kk 2.5 &

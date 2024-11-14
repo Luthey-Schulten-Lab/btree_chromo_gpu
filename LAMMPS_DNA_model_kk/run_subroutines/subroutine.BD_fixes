@@ -3,7 +3,10 @@
 ######################################
 
 # Brownian fix for DNA
-fix dnaBD DNA brownian/kk ${T} ${rng_seed} gamma_t ${gamma_t_mono}
+fix dnaBD DNA_noanchor brownian/kk ${T} ${rng_seed} gamma_t ${gamma_t_mono}
 
 # Brownian fix for ribosomes
 fix ribosBD ribos brownian/kk ${T} ${rng_seed} gamma_t ${gamma_t_ribo}
+
+# Brownian fix for anchors (SMC)
+fix smcBD anchors brownian/kk ${T} ${rng_seed} gamma_t ${gamma_t_smc}

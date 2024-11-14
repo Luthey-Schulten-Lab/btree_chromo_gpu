@@ -18,15 +18,15 @@ importlib.reload(r_L_D)
 import chromosome_structure.chromosome_structure as c_s
 importlib.reload(c_s)
 
-conditions = np.array([0,25,50,100],dtype=np.int32)
+conditions = np.array([100],dtype=np.int32)
 N_conditions = conditions.shape[0]
-in_base_dir = '/home/ben/Data/btree_chromo/loop_compaction_testing_new/'
-in_base_label = 'loops_'
+in_base_dir = '/home/andrew/Data/btree_chromo/fork_partition_testing/'
+in_base_label = 'fork_partition_testing8'
 min_rep = 1
 max_rep = 1
 
-out_dir = '/home/ben/Documents/svn/Minimal_Cell_Chromosome_Organization_2022/tex_figures/looping_summary/raw_plots/'
-out_label = 'loop_compaction_v2'
+out_dir = '/home/andrew/Data/btree_chromo/fork_partition_testing/'
+out_label = 'fork_partition_testing_8'
 
 write_RoG = True
 read_RoG = True
@@ -36,7 +36,7 @@ if not os.path.isdir(out_dir):
 
 RoG_file = out_dir + out_label + '_RoG.pickle'
 
-ts_RoG = np.arange(0,4000000+1,50000,dtype=np.int32)
+ts_RoG = np.arange(0,9020000+1,10000,dtype=np.int32)
 print(ts_RoG)
 freq = 1
 window = 100
@@ -50,14 +50,15 @@ if write_RoG:
 
     for i_condition in range(N_conditions):
 
-        in_file_temp = in_base_dir + in_base_label + str(conditions[i_condition]) + '/'
-        in_file_temp += (in_base_label + str(conditions[i_condition]))
+        in_file_temp = in_base_dir + in_base_label # + str(conditions[i_condition]) + '/'
+        #in_file_temp += (in_base_label + str(conditions[i_condition]))
 
         for rep in range(min_rep,max_rep+1):
 
             # read the trajectory
 
-            rep_label = '_rep' + str(rep).zfill(5)
+            #rep_label = '_rep' + str(rep).zfill(5)
+            rep_label = ''
 
             in_file = in_file_temp + rep_label + '.pkl_traj'
 

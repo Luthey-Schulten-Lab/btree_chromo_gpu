@@ -7,7 +7,7 @@ variable kBT equal ${kBoltz}*${T} # [Kcal/mol]
 variable r_mono internal 17.0 # radius of monomer [A]
 variable r_ribo internal 100.0 # radius of ribosome [A]
 variable r_sphere internal 2500.0 # radius of cell membrane [A]
-variable r_bdry equal 2.5*${r_mono} # radius of boundary particles
+variable r_bdry equal 5*${r_mono} # radius of boundary particles. Normally set to 2.5*r_mono = 42.5
 variable sigma_mono_mono equal 2*${r_mono}
 variable sigma_mono_ribo equal ${r_mono}+${r_ribo}
 variable sigma_ribo_ribo equal 2*${r_ribo}
@@ -30,6 +30,8 @@ variable m_eT internal 1.0E-3 # mass of orientation particle [g/mol]
 variable rho_mono equal ${m_mono}/((4.0/3.0)*PI*${r_mono}^3) # density of monomer [g/(mol*A^3)]
 variable rho_ribo equal ${m_ribo}/((4.0/3.0)*PI*${r_ribo}^3) # density of ribosome [g/(mol*A^3)]
 
+variable m_anchor internal 7.0E+5 # mass of SMC complex [g/mol]
+
 # variable describing damping coefficients
 # variable eta equal 1.6840E+5 # dynamic viscosity of cytoplasm [Kcal*fs/(mol*A^3)]
 variable eta internal 7.0434E+1 # dynamic viscosity of cytoplasm [(g/mol)/(fs*A)]
@@ -41,6 +43,8 @@ variable gamma_t_ribo equal 6*PI*${eta}*${r_ribo} # [(g/mol)/fs]
 variable gamma_r_ribo equal ${gamma_t_ribo}*(${sigma_ribo_ribo}^2)/3
 variable ratio_t_mono equal ${m_mono}/${gamma_t_mono}
 variable ratio_t_ribo equal ${m_ribo}/${gamma_t_ribo}
+
+variable gamma_t_smc equal 2*6*PI*${eta}*${r_ribo} # [(g/mol)/fs]
 
 print """
 ----------------------------------
@@ -84,7 +88,7 @@ print """
 """
 
 mass 8 ${m_mono}
-mass 7 ${m_mono}
+mass 7 ${m_anchor}
 mass 6 ${m_mono}
 mass 5 ${m_mono}
 mass 4 ${m_mono}
@@ -92,20 +96,4 @@ mass 3 ${m_mono}
 mass 2 ${m_ribo}
 mass 1 ${m_bdry}
 
-# create groups
-print """
- ------------------------
- ---[ Grouping Atoms ]---
- ------------------------
-"""
 
-group bdry type 1
-group ribos type 2
-group monos type 3
-group oris type 4
-group ters type 5
-group forks type 6
-group anchors type 7
-group hinges type 8
-group DNA union monos oris ters forks anchors hinges
-group DNAribos union DNA ribos

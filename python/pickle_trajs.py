@@ -16,8 +16,8 @@ import sys
 import LAMMPS_helpers.read_LAMMPS_DNA as r_L_D
 importlib.reload(r_L_D)
 
-in_dir = '/home/andrew/Data/btree_chromo/hamiltonian_testing/'
-in_label = 'hamiltonian_bond_bending'
+in_dir = '/home/andrew/Data/btree_chromo/fork_partition_testing/'
+in_label = 'softev_SMCev8'
 #in_dir = '/home/ben/Data/btree_chromo/loop_compaction_testing_new/loops_25/'
 #in_label = 'loops_25'
 #in_dir = '/home/ben/Data/btree_chromo/small_system_Jan/'
@@ -27,8 +27,8 @@ in_label = 'hamiltonian_bond_bending'
 #in_dir = '/home/ben/Data/btree_chromo/full_chromo_movie/'
 #in_label = 'full_chromo_run0'
 
-out_dir = '/home/andrew/Data/btree_chromo/hamiltonian_testing/'
-out_label = 'hamiltonian_bond_bending'
+out_dir = '/home/andrew/Data/btree_chromo/fork_partition_testing/'
+out_label = 'fork_partition_testing8'
 # out_dir = '/home/ben/Data/btree_chromo/loop_compaction_testing_new/loops_25/'
 # out_label = 'loops_25'
 # out_dir = '/home/been/Data/btree_chromo/small_system_Jan/'
@@ -53,7 +53,7 @@ N_reps = reps.shape[0]
 
 timestep_options = ['Last','FirstLast','Slices','All']
 timestep_select = timestep_options[3]
-slices = [0,50000,100000,150000,200000,250000]
+slices = [0,50000,100000,150000,200000,250000] #???
 
 
 if not os.path.isdir(out_dir):
@@ -63,7 +63,8 @@ for i_rep in range(N_reps):
 
     rep = reps[i_rep]
     
-    rep_label = '_rep' + str(rep).zfill(5)
+    #rep_label = '_rep' + str(rep).zfill(5)
+    rep_label =''
 
     in_file = in_dir + in_label + rep_label  + '.lammpstrj'
 

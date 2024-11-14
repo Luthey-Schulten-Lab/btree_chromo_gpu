@@ -69,6 +69,7 @@ public:
   void generate_spherical_bdry(double r, double x0, double y0, double z0);
   void generate_cylindrical_bdry(double l, double r, double x0, double y0, double z0);
   void generate_spherocylindrical_bdry(double l, double r, double x0, double y0, double z0);
+  void generate_overlapping_spheres_bdry(double l, double r, double x0, double y0, double z0, double u, double v, double w);
 
   // read the monomer coordinates and quaternions
   int read_mono_coords(std::string coords_filename, std::string order);
@@ -96,6 +97,9 @@ public:
 
   // write the monomer coordinates to an xyz for quick visualization
   void write_mono_xyz(std::string data_filename);
+
+  // write the boundary coordinates to an xyz for quick visualization
+  void write_bdry_xyz(std::string data_filename);
 
   // write the monomer orientations to an xyz for quick visualization
   void write_mono_orientation_xyz(std::string data_filename);
@@ -136,7 +140,7 @@ public:
   void prepare_loop_topo();
   void initialize_loop_topo(int N_loops);
   void update_loop_topo();
-  std::vector<bond> get_loop_bonds();
+  std::vector<bond>get_loop_bonds();
 
   // switches for the topology
   void switch_bonds(bool s);

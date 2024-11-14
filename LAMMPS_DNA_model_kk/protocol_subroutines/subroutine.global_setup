@@ -6,8 +6,8 @@
 # package omp ${nProc} neigh yes
 
 # Kokkos package
-package kokkos
-suffix kk
+#package kokkos
+#suffix kk
 
 # real units
 units real

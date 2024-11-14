@@ -169,6 +169,7 @@ private:
   int spherical_bdry(std::vector<std::string> &params);
   int cylindrical_bdry(std::vector<std::string> &params);
   int spherocylindrical_bdry(std::vector<std::string> &params);
+  int overlapping_spheres_bdry(std::vector<std::string> &params);
   // loading BD lengths
   int load_BD_lengths(std::vector<std::string> &params);
   // apply rotation minimizing frame
@@ -186,6 +187,7 @@ private:
   // writing LAMMPS data file
   int write_LAMMPS_data(std::vector<std::string> &params);
   int write_mono_xyz(std::vector<std::string> &params);
+  int write_bdry_xyz(std::vector<std::string> &params);
   int write_mono_orientation_xyz(std::vector<std::string> &params);
   // mapper
   int set_initial_state();

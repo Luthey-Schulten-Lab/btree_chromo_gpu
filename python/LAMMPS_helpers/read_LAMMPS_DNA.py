@@ -110,10 +110,10 @@ def read_traj(filename,in_timesteps=None,slices=None):
             f.seek(0)
             
             # atom orientations
-            temp_q = np.loadtxt(f,dtype=np.float32,\
-                                skiprows=skip_row_count,\
-                                usecols=(5,6,7,8),\
-                                max_rows=Natoms[i_t])
+            #temp_q = np.loadtxt(f,dtype=np.float32,\
+            #                    skiprows=skip_row_count,\
+            #                    usecols=(5,6,7,8),\
+            #                    max_rows=Natoms[i_t])
 
 
             # create dictionaries to hold the DNA, ribo, and bdry information
@@ -142,10 +142,10 @@ def read_traj(filename,in_timesteps=None,slices=None):
                     temp_x[DNA_idx[i],:]
 
             # get DNA orientations
-            traj[t]['DNA']['q'] = np.zeros((N_DNA,4),dtype=np.float32)
-            for i in range(N_DNA):
-                traj[t]['DNA']['q'][offset_DNA_id[i],:] = \
-                    temp_q[DNA_idx[i],:]
+            #traj[t]['DNA']['q'] = np.zeros((N_DNA,4),dtype=np.float32)
+            #for i in range(N_DNA):
+            #    traj[t]['DNA']['q'][offset_DNA_id[i],:] = \
+            #        temp_q[DNA_idx[i],:]
 
             # get DNA type
             traj[t]['DNA']['type'] = np.zeros((N_DNA),dtype=np.int32)

@@ -1403,6 +1403,17 @@ void btree_driver::prepare_command_requirements()
   t_ls.clear();
   lock_updates["spherocylindrical_bdry"] = t_ls;
 
+  // overlapping_spheres_bdry
+  // number of required parameters
+  N_param_reqs["overlapping_spheres_bdry"] = 8;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("BD_lengths_present",true));
+  lock_tests["overlapping_spheres_bdry"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["overlapping_spheres_bdry"] = t_ls;
+
 
   // apply_RMF
   // number of required parameters
@@ -1464,6 +1475,17 @@ void btree_driver::prepare_command_requirements()
   // lock updates
   t_ls.clear();
   lock_updates["write_mono_xyz"] = t_ls;
+
+  // write_bdry_xyz
+  // number of required parameters
+  N_param_reqs["write_bdry_xyz"] = 1;
+  // lock tests
+  t_ls.clear();
+  t_ls.push_back(new_lock("btree_initialized",true));
+  lock_tests["write_bdry_xyz"] = t_ls;
+  // lock updates
+  t_ls.clear();
+  lock_updates["write_bdry_xyz"] = t_ls;
 
   // write_mono_orientation_xyz
   // number of required parameters
@@ -2453,6 +2475,11 @@ int btree_driver::execute_single_command(std::string &command,
       error_code = spherocylindrical_bdry(params);
   }
 
+    // write file containing the spherocylindrical boundary coordinates
+  else if (command == "overlapping_spheres_bdry")
+  {
+      error_code = overlapping_spheres_bdry(params);
+  }
 
   // load file containing length-scales for BD simulations
   else if (command == "load_BD_lengths")
@@ -2529,6 +2556,12 @@ int btree_driver::execute_single_command(std::string &command,
     {
       error_code = write_mono_xyz(params);
     }
+
+  // write the LAMMPS system data
+  else if (command == "write_bdry_xyz")
+  {
+      error_code = write_bdry_xyz(params);
+  }
 
   // write the LAMMPS system data
   else if (command == "write_mono_orientation_xyz")
@@ -3570,6 +3603,20 @@ int btree_driver::spherocylindrical_bdry(std::vector<std::string> &params)
 }
 
 
+int btree_driver::overlapping_spheres_bdry(std::vector<std::string> &params)
+{
+    driver_lmp_sys.generate_overlapping_spheres_bdry(stod(params[0]),
+                                             stod(params[1]),
+                                             stod(params[2]),
+                                             stod(params[3]),
+                                             stod(params[4]),
+                                             stod(params[5]),
+                                             stod(params[6]),
+                                             stod(params[7]));
+    return 0;
+}
+
+
 int btree_driver::switch_bonds(std::vector<std::string> &params)
 {
   if (params[0] == "T")
@@ -3713,6 +3760,12 @@ int btree_driver::write_mono_xyz(std::vector<std::string> &params)
 {
   driver_lmp_sys.write_mono_xyz(params[0]);
   return 0;
+}
+
+int btree_driver::write_bdry_xyz(std::vector<std::string> &params)
+{
+    driver_lmp_sys.write_bdry_xyz(params[0]);
+    return 0;
 }
 
 int btree_driver::write_mono_orientation_xyz(std::vector<std::string> &params)

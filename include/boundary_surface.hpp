@@ -36,6 +36,7 @@ public:
   void generate_sphere(double R, double r);
   void generate_cylinder(double L, double R, double r);
   void generate_spherocylinder(double L, double R, double r);
+  void generate_overlapping_spheres(double h, double R, double r, double u, double v, double w);
   
   // surface-wide operations
   void project_to_sphere();
@@ -51,6 +52,9 @@ public:
 
   // write an xyz file for testing
   void write_xyz(std::string data_filename);
+
+  //helpers
+  bool is_inside_sphere(vec point, vec center, double R);
 
 private:
 

@@ -97,11 +97,14 @@ void LAMMPS_simulator::read_data(std::string data_file)
   // read the data
   // lmp->input->one("newton off"); // Andrew's jank method of turning newton bond value on, 070124
 
-  lmp->input->one(("read_data " + data_file + " extra/bond/per/atom 2").c_str());
+  lmp->input->one(("read_data " + data_file + " extra/bond/per/atom 4").c_str());
 
 
   // include the physical parameterization of the DNA polymer model
   lmp->input->one("include ${DNA_model_dir}/lmp.DNA_physical_params");
+
+  // include the bead groupings of the DNA polymer model
+  lmp->input->one("include ${DNA_model_dir}/protocol_subroutines/subroutine.group_setup");
 
   // fix the boundary particles in a static position
   lmp->input->one("include ${DNA_model_dir}/potentials/lmp.bdry_static");
@@ -1003,7 +1006,7 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
   unsigned long step_counter = 0;
   unsigned long step_increment;
   thermo_dump_parameters t_d_p_iter = t_d_p;
-  // thermo_dump_parameters t_d_p_topo = t_d_p;
+  thermo_dump_parameters t_d_p_topo = t_d_p;
   unsigned long Nt_pre_topo, step_prev_topo;
   bool first_iteration, new_bonds;
 
@@ -1014,7 +1017,7 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
   step_prev_topo = step_counter;
 
   // prepare the dummy thermo and dump info
-  // t_d_p_topo.dump_freq = 0;
+  t_d_p_topo.dump_freq = 0;
 
   // repeat until the final number of steps is reached
   while (step_counter < N_steps)
@@ -1060,15 +1063,16 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
 
 
       // minimize with topoisomerase pair potentials
-      // minimize_topoDNA_harmonic(t_d_p_topo);
-      //minimize_topoDNA_FENE(t_d_p_topo);
+      minimize_topoDNA_harmonic(t_d_p_topo);
+      minimize_topoDNA_FENE(t_d_p_topo);
 
       // run the system while allowing strand crossings
-      // run_topoDNA_FENE(l_sim_p.dNt_topo, t_d_p_topo);
+      run_topoDNA_FENE(l_sim_p.dNt_topo, t_d_p_topo);
+      // run_topoDNA_harmonic(l_sim_p.dNt_topo, t_d_p_topo);
 
       // step the pair potentials back to full strength of hard pairs
-      //minimize_soft_harmonic(t_d_p_topo);
-      //minimize_soft_FENE(t_d_p_topo);
+      minimize_soft_harmonic(t_d_p_topo);
+      minimize_soft_FENE(t_d_p_topo);
 
 	  // reset the timestep to before the topoisomerase action
 	  reset_Nt(Nt_pre_topo);
@@ -1077,11 +1081,11 @@ void LAMMPS_simulator::run_loops(int N_loops, unsigned long N_steps, thermo_dump
 	  step_prev_topo = step_counter + step_increment;
 	}
 
-      //minimize_hard_harmonic(t_d_p_topo);
-      //minimize_hard_FENE(t_d_p_topo);
+      minimize_hard_harmonic(t_d_p_topo);
+      minimize_hard_FENE(t_d_p_topo);
       // run the looped system
-      // run_hard_FENE(step_increment,t_d_p_iter);
-  	  run_topoDNA_harmonic(step_increment,t_d_p_iter);
+      run_hard_FENE(step_increment,t_d_p_iter);
+  	  // run_soft_harmonic(step_increment,t_d_p_iter);
       // run_topoDNA_FENE(step_increment,t_d_p_iter);
 
       // advance the step counter

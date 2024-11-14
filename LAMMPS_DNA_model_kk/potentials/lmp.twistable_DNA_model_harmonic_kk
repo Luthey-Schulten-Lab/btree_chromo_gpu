@@ -29,3 +29,4 @@ angle_coeff   3 ${k_bend} # replication fork angles (placeholder)
 angle_coeff   4 ${k_bend} # replication fork twist (placeholder)
 
 special_bonds angle yes
+
