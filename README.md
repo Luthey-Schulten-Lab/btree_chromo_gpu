@@ -157,6 +157,7 @@ See `examples` directory for a demonstration:
  - `spherical_bdry:R,x0,y0,z0` - *generates bdry particles forming a sphere of radius R centered at (x0,y0,z0)*
  - `cylindrical_bdry:L,R,x0,y0,z0` - *generates bdry particles forming a cylinder of length L and radius R centered at (x0,y0,z0), oriented in the x direction*
  - `spherocylindrical_bdry:L,R,x0,y0,z0` - *generates bdry particles forming a cylinder of length L and radius R centered at (x0,y0,z0), oriented in the x direction, with hemispherical caps*
+  - `overlapping_spheres_bdry:h,R,x0,y0,z0,u,v,w` - *generates bdry particles from two overlapping spheres, each with radius R and with centers length h away from the center plane, with the two internal caps removed. Oriented along a unit vector (u,v,w), e.g. the z direction (0,0,1)*
  - `load_mono_coords:coords_file,order` - *reads binary file with monomer coordinates (doubles) using data ordering convention (row/col)*
  - `load_mono_quats:quats_file,order` - *reads binary file with monomer quaternions (doubles) using data ordering convention (row/col)*
  - `load_ribo_coords:coords_file,order` - *reads binary file with ribosome coordinates (doubles) using data ordering convention (row/col)*
