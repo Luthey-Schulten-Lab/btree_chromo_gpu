@@ -1615,19 +1615,13 @@ void LAMMPS_simulator::switch_fork_partition_force(bool s)
 
   command("include ${DNA_model_dir}/potentials/lmp.fork_partitioning");
 
-  //int force_freq = 1;
-
   if (s == true)
     {
 
       std::string mother, ld, rd;
-      std::string fix_cmd, temp_var, variable_cmd, energy_cmd;
+      std::string fix_cmd, temp_var, variable_cmd;
 
       std::array<std::string,3> dims = {"x","y","z"};
-
-      energy_cmd = "variable PE equal pe";
-      //std::cout << energy_cmd << std::endl;
-      // command (energy_cmd);
 
       for (fork_partition f_p : f_ps)
 	{
@@ -1663,10 +1657,7 @@ void LAMMPS_simulator::switch_fork_partition_force(bool s)
 	      fix_cmd += " " + temp_var;
 	    }
 
-      // fix_cmd += " energy v_PE";
-
-	  //fix_cmd += " every " + std::to_string(force_freq);
-	  //fix_cmd += " region sphere_" + mother;
+	  fix_cmd += " region sphere_" + mother;
 
 	  std::cout << fix_cmd << std::endl;
 	  command(fix_cmd);
@@ -1680,10 +1671,7 @@ void LAMMPS_simulator::switch_fork_partition_force(bool s)
 	      fix_cmd += " " + temp_var;
 	    }
 
-      // fix_cmd += " energy v_PE";
-
-	  //fix_cmd += " every " + std::to_string(force_freq);
-	  //fix_cmd += " region sphere_" + mother;
+	  fix_cmd += " region sphere_" + mother;
 
 	  std::cout << fix_cmd << std::endl;
 	  command(fix_cmd);
