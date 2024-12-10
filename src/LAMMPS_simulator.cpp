@@ -1563,7 +1563,7 @@ void LAMMPS_simulator::prepare_fork_partition_groups(int idx)
       region_cmd += " sphere";
       for (size_t i=0; i<dims.size(); i++)
 	{
-	  region_cmd += " v_" + dims[i] + "_com_" + mother;
+	  region_cmd += " ${" + dims[i] + "_com_" + mother + "}";
 	}
       region_cmd += " ${fork_cutoff}";
       std::cout << region_cmd << std::endl;
