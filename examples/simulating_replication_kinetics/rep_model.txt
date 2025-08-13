@@ -1,0 +1,40 @@
+# average replication rate per replisome
+# units - [monomers/s]
+k_rep=5.0E+2
+
+# DnaA creation from genes and destruction
+# units - [M^-1*s^-1]
+k_c=0.0
+# units - [s^-1]
+k_d=0.0
+
+# DnaA filament details
+
+# binding to high-affinity site by domain IV
+# number of high-affinity sites
+N_hi=1
+# units - [M^-1*s^-1]
+k_hi=7.8E+6
+
+
+# binding to flanking low-affinity sites by domain IV
+# number of low-affinity sites
+N_lo=2
+# units - [M^-1*s^-1]
+k_lo=3.5E+4
+
+
+# filamentation along ssDNA by domain III
+# filament length
+N_fil=30
+# units - [M^-1*s^-1]
+k_on=1.0E+5
+# units - [s^-1]
+k_off=5.5E-1
+
+
+# insertion of replisome into bubble
+# minimum filament length (including N_hi and N_lo) for bubble formation
+bubble_min_fil=25
+# units - [s^-1]
+k_bubble=1.0E-3

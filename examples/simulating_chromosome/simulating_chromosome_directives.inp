@@ -1,0 +1,81 @@
+######################
+######  README  ######
+######################
+
+# PURPOSE: run a simulation of an unreplicated chromosome
+
+# NOTE 1: comment the ``terminate'' at the top to execute all of the commands
+
+# NOTE 2: change all directories in this file from ``/home/andrew/Desktop/Projects/'' to the local repository location
+
+# NOTE 3: by default the runs will be skipped
+
+# NOTE 4: change the number of processors to whatever is appropriate
+
+######################
+######################
+######################
+
+
+#terminate
+
+
+#enable/disable the skipping of runs/minimizations for debugging of directive file
+switch_skip_runs:F
+
+
+#set the prng seed
+btree_prng_seed:10
+
+#repeat_replicates:1,1,4
+#create a new circular chromosome with 5000 monomers
+new_chromo:5000
+
+
+#load the BD lengths
+load_BD_lengths:/home/andrew/Desktop/Projects/btree_chromo/examples/simulating_chromosome/BD_lengths.txt
+
+
+#commands to set up the simulator
+prepare_simulator:log.test
+simulator_set_prng_seed:10
+simulator_set_nProc:8
+simulator_set_DNA_model:/home/andrew/Desktop/Projects/btree_chromo/LAMMPS_DNA_model/
+simulator_set_delta_t:1.0E+5
+switch_twisting_angles:T
+switch_bending_angles:T
+
+#set the directory and file label for the simulation output
+simulator_set_output_details:/home/andrew/Data/btree_chromo/hamiltonian_testing/,hamiltonian_bond_bending
+
+
+#load the monomer coordinates and orientations
+load_mono_coords:/home/andrew/Desktop/Projects/btree_chromo/examples/simulating_chromosome/x_mono_5000mono_50ribo_bdry900A.bin,row
+load_mono_quats:/home/andrew/Desktop/Projects/btree_chromo/examples/simulating_chromosome/q_mono_5000mono_50ribo_bdry900A.bin,row
+write_mono_xyz:/home/andrew/Desktop/Projects/btree_chromo/examples/simulating_chromosome/test_initial.xyz
+terminate
+#load the ribosome coordinates and orientations
+load_ribo_coords:/home/andrew/Desktop/Projects/btree_chromo/examples/simulating_chromosome/x_ribo_5000mono_50ribo_bdry900A.bin,row
+load_ribo_quats:/home/andrew/Desktop/Projects/btree_chromo/examples/simulating_chromosome/q_ribo_5000mono_50ribo_bdry900A.bin,row
+
+
+#generate a spherical boundary with 900A radius centered at the origin
+spherical_bdry:900.0,0.0,0.0,0.0
+
+
+#write a LAMMPS data file with the current system for the simulation
+write_LAMMPS_data:/home/andrew/Desktop/Projects/btree_chromo/examples/simulating_chromosome/data.example
+
+
+#read the LAMMPS data file into the simulator
+simulator_read_data:/home/andrew/Desktop/Projects/btree_chromo/examples/simulating_chromosome/data.example
+
+
+#relax the structure
+#simulator_relax_progressive:10000,5000
+simulator_minimize_soft_harmonic:5000
+sync_simulator_and_system
+write_mono_coords:/home/andrew/Data/btree_chromo/hamiltonian_testing/hamiltonian_bond_bending_twisting_soft_harmonic_0MC_rep00001.bin,row
+#run the system
+#simulator_run_hard_FENE:50000,1000,5000,noappend,first
+#end_repeat_replicates

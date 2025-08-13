@@ -1,0 +1,60 @@
+######################
+######  README  ######
+######################
+
+# PURPOSE: simulate replication kinetics of DnaA
+
+# NOTE 1: comment the ``terminate'' at the top to execute all of the commands
+
+# NOTE 2: change all directories in this file from ``/home/andrew/Desktop/Projects/'' to the local repository location
+
+######################
+######################
+######################
+
+
+#terminate
+
+
+#set the prng seed
+btree_prng_seed:10
+replicator_prng_seed:15
+
+
+#create a new circular chromosome with 1000000 monomers
+new_chromo:1000000
+
+
+#print the current replication state
+print
+
+
+#output the current state
+output_state:/home/andrew/Desktop/Projects/btree_chromo/examples/simulating_replication_kinetics/chromo_state_0.dat
+#read the model of the replication kinetics
+replicator_load_model:/home/andrew/Desktop/Projects/btree_chromo/examples/simulating_replication_kinetics/rep_model.txt
+
+
+#set the volume, DnaA count, and maximum number of replisomes
+#replicator_set_volume:3.3E-17
+replicator_load_volume_protocol:/home/andrew/Desktop/Projects/btree_chromo/examples/simulating_replication_kinetics/volume_trace.txt
+replicator_set_DnaA:300
+replicator_set_max_replisomes:8
+
+
+#initialize the replicator's time
+replicator_set_time:0.0
+
+
+#run the replicator for 1800 seconds
+repeat:3
+replicator_run:600.0
+end_repeat
+
+
+#print the current replication state
+print
+
+
+#output the current state
+output_state:/home/andrew/Desktop/Projects/btree_chromo/examples/simulating_replication_kinetics/chromo_state_2.dat

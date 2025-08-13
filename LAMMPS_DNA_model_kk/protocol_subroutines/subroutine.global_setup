@@ -1,0 +1,21 @@
+#################################
+# prepare LAMMPS for simulation #
+#################################
+
+# OpenMP package
+# package omp ${nProc} neigh yes
+
+# Kokkos package
+#package kokkos
+#suffix kk
+
+# real units
+units real
+# atom style
+# atom_style hybrid angle ellipsoid
+# atom_style hybrid/kk angle/kk sphere/kk
+atom_style angle/kk
+# periodic boundaries
+boundary f f f
+# atom map
+atom_modify id yes map hash
