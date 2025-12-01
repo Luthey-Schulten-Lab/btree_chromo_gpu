@@ -1,0 +1,47 @@
+# create groups
+print """
+ ------------------------
+ ---[ Grouping Atoms ]---
+ ------------------------
+"""
+
+group bdry empty
+group ribos empty
+group monos empty
+group oris empty
+group ters empty
+group forks empty
+group anchors empty
+group hinges empty
+group extruded_monos empty
+group DNA empty
+group DNA_noanchor empty
+group DNAribos empty
+
+group bdry clear
+group ribos clear
+group monos clear
+group oris clear
+group ters clear
+group forks clear
+group anchors clear
+group hinges clear
+group extruded_monos clear
+group DNA clear
+group DNA_noanchor clear
+group DNAribos clear
+
+
+group bdry type 1
+group ribos type 2
+group monos type 3
+group oris type 4
+group ters type 5
+group forks type 6
+group anchors type 7
+group hinges type 8
+group extruded_monos type 9
+group DNA union monos oris ters forks anchors hinges extruded_monos
+group DNA_noanchor subtract DNA anchors
+group DNA_noextrudedmonos subtract DNA extruded_monos
+group DNAribos union DNA ribos

@@ -1,0 +1,16 @@
+######################################
+# fix commands for Brownian dynamics #
+######################################
+
+# Brownian fix for DNA
+fix dnaBD DNA brownian/kk ${T} ${rng_seed} gamma_t ${gamma_t_mono}
+
+# Brownian fix for ribosomes
+fix ribosBD ribos brownian/kk ${T} ${rng_seed} gamma_t ${gamma_t_ribo}
+
+# Brownian fix for anchors (SMC)
+# fix smcBD anchors brownian/kk ${T} ${rng_seed} gamma_t ${gamma_t_mono}
+
+# fix dnaRecenter DNA recenter/kk 0.0 0.0 0.0
+
+info fixes

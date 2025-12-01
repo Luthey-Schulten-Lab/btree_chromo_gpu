@@ -1,0 +1,32 @@
+# example 1: Ben's workstation
+
+cmake -B build_GPU_Kokkos/ -S lammps/cmake/ -DBUILD_MPI=yes -DBUILD_OMP=yes -DLAMMPS_MACHINE=GPU_Kokkos -DBUILD_SHARED_LIBS=yes -DCMAKE_INSTALL_PREFIX=/usr/local/Software/LAMMPS/GPU_Kokkos -DPKG_GPU=yes -DPKG_KOKKOS=on -DMPIEXEC_EXECUTABLE=/usr/local/Libraries/OpenMPI/4.1.1/bin/mpicxx -DKokkos_ARCH_ZEN2=yes -DKokkos_ENABLE_OMP=yes -DKokkos_ARCH_AMPERE86=yes -DKokkos_ENABLE_CUDA=yes -DGPU_API=cuda -DGPU_ARCH=sm_86 -DCMAKE_CUDA_ARCHITECTURES=86 -DPKG_OPENMP=yes -DPKG_MOLECULE=yes -DPKG_ASPHERE=yes -DPKG_BROWNIAN=yes -DPKG_RIGID=yes -DPKG_CG-DNA=yes -DPKG_EXTRA-MOLECULE=yes
+
+# example 2: A100 node on Delta cluster
+
+/usr/local/bin/cmake \
+    -B build_${LAMMPS_tag} \
+    -S lammps-19Nov2024/cmake \
+    -DBUILD_MPI=yes \
+    -DBUILD_OMP=yes \
+    -DLAMMPS_MACHINE=${LAMMPS_tag} \
+    -DBUILD_SHARED_LIBS=yes \
+    -DCMAKE_INSTALL_PREFIX=/usr/local \
+    -DPKG_GPU=yes \
+    -DPKG_KOKKOS=on \
+    -DMPIEXEC_EXECUTABLE=/usr/local/bin/mpicxx \
+    -DKokkos_ARCH_HOSTARCH=ZEN3 \
+    -DKokkos_ENABLE_OMP=yes \
+    -DKokkos_ENABLE_CUDA=yes \
+    -DGPU_API=cuda \
+    -DKokkos_ARCH_AMPERE80=yes \
+    -DGPU_ARCH=sm_80 \
+    -DCMAKE_CUDA_ARCHITECTURES=80 \
+    -DPKG_OPENMP=yes \
+    -DPKG_MOLECULE=yes \
+    -DPKG_ASPHERE=yes \
+    -DPKG_BROWNIAN=yes \
+    -DPKG_RIGID=yes \
+    -DPKG_CG-DNA=yes \
+    -DPKG_EXTRA-MOLECULE=yes \
+    -DPKG_MOLFILE=yes 

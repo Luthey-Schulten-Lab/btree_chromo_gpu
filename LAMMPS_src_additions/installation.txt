@@ -1,0 +1,16 @@
+This file provides an explanation of how to modify the LAMMPS source code to add KOKKOS versions of fix brownian (Brownian dynamics integrator) and fix addforce (adds a force to atoms during timestepping).
+
+1) Beginning in the directory with the LAMMPS source code (./lammps), copy the following files to the listed directories.
+
+
+ ./lammps/src/KOKKOS
+
+ - fix_brownian_kokkos.cpp
+ - fix_brownian_kokkos.h
+ - fix_addforce_kokkos.cpp
+ - fix_addforce_kokkos.h
+ 
+
+2) Recompile LAMMPS using the cmake command in "cmake_command.txt".
+
+
