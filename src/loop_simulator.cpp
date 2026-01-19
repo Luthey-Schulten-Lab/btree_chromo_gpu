@@ -4,6 +4,7 @@
 loop_simulator::loop_simulator()
 {
   rand_eng.seed(0);
+  // the following math is wrong
   // 100 beads in 1 s
   // 1 bead in 10 ms
   // basal death prob: 0.0004 per second, or 2500 seconds lifetime
@@ -185,23 +186,44 @@ std::uniform_real_distribution<double> dist(0.0, 1.0);
 
 int loop_simulator::get_next_position(int pos, int direction) {
     // get next position based on topology
-   int new_pos;
+    int new_pos;
 
-
-   // for now skip trying to debug the above code
     if (pos <= 54338) {
+        // Left daughter: always circular
         int region_size = 54338;
         int zero_based_pos = pos - 1;
         int wrapped = (zero_based_pos + direction) % region_size;
         if (wrapped < 0) wrapped += region_size;
         new_pos = wrapped + 1;
     } else {
+        // Right daughter: linear during replication, circular when complete
         int region_start = 54339;
         int region_size = N - 54338;
         int zero_based_pos = pos - region_start;
-        int wrapped = (zero_based_pos + direction) % region_size;
-        if (wrapped < 0) wrapped += region_size;
-        new_pos = wrapped + region_start;
+        int new_zero_based = zero_based_pos + direction;
+        
+        // Check if replication is complete (fork_width == 0 means fully replicated)
+        bool is_fully_replicated = (this->fork_width == 0);
+        
+        if (new_zero_based < 0) {
+            // Wrap around if fully replicated, otherwise can't go before start
+            if (is_fully_replicated) {
+                int wrapped_zero_based = new_zero_based % region_size;
+                if (wrapped_zero_based < 0) wrapped_zero_based += region_size;
+                new_pos = region_start + wrapped_zero_based;
+            } else {
+                new_pos = pos;  // Can't go before start if not fully replicated
+            }
+        } else if (new_zero_based >= region_size) {
+            // Wrap around if fully replicated
+            if (is_fully_replicated) {
+                new_pos = region_start + (new_zero_based % region_size);
+            } else {
+                new_pos = pos;  // Can't go after end if not fully replicated
+            }
+        } else {
+            new_pos = region_start + new_zero_based;
+        }
     }
 
     return new_pos;
@@ -249,7 +271,10 @@ void loop_simulator::step(bool tag_extruded)
 		        //std::cout << "SMC is not stalled..." <<std::endl;
                 if (dis(rand_eng) <= step_prob) {
 		            //std::cout << "Attempting to take a step to newCur1 = " << newCur1  <<std::endl;
-                    if (neighbors(newCur1).front() == 0 && no_forks_around(newCur1)) {
+                    bool no_forks = no_forks_around(newCur1);
+                    bool leftmost_neighbor_empty = (neighbors(newCur1).front() == 0);
+                    
+                    if (leftmost_neighbor_empty && no_forks) {
                         // take a normal step
 			            // std::cout << "Taking a normal step..." <<std::endl;
                         occupy_around(newCur1);
@@ -258,26 +283,30 @@ void loop_simulator::step(bool tag_extruded)
                         if (tag_extruded) extruded[i].push_front(newCur1);
                     } else {
 			            // std::cout << "Can't take a normal step, either stalling or bypassing..." <<std::endl;
-                        double rate_sum = knockoff + bypass;
-                        if (dis(rand_eng) <= rate_sum) {
-                            if (dis(rand_eng) <= knockoff / rate_sum || occupied[newCur2] > 2) {
-                                // stall and maybe dissociate
-				                // std::cout << "Marking as stalled..." <<std::endl;
-                                stalled1[i] = 1;
-                            } else {
-                                // One could imagine that bypassing is harder the more SMCs are in the traffic jam
-                                // We can allow SMCs to bypass the entire jam with the requirement that they traverse
-                                // no greater than 50 nm during the bypass
-				                std::cout << "Bypassing..." <<std::endl;
-				                // STILL NEED TO ADD LOGIC FOR BYPASSING REPLICATION FORK
-				                newCur1 = get_next_vacancy(cur1, -1);
-                                occupy_around(newCur1);
-                                release_around(cur1);
-                                loops1[i] = newCur1;
-                                if (cur1==newCur1) {
-                                    std::cout << "... but there was no vacancy" <<std::endl;
+                        // Blocked - try bypass or stall
+                        // If blocked by fork, always stall
+                        if (!no_forks) {
+                            stalled1[i] = 1;
+                        } else {
+                            double rate_sum = knockoff + bypass;
+                            if (dis(rand_eng) <= rate_sum) {
+                                if (occupied[newCur1] > 2) {
+                                    // stall
+                                    stalled1[i] = 1;
+                                } else if (dis(rand_eng) <= knockoff / rate_sum) {
+                                    // stall
+                                    stalled1[i] = 1;
                                 } else {
-                                    if (tag_extruded) extruded[i].push_front(newCur1);
+                                    // Bypass
+                                    newCur1 = get_next_vacancy(cur1, -1);
+                                    occupy_around(newCur1);
+                                    release_around(cur1);
+                                    loops1[i] = newCur1;
+                                    if (cur1==newCur1) {
+                                        std::cout << "... but there was no vacancy" <<std::endl;
+                                    } else {
+                                        if (tag_extruded) extruded[i].push_front(newCur1);
+                                    }
                                 }
                             }
                         }
@@ -287,28 +316,40 @@ void loop_simulator::step(bool tag_extruded)
 
             if (stalled2[i] == 0) {
                 if (dis(rand_eng) <= step_prob) {
-                    if (neighbors(newCur2).back() == 0 && no_forks_around(newCur2)) {
+                    bool no_forks = no_forks_around(newCur2);
+                    bool rightmost_neighbor_empty = (neighbors(newCur2).back() == 0);
+                    
+                    if (rightmost_neighbor_empty && no_forks) {
                         // take a normal step
                         occupy_around(newCur2);
                         release_around(cur2);
                         loops2[i] = newCur2;
                         if (tag_extruded) extruded[i].push_back(newCur2);
                     } else {
-                        double rate_sum = knockoff + bypass;
-                        if (dis(rand_eng) <= rate_sum) {
-                            if (dis(rand_eng) <= knockoff / rate_sum || occupied[newCur2] > 2) {
-                                // stall and maybe dissociate
-                                stalled2[i] = 1;
-                            } else {
-                                // bypass
-                                newCur2 = get_next_vacancy(cur2, 1);
-                                occupy_around(newCur2);
-                                release_around(cur2);
-                                loops2[i] = newCur2;
-                                if (cur2==newCur2) {
-                                    std::cout << "... but there was no vacancy" <<std::endl;
+                        // Blocked - try bypass or stall
+                        // If blocked by fork, always stall
+                        if (!no_forks) {
+                            stalled2[i] = 1;
+                        } else {
+                            double rate_sum = knockoff + bypass;
+                            if (dis(rand_eng) <= rate_sum) {
+                                if (occupied[newCur2] > 2) {
+                                    // stall and maybe dissociate
+                                    stalled2[i] = 1;
+                                } else if (dis(rand_eng) <= knockoff / rate_sum) {
+                                    // stall
+                                    stalled2[i] = 1;
                                 } else {
-                                    if (tag_extruded) extruded[i].push_back(newCur2);
+                                    // bypass
+                                    newCur2 = get_next_vacancy(cur2, 1);
+                                    occupy_around(newCur2);
+                                    release_around(cur2);
+                                    loops2[i] = newCur2;
+                                    if (cur2==newCur2) {
+                                        std::cout << "... but there was no vacancy" <<std::endl;
+                                    } else {
+                                        if (tag_extruded) extruded[i].push_back(newCur2);
+                                    }
                                 }
                             }
                         }
