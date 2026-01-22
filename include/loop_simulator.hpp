@@ -65,7 +65,8 @@ private:
   // std::vector<loop> loops;
   std::mt19937 rand_eng;
 
-  int N; // Length of the emission probability vector
+  int N; // Current length of the chromosome (increases during replication)
+  int N_initial; // Initial chromosome length (before replication starts)
   int fork_width;
   int left_fork;
   int right_fork;

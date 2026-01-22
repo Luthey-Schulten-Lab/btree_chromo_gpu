@@ -4,7 +4,7 @@
 loop_simulator::loop_simulator()
 {
   rand_eng.seed(0);
-  // the following math is wrong
+  // the following math is wrong, need to fix
   // 100 beads in 1 s
   // 1 bead in 10 ms
   // basal death prob: 0.0004 per second, or 2500 seconds lifetime
@@ -12,6 +12,7 @@ loop_simulator::loop_simulator()
   // stall death prob: 0.001 to 0.005 per second
   // knockoff prob: ? set to 1-bypass
   // bypass prob: lifetime of ~20 s: 0.03 to 0.05 per second
+  // Default initial chromosome length: 54338
   initialize_loop_simulator(0.000004,1.0,0.00005,0.9995,0.0005,54338,50,1);
 }
 
@@ -39,8 +40,9 @@ void loop_simulator::initialize_loop_simulator(
     )
 {
         this->N = N;
-        int midpoint = 27169; // 54338 is even so technically 27169 and 27170 both straddle origin (to start)
-        this->fork_width = (N - 54338) / 2;
+        this->N_initial = N; // Store initial chromosome length
+        int midpoint = N_initial / 2; // Midpoint of initial chromosome
+        this->fork_width = (N - N_initial) / 2;
         this->left_fork = midpoint - fork_width;
         this->right_fork = midpoint + fork_width + 1;
 
@@ -103,7 +105,11 @@ bool loop_simulator::is_empty_around(int pos) {
 }
 
 bool loop_simulator::no_forks_around(int pos) {
-    if (this->fork_width == 0) return true ;
+    // Replication is complete when N == 2 * N_initial (two separate circular chromosomes)
+    // fork_width == 0 means replication hasn't started, not that it's complete
+    // When fully replicated, region_size (N - N_initial) equals N_initial (same as left daughter)
+    bool is_fully_replicated = (this->N == 2 * this->N_initial);
+    if (is_fully_replicated || this->fork_width == 0) return true;
 
     for (int j = -smc_width; j <= smc_width; ++j) {
         if (wrapped_index(pos + j) == left_fork || wrapped_index(pos + j) == right_fork) {
@@ -119,13 +125,13 @@ void loop_simulator::birth(int i) {
         std::uniform_int_distribution<int> unif_dist(1, N);
         int pos = unif_dist(rand_eng);
 
-        if (pos <= 54338) {
+        if (pos <= N_initial) {
             // Chromosome 1 (original / mother strand or mother-indexed daughter)
 
             int idx1 = pos;
-            int idx2 = ((pos + 1 + 2*smc_width - 1) % 54338) + 1;  // wrap from 54338 back to 1
+            int idx2 = ((pos + 1 + 2*smc_width - 1) % N_initial) + 1;  // wrap from N_initial back to 1
 
-            std::cout << "SMC: idx1 = " << idx1 << ", idx2 = " << idx2 << ", distance = " << (idx2 > idx1 ? idx2 - idx1 : 54338 - idx1 + idx2) << "\n" << std::endl;
+            std::cout << "SMC: idx1 = " << idx1 << ", idx2 = " << idx2 << ", distance = " << (idx2 > idx1 ? idx2 - idx1 : N_initial - idx1 + idx2) << "\n" << std::endl;
 
             // Reject if either spot is already occupied or if too close to replication forks
             if (!(is_empty_around(idx1)
@@ -147,7 +153,7 @@ void loop_simulator::birth(int i) {
 
             if (!(is_empty_around(idx1)
                 && is_empty_around(idx2))
-                && idx1 >= 54339 + smc_width
+                && idx1 >= N_initial + 1 + smc_width
                 && idx2 <= N - smc_width) continue;
 
             loops1[i] = idx1;
@@ -188,22 +194,23 @@ int loop_simulator::get_next_position(int pos, int direction) {
     // get next position based on topology
     int new_pos;
 
-    if (pos <= 54338) {
+    if (pos <= N_initial) {
         // Left daughter: always circular
-        int region_size = 54338;
+        int region_size = N_initial;
         int zero_based_pos = pos - 1;
         int wrapped = (zero_based_pos + direction) % region_size;
         if (wrapped < 0) wrapped += region_size;
         new_pos = wrapped + 1;
     } else {
         // Right daughter: linear during replication, circular when complete
-        int region_start = 54339;
-        int region_size = N - 54338;
+        int region_start = N_initial + 1;
+        int region_size = N - N_initial;
         int zero_based_pos = pos - region_start;
         int new_zero_based = zero_based_pos + direction;
         
-        // Check if replication is complete (fork_width == 0 means fully replicated)
-        bool is_fully_replicated = (this->fork_width == 0);
+        // Check if replication is complete: N == 2 * N_initial means two separate circular chromosomes
+        // When fully replicated, region_size == N_initial (same as left daughter size)
+        bool is_fully_replicated = (this->N == 2 * this->N_initial);
         
         if (new_zero_based < 0) {
             // Wrap around if fully replicated, otherwise can't go before start
@@ -386,8 +393,8 @@ void loop_simulator::write_state(std::string st_filename) {
         // Write a separator header indicating the number of loops
         st_file << "Number of loops: " << loops1.size() << "\n";
 
-        int midpoint = 27169;
-        int fork_width = (N - 54338) / 2;
+        int midpoint = N_initial / 2;
+        int fork_width = (N - N_initial) / 2;
         int left_fork = midpoint - fork_width;
         int right_fork = midpoint + fork_width + 1;
         st_file << "Replication forks: " << left_fork << ", " << right_fork << "\n";
@@ -509,8 +516,12 @@ void loop_simulator::set_N(int N_new) {
     }
 
     std::cout << "Inferring fork positions from new chromosome length" << std::endl;
-    this->fork_width = (this->N - 54338) / 2;
-    int midpoint = 27169; // 54338 is even so technically 27169 and 27170 both straddle origin (to start)
+    // Only set N_initial if it hasn't been set yet (first time set_N is called)
+    if (this->N_initial == 0) {
+        this->N_initial = N_old; // Use the old N as the initial value
+    }
+    this->fork_width = (this->N - this->N_initial) / 2;
+    int midpoint = this->N_initial / 2;
     this->left_fork = midpoint - fork_width;
     this->right_fork = midpoint + fork_width + 1;
 
@@ -532,7 +543,7 @@ void loop_simulator::set_N(int N_new) {
             stalled2[i] = 0;
             birth(i);
         }
-        if (loops1[i] > 54338 && loops2[i] > 54338) { // 
+        if (loops1[i] > N_initial && loops2[i] > N_initial) { // 
             release_around(loops1[i]);
             release_around(loops2[i]);
             stalled1[i] = 0;
