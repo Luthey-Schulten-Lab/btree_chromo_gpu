@@ -47,6 +47,7 @@ void loop_simulator::initialize_loop_simulator(
         this->right_fork = midpoint + fork_width + 1;
 
         this->M = numSmc;
+        this->numSmc_initial = numSmc;
 
         this->falloff = basal_death_prob;
         this->step_prob = step_prob;
@@ -648,10 +649,12 @@ int loop_simulator::read_loop_params(std::string loop_param_filename)
 		  else if (param == "N")
 		    {
 		      this->N = stoi(val);
+		      this->N_initial = this->N;
 		    }
                   else if (param == "numSmc")
 		    {
 		      this->M = stoi(val);
+		      this->numSmc_initial = this->M;
 		    }
 		  else if (param == "smcWidth")
 		    {

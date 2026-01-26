@@ -3652,10 +3652,11 @@ int btree_driver::load_loops(std::vector<std::string> &params)
   std::cout << "Setting N to " << size << std::endl;
   driver_ls.set_N(size);
   std::cout << "Setting M" << std::endl;
-  
-  int M_original = 50;
-  int extra_loops = M_original * (size - 54338) / 54338;
-  driver_ls.set_M(M_original + extra_loops);
+
+  int N_init = driver_ls.get_N_initial();
+  int M_init = driver_ls.get_numSmc_initial();
+  int extra_loops = M_init * (size - N_init) / N_init;
+  driver_ls.set_M(M_init + extra_loops);
 
   std::cout << "Setting loop state..." << std::endl;
   driver_ls.read_state(params[0]);
@@ -3998,9 +3999,10 @@ int btree_driver::map_replication()
   std::cout << "Setting new N to " << size << std::endl;
   driver_ls.set_N(size);
   std::cout << "Setting new M" << std::endl;
-  int M_original = 50;
-  int extra_loops = M_original * (size - 54338) / 54338;
-  driver_ls.set_M(M_original + extra_loops);
+  int N_init = driver_ls.get_N_initial();
+  int M_init = driver_ls.get_numSmc_initial();
+  int extra_loops = M_init * (size - N_init) / N_init;
+  driver_ls.set_M(M_init + extra_loops);
   return e;
 }
 
