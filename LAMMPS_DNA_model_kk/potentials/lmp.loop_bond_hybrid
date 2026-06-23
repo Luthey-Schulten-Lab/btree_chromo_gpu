@@ -1,2 +1,3 @@
 include ${DNA_model_dir}/potentials/lmp.DNA_loops
 bond_coeff 2 harmonic/kk ${k_loop} ${r_loop}
+bond_coeff 3 harmonic/kk ${k_stretch} 0.0
