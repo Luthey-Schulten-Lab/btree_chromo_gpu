@@ -529,7 +529,15 @@ void loop_simulator::set_N(int N_new) {
     std::cout << "Done setting N" << std::endl;
 
     std::cout << "Re-indexing SMC on right daughter, and knocking off all SMC that are too close to or straddle a replisome..." << std::endl;
-    for (int i = 0; i < M; ++i) {
+    // Only iterate over SMC slots that are actually allocated. read_loop_params()
+    // may raise M (numSmc) above the size the per-SMC arrays were allocated with
+    // (the constructor default), without resizing loops1/loops2/stalled1/stalled2.
+    // Iterating to M here would read/write past those arrays (heap-buffer-overflow
+    // at this line; confirmed via ASan). The trailing slots are repopulated by the
+    // read_state()/set_M() calls that follow in load_loops(), so clamping to the
+    // populated size is safe and preserves behavior whenever size >= M.
+    int n_smc = std::min(M, static_cast<int>(std::min(loops1.size(), loops2.size())));
+    for (int i = 0; i < n_smc; ++i) {
         if ((loops1[i] >= left_fork && loops1[i] <= right_fork && loops2[i] >= right_fork) //    L 1 R 2
             || (loops1[i] <= left_fork && loops2[i] >= left_fork  && loops2[i] <= right_fork) // 1 L 2 R
             || (loops1[i] >= left_fork && loops1[i] <= right_fork && loops2[i] <= left_fork)  // 2 L 1 R
@@ -575,6 +583,16 @@ void loop_simulator::set_M(int M_new) {
     for (int ind = M_old; ind < this->M; ++ind) {
         this->birth(ind);
     }
+}
+
+// WCM patch: after read_state(), loops1/loops2 hold exactly the loaded loops.
+// Align M (and the stalled arrays) to that count WITHOUT re-birthing, so a
+// subsequent set_M(numSmc_initial) births exactly the missing SMCs.
+void loop_simulator::sync_M_to_loaded() {
+    this->M = static_cast<int>(loops1.size());
+    this->loops2.resize(this->M, 0);
+    this->stalled1.assign(this->M, 0);
+    this->stalled2.assign(this->M, 0);
 }
 
 int loop_simulator::read_loop_params(std::string loop_param_filename)

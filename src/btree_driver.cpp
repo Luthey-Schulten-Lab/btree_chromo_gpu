@@ -2056,6 +2056,25 @@ void btree_driver::prepare_command_requirements()
   t_ls.push_back(new_lock("lmp_data_present",true));
   lock_updates["sys_write_sim_read_LAMMPS_data_at_timestep"] = t_ls;
 
+  // sys_update_lammps_inplace (in-place coord scatter; no data-file rebuild)
+  // number of required parameters
+  N_param_reqs["sys_update_lammps_inplace"] = 1;
+  // lock tests: requires an already-loaded simulator/data (set by a prior
+  // sys_write_sim_read this hook) so we can safely skip the rebuild
+  t_ls.clear();
+  t_ls.push_back(new_lock("btree_initialized",true));
+  t_ls.push_back(new_lock("BD_lengths_present",true));
+  t_ls.push_back(new_lock("simulator_prepared",true));
+  t_ls.push_back(new_lock("DNA_model",true));
+  t_ls.push_back(new_lock("output_details",true));
+  t_ls.push_back(new_lock("delta_t",true));
+  t_ls.push_back(new_lock("lmp_data_present",true));
+  lock_tests["sys_update_lammps_inplace"] = t_ls;
+  // lock updates: data already present, no state change
+  t_ls.clear();
+  t_ls.push_back(new_lock("lmp_data_present",true));
+  lock_updates["sys_update_lammps_inplace"] = t_ls;
+
   // simulator_relax_progressive
   // number of required parameters
   N_param_reqs["simulator_relax_progressive"] = 2;
@@ -2977,6 +2996,13 @@ int btree_driver::execute_single_command(std::string &command,
       error_code = sys_write_sim_read_LAMMPS_data_at_timestep(params);
     }
 
+
+  // in-place coord scatter (fast path, skips the 2nd data-file round-trip)
+  else if (command == "sys_update_lammps_inplace")
+    {
+      error_code = sys_update_lammps_inplace(params);
+    }
+
   
   // write LAMMPS data with system and read LAMMPS data with simulator
   else if (command == "simulator_relax_progressive")
@@ -3639,7 +3665,7 @@ int btree_driver::translocate(std::vector<std::string> &params)
     driver_ls.steps(stoi(params[0]), true);
   } else {
     // driver_lmp_simulator.update_loop_bonds(false, driver_ls);
-    driver_ls.steps(stoi(params[0]), true);
+    driver_ls.steps(stoi(params[0]), false);
   }
   return 0;
 }
@@ -3651,15 +3677,17 @@ int btree_driver::load_loops(std::vector<std::string> &params)
 
   std::cout << "Setting N to " << size << std::endl;
   driver_ls.set_N(size);
-  std::cout << "Setting M" << std::endl;
-
-  int N_init = driver_ls.get_N_initial();
-  int M_init = driver_ls.get_numSmc_initial();
-  int extra_loops = M_init * (size - N_init) / N_init;
-  driver_ls.set_M(M_init + extra_loops);
 
   std::cout << "Setting loop state..." << std::endl;
   driver_ls.read_state(params[0]);
+
+  // WCM patch: numSmc from loop_params is authoritative (not replication-scaled).
+  // Align M to the loaded loops, then top up to numSmc_initial.
+  std::cout << "Setting M from loop_params numSmc (loaded "
+            << driver_ls.get_loaded_loop_count() << " loops)" << std::endl;
+  driver_ls.sync_M_to_loaded();
+  driver_ls.set_M(driver_ls.get_numSmc_initial());
+
   std::cout << "Updating loop bonds..." << std::endl;
   driver_lmp_simulator.update_loop_bonds(true, driver_ls); // possible bug - will not re-write existing loops
   return 0;
@@ -3998,11 +4026,9 @@ int btree_driver::map_replication()
 
   std::cout << "Setting new N to " << size << std::endl;
   driver_ls.set_N(size);
-  std::cout << "Setting new M" << std::endl;
-  int N_init = driver_ls.get_N_initial();
-  int M_init = driver_ls.get_numSmc_initial();
-  int extra_loops = M_init * (size - N_init) / N_init;
-  driver_ls.set_M(M_init + extra_loops);
+  // WCM patch: keep numSmc authoritative (not replication-scaled).
+  std::cout << "Setting new M to numSmc " << driver_ls.get_numSmc_initial() << std::endl;
+  driver_ls.set_M(driver_ls.get_numSmc_initial());
   return e;
 }
 
@@ -4353,6 +4379,21 @@ int btree_driver::sys_write_sim_read_LAMMPS_data(std::vector<std::string> &param
   e += write_LAMMPS_data(params);
   e += simulator_read_data(params);
   return e;
+}
+
+
+// Fast path: replaces the 2nd per-hook sys_write_sim_read round-trip.
+// After the first sys_write_sim_read this hook, LAMMPS already holds the correct
+// backbone topology and fork-partition groups; translocate only advanced the loop
+// system on the CPU (no LAMMPS topology change) and the loop bonds are applied
+// afterward by simulator_form_loops. So we skip the expensive clear/read_data
+// rebuild and just push the (unchanged) coordinates for consistency. The param
+// (data-file path) is accepted for call-site symmetry but not used.
+int btree_driver::sys_update_lammps_inplace(std::vector<std::string> &params)
+{
+  (void)params;
+  driver_lmp_simulator.scatter_coords_from_sys();
+  return 0;
 }
 
 

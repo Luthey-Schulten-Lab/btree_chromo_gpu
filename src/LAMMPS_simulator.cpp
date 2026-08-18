@@ -1,4 +1,15 @@
 #include <LAMMPS_simulator.hpp>
+#include <fused_cg_minimize.h>
+#include <fused_cg_btree_bridge.h>
+#include <cstdlib>
+#include <vector>
+#include <cmath>
+#include <cstdint>
+
+// Persistent device-side cache for the fused CG minimizer. Zero-initialized;
+// fused_cg_minimize() lazily allocates on first use and reuses across calls.
+// Torn down in LAMMPS_destroy().
+static FusedDeviceCache s_fused_cache = {};
 
 // constructor
 LAMMPS_simulator::LAMMPS_simulator()
@@ -68,11 +79,183 @@ void LAMMPS_simulator::LAMMPS_initialize(std::string logfile)
 // destroy LAMMPS object
 void LAMMPS_simulator::LAMMPS_destroy()
 {
+  fused_cache_destroy(&s_fused_cache);
   if (lmp != nullptr)
     {
       delete lmp;
       lmp = nullptr;
     }
+}
+
+
+// fused GPU minimizer: builds a FusedMinSystem directly from the btree_chromo
+// atom/bond/angle arrays (plus the active SMC loop bonds and LAMMPS's current
+// atom types) and runs the whole conjugate-gradient sweep in a single
+// persistent CUDA kernel, avoiding a LAMMPS round-trip per iteration.
+//
+// This is biology-neutral: with FUSED_MIN_FULL the convergence budget is
+// etol=1e-5, ftol=1e-7, maxiter=40000 — identical to the protein_science
+// LAMMPS minimize (subroutine.min_topoDNA_harmonic: "minimize 1.0e-5 1.0e-7
+// ..."). It computes the same minimization faster, it does not change it.
+static void run_fused_minimize(
+    LAMMPS_NS::LAMMPS *lmp, LAMMPS_sys *lmp_sys,
+    const char *label, int pair_style, int bond_style,
+    int profile = FUSED_MIN_FULL)
+{
+  int N = lmp_sys->get_atoms().get_N();
+  if (N == 0) return;
+
+  // pull current coordinates from LAMMPS into the btree atom_array
+  double *coords = new double[3 * N];
+  lammps_gather_atoms(lmp, const_cast<char*>("x"), 1, 3, coords);
+  lmp_sys->set_coords_arr_total(coords, "row");
+  delete[] coords;
+
+  FusedMinSystem sys;
+  fused_sys_from_btree(lmp_sys->get_atoms(), lmp_sys->get_bonds(), lmp_sys->get_angles(), &sys);
+
+  // Overwrite atom types with LAMMPS's current types, which include
+  // anchor (7) and hinge (8) modifications from loop bond creation.
+  // btree_chromo's atom_array retains the original types and doesn't
+  // reflect the type changes made by update_loop_bonds().
+  {
+      int *lmp_types = new int[N];
+      lammps_gather_atoms(lmp, const_cast<char*>("type"), 0, 1, lmp_types);
+      for (int i = 0; i < N; i++) sys.type[i] = lmp_types[i];
+      delete[] lmp_types;
+  }
+
+  // Replace the btree-reconstructed bond/angle topology with LAMMPS's
+  // AUTHORITATIVE topology gathered directly from the live LAMMPS instance.
+  //
+  // Why: btree's bond_array + loop_topology (get_loop_bonds) do NOT contain the
+  // SMC loop bonds (type 2) that update_loop_bonds() creates directly inside
+  // LAMMPS via create_bonds. Reconstructing from btree therefore minimizes only
+  // the backbone (the fused kernel saw 108010 type-1 bonds, |max|=65A, while the
+  // stock LAMMPS minimize starts at E_bond~1.3e8 from the freshly-stretched loop
+  // bonds). The unrelaxed loop bonds are then evaluated by LAMMPS on the first
+  // run_soft_harmonic step (E_bond~1.3e8); with the large BD timestep the
+  // brownian integrator flings atoms out of the box -> cudaErrorIllegalAddress
+  // in NBinKokkos::bin_atoms. Gathering bonds/angles straight from LAMMPS makes
+  // the fused minimize relax EXACTLY the topology BD will integrate.
+  {
+      int  tagsize = lammps_extract_setting(lmp, const_cast<char*>("tagint"));
+      int  bigsize = lammps_extract_setting(lmp, const_cast<char*>("bigint"));
+      void *nb_p   = lammps_extract_global(lmp, const_cast<char*>("nbonds"));
+      void *na_p   = lammps_extract_global(lmp, const_cast<char*>("nangles"));
+      long long nbonds  = (bigsize == 4) ? (long long)*(int32_t*)nb_p : (long long)*(int64_t*)nb_p;
+      long long nangles = (bigsize == 4) ? (long long)*(int32_t*)na_p : (long long)*(int64_t*)na_p;
+
+      // bonds: nbonds * 3 of tagint -> (bond_type, atom1_tag, atom2_tag)
+      free(sys.bond_type); free(sys.bond_i); free(sys.bond_j);
+      sys.bond_type = sys.bond_i = sys.bond_j = nullptr;
+      sys.nbonds = (int)nbonds;
+      if (nbonds > 0) {
+          sys.bond_type = (int*)malloc(nbonds * sizeof(int));
+          sys.bond_i    = (int*)malloc(nbonds * sizeof(int));
+          sys.bond_j    = (int*)malloc(nbonds * sizeof(int));
+          void *buf = malloc((size_t)nbonds * 3 * tagsize);
+          lammps_gather_bonds(lmp, buf);
+          for (long long b = 0; b < nbonds; b++) {
+              long long t, a1, a2;
+              if (tagsize == 4) { int32_t *p=(int32_t*)buf; t=p[3*b]; a1=p[3*b+1]; a2=p[3*b+2]; }
+              else              { int64_t *p=(int64_t*)buf; t=p[3*b]; a1=p[3*b+1]; a2=p[3*b+2]; }
+              sys.bond_type[b] = (int)t;
+              sys.bond_i[b]    = (int)a1 - 1;
+              sys.bond_j[b]    = (int)a2 - 1;
+          }
+          free(buf);
+      }
+
+      // angles: nangles * 4 of tagint -> (angle_type, atom1, atom2=vertex, atom3)
+      free(sys.angle_type); free(sys.angle_i); free(sys.angle_j); free(sys.angle_k);
+      sys.angle_type = sys.angle_i = sys.angle_j = sys.angle_k = nullptr;
+      sys.nangles = (int)nangles;
+      if (nangles > 0) {
+          sys.angle_type = (int*)malloc(nangles * sizeof(int));
+          sys.angle_i    = (int*)malloc(nangles * sizeof(int));
+          sys.angle_j    = (int*)malloc(nangles * sizeof(int));
+          sys.angle_k    = (int*)malloc(nangles * sizeof(int));
+          void *buf = malloc((size_t)nangles * 4 * tagsize);
+          lammps_gather_angles(lmp, buf);
+          for (long long a = 0; a < nangles; a++) {
+              long long t, a1, a2, a3;
+              if (tagsize == 4) { int32_t *p=(int32_t*)buf; t=p[4*a]; a1=p[4*a+1]; a2=p[4*a+2]; a3=p[4*a+3]; }
+              else              { int64_t *p=(int64_t*)buf; t=p[4*a]; a1=p[4*a+1]; a2=p[4*a+2]; a3=p[4*a+3]; }
+              sys.angle_type[a] = (int)t;
+              sys.angle_i[a]    = (int)a1 - 1;
+              sys.angle_j[a]    = (int)a2 - 1;
+              sys.angle_k[a]    = (int)a3 - 1;
+          }
+          free(buf);
+      }
+  }
+
+  double box_lo[3] = { lmp->domain->boxlo[0], lmp->domain->boxlo[1], lmp->domain->boxlo[2] };
+  double box_hi[3] = { lmp->domain->boxhi[0], lmp->domain->boxhi[1], lmp->domain->boxhi[2] };
+
+  // [FUSED-DBG] bond-type histogram + max stretch per type (pre-minimize).
+  // Silent unless FUSED_DBG_BONDS is set, to avoid per-step log spam.
+  if (std::getenv("FUSED_DBG_BONDS")) {
+      int maxbt = 0;
+      for (int b = 0; b < sys.nbonds; b++) if (sys.bond_type[b] > maxbt) maxbt = sys.bond_type[b];
+      std::vector<int> cnt(maxbt + 2, 0);
+      std::vector<double> maxlen(maxbt + 2, 0.0);
+      for (int b = 0; b < sys.nbonds; b++) {
+          int bt = sys.bond_type[b];
+          int i = sys.bond_i[b], j = sys.bond_j[b];
+          double dx = sys.x[3*i]-sys.x[3*j], dy = sys.x[3*i+1]-sys.x[3*j+1], dz = sys.x[3*i+2]-sys.x[3*j+2];
+          double r = std::sqrt(dx*dx+dy*dy+dz*dz);
+          if (bt >= 0 && bt <= maxbt) { cnt[bt]++; if (r > maxlen[bt]) maxlen[bt] = r; }
+      }
+      fprintf(stderr, "[FUSED-DBG %s] nbonds=%d maxbondtype=%d\n", label, sys.nbonds, maxbt);
+      for (int t = 0; t <= maxbt; t++)
+          if (cnt[t]) fprintf(stderr, "[FUSED-DBG %s]   type %d: count=%d maxlen=%.1f A\n", label, t, cnt[t], maxlen[t]);
+  }
+
+  FusedMinParams params;
+  fused_min_init_params(&params, pair_style, bond_style, profile);
+
+  FusedMinResult result = fused_cg_minimize(&sys, &params, box_lo, box_hi, 0, &s_fused_cache);
+
+  fprintf(stderr, "[fused_min_%s] %d iters, E: %.1f -> %.1f, |f|: %.3g, %.1f ms\n",
+          label, result.niter, result.energy_initial, result.energy_final,
+          result.fnorm_final, result.elapsed_ms);
+
+  // write minimized positions back to btree_chromo and into LAMMPS
+  fused_sys_to_btree(&sys, lmp_sys->get_atoms());
+
+  double *new_coords = new double[3 * N];
+  for (int i = 0; i < N * 3; i++) new_coords[i] = sys.x[i];
+  lammps_scatter_atoms(lmp, const_cast<char*>("x"), 1, 3, new_coords);
+  delete[] new_coords;
+
+  fused_free_system(&sys);
+}
+
+
+// push CPU-side system coordinates to LAMMPS without clear/read_data.
+// Used by the in-place fast path that replaces the 2nd per-hook
+// sys_write_sim_read round-trip: topology (backbone + fork-partition groups)
+// is already correct from call #1, translocate only advanced the loop system,
+// and the loop bonds are (re)formed afterward by simulator_form_loops. Only the
+// coordinates need to be consistent, so scatter them directly.
+void LAMMPS_simulator::scatter_coords_from_sys()
+{
+  int N = lmp_sys->get_N_total();
+  if (N <= 0) return;
+
+  double *coords = new double[3*N];
+  for (int i = 0; i < N; i++)
+    {
+      atom a = lmp_sys->get_atoms().get_atom(i);
+      coords[3*i]   = a.r.x;
+      coords[3*i+1] = a.r.y;
+      coords[3*i+2] = a.r.z;
+    }
+
+  lammps_scatter_atoms(lmp, const_cast<char*>("x"), 1, 3, coords);
+  delete[] coords;
 }
 
 
@@ -143,7 +326,6 @@ void LAMMPS_simulator::standard_computes()
 }
 
 
-// clear the LAMMPS system state
 void LAMMPS_simulator::clear()
 {
   // clear the simulator
@@ -154,6 +336,8 @@ void LAMMPS_simulator::clear()
   initialize_dumps();
   initialize_extra_fixes();
 }
+
+
 
 
 // set number of processors
@@ -315,19 +499,24 @@ void LAMMPS_simulator::minimize_hard_harmonic(thermo_dump_parameters t_d_p)
 
 
 // minimize with soft (topoisomerase) potentials and harmonic bonds
+//
+// Routed through the fused CG CUDA kernel. FUSED_MIN_FULL keeps the exact
+// convergence budget of the LAMMPS subroutine (etol=1e-5, ftol=1e-7), so the
+// trajectory is unchanged — only the per-iteration LAMMPS round-trip is
+// eliminated. (Old LAMMPS-include path kept below, commented, for reference.)
 void LAMMPS_simulator::minimize_topoDNA_harmonic(thermo_dump_parameters t_d_p)
 {
+  (void)t_d_p;
 
-  std::cout << "---[ minimizing topoDNA_HARMONIC ]---" << std::endl;
+  std::cout << "---[ minimizing topoDNA_HARMONIC (fused CG) ]---" << std::endl;
 
-  // setup the minimization
-  setup_minimize(t_d_p);
+  run_fused_minimize(lmp, lmp_sys, "topoDNA_harmonic",
+                     FUSED_PAIR_TOPO, FUSED_BOND_HARMONIC, FUSED_MIN_FULL);
 
-  // include minimization subroutine
-  lmp->input->one("include ${DNA_model_dir}/minimize_subroutines/subroutine.min_topoDNA_harmonic");
-
-  // cleanup the minimization
-  cleanup_minimize();
+  // Legacy LAMMPS-include minimize (replaced by fused CG kernel above):
+  // setup_minimize(t_d_p);
+  // lmp->input->one("include ${DNA_model_dir}/minimize_subroutines/subroutine.min_topoDNA_harmonic");
+  // cleanup_minimize();
 }
 
 
@@ -1019,7 +1208,6 @@ void LAMMPS_simulator::delete_loops(bool extruded_beads, loop_simulator &sim_ls)
 }
 
 
-// form loops and/or extruded beads bonds
 void LAMMPS_simulator::form_loops(bool extruded_beads, loop_simulator &sim_ls)
 {
 

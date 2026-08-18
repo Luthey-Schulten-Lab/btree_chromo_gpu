@@ -55,6 +55,9 @@ public:
   void sim_to_sys();
   void sim_to_sys_atom_counts();
 
+  // push CPU-side system coordinates to LAMMPS without clear/read_data
+  void scatter_coords_from_sys();
+
   // set nProc for simulator
   void set_nProc(int nProc);
   // set the DNA model

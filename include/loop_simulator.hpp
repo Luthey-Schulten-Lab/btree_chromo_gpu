@@ -52,7 +52,12 @@ public:
 
   void set_N(int N_new);
   void set_M(int M_new);
-  
+
+  // WCM patch: numSmc is authoritative from loop_params (not replication-scaled).
+  int get_numSmc_initial() const { return numSmc_initial; }
+  int get_loaded_loop_count() const { return static_cast<int>(loops1.size()); }
+  void sync_M_to_loaded();
+
   int read_loop_params(std::string loop_param_filename);
 
   std::vector<bond> get_loop_bonds();
@@ -71,6 +76,7 @@ private:
   int left_fork;
   int right_fork;
   int M; // Number of SMCs
+  int numSmc_initial; // WCM patch: from loop_params numSmc (not replication-scaled)
 
   double falloff;
   double step_prob;

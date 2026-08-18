@@ -198,6 +198,13 @@ public:
   void add_loops(int N_loops, double radius);
   std::vector<bond>get_loop_bonds();
 
+  // direct accessors to the internal arrays (used by the fused CG minimizer
+  // bridge, fused_cg_btree_bridge.h, to build a FusedMinSystem without a
+  // LAMMPS round-trip).
+  atom_array&  get_atoms()  { return atoms; }
+  bond_array&  get_bonds()  { return bonds; }
+  angle_array& get_angles() { return angles; }
+
   // switches for the topology
   void switch_bonds(bool s);
   void switch_bending_angles(bool s);

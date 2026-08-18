@@ -243,6 +243,7 @@ private:
   // fused commands
   int sys_write_sim_read_LAMMPS_data(std::vector<std::string> &params);
   int sys_write_sim_read_LAMMPS_data_at_timestep(std::vector<std::string> &params);
+  int sys_update_lammps_inplace(std::vector<std::string> &params);
   int simulator_relax_progressive(std::vector<std::string> &params);
 
   ///////////////
