@@ -1,0 +1,7 @@
+# Build output. The Makefile's BUILD var is overridden per-config
+# (make BUILD=./build_fused), so ignore the variants too.
+build/
+build_*/
+
+# Locally compiled test harness
+harness_loop

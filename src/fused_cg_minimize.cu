@@ -844,8 +844,13 @@ void fused_min_init_params(FusedMinParams *p, int pair_style, int bond_style,
         //   - bdry-bdry (1,1): off (pair_coeff 1 1 lj/cut 0.0 ...).
         // Soft cutoff = the protein_science sigma for that pair class:
         //   DNA-DNA          (3-8 x 3-8): rc = sigma_mono_mono (= 2*r_mono   = 34)
-        //   {bdry|ribo}-DNA  (1|2 x 3-8): rc = sigma_mono_ribo (= r_mono+r_ribo = 117)
+        //   bdry-DNA         (1   x 3-8): rc = sigma_mono_bdry (= r_mono+r_bdry = 217)
+        //   ribo-DNA         (2   x 3-8): rc = sigma_mono_ribo (= r_mono+r_ribo = 117)
         //   {bdry|ribo} pair (excl 1,1) : rc = sigma_ribo_ribo (= 2*r_ribo   = 200)
+        //
+        // bdry-DNA must use r_bdry, not r_ribo. soft/kk is finite at contact,
+        // so the undersized 117 cutoff left a cheap path through the envelope
+        // and DNA leaked out during replication.
         //
         // CRITICAL: boundary (type 1) is SOFT here, NOT WCA. The previous WCA
         // boundary diverges as r->0 and minimizes to a config that detonates
@@ -860,9 +865,11 @@ void fused_min_init_params(FusedMinParams *p, int pair_style, int bond_style,
                     continue;
                 }
                 double rc;
+                bool bdry_dna = (i == 1 && j >= 3) || (j == 1 && i >= 3);
                 if (i >= 3 && j >= 3)      rc = s_mm;  // DNA-DNA
+                else if (bdry_dna)         rc = s_mb;  // bdry-DNA
                 else if (i < 3 && j < 3)   rc = s_rr;  // (1,2)/(2,1)/(2,2)
-                else                       rc = s_mr;  // {bdry,ribo} vs DNA
+                else                       rc = s_mr;  // ribo-DNA
                 p->pair_mode[i][j]  = 2;   // soft
                 p->cutoff_sq[i][j]  = rc * rc;
                 p->soft_A[i][j]     = eps_soft;
