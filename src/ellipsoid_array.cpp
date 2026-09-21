@@ -1,4 +1,5 @@
 #include <ellipsoid_array.hpp>
+#include <atomic_write.hpp>
 
 // constructor
 ellipsoid_array::ellipsoid_array()
@@ -264,11 +265,17 @@ void ellipsoid_array::write(std::fstream &data_file)
 
 
 // write quaternions to a binary file
+//
+// Written to a temporary name and renamed into place, for the same reason as
+// atom_array::write_bin: the reader polls for these by name while the run is in
+// progress, and must not be handed a file that is only partly written.
 int ellipsoid_array::write_bin(std::string data_filename, std::string order)
 {
   std::fstream data_file;
 
-  data_file.open(data_filename, std::ios::out | std::ios::binary);
+  std::string temp_filename = data_filename + ".tmp";
+
+  data_file.open(temp_filename, std::ios::out | std::ios::binary);
 
   // int data_size = 4;
     
@@ -306,13 +313,13 @@ int ellipsoid_array::write_bin(std::string data_filename, std::string order)
       
       delete[] q;
       data_file.close();
-      return 0;
+      return publish_temp_file(temp_filename,data_filename,"write_bin");
     }
   else
     {
       std::cout << "no quats to write" << std::endl;
       data_file.close();
-      return 0;
+      return publish_temp_file(temp_filename,data_filename,"write_bin");
     }
 
   return 0;

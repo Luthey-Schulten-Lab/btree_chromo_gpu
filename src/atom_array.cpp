@@ -1,4 +1,5 @@
 #include <atom_array.hpp>
+#include <atomic_write.hpp>
 
 // constructor
 atom_array::atom_array()
@@ -358,11 +359,22 @@ int atom_array::write_xyz(std::string data_filename)
 
 
 // write coordinates to a binary file
+//
+// The write goes to a temporary name and is renamed into place once complete.
+// Opening the final path directly, as this used to, publishes the name before
+// the contents: an ofstream flushes in chunks as its buffer fills, so a reader
+// that looks while the write is in flight finds a file that is present,
+// non-empty, and a whole number of coordinate triples, but holds only the
+// leading part of the chromosome. It then proceeds with beads missing off the
+// end. rename(2) is atomic within a directory, so a reader now sees either no
+// file at all or the finished one.
 int atom_array::write_bin(std::string data_filename, std::string order)
 {
   std::fstream data_file;
 
-  data_file.open(data_filename, std::ios::out | std::ios::binary);
+  std::string temp_filename = data_filename + ".tmp";
+
+  data_file.open(temp_filename, std::ios::out | std::ios::binary);
 
   // int data_size = 4;
     
@@ -398,13 +410,13 @@ int atom_array::write_bin(std::string data_filename, std::string order)
       
       delete[] x;
       data_file.close();
-      return 0;
+      return publish_temp_file(temp_filename,data_filename,"write_bin");
     }
   else
     {
       std::cout << "no coords to write" << std::endl;
       data_file.close();
-      return 0;
+      return publish_temp_file(temp_filename,data_filename,"write_bin");
     }
 
   return 0;

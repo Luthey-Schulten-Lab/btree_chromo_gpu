@@ -1,4 +1,5 @@
 #include <btree.hpp>
+#include <atomic_write.hpp>
 
 // constructor
 btree::btree()
@@ -1171,13 +1172,20 @@ void btree::solve_topology()
 
 
 // function used to dump the topology to a file
+//
+// Written to a temporary name and renamed into place, for the same reason as
+// atom_array::write_bin. This file declares the bead count on its first line,
+// so a reader that catches it half written can come away with a count that has
+// been truncated to a smaller, still perfectly plausible number.
 void btree::dump_topology(std::string topo_filename, int idx)
 {
   std::fstream topo_file;
   
   node *topo_branch;
 
-  topo_file.open(topo_filename, std::ios::out);
+  std::string temp_filename = topo_filename + ".tmp";
+
+  topo_file.open(temp_filename, std::ios::out);
 
   if (!topo_file.is_open())
     {
@@ -1207,6 +1215,8 @@ void btree::dump_topology(std::string topo_filename, int idx)
 	}
 
       topo_file.close();
+
+      publish_temp_file(temp_filename,topo_filename,"dump_topology");
       
     }
 
