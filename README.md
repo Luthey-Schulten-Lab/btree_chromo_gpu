@@ -11,9 +11,9 @@ is unchanged; what is new is how fast it runs and how reliably it writes output.
 
 | Branch | What it is | Use it when |
 |---|---|---|
-| **`btree_chromo_v2.0.0`** | This branch. v1 physics + GPU optimizations + fixes. | You want the current engine. |
+| **`btree_chromo_v2.0.0`** | This branch. v1 physics + GPU optimizations + fixes. | You want to run 4DWCM `1.1.0`. |
 | `protein_science` | Maytin *et al.* as published, frozen at `4635d2a`. | You are reproducing that paper. |
-| `main` | Separate public lineage — **no shared history** with either branch above. | Not a drop-in replacement; do not mix. |
+| `main` | Separate public lineage — **no shared history** with either branch above. | You want to run 4DWCM `main`. |
 
 Inherited from `protein_science`: persistent SMC loop state across DNA hooks via
 `load_loops` / `write_loops` / `translocate`, which lets SMC dwell times run much
