@@ -3,17 +3,17 @@
 GPU chromosome engine (C++ / Kokkos–LAMMPS) for replicating bacterial DNA.
 
 **This is version 2.** It inherits the persistent SMC loop-extrusion model from
-the `protein_science` branch (Maytin *et al.*, *Protein Science*, 2026) and adds
+the [`protein_science`](https://github.com/Luthey-Schulten-Lab/btree_chromo_gpu/tree/protein_science)
+branch (Maytin *et al.*, *Protein Science*, 2026, frozen at `4635d2a`) and adds
 GPU performance work plus three correctness fixes. The physics of loop extrusion
 is unchanged; what is new is how fast it runs and how reliably it writes output.
 
 ## Which branch should I use?
 
-| Branch | What it is | Use it when |
+| Branch | What it is | Run with |
 |---|---|---|
-| **`btree_chromo_v2.0.0`** | This branch. v1 physics + GPU optimizations + fixes. | You want to run 4DWCM `1.1.0`. |
-| `protein_science` | Maytin *et al.* as published, frozen at `4635d2a`. | You are reproducing that paper. |
-| `main` | Separate public lineage — **no shared history** with either branch above. | You want to run 4DWCM `main`. |
+| **`btree_chromo_v2.0.0`** | This branch. v1 physics + GPU optimizations + fixes. | 4DWCM `1.1.0` |
+| `main` | The original engine. Separate lineage — no shared history with this branch. | 4DWCM `main` |
 
 Inherited from `protein_science`: persistent SMC loop state across DNA hooks via
 `load_loops` / `write_loops` / `translocate`, which lets SMC dwell times run much
