@@ -4,8 +4,7 @@ GPU chromosome engine (C++ / Kokkos–LAMMPS) for replicating bacterial DNA.
 
 **This is version 2.** It inherits the persistent SMC loop-extrusion model from
 the `protein_science` branch (Maytin *et al.*, *Protein Science*, 2026) and adds
-GPU performance work plus three correctness fixes. The physics of loop extrusion
-is unchanged; what is new is how fast it runs and how reliably it writes output.
+optimizations such as fused minimizer and related fixes. 
 
 ## Which branch should I use?
 
