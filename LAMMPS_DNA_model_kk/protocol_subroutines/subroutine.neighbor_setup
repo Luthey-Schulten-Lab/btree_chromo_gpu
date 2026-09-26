@@ -9,8 +9,15 @@
 # 9 - Extruded monomer
 
 # set the neighbor type
-neighbor ${r_ribo} bin
-neigh_modify every 1 delay 5 check yes page 100000 exclude type 1 1
+# skin 65 A instead of r_ribo (100 A). The skin only pads the lists (a pair enters within cutoff + skin; lists are rebuilt
+# when an atom has moved half the skin, checked every step after 5). With 100 A a DNA atom's list reached 202 A for the 102 A
+# DNA-DNA soft cutoff (PairSoftKokkos 114 us per BD step). 40 A (036) cut the pair time 1.2 s but needed 488 builds instead of 37;
+# 65 A is the fitted optimum. "Dangerous builds" in the LAMMPS log must stay 0.
+# displacement check every 5 steps (was every step after a delay of 5). Each check is a Kokkos kernel plus a flag copy to
+# the host and a sync (~20 us per BD step); with skin 65 A a rebuild is due only every ~190 steps (half-skin 32.5 A), so checking
+# every 5 steps keeps a wide margin. LAMMPS still reports "Dangerous builds" (must stay 0).
+neighbor 65.0 bin
+neigh_modify every 5 delay 5 check yes page 100000 exclude type 1 1
 
 # neighbor ${r_ribo} multi
 # neigh_modify every 1 delay 5 check yes &

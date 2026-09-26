@@ -245,12 +245,22 @@ private:
   int sys_write_sim_read_LAMMPS_data_at_timestep(std::vector<std::string> &params);
   int sys_update_lammps_inplace(std::vector<std::string> &params);
   int simulator_relax_progressive(std::vector<std::string> &params);
+  // deferred loop bonds and skipped identical rebuilds (see btree_driver.cpp)
+  void wcm_before_command(const std::string &command);
+  std::string wcm_rebuild_signature(const std::string &data_file);
 
   ///////////////
   // variables //
   ///////////////
 
   bool skip_runs;
+
+  // defer-loop-bonds state
+  bool wcm_loop_bonds_pending = false;   // load_loops captured loop bonds + types that are not yet applied to LAMMPS
+  std::vector<bond> wcm_loop_bonds;
+  std::vector<int> wcm_loop_types;
+  bool wcm_lammps_clean = false;         // no command that can change LAMMPS ran since the last clear+read
+  std::string wcm_read_signature;        // data file bytes + fork partitions of that clear+read
 
   /////////////
   // objects //

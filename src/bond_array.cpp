@@ -1,3 +1,4 @@
+#include <wcm_fmt.hpp>
 #include <bond_array.hpp>
 
 // constructor
@@ -78,6 +79,22 @@ bond bond_array::get_bond(int i)
 
 
 // write to stream
+// the same text as write()
+void bond_array::append(std::string &out) const
+{
+  if (N > 0)
+    {
+      out += "\nBonds # bond-ID bond-type i j\n\n";
+      for (int i=0; i<N; i++)
+        {
+      wcm_put_int(out, bonds[i].id); out += '\t';
+      wcm_put_int(out, bonds[i].type); out += '\t';
+      wcm_put_int(out, bonds[i].i); out += '\t';
+      wcm_put_int(out, bonds[i].j); out += '\n';
+        }
+    }
+}
+
 void bond_array::write(std::fstream &data_file)
 {
 
@@ -90,7 +107,7 @@ void bond_array::write(std::fstream &data_file)
 	  data_file << bonds[i].id << "\t"
 		    << bonds[i].type << "\t"
 		    << bonds[i].i << "\t"
-		    << bonds[i].j << std::endl;
+		    << bonds[i].j << '\n';   // '\n', not std::endl (a flush per line)
 	}
     }
   

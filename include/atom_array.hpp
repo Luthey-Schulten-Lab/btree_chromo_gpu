@@ -53,6 +53,7 @@ public:
 
   // write atom data
   void write(std::fstream &data_file, bool ellipsoids);
+  void append(std::string &out) const;   // the non-ellipsoid text of write(), appended to a string
   int write_xyz(std::string data_filename);
   int write_bin(std::string data_filename, std::string order);
 

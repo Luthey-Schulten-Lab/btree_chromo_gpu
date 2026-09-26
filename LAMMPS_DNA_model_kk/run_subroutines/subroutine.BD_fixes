@@ -6,7 +6,10 @@
 fix dnaBD DNA brownian/kk ${T} ${rng_seed} gamma_t ${gamma_t_mono}
 
 # Brownian fix for ribosomes
-fix ribosBD ribos brownian/kk ${T} ${rng_seed} gamma_t ${gamma_t_ribo}
+# only when the group has atoms. In the 4DWCM hooks the ribos group is empty (0 atoms at t = 500, 2996, 6000 s), and the
+# fix still launched a Kokkos kernel + fence every BD step. Each brownian fix draws from its own random pool, so the DNA fix's
+# stream is unchanged; with an empty group the fix moved nothing.
+if "$(count(ribos)) > 0" then "fix ribosBD ribos brownian/kk ${T} ${rng_seed} gamma_t ${gamma_t_ribo}"
 
 # Brownian fix for anchors (SMC)
 # fix smcBD anchors brownian/kk ${T} ${rng_seed} gamma_t ${gamma_t_mono}

@@ -1,3 +1,8 @@
+#include <iterator>
+#include <cstdio>
+#include <cstdlib>
+#include <sstream>
+#include <wcm_fmt.hpp>
 #include <LAMMPS_sys.hpp>
 
 // constructor
@@ -1107,33 +1112,82 @@ void LAMMPS_sys::write_data(std::string data_filename)
           data_file.close();
       }
       else {
+          // the file's text is built in memory (same bytes as the stream writes below, WCM_DATA_TEXT_OFF=1 keeps those)
+          // and written at once; it is also kept for the rebuild check of sys_write_sim_read_LAMMPS_data.
+          static const bool off_data_text = std::getenv("WCM_DATA_TEXT_OFF") != nullptr;
+          if (!off_data_text) {
+              std::string out;
+              out.reserve((size_t)atoms.get_N() * 64 + (size_t)(bonds.get_N() + angles.get_N()) * 32 + 1024);
+              out += "# LAMMPS data file for replicating chromosomes formed of rigid body monomers\n\n";
+              wcm_put_int(out, atoms.get_N()); out += "\t\tatoms\n";
+              wcm_put_int(out, N_atom_types); out += "\t\tatom types\n";
+              wcm_put_int(out, bonds.get_N()); out += "\t\tbonds\n";
+              wcm_put_int(out, N_bond_types); out += "\t\tbond types\n";
+              wcm_put_int(out, angles.get_N()); out += "\t\tangles\n";
+              wcm_put_int(out, N_angle_types); out += "\t\tangle types\n";
+              out += "\n\n";
+              wcm_put_double(out, bbox.r_min.x); out += '\t'; wcm_put_double(out, bbox.r_max.x); out += "\txlo xhi\n";
+              wcm_put_double(out, bbox.r_min.y); out += '\t'; wcm_put_double(out, bbox.r_max.y); out += "\tylo yhi\n";
+              wcm_put_double(out, bbox.r_min.z); out += '\t'; wcm_put_double(out, bbox.r_max.z); out += "\tzlo zhi\n";
+              atoms.append(out);
+              bonds.append(out);
+              angles.append(out);
+              if (std::getenv("WCM_DATA_TEXT_VERIFY") != nullptr) {
+                  std::stringstream ref;
+                  ref << "# LAMMPS data file for replicating chromosomes formed of rigid body monomers\n" << std::endl;
+                  ref << atoms.get_N() << "\t\tatoms" << std::endl;
+                  ref << N_atom_types << "\t\tatom types" << std::endl;
+                  ref << bonds.get_N() << "\t\tbonds" << std::endl;
+                  ref << N_bond_types << "\t\tbond types" << std::endl;
+                  ref << angles.get_N() << "\t\tangles" << std::endl;
+                  ref << N_angle_types << "\t\tangle types" << std::endl;
+                  ref << "\n" << std::endl;
+                  ref << bbox.r_min.x << "\t" << bbox.r_max.x << "\txlo xhi" << std::endl;
+                  ref << bbox.r_min.y << "\t" << bbox.r_max.y << "\tylo yhi" << std::endl;
+                  ref << bbox.r_min.z << "\t" << bbox.r_max.z << "\tzlo zhi" << std::endl;
+                  std::string r = ref.str();
+                  // the array writers take an fstream: render them through a temporary file
+                  const std::string tmp = data_filename + ".wcm_data_textref";
+                  { std::fstream t(tmp, std::ios::out); t << r; atoms.write(t, false); bonds.write(t); angles.write(t); }
+                  std::ifstream t(tmp, std::ios::binary);
+                  std::string rr((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
+                  std::remove(tmp.c_str());
+                  std::cout << "WCM_DATA_TEXT_VERIFY: data file text " << (rr == out ? "IDENTICAL" : "DIFFERENT") << " (" << out.size() << " / " << rr.size() << " bytes)" << std::endl;
+              }
+              data_file.write(out.data(), (std::streamsize)out.size());
+              data_file.close();
+              wcm_last_data.swap(out);
+              wcm_last_data_path = data_filename;
+          } else {
           // write system summary
-          data_file << "# LAMMPS data file for replicating chromosomes formed of rigid body monomers\n" << std::endl;
-
-          data_file << atoms.get_N() << "\t\tatoms" << std::endl;
-          data_file << N_atom_types << "\t\tatom types" << std::endl;
-          data_file << bonds.get_N() << "\t\tbonds" << std::endl;
-          data_file << N_bond_types << "\t\tbond types" << std::endl;
-          data_file << angles.get_N() << "\t\tangles" << std::endl;
-          data_file << N_angle_types << "\t\tangle types" << std::endl;
-
-          data_file << "\n" << std::endl;
-
-          data_file << bbox.r_min.x << "\t" << bbox.r_max.x << "\txlo xhi" << std::endl;
-          data_file << bbox.r_min.y << "\t" << bbox.r_max.y << "\tylo yhi" << std::endl;
-          data_file << bbox.r_min.z << "\t" << bbox.r_max.z << "\tzlo zhi" << std::endl;
-
-          // write atom information
-          atoms.write(data_file, r_s.ellipsoid);
-
-          // write bond information
-          bonds.write(data_file);
-
-          // write angle information
-          angles.write(data_file);
-
-
-          data_file.close();
+            data_file << "# LAMMPS data file for replicating chromosomes formed of rigid body monomers\n" << std::endl;
+  
+            data_file << atoms.get_N() << "\t\tatoms" << std::endl;
+            data_file << N_atom_types << "\t\tatom types" << std::endl;
+            data_file << bonds.get_N() << "\t\tbonds" << std::endl;
+            data_file << N_bond_types << "\t\tbond types" << std::endl;
+            data_file << angles.get_N() << "\t\tangles" << std::endl;
+            data_file << N_angle_types << "\t\tangle types" << std::endl;
+  
+            data_file << "\n" << std::endl;
+  
+            data_file << bbox.r_min.x << "\t" << bbox.r_max.x << "\txlo xhi" << std::endl;
+            data_file << bbox.r_min.y << "\t" << bbox.r_max.y << "\tylo yhi" << std::endl;
+            data_file << bbox.r_min.z << "\t" << bbox.r_max.z << "\tzlo zhi" << std::endl;
+  
+            // write atom information
+            atoms.write(data_file, r_s.ellipsoid);
+  
+            // write bond information
+            bonds.write(data_file);
+  
+            // write angle information
+            angles.write(data_file);
+  
+  
+            data_file.close();
+        }
+  
       }
 
     }

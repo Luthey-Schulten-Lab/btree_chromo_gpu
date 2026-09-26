@@ -1,10 +1,11 @@
 CXX      := -g++
 CXXFLAGS := -pedantic-errors -Wall -Wextra -Werror
 
-# CUDA toolchain for the fused CG minimizer (src/fused_cg_minimize.cu).
-# sm_100 = Blackwell (B200). nvcc 12.x ships in the protein_science container.
+# CUDA toolchain for the fused CG minimizer and fused BD (src/*.cu). CUDA_ARCHS = one or more compute capabilities:
+#   make CUDA_ARCHS=100 (B200, default) | 90 (H100) | 80 (A100) | "80 90 100" (one binary for all of them; sm_70 and newer)
 NVCC       := nvcc
-NVCC_ARCH  := -arch=sm_100
+CUDA_ARCHS ?= 100
+NVCC_ARCH  := $(foreach a,$(subst sm_,,$(CUDA_ARCHS)),-gencode arch=compute_$(a),code=sm_$(a))
 NVCC_FLAGS := -O3 $(NVCC_ARCH) -rdc=true --std=c++17
 
 CUDA_LIB := /usr/local/cuda/lib64
@@ -28,7 +29,8 @@ BASE_LDFLAGS  := -L${GCC_LIB} -lstdc++ -lm -std=c++17
 OPENMPI_LDFLAGS := -L${OpenMPI_LIB} -lmpi -lmpi_cxx -pthread -Wl,-rpath -Wl,${OpenMPI_LIB} -Wl,--enable-new-dtags
 FMT_LDFLAGS := -lfmt
 LAMMPS_LDFLAGS := ${LAMMPS_LIB}/liblammps_OMP_GPU_Kokkos.so
-LDFLAGS := ${BASE_LDFLAGS} ${OPENMPI_LDFLAGS} ${FMT_LDFLAGS} ${LAMMPS_LDFLAGS} ${CUDA_LDFLAGS} -ldl
+# export the executable's LAMMPS_NS::Special::build so liblammps' read_data binds to it
+LDFLAGS := -Wl,--export-dynamic-symbol=_ZN9LAMMPS_NS7Special5buildEv -Wl,--export-dynamic-symbol=_ZN9LAMMPS_NS4Atom10data_bondsEiPcPiiiiS2_ -Wl,--export-dynamic-symbol=_ZN9LAMMPS_NS4Atom11data_anglesEiPcPiiiiS2_ -Wl,--export-dynamic-symbol=_ZN9LAMMPS_NS4Atom10data_atomsEiPciiiiPdiPii -Wl,--export-dynamic-symbol=_ZN9LAMMPS_NS10DumpCustom11write_linesEiPd -Wl,--export-dynamic-symbol=_ZN9LAMMPS_NS10DumpCustom14convert_stringEiPd ${BASE_LDFLAGS} ${OPENMPI_LDFLAGS} ${FMT_LDFLAGS} ${LAMMPS_LDFLAGS} ${CUDA_LDFLAGS} -ldl
 
 BASE_INCLUDE  := -Iinclude/ -I${GCC_INC}
 OPENMPI_INCLUDE := -I${OpenMPI_INC}

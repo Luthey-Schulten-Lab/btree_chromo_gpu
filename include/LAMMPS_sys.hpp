@@ -159,6 +159,8 @@ public:
 
   // write the data
   void write_data(std::string data_filename);
+  const std::string &wcm_data_text() const { return wcm_last_data; }
+  const std::string &wcm_data_path() const { return wcm_last_data_path; }
 
   // getters for the total system state
   int get_N_total();
@@ -252,6 +254,8 @@ private:
   angle_array angles;
 
   sys_bbox bbox;
+  // text of the last data file written by write_data (non-ellipsoid path) and its path
+  std::string wcm_last_data, wcm_last_data_path;
   BD_lengths BD_l;
   topo_switches t_s;
   rep_switches r_s;

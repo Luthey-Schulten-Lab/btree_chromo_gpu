@@ -1,3 +1,4 @@
+#include <wcm_fmt.hpp>
 #include <angle_array.hpp>
 
 // constructor
@@ -79,6 +80,23 @@ angle angle_array::get_angle(int i)
 
 
 // write to stream
+// the same text as write()
+void angle_array::append(std::string &out) const
+{
+  if (N > 0)
+    {
+      out += "\nAngles # angle-ID angle-type i j k\n\n";
+      for (int i=0; i<N; i++)
+        {
+      wcm_put_int(out, angles[i].id); out += '\t';
+      wcm_put_int(out, angles[i].type); out += '\t';
+      wcm_put_int(out, angles[i].i); out += '\t';
+      wcm_put_int(out, angles[i].j); out += '\t';
+      wcm_put_int(out, angles[i].k); out += '\n';
+        }
+    }
+}
+
 void angle_array::write(std::fstream &data_file)
 {
 
@@ -92,7 +110,7 @@ void angle_array::write(std::fstream &data_file)
 		    << angles[i].type << "\t"
 		    << angles[i].i << "\t"
 		    << angles[i].j << "\t"
-		    << angles[i].k << std::endl;
+		    << angles[i].k << '\n';   // '\n', not std::endl (a flush per line)
 	}
     }
   

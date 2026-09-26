@@ -1,3 +1,4 @@
+#include <wcm_fmt.hpp>
 #include <atom_array.hpp>
 #include <atomic_write.hpp>
 
@@ -272,6 +273,21 @@ int atom_array::read_bin_coords(std::string data_filename, std::string order, bo
 
 
 // write to stream
+// the same text as write(data_file, false)
+void atom_array::append(std::string &out) const
+{
+  out += "\nAtoms # atom-ID molecule-ID atom-type x y z\n\n";
+  for (int i=0; i<N; i++)
+    {
+      wcm_put_int(out, atoms[i].id); out += "  \t";
+      wcm_put_int(out, atoms[i].mol_id); out += '\t';
+      wcm_put_int(out, atoms[i].type); out += '\t';
+      wcm_put_double(out, atoms[i].r.x); out += "  \t";
+      wcm_put_double(out, atoms[i].r.y); out += "  \t";
+      wcm_put_double(out, atoms[i].r.z); out += '\n';
+    }
+}
+
 void atom_array::write(std::fstream &data_file, bool ellipsoid)
 {
   if (ellipsoid){
@@ -286,7 +302,7 @@ void atom_array::write(std::fstream &data_file, bool ellipsoid)
                     << atoms[i].r.z << "  \t"
                     << atoms[i].mol_id << "\t"
                     << atoms[i].ellipsoid_flag << "\t"
-                    << atoms[i].density << std::endl;
+                    << atoms[i].density << '\n';   // '\n', not std::endl (a flush per line)
       }
   }
   else {
@@ -299,7 +315,7 @@ void atom_array::write(std::fstream &data_file, bool ellipsoid)
                     << atoms[i].type << "\t"
                     << atoms[i].r.x << "  \t"
                     << atoms[i].r.y << "  \t"
-                    << atoms[i].r.z << std::endl;
+                    << atoms[i].r.z << '\n';
       }
 
       //data_file << "\nAtoms # atom-ID atom-type x y z molecule-ID diameter density\n" << std::endl;

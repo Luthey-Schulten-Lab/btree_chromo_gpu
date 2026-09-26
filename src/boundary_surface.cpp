@@ -181,6 +181,8 @@ int boundary_surface::vert_from_edge(std::array<int,2> &e, std::vector<edge_map>
 
 // AKM edit 111424
 #include <unordered_set>
+#include <unordered_map>
+#include <algorithm>
 #include <functional>
 
 // Helper function to get a unique hash for an edge
@@ -243,10 +245,29 @@ void boundary_surface::interpolate_surface()
     // Reserve space for the resulting tri_surf to avoid repeated reallocations
     tri_surf.reserve(old_tri_surf.size() * 4); // Assuming splitting each triangle into 4 smaller ones
 
-    // Interpolate faces using edge mapping
+    // Interpolate faces using edge mapping.
+    // midpoint vertices are looked up in a hash map keyed on the (min, max) vertex pair instead of the linear scan
+    // over edge_mapping in vert_from_edge (O(faces x edges): ~1e9 comparisons at the last level of a 40,962-vertex sphere,
+    // 0.5 s per DNA hook). Each edge is in edge_mapping exactly once, so the vertex found and the faces pushed are identical.
+    std::unordered_map<unsigned long long, int> edge_vert;
+    edge_vert.reserve(edge_mapping.size() * 2);
+    for (const edge_map& e_m : edge_mapping)
+        edge_vert[((unsigned long long)(unsigned)e_m.edge[0] << 32) | (unsigned)e_m.edge[1]] = e_m.vert;
     for (const tri_face& t_f : old_tri_surf)
     {
-        interpolate_face(t_f, edge_mapping);
+        int new_verts[3];
+        for (int i = 0; i < 3; i++)
+        {
+            int a = t_f.verts[perm_edges[i][0]], b = t_f.verts[perm_edges[i][1]];
+            auto it = edge_vert.find(((unsigned long long)(unsigned)std::min(a, b) << 32) | (unsigned)std::max(a, b));
+            new_verts[i] = (it == edge_vert.end()) ? -1 : it->second;
+            if (new_verts[i] == -1) std::cout << a << "," << b << " fail" << std::endl;
+        }
+        // same four faces, same order as interpolate_face
+        tri_surf.push_back(new_tri_face(t_f.verts[0],new_verts[0],new_verts[2]));
+        tri_surf.push_back(new_tri_face(t_f.verts[1],new_verts[1],new_verts[0]));
+        tri_surf.push_back(new_tri_face(t_f.verts[2],new_verts[2],new_verts[1]));
+        tri_surf.push_back(new_tri_face(new_verts[0],new_verts[1],new_verts[2]));
     }
 }
 

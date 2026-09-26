@@ -1,4 +1,10 @@
+#include <chrono>
 #include <btree_driver.hpp>
+#include <unordered_set>
+extern bool wcm_fast_read_atoms_force_off;   // the fast-read-atoms change (wcm_fast_read.cpp): WCM_FAST_READ_ATOMS_VERIFY's reference read
+#include <fstream>
+#include <iterator>
+#include <cstdlib>
 
 // constructor
 btree_driver::btree_driver()
@@ -2161,8 +2167,12 @@ void btree_driver::prepare_command_requirements()
 
 
 // function to execute commands
+// WCM_CMD_TIMES=1: seconds since the start of this directive file at each command (stderr, "WCM_T <t> <command>")
+static std::chrono::steady_clock::time_point wcm_cmd_t0;
+static bool wcm_cmd_times() { static const bool on = std::getenv("WCM_CMD_TIMES") != nullptr; return on; }
 int btree_driver::execute_commands()
 {
+  wcm_cmd_t0 = std::chrono::steady_clock::now();
   
   std::cout << "\n---BEGIN EXECUTING COMMANDS---\n" << std::endl;
 
@@ -2179,6 +2189,7 @@ int btree_driver::execute_commands()
       update_lock_state_post_command(commands[i_c]);
     }
 
+  if (wcm_cmd_times()) std::cerr << "WCM_T " << std::chrono::duration<double>(std::chrono::steady_clock::now() - wcm_cmd_t0).count() << " END" << std::endl;
   std::cout << "---END EXECUTING COMMANDS---\n" << std::endl;
 
   return e;
@@ -2190,6 +2201,7 @@ int btree_driver::execute_single_command(std::string &command,
 					 std::vector<std::string> &params)
 {
 
+  if (wcm_cmd_times()) std::cerr << "WCM_T " << std::chrono::duration<double>(std::chrono::steady_clock::now() - wcm_cmd_t0).count() << " " << command << std::endl;
   std::cout << "\nCOMMAND: " << command << std::endl;
   for (size_t i_p=0; i_p<params.size(); i_p++)
     {
@@ -2201,6 +2213,8 @@ int btree_driver::execute_single_command(std::string &command,
 
 
   int error_code = 0;
+
+  wcm_before_command(command);
   
   //////////////////
   // COMMAND LIST //
@@ -3689,7 +3703,18 @@ int btree_driver::load_loops(std::vector<std::string> &params)
   driver_ls.set_M(driver_ls.get_numSmc_initial());
 
   std::cout << "Updating loop bonds..." << std::endl;
-  driver_lmp_simulator.update_loop_bonds(true, driver_ls); // possible bug - will not re-write existing loops
+  if (std::getenv("WCM_DEFER_LOOP_BONDS_OFF") != nullptr)
+    {
+      driver_lmp_simulator.update_loop_bonds(true, driver_ls); // possible bug - will not re-write existing loops
+      return 0;
+    }
+  // capture the inputs of update_loop_bonds(true, ...) now and apply them to LAMMPS before the next command that can
+  // see or change LAMMPS state (wcm_before_command); a clear+read that comes first discards them, as it discarded the bonds.
+  wcm_loop_bonds = driver_ls.get_loop_bonds();
+  wcm_loop_types.assign(driver_lmp_sys.get_N_total(), 0);
+  { int *t = wcm_loop_types.data(); driver_lmp_sys.get_types(t); }
+  wcm_loop_bonds_pending = true;
+  std::cout << "" << wcm_loop_bonds.size() << " loop bonds captured, applied to LAMMPS when next needed" << std::endl;
   return 0;
 }
 
@@ -4114,6 +4139,23 @@ int btree_driver::simulator_read_data(std::vector<std::string> &params)
   driver_lmp_simulator.read_data(params[0]);
   driver_lmp_simulator.prepare_fork_partition_groups(1);
   driver_lmp_simulator.standard_computes();
+  // WCM_FAST_READ_ATOMS_VERIFY=1: the same clear+read again with LAMMPS' own Atoms parser; the two LAMMPS states are compared byte for byte
+  if (std::getenv("WCM_FAST_READ_ATOMS_VERIFY") != nullptr && std::getenv("WCM_FAST_READ_ATOMS_OFF") == nullptr)
+    {
+      const std::string fast = driver_lmp_simulator.wcm_fast_read_atoms_fingerprint();
+      wcm_fast_read_atoms_force_off = true;
+      driver_lmp_simulator.clear();
+      driver_lmp_simulator.reset_protocol_variables();
+      driver_lmp_simulator.global_setup();
+      driver_lmp_simulator.read_data(params[0]);
+      driver_lmp_simulator.prepare_fork_partition_groups(1);
+      driver_lmp_simulator.standard_computes();
+      wcm_fast_read_atoms_force_off = false;
+      const std::string ref = driver_lmp_simulator.wcm_fast_read_atoms_fingerprint();
+      size_t d = 0; while (d < fast.size() && d < ref.size() && fast[d] == ref[d]) d++;
+      std::cout << "WCM_FAST_READ_ATOMS_VERIFY: fast Atoms parse leaves LAMMPS " << (fast == ref ? "IDENTICAL" : "DIFFERENT")
+                << " to LAMMPS' own (fingerprint " << fast.size() << " / " << ref.size() << " bytes, first difference at " << d << ")" << std::endl;
+    }
   return 0;  
 }
 
@@ -4373,11 +4415,92 @@ int btree_driver::print_state()
 }
 
 
+// commands that neither read nor change the LAMMPS topology, per-atom types or setup (CPU state of the btree, mapper,
+// loop simulator and system only; sync_simulator_and_system only gathers coordinates, which loop bonds do not change).
+static const std::unordered_set<std::string> wcm_lammps_free_commands = {
+  "simulator_load_loop_params", "load_loops", "sync_simulator_and_system", "set_initial_state", "transform",
+  "set_final_state", "output_state", "map_replication", "write_loops"};
+
+// commands that run while the special list may be stale (form_loops left it so): the LAMMPS-free ones, the fused
+// minimiser (its own exclusions), the BD run (rebuilds or refreshes it itself), coordinate output, and a clear+read.
+static const std::unordered_set<std::string> wcm_special_free_commands = {
+  "simulator_form_loops", "simulator_minimize_topoDNA_harmonic", "simulator_set_delta_t", "simulator_run_soft_harmonic",
+  "write_mono_coords", "sys_write_sim_read_LAMMPS_data",
+  // translocate advances the loop simulator on the CPU; the in-place update only scatters coordinates
+  "translocate", "sys_update_lammps_inplace"};
+
+void btree_driver::wcm_before_command(const std::string &command)
+{
+  if (!wcm_lammps_free_commands.count(command) && !wcm_special_free_commands.count(command))
+    driver_lmp_simulator.wcm_special_fresh();
+  if (wcm_lammps_free_commands.count(command)) return;
+  if (command == "sys_write_sim_read_LAMMPS_data") return;   // rebuilds LAMMPS itself (drops pending loop bonds)
+  if (wcm_loop_bonds_pending)
+    {
+      driver_lmp_simulator.wcm_special_fresh();   // create_bonds must see a current special list
+      std::cout << "applying the " << wcm_loop_bonds.size() << " captured loop bonds before " << command << std::endl;
+      driver_lmp_simulator.update_loop_bonds_apply(true, wcm_loop_bonds, wcm_loop_types.data());
+      wcm_loop_bonds_pending = false;
+    }
+  wcm_lammps_clean = false;
+}
+
+// Everything a clear+read of this data file sets up from the driver's state: the file itself and the fork partitions from which
+// prepare_fork_partition_groups builds its groups (the rest of the setup comes from simulator settings, which only commands
+// outside wcm_lammps_free_commands change).
+std::string btree_driver::wcm_rebuild_signature(const std::string &data_file)
+{
+  std::string sig;
+  if (driver_lmp_sys.wcm_data_path() == data_file && !driver_lmp_sys.wcm_data_text().empty())
+    sig = driver_lmp_sys.wcm_data_text();   // the text write_data just wrote
+  else
+    {
+      std::ifstream f(data_file, std::ios::binary);
+      sig.assign((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
+      if (!f.good() && !f.eof()) return std::string();
+    }
+  sig += "\n#fork_partitions";
+  for (const fork_partition &f_p : driver_lmp_sys.get_all_fork_partitions())
+    {
+      sig += " " + f_p.fork + " L";
+      for (const mono_range &m : f_p.left_monos)
+        sig += " " + std::to_string(m.wrapped) + "," + std::to_string(m.N) + "," + std::to_string(m.ll) + "," + std::to_string(m.ul) + "," + std::to_string(m.mid_ll) + "," + std::to_string(m.mid_ul);
+      sig += " R";
+      for (const mono_range &m : f_p.right_monos)
+        sig += " " + std::to_string(m.wrapped) + "," + std::to_string(m.N) + "," + std::to_string(m.ll) + "," + std::to_string(m.ul) + "," + std::to_string(m.mid_ll) + "," + std::to_string(m.mid_ul);
+    }
+  return sig;
+}
+
 int btree_driver::sys_write_sim_read_LAMMPS_data(std::vector<std::string> &params)
 {
   int e = 0;
   e += write_LAMMPS_data(params);
+  // the clear+read rebuilds LAMMPS from this data file; loop bonds captured by load_loops and not yet applied would
+  // be discarded by it (as the bonds themselves were), so they are dropped. When the file and fork partitions are those of the
+  // last clear+read and nothing has touched LAMMPS since, LAMMPS already holds exactly what the rebuild would produce.
+  wcm_loop_bonds_pending = false;
+  const bool off = std::getenv("WCM_SKIP_SAME_READ_OFF") != nullptr;
+  std::string sig = off ? std::string() : wcm_rebuild_signature(params[0]);
+  if (!off && wcm_lammps_clean && !sig.empty() && sig == wcm_read_signature)
+    {
+      if (std::getenv("WCM_DEFER_LOOP_BONDS_VERIFY") != nullptr)
+        {
+          const std::string before = driver_lmp_simulator.wcm_state_fingerprint();
+          e += simulator_read_data(params);
+          const std::string after = driver_lmp_simulator.wcm_state_fingerprint();
+          size_t d = 0; while (d < before.size() && d < after.size() && before[d] == after[d]) d++;
+          std::cout << "WCM_DEFER_LOOP_BONDS_VERIFY: the skipped clear+read leaves LAMMPS " << (before == after ? "IDENTICAL" : "DIFFERENT")
+                    << " (fingerprint " << before.size() << " / " << after.size() << " bytes, first difference at " << d << ")" << std::endl;
+          wcm_lammps_clean = true;
+          return e;
+        }
+      std::cout << "data file and fork partitions unchanged since the last read, LAMMPS untouched since: clear+read skipped" << std::endl;
+      return e;
+    }
   e += simulator_read_data(params);
+  wcm_read_signature = std::move(sig);
+  wcm_lammps_clean = !off;
   return e;
 }
 

@@ -31,6 +31,7 @@ public:
 
   // write angle data
   void write(std::fstream &data_file);
+  void append(std::string &out) const;   // the non-ellipsoid text of write(), appended to a string
 
 private:
 

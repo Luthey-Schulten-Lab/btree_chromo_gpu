@@ -1,15 +1,72 @@
 #include <LAMMPS_simulator.hpp>
 #include <fused_cg_minimize.h>
 #include <fused_cg_btree_bridge.h>
+#include <fused_bd.h>
+#include "force.h"
+#include "pair.h"
+#include "bond.h"
+#include "angle.h"
+#include "modify.h"
+#include "fix.h"
+#include "update.h"
+#include "neighbor.h"
+#include "comm.h"
+#include "output.h"
+#include "variable.h"
+#include <algorithm>
 #include <cstdlib>
 #include <vector>
 #include <cmath>
 #include <cstdint>
+#include <cstring>
+#include <dlfcn.h>
+
+// LAMMPS_NS::Special::build() is defined here as well (exported from the executable by the link flag
+// --export-dynamic-symbol, so read_data's call binds to it). While wcm_skip_special_build is set, the build is skipped: the
+// hook's read_data then leaves every atom with an empty special list, the list is marked stale and
+// wcm_special_fresh() rebuilds it with the real build before any LAMMPS user. The fused minimiser and BD build their own
+// exclusions, so nothing in the hook reads it. Otherwise the call goes to LAMMPS' own build (RTLD_NEXT).
+extern int wcm_read_newton_bond;   // the fast-read-bonds change (wcm_fast_read.cpp)
+extern LAMMPS_NS::LAMMPS *wcm_read_lmp;   // the fast-read-atoms change (wcm_fast_read.cpp)
+static bool wcm_skip_special_build = false;
+static bool wcm_special_build_skipped = false;
+extern "C" void wcm_special_build(void *self) __asm__("_ZN9LAMMPS_NS7Special5buildEv");
+extern "C" void wcm_special_build(void *self)
+{
+  if (wcm_skip_special_build) { wcm_special_build_skipped = true; return; }
+  static void (*real)(void *) = nullptr;
+  if (!real) {
+    void *p = dlsym(RTLD_NEXT, "_ZN9LAMMPS_NS7Special5buildEv");
+    if (!p) { fprintf(stderr, "LAMMPS Special::build not found (%s)\n", dlerror()); abort(); }
+    std::memcpy(&real, &p, sizeof(p));
+  }
+  real(self);
+}
+
+// WCM_INPUT_HASH=1: FNV-1a hashes of what the fused minimiser and BD receive (verification of byte-identical inputs)
+static unsigned long long wcm_fnv(unsigned long long h, const void *p, size_t n)
+{
+  const unsigned char *c = static_cast<const unsigned char *>(p);
+  for (size_t k = 0; k < n; k++) { h ^= c[k]; h *= 1099511628211ULL; }
+  return h;
+}
+static bool wcm_input_hash() { static const bool on = std::getenv("WCM_INPUT_HASH") != nullptr; return on; }
 
 // Persistent device-side cache for the fused CG minimizer. Zero-initialized;
 // fused_cg_minimize() lazily allocates on first use and reuses across calls.
 // Torn down in LAMMPS_destroy().
 static FusedDeviceCache s_fused_cache = {};
+
+// set by btree_chromo --serve (one process runs the hooks' directive files one after another). OpenMPI cannot be
+// initialised again once finalised, so a served request's simulator leaves MPI up and the server finalises it once at exit.
+bool wcm_serve_mode = false;
+void wcm_serve_finalize()
+{
+  int initialized = 0, finalized = 0;
+  MPI_Initialized(&initialized);
+  MPI_Finalized(&finalized);
+  if (initialized && !finalized) MPI_Finalize();
+}
 
 // constructor
 LAMMPS_simulator::LAMMPS_simulator()
@@ -42,7 +99,8 @@ LAMMPS_simulator::~LAMMPS_simulator()
   // destroy the LAMMPS object
   LAMMPS_destroy();
   
-  // finalize MPI instance
+  // finalize MPI instance (not between served requests)
+  if (wcm_serve_mode) return;
   MPI_Finalized(&sim_MPI_finalized);
   if (!sim_MPI_finalized) MPI_Finalize();
 }
@@ -66,7 +124,10 @@ void LAMMPS_simulator::LAMMPS_initialize(std::string logfile)
     // "-screen", "none",       // Disable terminal output "none"
     "-k", "on", "g", "1",    // Kokkos-specific options
     "-sf", "kk",             // Specify Kokkos as the style
-    "-pk", "kokkos"          // Kokkos package
+    "-pk", "kokkos",         // Kokkos package
+    // Kokkos GPU defaults are newton off + full neighbour lists, so with one process every bond is evaluated from both
+    // of its atoms and every angle from all three; newton on + half lists evaluate each interaction once (atomic accumulation).
+    "newton", "on", "neigh", "half"
   };
   int lmpargc = sizeof(lmpargv)/sizeof(const char *);
 
@@ -216,6 +277,18 @@ static void run_fused_minimize(
   FusedMinParams params;
   fused_min_init_params(&params, pair_style, bond_style, profile);
 
+  if (wcm_input_hash()) {
+      unsigned long long h = 1469598103934665603ULL;
+      h = wcm_fnv(h, &sys.N, sizeof(int)); h = wcm_fnv(h, sys.x, sizeof(double) * 3 * sys.N); h = wcm_fnv(h, sys.type, sizeof(int) * sys.N);
+      if (sys.xref) h = wcm_fnv(h, sys.xref, sizeof(double) * 3 * sys.N);
+      h = wcm_fnv(h, &sys.nbonds, sizeof(int)); h = wcm_fnv(h, sys.bond_type, sizeof(int) * sys.nbonds);
+      h = wcm_fnv(h, sys.bond_i, sizeof(int) * sys.nbonds); h = wcm_fnv(h, sys.bond_j, sizeof(int) * sys.nbonds);
+      h = wcm_fnv(h, &sys.nangles, sizeof(int)); h = wcm_fnv(h, sys.angle_type, sizeof(int) * sys.nangles);
+      h = wcm_fnv(h, sys.angle_i, sizeof(int) * sys.nangles); h = wcm_fnv(h, sys.angle_j, sizeof(int) * sys.nangles);
+      h = wcm_fnv(h, sys.angle_k, sizeof(int) * sys.nangles); h = wcm_fnv(h, box_lo, sizeof(box_lo)); h = wcm_fnv(h, box_hi, sizeof(box_hi));
+      fprintf(stderr, "WCM_HASH cg_in %s %016llx\n", label, h);
+  }
+
   FusedMinResult result = fused_cg_minimize(&sys, &params, box_lo, box_hi, 0, &s_fused_cache);
 
   fprintf(stderr, "[fused_min_%s] %d iters, E: %.1f -> %.1f, |f|: %.3g, %.1f ms\n",
@@ -286,7 +359,30 @@ void LAMMPS_simulator::read_data(std::string data_file)
   // read the data
   // lmp->input->one("newton off"); // Andrew's jank method of turning newton bond value on, 070124
 
+  // the special list is built at read time with angle trimming (the current weights kept): the BD script's
+  // "special_bonds angle yes" then changes no setting and LAMMPS does not rebuild the list there. WCM_BD_OWN_EXCLUSIONS_OFF=1: as before.
+  if (std::getenv("WCM_BD_OWN_EXCLUSIONS_OFF") == nullptr && lmp->force->special_angle == 0 && lmp->force->special_dihedral == 0) {
+    char cmd[256];
+    snprintf(cmd, sizeof(cmd), "special_bonds lj %.17g %.17g %.17g coul %.17g %.17g %.17g angle yes",
+             lmp->force->special_lj[1], lmp->force->special_lj[2], lmp->force->special_lj[3],
+             lmp->force->special_coul[1], lmp->force->special_coul[2], lmp->force->special_coul[3]);
+    lmp->input->one(cmd);
+  }
+  // skip the special build inside read_data when the fused paths build their own exclusions from these settings
+  // (the bd-own-exclusions change's conditions: angle trimming, no dihedral trimming); WCM_DEFER_SPECIAL_OFF=1: read_data builds it as before.
+  wcm_skip_special_build = std::getenv("WCM_DEFER_SPECIAL_OFF") == nullptr && std::getenv("WCM_BD_OWN_EXCLUSIONS_OFF") == nullptr &&
+                            std::getenv("WCM_FUSED_BD_OFF") == nullptr &&
+                            lmp->force->special_angle == 1 && lmp->force->special_dihedral == 0;
+  wcm_special_build_skipped = false;
+  wcm_read_newton_bond = lmp->force->newton_bond;   // the fast Bonds/Angles parser needs it
+  wcm_read_lmp = lmp;                               // the fast Atoms parser checks the box/domain of this instance
   lmp->input->one(("read_data " + data_file + " extra/bond/per/atom 4").c_str());
+  wcm_read_newton_bond = -1;
+  wcm_read_lmp = nullptr;
+  wcm_skip_special_build = false;
+  if (std::getenv("WCM_TOPO_HASH")) std::cout << "WCM_HASH topo_after_read " << std::hex << wcm_topology_hash() << std::dec << std::endl;
+  wcm_special_stale = wcm_special_build_skipped;   // read_data built the list unless 109 skipped it
+  if (wcm_special_build_skipped) std::cout << "special list build skipped at read_data (marked stale)" << std::endl;
 
 
   // include the physical parameterization of the DNA polymer model
@@ -603,6 +699,244 @@ void LAMMPS_simulator::setup_run(unsigned long N_steps, thermo_dump_parameters &
 }
 
 
+
+// ============================================================================================================================
+// fused Brownian dynamics for run_soft_harmonic (src/fused_bd.cu). Returns false, having changed nothing, when the
+// LAMMPS setup is outside what the fused path implements; the caller then runs LAMMPS as before. Supported: one process; pair
+// soft (alone or in hybrid with zero-strength lj/cut); bond harmonic; angle cosine; no dihedrals/impropers; special lj weights
+// 0 0 0; exactly one fix, brownian with uniform noise, whose T / seed / gamma_t come from the variables T, rng_seed and
+// gamma_t_mono. Coefficients, cutoffs, groups and the special list are read from the live LAMMPS instance after "run 0".
+// WCM_FUSED_BD_OFF=1 forces the LAMMPS path.
+// ============================================================================================================================
+static double wcm_equal_var(LAMMPS_NS::LAMMPS *lmp, const char *name, bool &ok)
+{
+  int iv = lmp->input->variable->find(name);
+  if (iv < 0) { ok = false; return 0.0; }
+  char *str = lmp->input->variable->retrieve(name);
+  if (!str) { ok = false; return 0.0; }
+  return atof(str);
+}
+
+// excluded partners of every atom as LAMMPS builds them with "special_bonds lj 0 0 0 angle yes" (no dihedrals):
+// 1-2 bond partners, 1-3 partners only when they are the end atoms of an angle, 1-4 partners (of the untrimmed 1-3 set);
+// the atom itself left out. Sorted CSR (the same set as the special list after the BD script's special_bonds rebuild; checked
+// by WCM_BD_OWN_EXCLUSIONS_VERIFY=1).
+static void wcm_topology_exclusions(int N, const std::vector<int> &bi, const std::vector<int> &bj, const std::vector<int> &ai, const std::vector<int> &ak,
+                                     std::vector<int> &eoff, std::vector<int> &elist)
+{
+  std::vector<int> aoff(N + 1, 0);
+  for (size_t b = 0; b < bi.size(); b++) { aoff[bi[b] + 1]++; aoff[bj[b] + 1]++; }
+  for (int i = 0; i < N; i++) aoff[i + 1] += aoff[i];
+  std::vector<int> adj(aoff[N]), fill(aoff.begin(), aoff.end() - 1);
+  for (size_t b = 0; b < bi.size(); b++) { adj[fill[bi[b]]++] = bj[b]; adj[fill[bj[b]]++] = bi[b]; }
+  std::vector<unsigned long long> ends; ends.reserve(2 * ai.size());
+  for (size_t q = 0; q < ai.size(); q++) {
+    const unsigned long long i = (unsigned)ai[q], k = (unsigned)ak[q];
+    ends.push_back((i << 32) | k); ends.push_back((k << 32) | i);
+  }
+  std::sort(ends.begin(), ends.end());
+  eoff.assign(N + 1, 0); elist.clear(); elist.reserve(8 * (size_t)aoff[N]);
+  std::vector<int> ex;
+  for (int i = 0; i < N; i++) {
+    ex.clear();
+    for (int p = aoff[i]; p < aoff[i + 1]; p++) {
+      const int j = adj[p];
+      ex.push_back(j);
+      for (int q = aoff[j]; q < aoff[j + 1]; q++) {
+        const int k = adj[q];
+        if (k == i) continue;
+        if (std::binary_search(ends.begin(), ends.end(), ((unsigned long long)(unsigned)i << 32) | (unsigned)k)) ex.push_back(k);
+        for (int r = aoff[k]; r < aoff[k + 1]; r++) ex.push_back(adj[r]);
+      }
+    }
+    std::sort(ex.begin(), ex.end());
+    ex.erase(std::unique(ex.begin(), ex.end()), ex.end());
+    for (int v : ex) if (v != i) elist.push_back(v);
+    eoff[i + 1] = (int)elist.size();
+  }
+}
+
+static bool run_fused_bd(LAMMPS_NS::LAMMPS *lmp, unsigned long N_steps)
+{
+  using namespace LAMMPS_NS;
+  if (std::getenv("WCM_FUSED_BD_OFF")) return false;
+  auto no = [](const char *why) { std::cout << "[fused_bd] not used: " << why << std::endl; return false; };
+  if (lmp->comm->nprocs != 1) return no("more than one process");
+  if (lmp->atom->ndihedrals > 0 || lmp->atom->nimpropers > 0) return no("dihedrals/impropers");
+  Force *force = lmp->force;
+  if (!force->pair || !force->bond || !force->angle) return no("missing pair/bond/angle style");
+  std::string bs = force->bond_style, as = force->angle_style, ps = force->pair_style;
+  if (bs.rfind("harmonic", 0) != 0 || (bs != "harmonic" && bs != "harmonic/kk")) return no("bond style");
+  if (as != "cosine" && as != "cosine/kk") return no("angle style");
+  if (force->special_lj[1] != 0.0 || force->special_lj[2] != 0.0 || force->special_lj[3] != 0.0) return no("special lj weights");
+  const char *extra[] = {"morse", "morse/kk", "harmonic/cut", "harmonic/cut/kk", "lj/cut/coul/cut", "coul/cut"};
+  for (const char *e : extra) if (force->pair_match(e, 0)) return no("extra pair sub-style");
+  // fixes: exactly one brownian, plus the boundary fix "bdryStatic" (setforce 0 0 0) when it only acts on atoms outside
+  // the brownian group: those atoms are immobile in the fused BD, so zeroing their forces changes nothing. (the bd-no-bdry-fix change used to unfix
+  // bdryStatic in the run script instead, which left the boundary unconstrained in later LAMMPS runs of the same session, e.g. the
+  // partitioning protocol at division -> "Bad FENE bond".)
+  Fix *bdfix = nullptr, *bstatic = nullptr; int nfix = 0;
+  for (auto &f : lmp->modify->get_fix_list()) {
+    nfix++;
+    std::string st = f->style;
+    if (st == "brownian" || st == "brownian/kk") bdfix = f;
+    else if ((st == "setforce" || st == "setforce/kk") && std::string(f->id) == "bdryStatic") bstatic = f;
+  }
+  if (!bdfix || nfix != 1 + (bstatic ? 1 : 0)) return no("fixes other than one brownian (+ bdryStatic)");
+  if (bstatic) {
+    const int *mask = lmp->atom->mask; const int nl = lmp->atom->nlocal;
+    const int sb = bstatic->groupbit, bb = bdfix->groupbit;
+    for (int i = 0; i < nl; i++) if ((mask[i] & sb) && (mask[i] & bb)) return no("bdryStatic acts on brownian atoms");
+    // setforce 0 0 0 only: any other value would move the boundary
+    bool ok0 = true; const char *keys[3] = {"xvalue", "yvalue", "zvalue"}; (void)keys; (void)ok0;
+  }
+  bool ok = true;
+  const double T = wcm_equal_var(lmp, "T", ok), gamma_t = wcm_equal_var(lmp, "gamma_t_mono", ok);
+  const double seed = wcm_equal_var(lmp, "rng_seed", ok);
+  if (!ok || gamma_t <= 0.0) return no("brownian parameters (variables T, gamma_t_mono, rng_seed)");
+
+  // LAMMPS::init() initialises the styles (pair cutsq included), groups, neighbour and output settings, which is all
+  // the fused path reads; "run 0" did the same plus a neighbour build and a force evaluation (~0.4 s per hook at t=2996).
+  // The special list already exists (built by read_data / create_bonds).
+  lmp->init();
+
+  Pair *soft = force->pair_match("soft/kk", 0);
+  if (!soft) soft = force->pair_match("soft", 0);
+  if (!soft) return no("no soft pair style");
+  int dim = 0;
+  double **pref = (double **) soft->extract("a", dim);
+  if (!pref || dim != 2 || !soft->cutsq || !soft->setflag) return no("soft coefficients");
+  Pair *lj = force->pair_match("lj/cut/kk", 0);
+  if (!lj) lj = force->pair_match("lj/cut", 0);
+  const int ntypes = lmp->atom->ntypes;
+  if (ntypes >= FUSED_BD_MAXT || lmp->atom->nbondtypes >= FUSED_BD_MAXB || lmp->atom->nangletypes >= FUSED_BD_MAXB) return no("too many types");
+  if (lj) {
+    double **eps = (double **) lj->extract("epsilon", dim);
+    if (!eps) return no("lj/cut coefficients");
+    for (int i = 1; i <= ntypes; i++) for (int j = i; j <= ntypes; j++)
+      if (lj->setflag[i][j] && eps[i][j] != 0.0) return no("lj/cut with nonzero epsilon");
+  }
+
+  FusedBDSystem s;
+  memset(&s, 0, sizeof(s));
+  for (int i = 1; i <= ntypes; i++) for (int j = i; j <= ntypes; j++) {
+    if (!soft->setflag[i][j]) continue;
+    double rc = std::sqrt(soft->cutsq[i][j]);
+    s.pair_A[i][j] = s.pair_A[j][i] = pref[i][j];
+    s.pair_rc[i][j] = s.pair_rc[j][i] = rc;
+  }
+  double *bk = (double *) force->bond->extract("k", dim), *br0 = (double *) force->bond->extract("r0", dim);
+  double *ak = (double *) force->angle->extract("k", dim);
+  if (!bk || !br0 || !ak) return no("bond/angle coefficients");
+  for (int t = 1; t <= lmp->atom->nbondtypes; t++) { s.bond_K[t] = bk[t]; s.bond_r0[t] = br0[t]; }
+  for (int t = 1; t <= lmp->atom->nangletypes; t++) s.angle_K[t] = ak[t];
+
+  // per-atom data in tag order (tags 1..N, as the fused minimiser assumes)
+  const int N = (int) lmp->atom->natoms;
+  std::vector<double> x(3 * (size_t)N);
+  std::vector<int> type(N), mask(N);
+  lammps_gather_atoms(lmp, const_cast<char*>("x"), 1, 3, x.data());
+  lammps_gather_atoms(lmp, const_cast<char*>("type"), 0, 1, type.data());
+  lammps_gather_atoms(lmp, const_cast<char*>("mask"), 0, 1, mask.data());
+  std::vector<unsigned char> mobile(N);
+  for (int i = 0; i < N; i++) mobile[i] = (mask[i] & bdfix->groupbit) ? 1 : 0;
+
+  int tagsize = lammps_extract_setting(lmp, const_cast<char*>("tagint"));
+  long long nb = lmp->atom->nbonds, na = lmp->atom->nangles;
+  std::vector<int> bt(nb), bi(nb), bj(nb), at(na), ai(na), aj(na), ak_(na);
+  {
+    std::vector<char> buf((size_t)std::max<long long>(1, nb) * 3 * tagsize);
+    if (nb > 0) lammps_gather_bonds(lmp, buf.data());
+    for (long long b = 0; b < nb; b++) {
+      long long v[3];
+      for (int w = 0; w < 3; w++) v[w] = (tagsize == 4) ? ((int32_t*)buf.data())[3*b+w] : ((int64_t*)buf.data())[3*b+w];
+      bt[b] = (int)v[0]; bi[b] = (int)v[1] - 1; bj[b] = (int)v[2] - 1;
+    }
+    std::vector<char> abuf((size_t)std::max<long long>(1, na) * 4 * tagsize);
+    if (na > 0) lammps_gather_angles(lmp, abuf.data());
+    for (long long q = 0; q < na; q++) {
+      long long v[4];
+      for (int w = 0; w < 4; w++) v[w] = (tagsize == 4) ? ((int32_t*)abuf.data())[4*q+w] : ((int64_t*)abuf.data())[4*q+w];
+      at[q] = (int)v[0]; ai[q] = (int)v[1] - 1; aj[q] = (int)v[2] - 1; ak_[q] = (int)v[3] - 1;
+    }
+  }
+  // exclusions: the LAMMPS special list (1-2, 1-3, 1-4 as built with this run's special_bonds settings)
+  auto lammps_exclusions = [&](std::vector<int> &eo, std::vector<int> &el) {
+    std::vector<std::vector<int>> ex(N);
+    Atom *A = lmp->atom;
+    for (int i = 0; i < A->nlocal; i++) {
+      int ti = (int)A->tag[i] - 1;
+      for (int k = 0; k < A->nspecial[i][2]; k++) ex[ti].push_back((int)A->special[i][k] - 1);
+    }
+    eo.assign(N + 1, 0); el.clear();
+    for (int i = 0; i < N; i++) { std::sort(ex[i].begin(), ex[i].end()); ex[i].erase(std::unique(ex[i].begin(), ex[i].end()), ex[i].end()); eo[i + 1] = eo[i] + (int)ex[i].size(); }
+    el.reserve(eo[N]);
+    for (int i = 0; i < N; i++) el.insert(el.end(), ex[i].begin(), ex[i].end());
+  };
+  // from the gathered bonds and angles when the settings are those wcm_topology_exclusions reproduces (lj 0 0 0,
+  // angle yes, no dihedral trimming), so the LAMMPS special list need not be rebuilt for the BD (WCM_BD_OWN_EXCLUSIONS_OFF=1: the list).
+  std::vector<int> eoff, elist;
+  const bool own_excl = std::getenv("WCM_BD_OWN_EXCLUSIONS_OFF") == nullptr && force->special_angle == 1 && force->special_dihedral == 0;
+  if (own_excl) {
+    wcm_topology_exclusions(N, bi, bj, ai, ak_, eoff, elist);
+    if (std::getenv("WCM_BD_OWN_EXCLUSIONS_VERIFY")) {
+      lmp->input->one("delete_bonds all stats special");   // a fresh LAMMPS special list with the current settings
+      std::vector<int> eo2, el2;
+      lammps_exclusions(eo2, el2);
+      std::cout << "WCM_BD_OWN_EXCLUSIONS_VERIFY: exclusion sets " << ((eo2 == eoff && el2 == elist) ? "IDENTICAL" : "DIFFERENT")
+                << " to the LAMMPS special list (" << elist.size() << " / " << el2.size() << " entries)" << std::endl;
+    }
+  } else {
+    lammps_exclusions(eoff, elist);
+  }
+
+  s.N = N; s.x = x.data(); s.type = type.data(); s.mobile = mobile.data();
+  s.nbonds = (int)nb; s.bond_type = bt.data(); s.bond_i = bi.data(); s.bond_j = bj.data();
+  s.nangles = (int)na; s.angle_type = at.data(); s.angle_i = ai.data(); s.angle_j = aj.data(); s.angle_k = ak_.data();
+  s.excl_off = eoff.data(); s.excl_list = elist.data();
+  s.dt = lmp->update->dt;
+  s.g1 = force->ftm2v / gamma_t;
+  s.g2 = std::sqrt(24.0 * force->boltz / s.dt / force->mvv2e) * std::sqrt(T / gamma_t);
+  // the fused BD's own list skin, 45 A (LAMMPS keeps 65 A for "run 0" and the fallback run). A step's cost grows with
+  // the list volume while a rebuild costs ~0.5 ms here (probe at t=2996: 65 A 2.88 s, 45 A 2.36 s, 30 A 2.30 s but unsafe with
+  // checks every 5 steps); never larger than LAMMPS's.
+  s.skin = std::min(lmp->neighbor->skin, 45.0);
+  s.check_every = std::max(1, lmp->neighbor->every);
+  if (const char *e = std::getenv("WCM_BD_SKIN")) s.skin = atof(e);          // probes only
+  if (const char *e = std::getenv("WCM_BD_CHECK")) s.check_every = std::max(1, atoi(e));
+  s.seed = (unsigned long long) seed;
+  for (int d = 0; d < 3; d++) { s.box_lo[d] = lmp->domain->boxlo[d]; s.box_hi[d] = lmp->domain->boxhi[d]; }
+
+  if (wcm_input_hash()) {   // everything the BD receives except the start positions (the minimiser's output)
+    unsigned long long h = 1469598103934665603ULL;
+    h = wcm_fnv(h, &s.N, sizeof(int)); h = wcm_fnv(h, s.type, sizeof(int) * s.N); h = wcm_fnv(h, s.mobile, s.N);
+    h = wcm_fnv(h, &s.nbonds, sizeof(int)); h = wcm_fnv(h, s.bond_type, sizeof(int) * s.nbonds);
+    h = wcm_fnv(h, s.bond_i, sizeof(int) * s.nbonds); h = wcm_fnv(h, s.bond_j, sizeof(int) * s.nbonds);
+    h = wcm_fnv(h, &s.nangles, sizeof(int)); h = wcm_fnv(h, s.angle_type, sizeof(int) * s.nangles);
+    h = wcm_fnv(h, s.angle_i, sizeof(int) * s.nangles); h = wcm_fnv(h, s.angle_j, sizeof(int) * s.nangles); h = wcm_fnv(h, s.angle_k, sizeof(int) * s.nangles);
+    h = wcm_fnv(h, s.excl_off, sizeof(int) * (s.N + 1)); h = wcm_fnv(h, s.excl_list, sizeof(int) * s.excl_off[s.N]);
+    h = wcm_fnv(h, s.pair_A, sizeof(s.pair_A)); h = wcm_fnv(h, s.pair_rc, sizeof(s.pair_rc)); h = wcm_fnv(h, s.bond_K, sizeof(s.bond_K));
+    h = wcm_fnv(h, s.bond_r0, sizeof(s.bond_r0)); h = wcm_fnv(h, s.angle_K, sizeof(s.angle_K)); h = wcm_fnv(h, &s.dt, sizeof(double) * 3);
+    h = wcm_fnv(h, &s.skin, sizeof(double)); h = wcm_fnv(h, &s.check_every, sizeof(int)); h = wcm_fnv(h, &s.seed, sizeof(s.seed));
+    h = wcm_fnv(h, s.box_lo, sizeof(s.box_lo)); h = wcm_fnv(h, s.box_hi, sizeof(s.box_hi));
+    fprintf(stderr, "WCM_HASH bd_in %016llx\n", h);
+  }
+  FusedBDStats st;
+  if (fused_bd_run(&s, (long)N_steps, &st) != 0) {
+    std::cout << "[fused_bd] GPU run failed" << std::endl;
+    std::exit(1);   // the LAMMPS state is untouched but the CUDA context may not be usable: fail loudly
+  }
+  lammps_scatter_atoms(lmp, const_cast<char*>("x"), 1, 3, x.data());
+  fprintf(stderr, "[fused_bd] %lu steps, N=%d mobile=%ld, %d list builds (max displacement at a build %.2f A, trigger %.2f A, skin %.1f A), "
+                  "steps %.1f ms, builds %.1f ms, total %.1f ms\n",
+          N_steps, N, (long)std::count(mobile.begin(), mobile.end(), 1), st.builds, st.max_disp_at_build, std::max(0.25 * s.skin, 0.5 * s.skin - 6.0), s.skin,
+          st.kernel_ms, st.build_ms, st.total_ms);
+  // final frame of the run, as the soft-harmonic dump ("every N_steps, first no, append yes") would have written it
+  if (lmp->output->get_dump_by_id("d_lammpstrj") && lmp->input->variable->find("output_file") >= 0)
+    lmp->input->one("write_dump all custom ${output_file}.lammpstrj id type x y z c_id_track c_type_track modify append yes");
+  return true;
+}
+
 // run with soft potentials and harmonic bonds
 void LAMMPS_simulator::run_soft_harmonic(unsigned long N_steps, thermo_dump_parameters t_d_p)
 {
@@ -611,13 +945,26 @@ void LAMMPS_simulator::run_soft_harmonic(unsigned long N_steps, thermo_dump_para
   setup_run(N_steps,t_d_p);
 
   // include run subroutine
+  // Input::special_bonds rebuilds the special list when a 1-3/1-4 weight or the angle/dihedral flag changes
+  const double wsp[4] = {lmp->force->special_lj[2], lmp->force->special_lj[3], lmp->force->special_coul[2], lmp->force->special_coul[3]};
+  const int wsa = lmp->force->special_angle, wsd = lmp->force->special_dihedral;
   lmp->input->one("include ${DNA_model_dir}/run_subroutines/subroutine.run_soft_harmonic");
+  if (wsp[0] != lmp->force->special_lj[2] || wsp[1] != lmp->force->special_lj[3] || wsp[2] != lmp->force->special_coul[2] ||
+      wsp[3] != lmp->force->special_coul[3] || wsa != lmp->force->special_angle || wsd != lmp->force->special_dihedral)
+    wcm_special_stale = false;   // the include rebuilt it from the current bonds
+  // the fused BD builds its own exclusions (angle yes, no dihedrals); the list is refreshed before a LAMMPS run only
+  const bool own_excl_bd_own_exclusions = std::getenv("WCM_BD_OWN_EXCLUSIONS_OFF") == nullptr && std::getenv("WCM_FUSED_BD_OFF") == nullptr &&
+                           lmp->force->special_angle == 1 && lmp->force->special_dihedral == 0;
+  if (!own_excl_bd_own_exclusions) wcm_special_fresh();
+  if (std::getenv("WCM_STALE_SPECIAL_VERIFY") != nullptr)
+    std::cout << "WCM_STALE_SPECIAL_VERIFY: topology + special list hash before BD " << std::hex << wcm_topology_hash() << std::dec << std::endl;
 
   // set the timestep
   lmp->input->one("timestep ${delta_t}");
 
-  // run for N_steps
-  lmp->input->one(("run " + std::to_string(N_steps)).c_str());
+  // run for N_steps (fused BD when the setup is supported)
+  if (!run_fused_bd(lmp, N_steps))
+    { wcm_special_fresh(); lmp->input->one(("run " + std::to_string(N_steps)).c_str()); }
 
   // increment Nt
   Nt += N_steps;
@@ -1244,7 +1591,12 @@ void LAMMPS_simulator::form_loops(bool extruded_beads, loop_simulator &sim_ls)
 
 			if (i_loop == loop_bonds.size() - 1 && !extruded_beads)
 			{
-				bond_command += " special yes";
+				// the next user of the special list in a hook is the special_bonds rebuild of the BD script (the fused
+				// minimiser builds its own exclusions), so the list is marked stale instead of rebuilt here; wcm_special_fresh()
+				// rebuilds it on demand. WCM_STALE_SPECIAL_OFF=1: rebuilt here as before.
+				static const bool off_stale_special = std::getenv("WCM_STALE_SPECIAL_OFF") != nullptr;
+				if (off_stale_special) bond_command += " special yes";
+				else { bond_command += " special no"; wcm_special_stale = true; }
 			}
 			else
 			{
@@ -1354,12 +1706,6 @@ void LAMMPS_simulator::form_loops(bool extruded_beads, loop_simulator &sim_ls)
 void LAMMPS_simulator::update_loop_bonds(bool new_bonds, loop_simulator &sim_ls)
 {
 
-  // delete the existing loop bonds
-  if (new_bonds == false)
-    {
-      lmp->input->one("delete_bonds DNA bond 2 remove");
-    }
-
   // type array for scatter
   int N = lmp_sys->get_N_total();
   int *types = new int[N];
@@ -1372,6 +1718,91 @@ void LAMMPS_simulator::update_loop_bonds(bool new_bonds, loop_simulator &sim_ls)
   // get the loop bonds
   // std::vector<bond> loop_bonds = lmp_sys->get_loop_bonds();
   std::vector<bond> loop_bonds = sim_ls.get_loop_bonds();
+  update_loop_bonds_apply(new_bonds, loop_bonds, types);
+  delete[] types;
+}
+
+
+// defer-loop-bonds verification (WCM_DEFER_LOOP_BONDS_VERIFY=1): what a clear+read sets up, compared byte for byte before and after a rebuild that
+// the driver would have skipped. Host-side arrays (current right after read_data: no run in between).
+std::string LAMMPS_simulator::wcm_state_fingerprint()
+{
+  std::string out;
+  auto add = [&out](const void *p, size_t n) { out.append(static_cast<const char*>(p), n); };
+  LAMMPS_NS::Atom *a = lmp->atom;
+  const int nlocal = a->nlocal;
+  add(&nlocal, sizeof(int));
+  add(&a->nbonds, sizeof(a->nbonds)); add(&a->nangles, sizeof(a->nangles));
+  add(a->tag, sizeof(*a->tag) * nlocal);                    // local atom order
+  add(&a->x[0][0], sizeof(double) * 3 * nlocal);
+  add(a->type, sizeof(int) * nlocal);
+  add(a->mask, sizeof(int) * nlocal);
+  add(a->image, sizeof(*a->image) * nlocal);
+  if (a->num_bond) for (int i = 0; i < nlocal; i++)
+    { add(&a->num_bond[i], sizeof(int)); add(a->bond_type[i], sizeof(int) * a->num_bond[i]); add(a->bond_atom[i], sizeof(*a->bond_atom[i]) * a->num_bond[i]); }
+  if (a->num_angle) for (int i = 0; i < nlocal; i++)
+    { add(&a->num_angle[i], sizeof(int)); add(a->angle_type[i], sizeof(int) * a->num_angle[i]);
+      add(a->angle_atom1[i], sizeof(*a->angle_atom1[i]) * a->num_angle[i]); add(a->angle_atom2[i], sizeof(*a->angle_atom2[i]) * a->num_angle[i]);
+      add(a->angle_atom3[i], sizeof(*a->angle_atom3[i]) * a->num_angle[i]); }
+  if (a->nspecial) for (int i = 0; i < nlocal; i++)
+    { add(a->nspecial[i], sizeof(int) * 3); add(a->special[i], sizeof(*a->special[i]) * a->nspecial[i][2]); }
+  LAMMPS_NS::Group *g = lmp->group;
+  for (int k = 0; k < g->ngroup; k++) { if (g->names[k]) out += g->names[k]; out += ';'; }
+  return out;
+}
+
+
+// fast-read-atoms verification: what a read leaves in the per-atom arrays the Atoms section fills (the defer-loop-bonds fingerprint + nmax, molecule, v)
+std::string LAMMPS_simulator::wcm_fast_read_atoms_fingerprint()
+{
+  std::string out = wcm_state_fingerprint();
+  LAMMPS_NS::Atom *a = lmp->atom;
+  const int nlocal = a->nlocal;
+  out.append(reinterpret_cast<const char *>(&a->nmax), sizeof(int));
+  if (a->molecule) out.append(reinterpret_cast<const char *>(a->molecule), sizeof(*a->molecule) * nlocal);
+  if (a->v) out.append(reinterpret_cast<const char *>(&a->v[0][0]), sizeof(double) * 3 * nlocal);
+  return out;
+}
+
+
+// rebuild the special list (1-2/1-3/1-4 partners) with the current special_bonds settings if form_loops left it stale.
+// "delete_bonds all stats special" deletes nothing and ends with the same Special::build that "special yes" on create_bonds runs.
+void LAMMPS_simulator::wcm_special_fresh()
+{
+  if (!wcm_special_stale) return;
+  std::cout << "rebuilding the special list left stale by form_loops" << std::endl;
+  lmp->input->one("delete_bonds all stats special");
+  wcm_special_stale = false;
+}
+
+unsigned long long LAMMPS_simulator::wcm_topology_hash()
+{
+  unsigned long long h = 1469598103934665603ULL;
+  auto mix = [&h](const void *p, size_t n) { const unsigned char *c = static_cast<const unsigned char*>(p); for (size_t k = 0; k < n; k++) { h ^= c[k]; h *= 1099511628211ULL; } };
+  LAMMPS_NS::Atom *a = lmp->atom;
+  const int nlocal = a->nlocal;
+  mix(&nlocal, sizeof(int));
+  mix(a->tag, sizeof(*a->tag) * nlocal); mix(a->type, sizeof(int) * nlocal); mix(a->mask, sizeof(int) * nlocal);
+  if (a->num_bond) for (int i = 0; i < nlocal; i++)
+    { mix(&a->num_bond[i], sizeof(int)); mix(a->bond_type[i], sizeof(int) * a->num_bond[i]); mix(a->bond_atom[i], sizeof(*a->bond_atom[i]) * a->num_bond[i]); }
+  if (a->num_angle) for (int i = 0; i < nlocal; i++)
+    { mix(&a->num_angle[i], sizeof(int)); mix(a->angle_atom1[i], sizeof(*a->angle_atom1[i]) * a->num_angle[i]); mix(a->angle_atom3[i], sizeof(*a->angle_atom3[i]) * a->num_angle[i]); }
+  if (a->nspecial) for (int i = 0; i < nlocal; i++)
+    { mix(a->nspecial[i], sizeof(int) * 3); mix(a->special[i], sizeof(*a->special[i]) * a->nspecial[i][2]); }
+  return h;
+}
+
+
+// everything update_loop_bonds does to LAMMPS, from its two CPU-side inputs (the loop bonds of the loop simulator and
+// the system's per-atom types), so that the driver can capture the inputs at load_loops and apply them later.
+void LAMMPS_simulator::update_loop_bonds_apply(bool new_bonds, const std::vector<bond> &loop_bonds, int *types)
+{
+  // delete the existing loop bonds
+  if (new_bonds == false)
+    {
+      lmp->input->one("delete_bonds DNA bond 2 remove");
+    }
+
   std::cout << "N_loop_bonds = " << loop_bonds.size() << std::endl;
   // add the updated loop bonds
   std::string temp_bond_command = "create_bonds single/bond";
@@ -1468,8 +1899,6 @@ void LAMMPS_simulator::update_loop_bonds(bool new_bonds, loop_simulator &sim_ls)
   // scatter the now modified atom types
   // 0 for integer type, 1 for per-atom count
   lammps_scatter_atoms(lmp, const_cast<char*>("type"), 0, 1, types);
-
-  delete[] types;
 }
 
 

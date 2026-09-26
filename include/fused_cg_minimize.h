@@ -192,3 +192,8 @@ int fused_read_lammps_data(
 
 void fused_free_system(FusedMinSystem *sys);
 void fused_free_neighlist(FusedNeighList *nlist);
+
+// create the CUDA primary context of device 0 (the device Kokkos "-k on g 1" and the fused minimiser use) on a helper
+// thread at program start, overlapping the ~0.7 s of CPU-only input handling before prepare_simulator; join before exit.
+void fused_prewarm_cuda_context_async();
+void fused_prewarm_join();

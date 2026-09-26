@@ -119,6 +119,15 @@ public:
   void delete_loops(bool extruded_beads, loop_simulator &sim_ls);
   void form_loops(bool extruded_beads, loop_simulator &sim_ls);
   void update_loop_bonds(bool new_bonds, loop_simulator &sim_ls);
+  // the LAMMPS part of update_loop_bonds, for a loop-bond list and per-atom types captured earlier
+  void update_loop_bonds_apply(bool new_bonds, const std::vector<bond> &loop_bonds, int *types);
+  // defer-loop-bonds verification: atoms (tag order, x, type, mask, image), bonds, angles, special lists and groups as one byte string
+  std::string wcm_state_fingerprint();
+  std::string wcm_fast_read_atoms_fingerprint();   // WCM_FAST_READ_ATOMS_VERIFY: wcm_state_fingerprint + nmax, molecule, v
+  // the special list is left stale by form_loops and rebuilt only before something that uses it
+  bool wcm_special_stale = false;
+  void wcm_special_fresh();
+  unsigned long long wcm_topology_hash();   // WCM_STALE_SPECIAL_VERIFY: tag order, type, mask, bonds, angles, special lists (no coordinates)
   void run_loops(int N_loops, double threshold, unsigned long N_steps, thermo_dump_parameters t_d_p, btree &sim_bt, mapper &sim_mapper, loop_simulator &sim_ls);
 
   // switch an extra potential on or off
